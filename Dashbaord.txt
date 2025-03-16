@@ -1,0 +1,27 @@
+ {/*
+         
+        
+        <Card>
+          {/* Search and Filters 
+           <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Overdue Invoices</CardTitle>
+            <Badge variant="destructive" className="text-xs">
+              {stats.overdueInvoices}
+            </Badge>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">${(stats.totalAmount - stats.paidAmount).toFixed(2)}</div>
+            <p className="text-xs text-gray-500">Outstanding amount</p>
+          </CardContent>
+          
+          
+          */}
+
+         
+
+
+
+
+        </Card>
+
+        */}

@@ -11,14 +11,4 @@
       "src": "/(.*)",
       "dest": "/index.js"
     }
-  ],
-  "includeFiles": [
-    "config/**",
-    "node_modules/**",
-    ".env",
-    "index.js",
-    "package.json",
-    "package-lock.json"
-  ],
-  "excludeFiles": ["client/**"]
 }

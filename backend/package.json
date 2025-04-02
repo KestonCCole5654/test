@@ -17,6 +17,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@clerk/clerk-sdk-node": "^4.13.23",
+    "@cloudflare/workers-types": "^4.20250327.0",
+    "@supabase/supabase-js": "^2.49.4",
     "axios": "^1.8.1",
     "body-parser": "^1.20.3",
     "cookie-parser": "^1.4.7",
@@ -27,7 +30,8 @@
     "google-auth-library": "^8.9.0",
     "googleapis": "^118.0.0",
     "jsonwebtoken": "^9.0.2",
-    "punycode": "^2.3.1"
+    "punycode": "^2.3.1",
+    "wrangler": "^4.6.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"

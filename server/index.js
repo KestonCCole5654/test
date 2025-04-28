@@ -1748,3 +1748,7 @@ app.post("/api/contact", async (req, res) => {
     res.status(500).json({ error: "Failed to send email" })
   }
 })
+
+app.get('/', (req, res) => {
+  res.send('SheetBills API is running! Visit /health for status.');
+});

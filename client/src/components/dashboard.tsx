@@ -179,7 +179,7 @@ export default function Dashboard() {
           throw new Error(error?.message || "Session validation failed")
         }
 
-        const response = await fetch("http://localhost:5000/api/sheets/spreadsheets", {
+        const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/spreadsheets", {
           signal: abortController.signal,
           headers: { Authorization: `Bearer ${session.provider_token}` },
         })
@@ -290,7 +290,7 @@ export default function Dashboard() {
         return
       }
 
-      const response = await fetch(`http://localhost:5000/api/sheets/data?sheetUrl=${encodeURIComponent(sheetUrl)}`, {
+      const response = await fetch(`https://sheetbills-server.vercel.app/api/sheets/data?sheetUrl=${encodeURIComponent(sheetUrl)}`, {
         headers: {
           Authorization: `Bearer ${googleToken}`,
           "X-Supabase-Token": supabaseToken,
@@ -808,7 +808,7 @@ export default function Dashboard() {
                                   throw new Error(sessionError.message)
                                 }
 
-                                const response = await fetch("http://localhost:5000/api/sheets/mark-as-paid", {
+                                const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/mark-as-paid", {
                                   method: "PUT",
                                   headers: {
                                     "Content-Type": "application/json",
@@ -863,7 +863,7 @@ export default function Dashboard() {
                                   throw new Error(sessionError.message)
                                 }
 
-                                const response = await fetch("http://localhost:5000/api/sheets/mark-as-pending", {
+                                const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/mark-as-pending", {
                                   method: "PUT",
                                   headers: {
                                     "Content-Type": "application/json",
@@ -915,7 +915,7 @@ export default function Dashboard() {
                                 throw new Error(sessionError.message)
                               }
 
-                              const response = await fetch("http://localhost:5000/api/sheets/delete-invoice", {
+                              const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/delete-invoice", {
                                 method: "DELETE",
                                 headers: {
                                   "Content-Type": "application/json",

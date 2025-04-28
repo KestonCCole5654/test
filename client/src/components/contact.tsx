@@ -38,7 +38,7 @@ export default function ContactPage() {
       setIsSubmitting(true)
 
       // Send email using your backend API
-      const response = await fetch("http://localhost:5000/api/contact", {
+      const response = await fetch("https://sheetbills-server.vercel.app/api/contact", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

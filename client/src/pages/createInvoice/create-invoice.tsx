@@ -203,7 +203,7 @@ export default function InvoiceForm() {
       }
 
       // Get the SheetBills Invoices sheet URL
-      const response = await axios.get("http://localhost:5000/api/sheets/spreadsheets", {
+      const response = await axios.get("https://sheetbills-server.vercel.app/api/sheets/spreadsheets", {
         headers: {
           Authorization: `Bearer ${session.provider_token}`,
           "X-Supabase-Token": session.access_token,
@@ -226,7 +226,7 @@ export default function InvoiceForm() {
 
       // Prepare the update request
       const updateResponse = await axios.post(
-        "http://localhost:5000/api/update-invoice",
+        "https://sheetbills-server.vercel.app/api/update-invoice",
         {
           accessToken: session.provider_token,
           invoiceData: {
@@ -280,7 +280,7 @@ export default function InvoiceForm() {
       }
 
       // Get the SheetBills Invoices sheet URL
-      const response = await axios.get("http://localhost:5000/api/sheets/spreadsheets", {
+      const response = await axios.get("https://sheetbills-server.vercel.app/api/sheets/spreadsheets", {
         headers: {
           Authorization: `Bearer ${session.provider_token}`,
           "X-Supabase-Token": session.access_token,
@@ -300,7 +300,7 @@ export default function InvoiceForm() {
 
       // Prepare the save request
       const saveResponse = await axios.post(
-        "http://localhost:5000/api/saveInvoice",
+        "https://sheetbills-server.vercel.app/api/saveInvoice",
         {
           accessToken: session.provider_token,
           invoiceData: {
@@ -683,7 +683,7 @@ export default function InvoiceForm() {
         throw new Error("Google authentication required")
       }
 
-      const response = await axios.get("http://localhost:5000/api/business-details", {
+      const response = await axios.get("https://sheetbills-server.vercel.app/api/business-details", {
         headers: {
           Authorization: `Bearer ${session.provider_token}`, // Google access token
           "X-Supabase-Token": session.access_token, // Supabase session token

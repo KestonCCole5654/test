@@ -109,7 +109,7 @@ export default function InitializePage() {
 
     try {
       // Call the API with all required data
-      const response = await fetch('http://localhost:5000/api/create-business-sheet', {
+      const response = await fetch('https://sheetbills-server.vercel.app/api/create-business-sheet', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

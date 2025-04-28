@@ -70,7 +70,7 @@ export default function SettingsPage() {
       };
 
       // Fetch user data
-      const userResponse = await axios.get("http://localhost:5000/api/user", { headers });
+      const userResponse = await axios.get("https://sheetbills-server.vercel.app/api/user", { headers });
       if (userResponse.data.user) {
         setUserData({
           name: userResponse.data.user.name,
@@ -84,7 +84,7 @@ export default function SettingsPage() {
       }
 
       // Fetch business details
-      const businessResponse = await axios.get("http://localhost:5000/api/business-details", { headers });
+      const businessResponse = await axios.get("https://sheetbills-server.vercel.app/api/business-details", { headers });
       if (businessResponse.data.businessDetails) {
         setBusinessData({
           companyName: businessResponse.data.businessDetails["Company Name"] || "",
@@ -152,7 +152,7 @@ export default function SettingsPage() {
       }
 
       const response = await axios.put(
-        "http://localhost:5000/api/update-business-details", // Correct endpoint
+        "https://sheetbills-server.vercel.app/api/update-business-details", // Correct endpoint
         {
           companyName: businessData.companyName,
           email: businessData.email,

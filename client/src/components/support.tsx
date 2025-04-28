@@ -53,7 +53,7 @@ export default function InvoiceTemplatePage() {
   const fetchTemplates = async () => {
     try {
       setIsLoading(true)
-      const response = await axios.get("http://localhost:5000/api/invoice-templates")
+      const response = await axios.get("https://sheetbills-server.vercel.app/api/invoice-templates")
       setTemplates(response.data.templates || [])
     } catch (error) {
       console.error("Error fetching templates:", error)
@@ -129,7 +129,7 @@ export default function InvoiceTemplatePage() {
       formData.append("description", newTemplate.description)
       formData.append("makeDefault", newTemplate.makeDefault.toString())
 
-      const response = await axios.post("http://localhost:5000/api/upload-invoice-template", formData, {
+      const response = await axios.post("https://sheetbills-server.vercel.app/api/upload-invoice-template", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -171,7 +171,7 @@ export default function InvoiceTemplatePage() {
     try {
       setIsSaving(true)
 
-      await axios.post("http://localhost:5000/api/set-default-template", {
+      await axios.post("https://sheetbills-server.vercel.app/api/set-default-template", {
         templateId,
       })
 
@@ -203,7 +203,7 @@ export default function InvoiceTemplatePage() {
     try {
       setIsSaving(true)
 
-      await axios.delete(`http://localhost:5000/api/invoice-templates/${templateId}`)
+      await axios.delete(`https://sheetbills-server.vercel.app/api/invoice-templates/${templateId}`)
 
       // Update local state
       setTemplates((prev) => prev.filter((template) => template.id !== templateId))

@@ -47,7 +47,7 @@ export default function BusinessSetup() {
       setSuccess("")
 
       // Call the API to create business sheet and update master
-      const response = await fetch("http://localhost:5000/api/check-business-sheet", {
+      const response = await fetch("https://sheetbills-server.vercel.app/api/check-business-sheet", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -71,7 +71,7 @@ export default function GoogleSheetsTable() {
         throw new Error("Missing Google authentication credentials")
       }
 
-      const response = await fetch("http://localhost:5000/api/sheets", {
+      const response = await fetch("https://sheetbills-server.vercel.app/api/sheets", {
         headers: {
           Authorization: `Bearer ${sessionData.session.provider_token}`,
           "X-Supabase-Token": sessionData.session.access_token,
@@ -144,7 +144,7 @@ export default function GoogleSheetsTable() {
 
       // Create sheet with basic parameters
       const response = await axios.post(
-        "http://localhost:5000/api/create-sheet",
+        "https://sheetbills-server.vercel.app/api/create-sheet",
         {
           name: sheetName,
           description,
@@ -190,7 +190,7 @@ export default function GoogleSheetsTable() {
 
       const session = sessionData.session
 
-      const response = await fetch(`http://localhost:5000/api/sheets/${encodeURIComponent(sheetUrl)}`, {
+      const response = await fetch(`https://sheetbills-server.vercel.app/api/sheets/${encodeURIComponent(sheetUrl)}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${session.provider_token}`,
@@ -250,7 +250,7 @@ export default function GoogleSheetsTable() {
 
       // Set the default sheet
       const response = await axios.put(
-        "http://localhost:5000/api/sheets/set-default",
+        "https://sheetbills-server.vercel.app/api/sheets/set-default",
         {
           sheetUrl,
           sheetType: "invoice", // Explicitly set type to ensure it's an invoice sheet

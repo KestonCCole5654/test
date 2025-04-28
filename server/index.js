@@ -12,7 +12,7 @@ const app = express(); // Create an Express app
 const drive = google.drive('v3'); // Initialize Drive API
 // This is used to rap the backend server to the frontend server using (Cross Origin Resource Sharing)
 app.use(cors({
-  origin: 'http://localhost:3000', // Allow requests from this origin
+  origin: 'https://sheetbills-client.vercel.app/', // Allow requests from this origin
   credentials: true, // Allow cookies and credentials
 }));
 app.use(express.json()); // Enable JSON body parsing

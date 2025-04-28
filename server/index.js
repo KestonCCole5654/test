@@ -1485,6 +1485,10 @@ app.post('/api/check-business-sheet', async (req, res) => {
 app.get('/api/test', (req, res) => {
   res.json({ message: 'Backend is working!' });
 });
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', message: 'Backend is running!' });
+});
 // Used to sepcify the port number
 const PORT = process.env.PORT || 5000;
 // Start the server

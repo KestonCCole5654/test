@@ -1,32 +1,23 @@
 // src/components/AuthenticatedRoute.tsx
-import { Navigate } from "react-router-dom";
-import { LoadingSpinner } from "../loadingSpinner";
+import { User } from '@supabase/supabase-js';
+import { Navigate, Outlet } from 'react-router-dom';
 
-interface Props {
-  authenticated: boolean;
+interface AuthenticatedRouteProps {
+  user: User | null;
   isLoading?: boolean;
-  children: React.ReactNode;
+  redirectPath?: string;
 }
 
-export default function AuthenticatedRoute({
-  authenticated,
+const AuthenticatedRoute = ({ 
+  user,
   isLoading = false,
-  children,
-}: Props) {
+  redirectPath = '/login'
+}: AuthenticatedRouteProps) => {
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <LoadingSpinner />
-          <p className="mt-4 text-slate-600">Verifying authentication...</p>
-        </div>
-      </div>
-    );
+    return <div>Loading authentication state...</div>;
   }
 
-  if (!authenticated) {
-    return <Navigate to="/login" />;
-  }
+  return user ? <Outlet /> : <Navigate to={redirectPath} replace />;
+};
 
-  return <>{children}</>;
-}
+export default AuthenticatedRoute;

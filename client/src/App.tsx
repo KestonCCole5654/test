@@ -23,7 +23,6 @@ import InvoiceTemplatePage from './components/support';
 import InitializePage from './pages/initialize/InitializationPage';
 import TemplateGenerator from "./components/template-generator"
 import ContactPage from './components/contact';
-import { LoadingSpinner } from "./components/loadingSpinner";
 
 
 const AuthenticatedLayout = () => (
@@ -121,43 +120,27 @@ function App() {
     };
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <LoadingSpinner />
-          <p className="mt-4 text-slate-600">Loading application...</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <div>Loading...</div>;
 
   return (
     <HelmetProvider>
       <InvoiceProvider>
         <Routes>
-          {/* Public Routes */}
-          <Route path="/login" element={<Login />} />
-          
-          {/* Protected Routes */}
-          <Route
-            element={
-              <AuthenticatedRoute authenticated={!!user} isLoading={loading}>
-                <AuthenticatedLayout />
-              </AuthenticatedRoute>
-            }
-          >
-            <Route path="/" element={<Navigate to="/invoices" replace />} />
-            <Route path="/invoices" element={<Dashboard />} />
-            <Route path="/create-invoice" element={<InvoiceForm />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/invoiceTemplates" element={<InvoiceTemplatePage />} />
-            <Route path="/businessSetup" element={<InitializePage />} />
-            <Route path="/template-generator" element={<TemplateGenerator />} />
-            <Route path="/contact" element={<ContactPage />} />
+          <Route element={<UnauthenticatedRoute user={user} />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<LandingPage />} />
           </Route>
-
-          {/* Catch all route */}
+          <Route element={<AuthenticatedRoute user={user} />}>
+            <Route element={<AuthenticatedLayout />}>
+              <Route path="/invoices" element={<Dashboard />} />
+              <Route path="/create-invoice" element={<InvoiceForm />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/invoiceTemplates" element={<InvoiceTemplatePage />} />
+              <Route path="/businessSetup" element={<InitializePage />} />
+              <Route path="/template-generator" element={<TemplateGenerator />} />
+              <Route path="/contact" element={<ContactPage />} />
+            </Route>
+          </Route>
           <Route path="*" element={
             <Navigate to={user ? "/invoices" : "/login"} replace />
           } />

@@ -1158,8 +1158,6 @@ app.put('/api/update-business-details', async (req, res) => {
     });
   }
 });
-
-
 app.post('/api/create-business-sheet', async (req, res) => {
   console.log('[CREATE] Initiating business sheet creation request');
   
@@ -1316,9 +1314,6 @@ app.post('/api/create-business-sheet', async (req, res) => {
     });
   }
 });
-
-
-
 
 ////////////////////////////////////////////////////////////////////
 {/*Method to Hanlde Getting User Data Logic*/}

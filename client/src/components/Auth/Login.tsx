@@ -7,6 +7,7 @@ import { Button } from "../../components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
 import { Separator } from "../../components/ui/separator"
 import { Loader2, Shield, Zap, BarChart3, Users, CheckCircle2, Mail, ArrowRight, Lock, Globe } from "lucide-react"
+import Header from "../../components/header"
 
 export default function Login() {
   const [error, setError] = useState("")
@@ -147,8 +148,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex flex-col">
-      
-
+      <Header />
       <div className="flex-1">
         <div className="container max-w-7xl mx-auto px-4 py-16 md:py-24">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -213,8 +213,8 @@ export default function Login() {
                   <p className="text-slate-600">Bank-grade encryption and compliance with industry standards</p>
                 </div>
               </div>
-
-              <div className="bg-gradient-to-r from-emerald-50 to-white border border-emerald-100 rounded-xl p-8 shadow-sm">
+                {/* Right Column - Login Card 
+                 <div className="bg-gradient-to-r from-emerald-50 to-white border border-emerald-100 rounded-xl p-8 shadow-sm">
                 <div className="flex items-start gap-5">
                   <div className="bg-white p-2 rounded-full shadow-sm">
                     <CheckCircle2 className="h-8 w-8 text-" />
@@ -240,6 +240,9 @@ export default function Login() {
                   </div>
                 </div>
               </div>
+                
+                */}
+             
             </div>
 
             {/* Right Column - Login Card */}
@@ -332,8 +335,6 @@ export default function Login() {
           </div>
         </div>
       </div>
-
-    
     </div>
   )
 }

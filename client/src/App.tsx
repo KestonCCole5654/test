@@ -136,25 +136,28 @@ function App() {
     <HelmetProvider>
       <InvoiceProvider>
         <Routes>
-          <Route element={<UnauthenticatedRoute user={user} />}>
-            <Route path="/login" element={<Login />} />
-            <Route
-              path="/"
-              element={
-                <AuthenticatedRoute authenticated={!!user} isLoading={loading}>
-                  <Outlet />
-                </AuthenticatedRoute>
-              }
-            >
-              <Route path="/invoices" element={<Dashboard />} />
-              <Route path="/create-invoice" element={<InvoiceForm />} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/invoiceTemplates" element={<InvoiceTemplatePage />} />
-              <Route path="/businessSetup" element={<InitializePage />} />
-              <Route path="/template-generator" element={<TemplateGenerator />} />
-              <Route path="/contact" element={<ContactPage />} />
-            </Route>
+          {/* Public Routes */}
+          <Route path="/login" element={<Login />} />
+          
+          {/* Protected Routes */}
+          <Route
+            element={
+              <AuthenticatedRoute authenticated={!!user} isLoading={loading}>
+                <AuthenticatedLayout />
+              </AuthenticatedRoute>
+            }
+          >
+            <Route path="/" element={<Navigate to="/invoices" replace />} />
+            <Route path="/invoices" element={<Dashboard />} />
+            <Route path="/create-invoice" element={<InvoiceForm />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/invoiceTemplates" element={<InvoiceTemplatePage />} />
+            <Route path="/businessSetup" element={<InitializePage />} />
+            <Route path="/template-generator" element={<TemplateGenerator />} />
+            <Route path="/contact" element={<ContactPage />} />
           </Route>
+
+          {/* Catch all route */}
           <Route path="*" element={
             <Navigate to={user ? "/invoices" : "/login"} replace />
           } />

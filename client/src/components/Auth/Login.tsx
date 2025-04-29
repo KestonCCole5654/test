@@ -69,9 +69,9 @@ export default function Login() {
         const { hasBusinessSheet } = await response.json()
 
         if (hasBusinessSheet) {
-          navigate("/invoices", { replace: true })
+          window.location.href = "/invoices"
         } else {
-          navigate("/business-setup", { replace: true, state: { session } })
+          window.location.href = "/businessSetup"
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Check failed")

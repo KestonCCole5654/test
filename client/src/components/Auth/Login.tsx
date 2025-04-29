@@ -8,11 +8,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { Separator } from "../../components/ui/separator"
 import { Loader2, Shield, Zap, BarChart3, Users, CheckCircle2, Mail, ArrowRight, Lock, Globe } from "lucide-react"
 import Header from "../../components/header"
+import { LoadingSpinner } from "../../components/loadingSpinner"
 
 export default function Login() {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Handle auth state changes with improved session management
   useEffect(() => {
@@ -146,6 +152,18 @@ export default function Login() {
     checkExistingSession()
   }, [checkBusinessSheet])
 
+  // If initial loading
+  if (!mounted || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <LoadingSpinner />
+          {loading && <p className="mt-4 text-slate-600">Connecting to Google...</p>}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex flex-col">
       <Header />
@@ -273,10 +291,10 @@ export default function Login() {
                       className="w-full h-12 bg-white text-slate-800 hover:bg-slate-50 border border-slate-200 shadow-sm transition-all duration-200 hover:shadow-md rounded-lg"
                     >
                       {loading ? (
-                        <>
-                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                          Signing in...
-                        </>
+                        <div className="flex items-center justify-center gap-3">
+                          <LoadingSpinner />
+                          <span>Connecting to Google...</span>
+                        </div>
                       ) : (
                         <>
                           <svg className="mr-3 h-5 w-5" viewBox="0 0 24 24">

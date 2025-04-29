@@ -10,10 +10,16 @@ import { createClient } from '@supabase/supabase-js';
 dotenv.config(); // Load environment variables
 const app = express(); // Create an Express app
 const drive = google.drive('v3'); // Initialize Drive API
-// This is used to rap the backend server to the frontend server using (Cross Origin Resource Sharing)
+// CORS configuration for Vercel deployment
 app.use(cors({
-  origin: 'https://sheetbills-client.vercel.app/', // Allow requests from this origin
-  credentials: true, // Allow cookies and credentials
+  origin: [
+    'https://sheetbills-client.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5000'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
+  optionsSuccessStatus: 200
 }));
 app.use(express.json()); // Enable JSON body parsing
 
@@ -1489,10 +1495,15 @@ app.get('/api/test', (req, res) => {
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Backend is running!' });
 });
-// Used to sepcify the port number
+// Used to specify the port number
 const PORT = process.env.PORT || 5000;
+
 // Start the server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', (err) => {
+  if (err) {
+    console.error('Error starting server:', err);
+    return;
+  }
   console.log(`Server running on port ${PORT}`);
 });
 

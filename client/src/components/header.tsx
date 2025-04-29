@@ -90,35 +90,36 @@ const Header: React.FC = () => {
             </Link>
           </div>
 
-          {/* Desktop Navigation 
-           
-          */}
+          {/* Desktop Navigation */}
            <nav className="hidden md:flex items-center space-x-1">
-            <Link
-              to="/dashboard"
-              className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-            >
-              Dashboard
-            </Link>
-            <Link
-              to="/template-generator"
-              className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-            >
-              Invoices Template Generator
-            </Link>
-            <Link
-              to="/settings"
-              className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-            >
-              Account & Settings
-            </Link>
-            <Link
-              to="/contact"
-              className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-            >
-              Contact & Support
-            </Link>
-          
+            {user && (
+              <>
+                <Link
+                  to="/dashboard"
+                  className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/template-generator"
+                  className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                >
+                  Invoices Template Generator
+                </Link>
+                <Link
+                  to="/settings"
+                  className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                >
+                  Account & Settings
+                </Link>
+                <Link
+                  to="/contact"
+                  className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                >
+                  Contact & Support
+                </Link>
+              </>
+            )}
           </nav>
         
 
@@ -201,43 +202,38 @@ const Header: React.FC = () => {
           className="absolute top-16 inset-x-0 bg-white border-b border-green-700 shadow-lg z-50 md:hidden"
         >
           <div className="container max-w-7xl mx-auto px-4 sm:px-6 py-3">
-
-            {/* Mobile Navigation Menu 
-             <nav className="flex flex-col space-y-1">
-              <Link
-                to="/dashboard"
-                className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-                onClick={handleNavigation}
-              >
-                Dashboard
-              </Link>
-              <Link
-                to="/invoices"
-                className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-                onClick={handleNavigation}
-              >
-                Invoices
-              </Link>
-              <Link
-                to="/clients"
-                className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-                onClick={handleNavigation}
-              >
-                Clients
-              </Link>
-              <Link
-                to="/settings"
-                className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-                onClick={handleNavigation}
-              >
-                Settings
-              </Link>
-            </nav>
-            
-            
-            
-            */}
-           
+            {user && (
+              <nav className="flex flex-col space-y-1">
+                <Link
+                  to="/dashboard"
+                  className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  onClick={handleNavigation}
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/template-generator"
+                  className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  onClick={handleNavigation}
+                >
+                  Invoices Template Generator
+                </Link>
+                <Link
+                  to="/settings"
+                  className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  onClick={handleNavigation}
+                >
+                  Settings
+                </Link>
+                <Link
+                  to="/contact"
+                  className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  onClick={handleNavigation}
+                >
+                  Contact & Support
+                </Link>
+              </nav>
+            )}
 
             {user ? (
               <div className="mt-4 pt-4 border-t border-green-200">

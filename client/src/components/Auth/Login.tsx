@@ -214,7 +214,7 @@ export default function Login() {
                 </div>
               </div>
 
-              
+
                 {/* Right Column - Login Card 
                  <div className="bg-gradient-to-r from-emerald-50 to-white border border-emerald-100 rounded-xl p-8 shadow-sm">
                 <div className="flex items-start gap-5">
@@ -317,7 +317,6 @@ export default function Login() {
                       </a>
                     </p>
 
-                
                   </div>
 
                   <div className="flex items-center justify-center gap-2 pt-4">
@@ -326,10 +325,7 @@ export default function Login() {
                       <span>Secure Login</span>
                     </div>
                     <div className="w-1 h-1 rounded-full bg-slate-300"></div>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <Globe className="h-3 w-3" />
-                      <span>GDPR Compliant</span>
-                    </div>
+                    
                   </div>
                 </CardContent>
               </Card>

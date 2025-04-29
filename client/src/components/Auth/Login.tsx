@@ -213,6 +213,8 @@ export default function Login() {
                   <p className="text-slate-600">Bank-grade encryption and compliance with industry standards</p>
                 </div>
               </div>
+
+              
                 {/* Right Column - Login Card 
                  <div className="bg-gradient-to-r from-emerald-50 to-white border border-emerald-100 rounded-xl p-8 shadow-sm">
                 <div className="flex items-start gap-5">

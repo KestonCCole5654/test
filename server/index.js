@@ -37,8 +37,6 @@ function createAuthClient(accessToken) {
   return auth;
 }
 
-
-
 ////////////////////////////////////////////////////////////////////
 {/*Helper Methods*/}
 ////////////////////////////////////////////////////////////////////
@@ -58,9 +56,6 @@ function extractSheetIdFromUrl(url) {
     return null;
   }
 }
-
-
-
 async function getOrCreateMasterSheet(accessToken, userId) {
   // Initialize authentication with API key
   const auth = new google.auth.OAuth2({

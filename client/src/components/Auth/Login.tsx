@@ -24,23 +24,19 @@ export default function Login() {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN" && session) {
-        // Store tokens with better error handling
         try {
           sessionStorage.setItem("supabase_token", session.access_token)
           if (session.provider_token) {
             sessionStorage.setItem("google_access_token", session.provider_token)
           }
-          // Check for business sheet after successful login
           await checkBusinessSheet(session)
         } catch (err) {
           console.error("Error storing session:", err)
           setError("Failed to store session data")
         }
       } else if (event === "TOKEN_REFRESHED") {
-        // Handle token refresh
         console.log("Token refreshed successfully")
       } else if (event === "SIGNED_OUT") {
-        // Clear all storage on sign out
         sessionStorage.clear()
         localStorage.clear()
       }
@@ -73,9 +69,9 @@ export default function Login() {
         const { hasBusinessSheet } = await response.json()
 
         if (hasBusinessSheet) {
-          navigate("/dashboard")
+          navigate("/invoices", { replace: true })
         } else {
-          navigate("/business-setup", { state: { session } })
+          navigate("/business-setup", { replace: true, state: { session } })
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Check failed")
@@ -96,7 +92,7 @@ export default function Login() {
         provider: "google",
         options: {
           scopes: ["https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/spreadsheets"].join(" "),
-          redirectTo: window.location.origin + "/auth/callback",
+          redirectTo: window.location.origin,
           queryParams: {
             access_type: "offline",
             include_granted_scopes: "true",
@@ -112,8 +108,6 @@ export default function Login() {
       await supabase.auth.signOut()
       sessionStorage.clear()
       localStorage.clear()
-    } finally {
-      setLoading(false)
     }
   }, [])
 

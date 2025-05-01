@@ -2,20 +2,7 @@
 
 import type React from "react"
 import { useEffect, useState } from "react"
-import {
-  Trash2,
-  Edit,
-  MoreVertical,
-  Plus,
-  RefreshCw,
-  ArrowUpDown,
-  CheckCircle,
-  Clock,
-  BarChart3,
-  DollarSign,
-  FileText,
-  Layout,
-} from "lucide-react"
+import { Trash2, Edit, MoreVertical, Plus, RefreshCw, ArrowUpDown, CheckCircle, Clock } from "lucide-react"
 import { Button } from "./ui/button"
 import { Input } from "./ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
@@ -290,12 +277,15 @@ export default function Dashboard() {
         return
       }
 
-      const response = await fetch(`https://sheetbills-server.vercel.app/api/sheets/data?sheetUrl=${encodeURIComponent(sheetUrl)}`, {
-        headers: {
-          Authorization: `Bearer ${googleToken}`,
-          "X-Supabase-Token": supabaseToken,
+      const response = await fetch(
+        `https://sheetbills-server.vercel.app/api/sheets/data?sheetUrl=${encodeURIComponent(sheetUrl)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${googleToken}`,
+            "X-Supabase-Token": supabaseToken,
+          },
         },
-      })
+      )
 
       // Handle specific error cases
       if (response.status === 401) {
@@ -325,20 +315,20 @@ export default function Dashboard() {
         .map((invoice: any) => {
           try {
             // Parse customer and items if they are strings
-            let customer = invoice.customer;
+            let customer = invoice.customer
             if (typeof customer === "string") {
               try {
-                customer = JSON.parse(customer);
+                customer = JSON.parse(customer)
               } catch {
-                customer = { name: "", email: "", address: "" };
+                customer = { name: "", email: "", address: "" }
               }
             }
-            let items = invoice.items;
+            let items = invoice.items
             if (typeof items === "string") {
               try {
-                items = JSON.parse(items);
+                items = JSON.parse(items)
               } catch {
-                items = [];
+                items = []
               }
             }
 
@@ -482,14 +472,12 @@ export default function Dashboard() {
               <Avatar className="h-16 w-16 ring-4 ring-white shadow-lg">
                 {user?.user_metadata?.avatar_url ? (
                   <img
-                    src={user.user_metadata.avatar_url}
+                    src={user.user_metadata.avatar_url || "/placeholder.svg"}
                     alt="User Avatar"
                     className="h-16 w-16 rounded-full object-cover"
                   />
                 ) : (
-                  <AvatarFallback>
-                    {user?.email?.[0]?.toUpperCase() || "U"}
-                  </AvatarFallback>
+                  <AvatarFallback>{user?.email?.[0]?.toUpperCase() || "U"}</AvatarFallback>
                 )}
               </Avatar>
               <span className="absolute bottom-0 right-0 bg-gradient-to-tr from-yellow-400 to-yellow-600 text-white text-xs px-2 py-0.5 rounded-full shadow-md font-semibold border-2 border-white">
@@ -504,18 +492,16 @@ export default function Dashboard() {
                 </span>
                 <span className="ml-2 animate-bounce text-yellow-300 text-2xl">👋</span>
               </h2>
-              <p className="text-slate-100 mt-2 text-lg font-medium">
-                Manage and track your invoices with ease.
-              </p>
+              <p className="text-slate-100 mt-2 text-lg font-medium">Manage and track your invoices with ease.</p>
             </div>
           </div>
           <div className="mt-6 md:mt-0 flex gap-4">
             <Button
               onClick={() => {
-                const invoicesSheet = spreadsheets.find(sheet => sheet.name === "SheetBills Invoices")
+                const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
                 const invoicesSheetUrl = invoicesSheet?.sheetUrl
                 navigate("/create-invoice", {
-                  state: { selectedSpreadsheetUrl: invoicesSheetUrl }
+                  state: { selectedSpreadsheetUrl: invoicesSheetUrl },
                 })
               }}
               className="bg-white text-slate-900 hover:bg-green-600 font-bold shadow-lg"
@@ -524,7 +510,6 @@ export default function Dashboard() {
               <Plus className="mr-2 h-4 w-4" />
               Create Invoice
             </Button>
-           
           </div>
         </div>
       </div>
@@ -625,7 +610,11 @@ export default function Dashboard() {
               />
 
               {selectedSpreadsheetUrl && (
-                <Button  onClick={handleRefresh} className="bg-green-600 text-white hover:bg-green-700" disabled={isStateLoading}>
+                <Button
+                  onClick={handleRefresh}
+                  className="bg-green-600 text-white hover:bg-green-700"
+                  disabled={isStateLoading}
+                >
                   <RefreshCw className={`mr-2 h-4 w-4 ${isStateLoading ? "animate-spin" : ""}`} />
                   Refresh
                 </Button>
@@ -669,7 +658,6 @@ export default function Dashboard() {
       return (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
-           
             <h3 className="text-lg font-medium text-slate-900 mb-2">No invoices found</h3>
             <p className="text-slate-500 text-center max-w-md mb-6">
               {searchQuery || statusFilter !== "all" ? (
@@ -681,10 +669,10 @@ export default function Dashboard() {
             {!searchQuery && statusFilter === "all" && (
               <Button
                 onClick={() => {
-                  const invoicesSheet = spreadsheets.find(sheet => sheet.name === "SheetBills Invoices")
+                  const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
                   const invoicesSheetUrl = invoicesSheet?.sheetUrl
                   navigate("/create-invoice", {
-                    state: { selectedSpreadsheetUrl: invoicesSheetUrl }
+                    state: { selectedSpreadsheetUrl: invoicesSheetUrl },
                   })
                 }}
                 className="bg-green-600 text-white hover:bg-green-700"
@@ -720,6 +708,7 @@ export default function Dashboard() {
                 <TableHead onClick={() => handleSort("amount")} className="cursor-pointer font-medium text-right">
                   Amount <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                 </TableHead>
+                <TableHead className="font-medium">Payment Action</TableHead>
                 <TableHead className="w-[80px] font-medium">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -729,7 +718,7 @@ export default function Dashboard() {
                   key={invoice.id}
                   className="cursor-pointer hover:bg-slate-50"
                   onClick={() => {
-                    const invoicesSheet = spreadsheets.find(sheet => sheet.name === "SheetBills Invoices")
+                    const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
                     const invoicesSheetUrl = invoicesSheet?.sheetUrl
 
                     navigate("/create-invoice", {
@@ -769,6 +758,76 @@ export default function Dashboard() {
                   </TableCell>
                   <TableCell className="text-right font-medium">{formatCurrency(invoice.amount)}</TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()}>
+                    {invoice.status === "Pending" && (
+                      <Button
+                        onClick={async (e) => {
+                          e.stopPropagation()
+                          try {
+                            const {
+                              data: { session },
+                              error: sessionError,
+                            } = await supabase.auth.getSession()
+
+                            if (sessionError) {
+                              throw new Error(sessionError.message)
+                            }
+
+                            const response = await fetch(
+                              "https://sheetbills-server.vercel.app/api/sheets/mark-as-paid",
+                              {
+                                method: "PUT",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                  Authorization: `Bearer ${session?.provider_token}`,
+                                  "X-Supabase-Token": session?.access_token || "",
+                                },
+                                body: JSON.stringify({
+                                  invoiceId: invoice.id,
+                                  sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
+                                    ?.sheetUrl,
+                                }),
+                              },
+                            )
+
+                            if (!response.ok) {
+                              const errorData = await response.json()
+                              throw new Error(errorData.error || "Failed to mark invoice as paid")
+                            }
+
+                            // Update local state
+                            const updatedInvoices = invoices.map((inv) =>
+                              inv.id === invoice.id ? { ...inv, status: "Paid" as const } : inv,
+                            )
+                            setInvoices(updatedInvoices)
+
+                            toast({
+                              title: "Status Updated",
+                              description: "Invoice marked as paid successfully.",
+                            })
+                          } catch (error) {
+                            toast({
+                              title: "Error",
+                              description: error instanceof Error ? error.message : "Failed to update invoice status",
+                              variant: "destructive",
+                            })
+                          }
+                        }}
+                        className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                        size="sm"
+                        aria-label="Mark invoice as paid"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault()
+                            e.currentTarget.click()
+                          }
+                        }}
+                      >
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        Mark as Paid
+                      </Button>
+                    )}
+                  </TableCell>
+                  <TableCell onClick={(e) => e.stopPropagation()}>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">
@@ -780,7 +839,7 @@ export default function Dashboard() {
                         <DropdownMenuItem
                           onClick={(e) => {
                             e.stopPropagation()
-                            const invoicesSheet = spreadsheets.find(sheet => sheet.name === "SheetBills Invoices")
+                            const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
                             const invoicesSheetUrl = invoicesSheet?.sheetUrl
 
                             navigate("/create-invoice", {
@@ -808,18 +867,22 @@ export default function Dashboard() {
                                   throw new Error(sessionError.message)
                                 }
 
-                                const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/mark-as-paid", {
-                                  method: "PUT",
-                                  headers: {
-                                    "Content-Type": "application/json",
-                                    Authorization: `Bearer ${session?.provider_token}`,
-                                    "X-Supabase-Token": session?.access_token || "",
+                                const response = await fetch(
+                                  "https://sheetbills-server.vercel.app/api/sheets/mark-as-paid",
+                                  {
+                                    method: "PUT",
+                                    headers: {
+                                      "Content-Type": "application/json",
+                                      Authorization: `Bearer ${session?.provider_token}`,
+                                      "X-Supabase-Token": session?.access_token || "",
+                                    },
+                                    body: JSON.stringify({
+                                      invoiceId: invoice.id,
+                                      sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
+                                        ?.sheetUrl,
+                                    }),
                                   },
-                                  body: JSON.stringify({ 
-                                    invoiceId: invoice.id,
-                                    sheetUrl: spreadsheets.find(sheet => sheet.name === "SheetBills Invoices")?.sheetUrl 
-                                  }),
-                                })
+                                )
 
                                 if (!response.ok) {
                                   const errorData = await response.json()
@@ -863,15 +926,18 @@ export default function Dashboard() {
                                   throw new Error(sessionError.message)
                                 }
 
-                                const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/mark-as-pending", {
-                                  method: "PUT",
-                                  headers: {
-                                    "Content-Type": "application/json",
-                                    Authorization: `Bearer ${session?.provider_token}`,
-                                    "X-Supabase-Token": session?.access_token || "",
+                                const response = await fetch(
+                                  "https://sheetbills-server.vercel.app/api/sheets/mark-as-pending",
+                                  {
+                                    method: "PUT",
+                                    headers: {
+                                      "Content-Type": "application/json",
+                                      Authorization: `Bearer ${session?.provider_token}`,
+                                      "X-Supabase-Token": session?.access_token || "",
+                                    },
+                                    body: JSON.stringify({ invoiceId: invoice.id }),
                                   },
-                                  body: JSON.stringify({ invoiceId: invoice.id }),
-                                })
+                                )
 
                                 if (!response.ok) {
                                   const errorData = await response.json()
@@ -915,15 +981,18 @@ export default function Dashboard() {
                                 throw new Error(sessionError.message)
                               }
 
-                              const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/delete-invoice", {
-                                method: "DELETE",
-                                headers: {
-                                  "Content-Type": "application/json",
-                                  Authorization: `Bearer ${session?.provider_token}`,
-                                  "X-Supabase-Token": session?.access_token || "",
+                              const response = await fetch(
+                                "https://sheetbills-server.vercel.app/api/sheets/delete-invoice",
+                                {
+                                  method: "DELETE",
+                                  headers: {
+                                    "Content-Type": "application/json",
+                                    Authorization: `Bearer ${session?.provider_token}`,
+                                    "X-Supabase-Token": session?.access_token || "",
+                                  },
+                                  body: JSON.stringify({ invoiceId: invoice.id }),
                                 },
-                                body: JSON.stringify({ invoiceId: invoice.id }),
-                              })
+                              )
 
                               if (!response.ok) {
                                 const errorData = await response.json()

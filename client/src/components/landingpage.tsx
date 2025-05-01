@@ -46,7 +46,7 @@ export default function LandingPage() {
 
           <div className="flex items-center gap-4">
             
-            <a href="/sign-in" className="hidden sm:inline-block">
+            <a href="/login" className="hidden sm:inline-block">
               <button className="h-9 rounded-md bg-green-600 hover:bg-green-700 px-4 text-sm font-medium text-white">
                 Get Started
               </button>
@@ -109,7 +109,7 @@ export default function LandingPage() {
             Create, track, and manage invoices with the power of Google Sheets. Secure, simple, and built for growth.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            <a href="/sign-up" className="inline-flex items-center justify-center rounded-md bg-green-600 px-8 py-4 text-lg font-bold text-white shadow-lg hover:bg-green-700 transition">
+            <a href="/login" className="inline-flex items-center justify-center rounded-md bg-green-600 px-8 py-4 text-lg font-bold text-white shadow-lg hover:bg-green-700 transition">
               Start Free Trial
             </a>
             <a href="#demo" className="inline-flex items-center justify-center rounded-md border border-green-600 bg-white px-8 py-4 text-lg font-bold text-green-700 shadow hover:bg-green-50 transition">
@@ -239,7 +239,7 @@ export default function LandingPage() {
         </div>
 
         <div className="mt-8 text-center">
-            <a href="/sign-up" className="inline-flex items-center justify-center rounded-md bg-green-600 px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+            <a href="/login" className="inline-flex items-center justify-center rounded-md bg-green-600 px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
               Start Free Trial
               <svg className="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -339,7 +339,7 @@ export default function LandingPage() {
             </div>
             <div className="mt-6 text-center">
               <a 
-                href="/sign-up" 
+                href="/login" 
                 className="inline-flex items-center justify-center rounded-md bg-green-600 px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
               >
                 Start Free Trial
@@ -440,7 +440,7 @@ export default function LandingPage() {
           {/* CTA */}
           <div className="mt-12 text-center">
             <a
-              href="/sign-up"
+              href="/login"
               className="inline-flex items-center justify-center rounded-md bg-green-600 px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
             >
               Join Our Growing Community
@@ -511,7 +511,7 @@ export default function LandingPage() {
                   <span className="text-lg font-semibold text-gray-500">during beta</span>
                 </div>
                 <p className="text-sm text-gray-500 mb-2">No credit card required</p>
-                <a href="/initialize" className="w-full">
+                <a href="/login" className="w-full">
                   <Button className="w-full bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg text-lg transition-all duration-150">
                     Join Beta Program
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -650,7 +650,7 @@ export default function LandingPage() {
               </p>
             </div>
             <div className="flex flex-col gap-3 min-[400px]:flex-row justify-center mt-4">
-              <a href="/sign-up">
+              <a href="/login">
                 <Button className="bg-white text-green-700 hover:bg-green-100 font-bold px-8 py-3 text-base shadow-lg">
                   Get Started Free
                 </Button>
@@ -689,7 +689,7 @@ export default function LandingPage() {
             <a href="#benefits" className="text-sm text-gray-600 hover:text-green-600 transition-colors">Demo</a>
             <a href="#testimonials" className="text-sm text-gray-600 hover:text-green-600 transition-colors">Testimonials</a>
             <a href="#faq" className="text-sm text-gray-600 hover:text-green-600 transition-colors">FAQ</a>
-            <a href="/sign-up" className="text-sm text-gray-600 hover:text-green-600 transition-colors">Get Started</a>
+            <a href="/login" className="text-sm text-gray-600 hover:text-green-600 transition-colors">Get Started</a>
           </div>
           {/* Contact */}
           <div className="flex flex-col items-center md:items-end">

@@ -8,33 +8,35 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { Separator } from "../../components/ui/separator"
 import { Loader2, Shield, Zap, BarChart3, Users, CheckCircle2, Mail, ArrowRight, Lock, Globe } from "lucide-react"
 import Header from "../../components/header"
+import { LoadingSpinner } from "../../components/loadingSpinner"
 
 export default function Login() {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Handle auth state changes with improved session management
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN" && session) {
-        // Store tokens with better error handling
         try {
           sessionStorage.setItem("supabase_token", session.access_token)
           if (session.provider_token) {
             sessionStorage.setItem("google_access_token", session.provider_token)
           }
-          // Check for business sheet after successful login
           await checkBusinessSheet(session)
         } catch (err) {
           console.error("Error storing session:", err)
           setError("Failed to store session data")
         }
       } else if (event === "TOKEN_REFRESHED") {
-        // Handle token refresh
         console.log("Token refreshed successfully")
       } else if (event === "SIGNED_OUT") {
-        // Clear all storage on sign out
         sessionStorage.clear()
         localStorage.clear()
       }
@@ -67,9 +69,9 @@ export default function Login() {
         const { hasBusinessSheet } = await response.json()
 
         if (hasBusinessSheet) {
-          navigate("/dashboard")
+          window.location.href = "/invoices"
         } else {
-          navigate("/business-setup", { state: { session } })
+          window.location.href = "/businessSetup"
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Check failed")
@@ -90,7 +92,7 @@ export default function Login() {
         provider: "google",
         options: {
           scopes: ["https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/spreadsheets"].join(" "),
-          redirectTo: window.location.origin + "/auth/callback",
+          redirectTo: window.location.origin,
           queryParams: {
             access_type: "offline",
             include_granted_scopes: "true",
@@ -106,8 +108,6 @@ export default function Login() {
       await supabase.auth.signOut()
       sessionStorage.clear()
       localStorage.clear()
-    } finally {
-      setLoading(false)
     }
   }, [])
 
@@ -145,6 +145,18 @@ export default function Login() {
     }
     checkExistingSession()
   }, [checkBusinessSheet])
+
+  // If initial loading
+  if (!mounted || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <LoadingSpinner />
+          {loading && <p className="mt-4 text-slate-600">Connecting to Google...</p>}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex flex-col">
@@ -273,10 +285,10 @@ export default function Login() {
                       className="w-full h-12 bg-white text-slate-800 hover:bg-slate-50 border border-slate-200 shadow-sm transition-all duration-200 hover:shadow-md rounded-lg"
                     >
                       {loading ? (
-                        <>
-                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                          Signing in...
-                        </>
+                        <div className="flex items-center justify-center gap-3">
+                          <LoadingSpinner />
+                          <span>Connecting to Google...</span>
+                        </div>
                       ) : (
                         <>
                           <svg className="mr-3 h-5 w-5" viewBox="0 0 24 24">

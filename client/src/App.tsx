@@ -137,8 +137,7 @@ function App() {
       <InvoiceProvider>
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<Login />} />
+            <Route path="/login" element={<Login />} />
           
           {/* Protected Routes */}
           <Route
@@ -148,18 +147,19 @@ function App() {
               </AuthenticatedRoute>
             }
           >
-            <Route path="/invoices" element={<Dashboard />} />
-            <Route path="/create-invoice" element={<InvoiceForm />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/invoiceTemplates" element={<InvoiceTemplatePage />} />
-            <Route path="/businessSetup" element={<InitializePage />} />
-            <Route path="/template-generator" element={<TemplateGenerator />} />
-            <Route path="/contact" element={<ContactPage />} />
-          </Route>
+            <Route path="/" element={<Navigate to="/invoices" replace />} />
+              <Route path="/invoices" element={<Dashboard />} />
+              <Route path="/create-invoice" element={<InvoiceForm />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/invoiceTemplates" element={<InvoiceTemplatePage />} />
+              <Route path="/businessSetup" element={<InitializePage />} />
+              <Route path="/template-generator" element={<TemplateGenerator />} />
+              <Route path="/contact" element={<ContactPage />} />
+            </Route>
 
           {/* Catch all route */}
           <Route path="*" element={
-            <Navigate to={user ? "/invoices" : "/"} replace />
+            <Navigate to={user ? "/invoices" : "/login"} replace />
           } />
         </Routes>
       </InvoiceProvider>

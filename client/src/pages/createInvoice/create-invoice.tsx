@@ -893,6 +893,7 @@ export default function InvoiceForm() {
                                 updateItem(index, "name", e.target.value);
                               }}
                               onClick={(e) => e.stopPropagation()}
+                              onFocus={(e) => e.stopPropagation()}
                               placeholder="Item name"
                             />
                           </div>
@@ -906,6 +907,7 @@ export default function InvoiceForm() {
                                 updateItem(index, "description", e.target.value);
                               }}
                               onClick={(e) => e.stopPropagation()}
+                              onFocus={(e) => e.stopPropagation()}
                               placeholder="Item description"
                             />
                           </div>
@@ -921,6 +923,7 @@ export default function InvoiceForm() {
                                   updateItem(index, "quantity", parseInt(e.target.value) || 0);
                                 }}
                                 onClick={(e) => e.stopPropagation()}
+                                onFocus={(e) => e.stopPropagation()}
                                 min="0"
                               />
                             </div>
@@ -935,6 +938,7 @@ export default function InvoiceForm() {
                                   updateItem(index, "price", parseFloat(e.target.value) || 0);
                                 }}
                                 onClick={(e) => e.stopPropagation()}
+                                onFocus={(e) => e.stopPropagation()}
                                 min="0"
                                 step="0.01"
                               />
@@ -967,6 +971,7 @@ export default function InvoiceForm() {
                                     updateItem(index, "discount", { ...item.discount, value: parseFloat(e.target.value) || 0 });
                                   }}
                                   onClick={(e) => e.stopPropagation()}
+                                  onFocus={(e) => e.stopPropagation()}
                                   min="0"
                                   step="0.01"
                                 />
@@ -998,6 +1003,7 @@ export default function InvoiceForm() {
                                     updateItem(index, "tax", { ...item.tax, value: parseFloat(e.target.value) || 0 });
                                   }}
                                   onClick={(e) => e.stopPropagation()}
+                                  onFocus={(e) => e.stopPropagation()}
                                   min="0"
                                   step="0.01"
                                 />

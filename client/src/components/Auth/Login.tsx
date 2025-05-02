@@ -3,11 +3,10 @@
 import { useState, useCallback, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import supabase from "./supabaseClient"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "../../components/ui/button"
+import { Card, CardContent } from "../../components/ui/card"
 import { Loader2, Shield } from "lucide-react"
-import Header from "@/components/header"
-import { AuthChangeEvent } from "@supabase/supabase-js"
+import Header from "../../components/header"
 
 type Session = {
   access_token: string

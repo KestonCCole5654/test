@@ -14,6 +14,7 @@ import axios from "axios"
 import { useLocation, useNavigate } from "react-router-dom"
 import supabase from "../../components/Auth/supabaseClient"
 import { Dialog, DialogContent } from "../../components/ui/dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 
 
 export interface InvoiceData {
@@ -881,7 +882,12 @@ export default function InvoiceForm() {
                             <Input
                               id={`item-name-${index}`}
                               value={item.name}
-                              onChange={(e) => updateItem(index, "name", e.target.value)}
+                              onChange={(e) => {
+                                e.stopPropagation();
+                                updateItem(index, "name", e.target.value);
+                              }}
+                              onClick={(e) => e.stopPropagation()}
+                              placeholder="Item name"
                             />
                           </div>
                           <div className="flex flex-col gap-2">
@@ -889,7 +895,12 @@ export default function InvoiceForm() {
                             <Textarea
                               id={`item-description-${index}`}
                               value={item.description}
-                              onChange={(e) => updateItem(index, "description", e.target.value)}
+                              onChange={(e) => {
+                                e.stopPropagation();
+                                updateItem(index, "description", e.target.value);
+                              }}
+                              onClick={(e) => e.stopPropagation()}
+                              placeholder="Item description"
                             />
                           </div>
                           <div className="grid grid-cols-2 gap-4">
@@ -898,9 +909,13 @@ export default function InvoiceForm() {
                               <Input
                                 id={`item-quantity-${index}`}
                                 type="number"
-                                min="1"
                                 value={item.quantity}
-                                onChange={(e) => updateItem(index, "quantity", parseInt(e.target.value))}
+                                onChange={(e) => {
+                                  e.stopPropagation();
+                                  updateItem(index, "quantity", parseInt(e.target.value) || 0);
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                                min="0"
                               />
                             </div>
                             <div className="flex flex-col gap-2">
@@ -908,86 +923,79 @@ export default function InvoiceForm() {
                               <Input
                                 id={`item-price-${index}`}
                                 type="number"
+                                value={item.price}
+                                onChange={(e) => {
+                                  e.stopPropagation();
+                                  updateItem(index, "price", parseFloat(e.target.value) || 0);
+                                }}
+                                onClick={(e) => e.stopPropagation()}
                                 min="0"
                                 step="0.01"
-                                value={item.price}
-                                onChange={(e) => updateItem(index, "price", e.target.value)}
                               />
                             </div>
                           </div>
                           <div className="grid grid-cols-2 gap-4">
                             <div className="flex flex-col gap-2">
-                              <Label htmlFor={`item-discount-type-${index}`}>Discount Type</Label>
-                              <select
-                                id={`item-discount-type-${index}`}
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                value={item.discount.type}
-                                onChange={(e) =>
-                                  updateItem(index, "discount", {
-                                    ...item.discount,
-                                    type: e.target.value as "percentage" | "fixed",
-                                  })
-                                }
-                              >
-                                <option value="percentage">Percentage (%)</option>
-                                <option value="fixed">Fixed Amount ($)</option>
-                              </select>
+                              <Label htmlFor={`item-discount-${index}`}>Discount</Label>
+                              <div className="flex gap-2">
+                                <Select
+                                  value={item.discount.type}
+                                  onValueChange={(value) => {
+                                    updateItem(index, "discount", { ...item.discount, type: value });
+                                  }}
+                                >
+                                  <SelectTrigger onClick={(e) => e.stopPropagation()}>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="percentage">%</SelectItem>
+                                    <SelectItem value="fixed">$</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <Input
+                                  id={`item-discount-${index}`}
+                                  type="number"
+                                  value={item.discount.value}
+                                  onChange={(e) => {
+                                    e.stopPropagation();
+                                    updateItem(index, "discount", { ...item.discount, value: parseFloat(e.target.value) || 0 });
+                                  }}
+                                  onClick={(e) => e.stopPropagation()}
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
                             </div>
                             <div className="flex flex-col gap-2">
-                              <Label htmlFor={`item-discount-value-${index}`}>
-                                {item.discount.type === "percentage" ? "Discount %" : "Discount Amount"}
-                              </Label>
-                              <Input
-                                id={`item-discount-value-${index}`}
-                                type="number"
-                                min="0"
-                                step={item.discount.type === "percentage" ? "1" : "0.01"}
-                                max={item.discount.type === "percentage" ? "100" : undefined}
-                                value={item.discount.value}
-                                onChange={(e) =>
-                                  updateItem(index, "discount", {
-                                    ...item.discount,
-                                    value: e.target.value === "" ? "" : Number.parseFloat(e.target.value),
-                                  })
-                                }
-                              />
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="flex flex-col gap-2">
-                              <Label htmlFor={`item-tax-type-${index}`}>Tax Type</Label>
-                              <select
-                                id={`item-tax-type-${index}`}
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                value={item.tax.type}
-                                onChange={(e) =>
-                                  updateItem(index, "tax", {
-                                    ...item.tax,
-                                    type: e.target.value as "percentage" | "fixed",
-                                  })
-                                }
-                              >
-                                <option value="percentage">Percentage (%)</option>
-                                <option value="fixed">Fixed Amount ($)</option>
-                              </select>
-                            </div>
-                            <div className="flex flex-col gap-2">
-                              <Label htmlFor={`item-tax-value-${index}`}>
-                                {item.tax.type === "percentage" ? "Tax %" : "Tax Amount"}
-                              </Label>
-                              <Input
-                                id={`item-tax-value-${index}`}
-                                type="number"
-                                min="0"
-                                step={item.tax.type === "percentage" ? "0.01" : "0.01"}
-                                value={item.tax.value}
-                                onChange={(e) =>
-                                  updateItem(index, "tax", {
-                                    ...item.tax,
-                                    value: e.target.value === "" ? "" : Number.parseFloat(e.target.value),
-                                  })
-                                }
-                              />
+                              <Label htmlFor={`item-tax-${index}`}>Tax</Label>
+                              <div className="flex gap-2">
+                                <Select
+                                  value={item.tax.type}
+                                  onValueChange={(value) => {
+                                    updateItem(index, "tax", { ...item.tax, type: value });
+                                  }}
+                                >
+                                  <SelectTrigger onClick={(e) => e.stopPropagation()}>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="percentage">%</SelectItem>
+                                    <SelectItem value="fixed">$</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <Input
+                                  id={`item-tax-${index}`}
+                                  type="number"
+                                  value={item.tax.value}
+                                  onChange={(e) => {
+                                    e.stopPropagation();
+                                    updateItem(index, "tax", { ...item.tax, value: parseFloat(e.target.value) || 0 });
+                                  }}
+                                  onClick={(e) => e.stopPropagation()}
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
                             </div>
                           </div>
                         </div>

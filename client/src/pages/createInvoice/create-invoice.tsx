@@ -845,7 +845,7 @@ export default function InvoiceForm() {
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <div>Items</div>
-                    <Button type="button" onClick={addItem} size="sm">
+                    <Button variant="outline" type="button" onClick={addItem} size="sm">
                       <Plus className="h-4 w-4 mr-2" />
                       Add Item
                     </Button>
@@ -857,7 +857,12 @@ export default function InvoiceForm() {
                       <div key={index} className="border rounded-md">
                         <div 
                           className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50"
-                          onClick={() => toggleItem(index)}
+                          onClick={(e) => {
+                            // Only toggle if clicking on the header, not the content
+                            if (e.target === e.currentTarget || e.target === e.currentTarget.firstChild) {
+                              toggleItem(index);
+                            }
+                          }}
                         >
                           <div className="flex items-center gap-2">
                             <ChevronDown className={`h-4 w-4 transition-transform ${collapsedItems[index] ? "rotate-180" : ""}`} />

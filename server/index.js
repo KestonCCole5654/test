@@ -1740,6 +1740,104 @@ app.put('/api/sheets/mark-as-paid', async (req, res) => {
   }
 });
 
+app.put('/api/sheets/mark-as-pending', async (req, res) => {
+  console.log('[MARK-AS-PENDING] Request received');
+  try {
+    const { sheetUrl, invoiceId } = req.body;
+    console.log('Request body:', { sheetUrl, invoiceId });
+
+    // Validate Supabase token first
+    const supabaseToken = req.headers['x-supabase-token'];
+    if (!supabaseToken) {
+      console.error('[ERROR] Missing Supabase token');
+      return res.status(401).json({ error: 'Supabase authentication required' });
+    }
+
+    // Validate Google token
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith('Bearer ')) {
+      console.error('[ERROR] Missing Google token');
+      return res.status(401).json({ error: 'Google authentication required' });
+    }
+    const googleToken = authHeader.split(' ')[1];
+
+    // Input validation
+    if (!sheetUrl || !invoiceId) {
+      console.error('[ERROR] Missing required fields');
+      return res.status(400).json({ error: 'Sheet URL and Invoice ID are required' });
+    }
+
+    // Extract sheet ID
+    const sheetId = extractSheetIdFromUrl(sheetUrl);
+    console.log('Extracted sheet ID:', sheetId);
+    if (!sheetId) {
+      console.error('[ERROR] Invalid sheet URL:', sheetUrl);
+      return res.status(400).json({ error: 'Invalid sheet URL' });
+    }
+
+    // Initialize Google Sheets API
+    const auth = new google.auth.OAuth2();
+    auth.setCredentials({ access_token: googleToken });
+    const sheets = google.sheets({ version: 'v4', auth });
+
+    // Get sheet metadata to determine the sheet name
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId: sheetId });
+    const invoiceSheet = spreadsheet.data.sheets.find(
+      s => s.properties.title === "SheetBills Invoices"
+    );
+    if (!invoiceSheet) {
+      console.error("SheetBills Invoices tab not found in spreadsheet");
+      return res.status(404).json({ error: 'SheetBills Invoices tab not found' });
+    }
+    const sheetName = invoiceSheet.properties.title;
+    console.log("Using sheet name:", sheetName);
+
+    // Fetch data from sheet
+    console.log('Fetching sheet data...');
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: sheetId,
+      range: `${sheetName}!A2:M`,
+    });
+
+    const rows = response.data.values || [];
+    console.log(`Found ${rows.length} rows`);
+
+    // Find invoice row
+    const rowIndex = rows.findIndex(row => row[0] === invoiceId);
+    console.log('Found row index:', rowIndex);
+    
+    if (rowIndex === -1) {
+      console.error('[ERROR] Invoice not found in sheet');
+      return res.status(404).json({ error: 'Invoice not found' });
+    }
+
+    // Update status
+    const updateRange = `${sheetName}!M${rowIndex + 2}`;
+    console.log('Updating range:', updateRange);
+    
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: sheetId,
+      range: updateRange,
+      valueInputOption: 'RAW',
+      requestBody: { values: [['Pending']] },
+    });
+
+    console.log('Update successful');
+    res.json({ success: true });
+    
+  } catch (error) {
+    console.error('[ERROR]', {
+      message: error.message,
+      stack: error.stack,
+      response: error.response?.data
+    });
+    res.status(500).json({ 
+      error: 'Operation failed',
+      details: error.message 
+    });
+  }
+});
+
 // Add this near the other route handlers
 app.post("/api/contact", async (req, res) => {
   try {

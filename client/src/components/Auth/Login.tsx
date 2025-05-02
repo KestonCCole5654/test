@@ -160,11 +160,7 @@ export default function Login() {
           <div className="flex flex-col items-center">
             {/* Centered content with login card as focus */}
             <div className="text-center mb-8 max-w-xl">
-              <div className="bg-green-600 py-6 px-8">
-                <h2 className="text-white text-2xl font-bold text-center">Welcome to SheetBills</h2>
-              </div>
-              <p className="text-slate-600 text-center mb-6">Sign in to access your invoicing dashboard</p>
-              
+            
               <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
                 Invoice Management, <span className="text-green-600">Simplified</span>
               </h1>
@@ -185,7 +181,7 @@ export default function Login() {
                   </div>
                 )}
 
-                
+                <p className="text-slate-600 text-center mb-6">Sign in to access your invoicing dashboard</p>
 
                 {/* Feature highlights inside the card */}
                 <div className="mb-6 space-y-3">

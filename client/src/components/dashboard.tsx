@@ -931,7 +931,11 @@ export default function Dashboard() {
                                 Authorization: `Bearer ${session?.provider_token}`,
                                 "X-Supabase-Token": session?.access_token || "",
                               },
-                              body: JSON.stringify({ invoiceId: invoice.id }),
+                              body: JSON.stringify({ 
+                                invoiceId: invoice.id,
+                                sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
+                                  ?.sheetUrl,
+                              }),
                             },
                           )
 
@@ -1081,7 +1085,11 @@ export default function Dashboard() {
                                     Authorization: `Bearer ${session?.provider_token}`,
                                     "X-Supabase-Token": session?.access_token || "",
                                   },
-                                  body: JSON.stringify({ invoiceId: invoice.id }),
+                                  body: JSON.stringify({ 
+                                    invoiceId: invoice.id,
+                                    sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
+                                      ?.sheetUrl,
+                                  }),
                                 },
                               )
 

@@ -1062,7 +1062,7 @@ export default function InvoiceForm() {
                   </Button>
                 )}
                 <Button variant="outline" onClick={() => window.print()} className="w-full sm:w-auto text-white">
-                  Print / Save as PDF
+                  Print Invoice
                 </Button>
               </div>
             </CollapsibleContent>

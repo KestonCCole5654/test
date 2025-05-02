@@ -160,7 +160,6 @@ export default function Login() {
           <div className="flex flex-col items-center">
             {/* Centered content with login card as focus */}
             <div className="text-center mb-8 max-w-xl">
-            
               <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
                 Invoice Management, <span className="text-green-600">Simplified</span>
               </h1>
@@ -170,9 +169,7 @@ export default function Login() {
             </div>
 
             {/* Login Card - Main Focus */}
-            <Card className="border-0 overflow-hidden w-full max-w-md">
-            
-
+            <Card className="border-0 items-center justify-center text-center overflow-hidden w-full max-w-md">
               <CardContent className="p-8">
                 {error && (
                   <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100 flex items-center gap-2 mb-6">

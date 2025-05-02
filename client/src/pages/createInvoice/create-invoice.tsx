@@ -888,7 +888,7 @@ export default function InvoiceForm() {
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <div>Items</div>
-                    <Button type="button" onClick={addItem} size="sm">
+                    <Button variant="outline" type="button" onClick={addItem} size="sm">
                       <Plus className="h-4 w-4 mr-2" />
                       Add Item
                     </Button>

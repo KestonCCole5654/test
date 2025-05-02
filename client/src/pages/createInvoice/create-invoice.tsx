@@ -510,8 +510,8 @@ export default function InvoiceForm() {
     }
 
     return (
-      <div
-        className="bg-white shadow-lg p-8"
+      <div 
+        className="bg-white"
         style={{
           width: "210mm",
           minHeight: "287mm",

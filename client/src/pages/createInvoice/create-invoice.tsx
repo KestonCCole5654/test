@@ -90,9 +90,10 @@ export default function InvoiceForm() {
         value: ""
       }
     }],
-    amount: invoiceToEdit?.amount,
+    amount: invoiceToEdit?.amount || 0,
     notes: invoiceToEdit?.notes || "",
     template: invoiceToEdit?.template || "classic",
+    status: invoiceToEdit?.status || "Pending"
   })
   const previewRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
@@ -423,8 +424,7 @@ export default function InvoiceForm() {
 
       // Process invoice data with guaranteed fields
       const processedInvoiceData: InvoiceData = {
-        invoiceNumber:
-          invoiceToEdit.invoiceNumber || `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+        invoiceNumber: invoiceToEdit.invoiceNumber || `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
         date: invoiceToEdit.date || new Date().toISOString().split("T")[0],
         dueDate: invoiceToEdit.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
         customer: invoiceToEdit.customer || {
@@ -443,10 +443,11 @@ export default function InvoiceForm() {
         amount: invoiceToEdit.amount || 0,
         notes: typeof invoiceToEdit.notes === "string" ? invoiceToEdit.notes : "",
         template: "classic" as const,
-        status: invoiceToEdit.status === "Paid" ? "Paid" : "Pending",
+        status: invoiceToEdit.status === "Paid" ? "Paid" : "Pending"
       }
 
       setInvoiceData(processedInvoiceData)
+      setIsFormExpanded(false) // Hide form by default when viewing an invoice
 
       // Debug log the processed data
       console.log("Processed Invoice Data:", processedInvoiceData)

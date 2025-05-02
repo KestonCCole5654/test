@@ -943,11 +943,18 @@ export default function Dashboard() {
                           )
                           setInvoices(updatedInvoices)
 
+                          // Update filtered invoices as well
+                          const updatedFilteredInvoices = filteredInvoices.map((inv) =>
+                            inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv,
+                          )
+                          setFilteredInvoices(updatedFilteredInvoices)
+
                           toast({
                             title: "Status Updated",
                             description: "Invoice marked as pending successfully.",
                           })
                         } catch (error) {
+                          console.error("Error marking invoice as pending:", error)
                           toast({
                             title: "Error",
                             description: error instanceof Error ? error.message : "Failed to update invoice status",

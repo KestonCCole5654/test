@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2, Shield, Zap, BarChart3, Users, Lock } from "lucide-react"
 import Header from "@/components/header"
+import { AuthChangeEvent } from "@supabase/supabase-js"
 
 // Define types for better type safety
 type Session = {

@@ -422,7 +422,7 @@ export default function InvoiceForm() {
       }
 
       // Process invoice data with guaranteed fields
-      const processedInvoiceData = {
+      const processedInvoiceData: InvoiceData = {
         invoiceNumber:
           invoiceToEdit.invoiceNumber || `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
         date: invoiceToEdit.date || new Date().toISOString().split("T")[0],
@@ -433,7 +433,7 @@ export default function InvoiceForm() {
           address: "",
         },
         items: Array.isArray(invoiceToEdit.items)
-          ? invoiceToEdit.items.map(item => ({
+          ? invoiceToEdit.items.map((item: InvoiceItem) => ({
               ...item,
               price: item.price === 0 ? "" : item.price,
               discount: parseFinancialField(item.discount, "discount", { type: "percentage", value: "" }),
@@ -442,7 +442,7 @@ export default function InvoiceForm() {
           : [{ name: "", description: "", quantity: 1, price: "", discount: { type: "percentage", value: "" }, tax: { type: "percentage", value: "" } }],
         amount: invoiceToEdit.amount || 0,
         notes: typeof invoiceToEdit.notes === "string" ? invoiceToEdit.notes : "",
-        template: "classic",
+        template: "classic" as const,
         status: invoiceToEdit.status === "Paid" ? "Paid" : "Pending",
       }
 

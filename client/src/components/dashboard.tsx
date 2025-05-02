@@ -22,6 +22,16 @@ import type { User } from "@supabase/supabase-js"
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
 import { Avatar, AvatarFallback } from "./ui/avatar"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "./ui/alert-dialog"
 
 interface Invoice {
   id: string
@@ -76,6 +86,8 @@ export default function Dashboard() {
     key: keyof Invoice | null
     direction: "ascending" | "descending"
   }>({ key: null, direction: "ascending" })
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [invoiceToDelete, setInvoiceToDelete] = useState<Invoice | null>(null)
 
   // Calculate totals
   const totalInvoices = invoices.length
@@ -633,6 +645,73 @@ export default function Dashboard() {
           </TabsContent>
         </Tabs>
       </div>
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete this invoice?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the invoice
+              {invoiceToDelete && <span className="font-medium"> #{invoiceToDelete.id}</span>}.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                if (!invoiceToDelete) return
+
+                try {
+                  const {
+                    data: { session },
+                    error: sessionError,
+                  } = await supabase.auth.getSession()
+
+                  if (sessionError) {
+                    throw new Error(sessionError.message)
+                  }
+
+                  const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/delete-invoice", {
+                    method: "DELETE",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${session?.provider_token}`,
+                      "X-Supabase-Token": session?.access_token || "",
+                    },
+                    body: JSON.stringify({ invoiceId: invoiceToDelete.id }),
+                  })
+
+                  if (!response.ok) {
+                    const errorData = await response.json()
+                    throw new Error(errorData.error || "Failed to delete invoice")
+                  }
+
+                  // Update local state by removing the deleted invoice
+                  const updatedInvoices = invoices.filter((inv) => inv.id !== invoiceToDelete.id)
+                  setInvoices(updatedInvoices)
+
+                  toast({
+                    title: "Invoice Deleted",
+                    description: "Invoice has been deleted successfully.",
+                  })
+                } catch (error) {
+                  toast({
+                    title: "Error",
+                    description: error instanceof Error ? error.message : "Failed to delete invoice",
+                    variant: "destructive",
+                  })
+                } finally {
+                  setInvoiceToDelete(null)
+                  setIsDeleteDialogOpen(false)
+                }
+              }}
+              className="bg-red-600 focus:ring-red-600"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 
@@ -758,7 +837,7 @@ export default function Dashboard() {
                   </TableCell>
                   <TableCell className="text-right font-medium">{formatCurrency(invoice.amount)}</TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()}>
-                    {invoice.status === "Pending" && (
+                    {invoice.status === "Pending" ? (
                       <Button
                         onClick={async (e) => {
                           e.stopPropagation()
@@ -824,6 +903,69 @@ export default function Dashboard() {
                       >
                         <CheckCircle className="mr-2 h-4 w-4" />
                         Mark as Paid
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={async (e) => {
+                          e.stopPropagation()
+                          try {
+                            const {
+                              data: { session },
+                              error: sessionError,
+                            } = await supabase.auth.getSession()
+
+                            if (sessionError) {
+                              throw new Error(sessionError.message)
+                            }
+
+                            const response = await fetch(
+                              "https://sheetbills-server.vercel.app/api/sheets/mark-as-pending",
+                              {
+                                method: "PUT",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                  Authorization: `Bearer ${session?.provider_token}`,
+                                  "X-Supabase-Token": session?.access_token || "",
+                                },
+                                body: JSON.stringify({ invoiceId: invoice.id }),
+                              },
+                            )
+
+                            if (!response.ok) {
+                              const errorData = await response.json()
+                              throw new Error(errorData.error || "Failed to mark invoice as pending")
+                            }
+
+                            // Update local state
+                            const updatedInvoices = invoices.map((inv) =>
+                              inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv,
+                            )
+                            setInvoices(updatedInvoices)
+
+                            toast({
+                              title: "Status Updated",
+                              description: "Invoice marked as pending successfully.",
+                            })
+                          } catch (error) {
+                            toast({
+                              title: "Error",
+                              description: error instanceof Error ? error.message : "Failed to update invoice status",
+                              variant: "destructive",
+                            })
+                          }
+                        }}
+                        className="bg-amber-50 text-amber-700 hover:bg-amber-100 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+                        size="sm"
+                        aria-label="Mark invoice as pending"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault()
+                            e.currentTarget.click()
+                          }
+                        }}
+                      >
+                        <Clock className="mr-2 h-4 w-4" />
+                        Mark as Pending
                       </Button>
                     )}
                   </TableCell>
@@ -970,50 +1112,10 @@ export default function Dashboard() {
                         )}
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                          onClick={async () => {
-                            try {
-                              const {
-                                data: { session },
-                                error: sessionError,
-                              } = await supabase.auth.getSession()
-
-                              if (sessionError) {
-                                throw new Error(sessionError.message)
-                              }
-
-                              const response = await fetch(
-                                "https://sheetbills-server.vercel.app/api/sheets/delete-invoice",
-                                {
-                                  method: "DELETE",
-                                  headers: {
-                                    "Content-Type": "application/json",
-                                    Authorization: `Bearer ${session?.provider_token}`,
-                                    "X-Supabase-Token": session?.access_token || "",
-                                  },
-                                  body: JSON.stringify({ invoiceId: invoice.id }),
-                                },
-                              )
-
-                              if (!response.ok) {
-                                const errorData = await response.json()
-                                throw new Error(errorData.error || "Failed to delete invoice")
-                              }
-
-                              // Update local state by removing the deleted invoice
-                              const updatedInvoices = invoices.filter((inv) => inv.id !== invoice.id)
-                              setInvoices(updatedInvoices)
-
-                              toast({
-                                title: "Invoice Deleted",
-                                description: "Invoice has been deleted successfully.",
-                              })
-                            } catch (error) {
-                              toast({
-                                title: "Error",
-                                description: error instanceof Error ? error.message : "Failed to delete invoice",
-                                variant: "destructive",
-                              })
-                            }
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setInvoiceToDelete(invoice)
+                            setIsDeleteDialogOpen(true)
                           }}
                           className="text-red-600"
                         >

@@ -154,13 +154,14 @@ export default function SettingsPage() {
       }
 
       const response = await axios.put(
-        "https://sheetbills-server.vercel.app/api/update-business-details", // Correct endpoint
+        "https://sheetbills-server.vercel.app/api/update-business-details",
         {
           companyName: businessData.companyName,
           email: businessData.email,
           phone: businessData.phone,
           addressLine1: businessData.addressLine1,
-          addressLine2: businessData.addressLine2
+          addressLine2: businessData.addressLine2,
+          selectedAddressLine: businessData.selectedAddressLine
         },
         {
           headers: {
@@ -176,7 +177,10 @@ export default function SettingsPage() {
           description: "Business details updated successfully",
         });
         setIsEditing(false);
-        fetchData(); // Refresh the data
+        setBusinessData(prev => ({
+          ...prev,
+          selectedAddressLine: businessData.selectedAddressLine
+        }));
       }
 
     } catch (error) {

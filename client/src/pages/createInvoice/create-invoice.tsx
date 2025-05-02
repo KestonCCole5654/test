@@ -1149,12 +1149,7 @@ export default function InvoiceForm() {
               </svg>
               <h2 className="text-2xl font-bold mb-2 text-green-700">Invoice Saved!</h2>
               <p className="mb-4 text-gray-600">Your invoice has been saved successfully.</p>
-              <Button
-                className="bg-green-700 text-white hover:bg-green-800"
-                onClick={() => setShowSuccessModal(false)}
-              >
-                Close
-              </Button>
+              
             </div>
           </div>
         )}

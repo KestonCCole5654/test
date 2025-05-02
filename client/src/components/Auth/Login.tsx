@@ -7,11 +7,7 @@ import { Button } from "../../components/ui/button"
 import { Card, CardContent } from "../../components/ui/card"
 import { Loader2, Shield } from "lucide-react"
 import Header from "../../components/header"
-
-type Session = {
-  access_token: string
-  provider_token?: string | null
-}
+import { Session } from "@supabase/supabase-js"
 
 export default function Login() {
   const [error, setError] = useState<string>("")

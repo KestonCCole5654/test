@@ -1034,35 +1034,13 @@ export default function InvoiceForm() {
               {/* Save and Download Invoice Button */}
               <div className="flex gap-3 justify-end no-print">
                 {invoiceToEdit ? (
-                  <>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => {
-                        updateInvoiceData("status", "Pending");
-                        handleUpdate();
-                      }}
-                      className={`w-full sm:w-auto ${invoiceData.status === "Pending" ? "bg-yellow-100 text-yellow-800" : "bg-white"}`}
-                    >
-                      Mark as Pending
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => {
-                        updateInvoiceData("status", "Paid");
-                        handleUpdate();
-                      }}
-                      className={`w-full sm:w-auto ${invoiceData.status === "Paid" ? "bg-green-100 text-green-800" : "bg-white"}`}
-                    >
-                      Mark as Paid
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={handleUpdate} 
-                      className="w-full sm:w-auto bg-green-600 text-white hover:bg-green-700"
-                    >
-                      Update Invoice
-                    </Button>
-                  </>
+                  <Button 
+                    variant="outline" 
+                    onClick={handleUpdate} 
+                    className="w-full sm:w-auto bg-green-600 text-white hover:bg-green-700"
+                  >
+                    Update Invoice
+                  </Button>
                 ) : (
                   <Button 
                     variant="outline" 

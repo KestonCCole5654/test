@@ -47,8 +47,8 @@ export default function SettingsPage() {
     addressLine1: "",
     addressLine2: "",
     email: "",
+    selectedAddressLine: "addressLine1" as "addressLine1" | "addressLine2"
   })
-  const [selectedAddressLine, setSelectedAddressLine] = useState<'addressLine1' | 'addressLine2'>('addressLine1')
   const [isUpdatingBusiness, setIsUpdatingBusiness] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
 
@@ -93,6 +93,7 @@ export default function SettingsPage() {
           phone: businessResponse.data.businessDetails["Phone Number"] || "",
           addressLine1: businessResponse.data.businessDetails["Address Line 1"] || "",
           addressLine2: businessResponse.data.businessDetails["Address Line 2"] || "",
+          selectedAddressLine: businessResponse.data.businessDetails["Address Line 1"] ? "addressLine1" : "addressLine2"
         });
       }
 
@@ -323,14 +324,14 @@ export default function SettingsPage() {
                 <dt className="text-sm text-muted-foreground">Address</dt>
                 <div className="flex items-center gap-2">
                   <select
-                    value={selectedAddressLine}
-                    onChange={(e) => setSelectedAddressLine(e.target.value as 'addressLine1' | 'addressLine2')}
+                    value={businessData.selectedAddressLine}
+                    onChange={(e) => setBusinessData({ ...businessData, selectedAddressLine: e.target.value as "addressLine1" | "addressLine2" })}
                     className="text-sm border rounded px-2 py-1"
                   >
                     <option value="addressLine1">Address Line 1</option>
                     <option value="addressLine2">Address Line 2</option>
                   </select>
-                  <dd className="font-medium">{businessData[selectedAddressLine] || "—"}</dd>
+                  <dd className="font-medium">{businessData[businessData.selectedAddressLine] || "—"}</dd>
                 </div>
               </div>
             </dl>
@@ -388,8 +389,8 @@ export default function SettingsPage() {
                 <div className="space-y-2">
                   <Label>Display Address</Label>
                   <select
-                    value={selectedAddressLine}
-                    onChange={(e) => setSelectedAddressLine(e.target.value as 'addressLine1' | 'addressLine2')}
+                    value={businessData.selectedAddressLine}
+                    onChange={(e) => setBusinessData({ ...businessData, selectedAddressLine: e.target.value as "addressLine1" | "addressLine2" })}
                     className="w-full px-3 py-2 border rounded-md"
                   >
                     <option value="addressLine1">Address Line 1</option>

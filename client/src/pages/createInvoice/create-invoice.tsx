@@ -5,7 +5,7 @@ import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Textarea } from "../../components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
 import { Trash2, Plus, Download, ChevronDown, ArrowLeft, CheckCircle, Clock } from "lucide-react"
 import html2canvas from "html2canvas"
 import jsPDF from "jspdf"
@@ -587,13 +587,12 @@ export default function InvoiceForm() {
   }
 
   const [isLoading, setIsLoading] = useState(true)
-  const [businessData, setBusinessData] = useState<BusinessData>({
+  const [businessData, setBusinessData] = useState({
     companyName: "",
     phone: "",
     addressLine1: "",
     addressLine2: "",
     email: "",
-    logo: "",
   })
   const [sheetConnection, setSheetConnection] = useState({
     connected: false,
@@ -671,60 +670,12 @@ export default function InvoiceForm() {
   }, [invoiceData.items]);
 
   const toggleItem = (index: number) => {
-    setCollapsedItems((prev) => {
-      const newCollapsed = [...prev]
-      newCollapsed[index] = !newCollapsed[index]
-      return newCollapsed
-    })
-  }
-
-  const handleItemClick = (e: React.MouseEvent, index: number) => {
-    // Only toggle if clicking on the header area, not on inputs
-    if ((e.target as HTMLElement).closest('input, select, textarea')) {
-      return
-    }
-    toggleItem(index)
-  }
-
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) return
-
-    try {
-      const formData = new FormData()
-      formData.append("logo", file)
-
-      const response = await fetch("https://sheetbills-server.vercel.app/api/upload-logo", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${session?.provider_token}`,
-          "X-Supabase-Token": session?.access_token || "",
-        },
-        body: formData,
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to upload logo")
-      }
-
-      const { logoUrl } = await response.json()
-      setBusinessData({ ...businessData, logo: logoUrl })
-      toast({
-        title: "Success",
-        description: "Logo uploaded successfully",
-        variant: "default"
-      })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to upload logo",
-        variant: "destructive"
-      })
-    }
-  }
+    setCollapsedItems(prev => {
+      const newState = [...prev];
+      newState[index] = !newState[index];
+      return newState;
+    });
+  };
 
   return (
     <>
@@ -888,7 +839,7 @@ export default function InvoiceForm() {
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <div>Items</div>
-                    <Button variant="outline" type="button" onClick={addItem} size="sm">
+                    <Button type="button" onClick={addItem} size="sm">
                       <Plus className="h-4 w-4 mr-2" />
                       Add Item
                     </Button>
@@ -897,79 +848,117 @@ export default function InvoiceForm() {
                 <CardContent>
                   <div className="space-y-4">
                     {invoiceData.items.map((item, index) => (
-                      <Card key={index}>
-                        <CardHeader
-                          className="cursor-pointer"
-                          onClick={(e) => handleItemClick(e, index)}
+                      <div key={index} className="border rounded-md">
+                        <div 
+                          className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50"
+                          onClick={() => toggleItem(index)}
                         >
-                          <div className="flex items-center justify-between">
-                            <CardTitle className="text-lg">
-                              {item.name || `Item ${index + 1}`}
-                            </CardTitle>
+                          <div className="flex items-center gap-2">
+                            <ChevronDown className={`h-4 w-4 transition-transform ${collapsedItems[index] ? "rotate-180" : ""}`} />
+                            <span className="font-medium">Item {index + 1}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-slate-500">
+                              {item.name || "Unnamed Item"}
+                            </span>
                             <Button
+                              type="button"
                               variant="ghost"
-                              size="sm"
+                              size="icon"
                               onClick={(e) => {
-                                e.stopPropagation()
-                                removeItem(index)
+                                e.stopPropagation();
+                                removeItem(index);
                               }}
+                              className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50"
                             >
                               <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">Remove item</span>
                             </Button>
                           </div>
-                        </CardHeader>
-                        <CardContent>
-                          <div className={`p-4 space-y-4 ${collapsedItems[index] ? "hidden" : ""}`}>
+                        </div>
+                        <div className={`p-4 space-y-4 ${collapsedItems[index] ? "hidden" : ""}`}>
+                          <div className="flex flex-col gap-2">
+                            <Label htmlFor={`item-name-${index}`}>Name</Label>
+                            <Input
+                              id={`item-name-${index}`}
+                              value={item.name}
+                              onChange={(e) => {
+                                e.stopPropagation();
+                                updateItem(index, "name", e.target.value);
+                              }}
+                              onClick={(e) => e.stopPropagation()}
+                              placeholder="Item name"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <Label htmlFor={`item-description-${index}`}>Description</Label>
+                            <Textarea
+                              id={`item-description-${index}`}
+                              value={item.description}
+                              onChange={(e) => {
+                                e.stopPropagation();
+                                updateItem(index, "description", e.target.value);
+                              }}
+                              onClick={(e) => e.stopPropagation()}
+                              placeholder="Item description"
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
                             <div className="flex flex-col gap-2">
-                              <Label htmlFor={`item-name-${index}`}>Name</Label>
+                              <Label htmlFor={`item-quantity-${index}`}>Quantity</Label>
                               <Input
-                                id={`item-name-${index}`}
-                                value={item.name}
+                                id={`item-quantity-${index}`}
+                                type="number"
+                                value={item.quantity}
                                 onChange={(e) => {
                                   e.stopPropagation();
-                                  updateItem(index, "name", e.target.value);
+                                  updateItem(index, "quantity", parseInt(e.target.value) || 0);
                                 }}
                                 onClick={(e) => e.stopPropagation()}
-                                placeholder="Item name"
+                                min="0"
                               />
                             </div>
                             <div className="flex flex-col gap-2">
-                              <Label htmlFor={`item-description-${index}`}>Description</Label>
-                              <Textarea
-                                id={`item-description-${index}`}
-                                value={item.description}
+                              <Label htmlFor={`item-price-${index}`}>Price</Label>
+                              <Input
+                                id={`item-price-${index}`}
+                                type="number"
+                                value={item.price}
                                 onChange={(e) => {
                                   e.stopPropagation();
-                                  updateItem(index, "description", e.target.value);
+                                  updateItem(index, "price", parseFloat(e.target.value) || 0);
                                 }}
                                 onClick={(e) => e.stopPropagation()}
-                                placeholder="Item description"
+                                min="0"
+                                step="0.01"
                               />
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
-                              <div className="flex flex-col gap-2">
-                                <Label htmlFor={`item-quantity-${index}`}>Quantity</Label>
-                                <Input
-                                  id={`item-quantity-${index}`}
-                                  type="number"
-                                  value={item.quantity}
-                                  onChange={(e) => {
-                                    e.stopPropagation();
-                                    updateItem(index, "quantity", parseInt(e.target.value) || 0);
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="flex flex-col gap-2">
+                              <Label htmlFor={`item-discount-${index}`}>Discount</Label>
+                              <div className="flex gap-2">
+                                <Select
+                                  value={item.discount.type}
+                                  onValueChange={(value) => {
+                                    updateItem(index, "discount", { ...item.discount, type: value });
                                   }}
-                                  onClick={(e) => e.stopPropagation()}
-                                  min="0"
-                                />
-                              </div>
-                              <div className="flex flex-col gap-2">
-                                <Label htmlFor={`item-price-${index}`}>Price</Label>
+                                >
+                                  <SelectTrigger onClick={(e) => e.stopPropagation()}>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="percentage">%</SelectItem>
+                                    <SelectItem value="fixed">$</SelectItem>
+                                  </SelectContent>
+                                </Select>
                                 <Input
-                                  id={`item-price-${index}`}
+                                  id={`item-discount-${index}`}
                                   type="number"
-                                  value={item.price}
+                                  value={item.discount.value}
                                   onChange={(e) => {
                                     e.stopPropagation();
-                                    updateItem(index, "price", parseFloat(e.target.value) || 0);
+                                    updateItem(index, "discount", { ...item.discount, value: parseFloat(e.target.value) || 0 });
                                   }}
                                   onClick={(e) => e.stopPropagation()}
                                   min="0"
@@ -977,73 +966,40 @@ export default function InvoiceForm() {
                                 />
                               </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
-                              <div className="flex flex-col gap-2">
-                                <Label htmlFor={`item-discount-${index}`}>Discount</Label>
-                                <div className="flex gap-2">
-                                  <Select
-                                    value={item.discount.type}
-                                    onValueChange={(value) => {
-                                      updateItem(index, "discount", { ...item.discount, type: value });
-                                    }}
-                                  >
-                                    <SelectTrigger onClick={(e) => e.stopPropagation()}>
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="percentage">%</SelectItem>
-                                      <SelectItem value="fixed">$</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                  <Input
-                                    id={`item-discount-${index}`}
-                                    type="number"
-                                    value={item.discount.value}
-                                    onChange={(e) => {
-                                      e.stopPropagation();
-                                      updateItem(index, "discount", { ...item.discount, value: parseFloat(e.target.value) || 0 });
-                                    }}
-                                    onClick={(e) => e.stopPropagation()}
-                                    min="0"
-                                    step="0.01"
-                                  />
-                                </div>
-                              </div>
-                              <div className="flex flex-col gap-2">
-                                <Label htmlFor={`item-tax-${index}`}>Tax</Label>
-                                <div className="flex gap-2">
-                                  <Select
-                                    value={item.tax.type}
-                                    onValueChange={(value) => {
-                                      updateItem(index, "tax", { ...item.tax, type: value });
-                                    }}
-                                  >
-                                    <SelectTrigger onClick={(e) => e.stopPropagation()}>
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="percentage">%</SelectItem>
-                                      <SelectItem value="fixed">$</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                  <Input
-                                    id={`item-tax-${index}`}
-                                    type="number"
-                                    value={item.tax.value}
-                                    onChange={(e) => {
-                                      e.stopPropagation();
-                                      updateItem(index, "tax", { ...item.tax, value: parseFloat(e.target.value) || 0 });
-                                    }}
-                                    onClick={(e) => e.stopPropagation()}
-                                    min="0"
-                                    step="0.01"
-                                  />
-                                </div>
+                            <div className="flex flex-col gap-2">
+                              <Label htmlFor={`item-tax-${index}`}>Tax</Label>
+                              <div className="flex gap-2">
+                                <Select
+                                  value={item.tax.type}
+                                  onValueChange={(value) => {
+                                    updateItem(index, "tax", { ...item.tax, type: value });
+                                  }}
+                                >
+                                  <SelectTrigger onClick={(e) => e.stopPropagation()}>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="percentage">%</SelectItem>
+                                    <SelectItem value="fixed">$</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <Input
+                                  id={`item-tax-${index}`}
+                                  type="number"
+                                  value={item.tax.value}
+                                  onChange={(e) => {
+                                    e.stopPropagation();
+                                    updateItem(index, "tax", { ...item.tax, value: parseFloat(e.target.value) || 0 });
+                                  }}
+                                  onClick={(e) => e.stopPropagation()}
+                                  min="0"
+                                  step="0.01"
+                                />
                               </div>
                             </div>
                           </div>
-                        </CardContent>
-                      </Card>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </CardContent>

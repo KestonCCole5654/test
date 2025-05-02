@@ -23,16 +23,7 @@ export interface InvoiceData {
   customer: Customer
 
   items: InvoiceItem[]
-  amount: number // Added invoice amount field
-  tax: {
-    type: "percentage" | "fixed"
-    value: number | string
-  }
-  discount: {
-    type: "percentage" | "fixed"
-    value: number | string
-  }
-
+  amount: number
   notes: string
   template: "classic"
   status?: "Paid" | "Pending"
@@ -98,15 +89,7 @@ export default function InvoiceForm() {
         value: ""
       }
     }],
-    amount: invoiceToEdit?.amount, // Added invoice amount field
-    tax: invoiceToEdit?.tax || {
-      type: "percentage",
-      value: "",
-    },
-    discount: invoiceToEdit?.discount || {
-      type: "percentage",
-      value: "",
-    },
+    amount: invoiceToEdit?.amount,
     notes: invoiceToEdit?.notes || "",
     template: invoiceToEdit?.template || "classic",
   })
@@ -194,52 +177,6 @@ export default function InvoiceForm() {
       return total + itemTotal - itemDiscount + itemTax
     }, 0)
   }
-  // Used to Calculate Final Total
-  function calculateFinalTotal(invoiceData: InvoiceData): number {
-    const subtotal = invoiceData.items.reduce((total: number, item: InvoiceItem) => {
-      const price = item.price === "" ? 0 : Number(item.price)
-      return total + item.quantity * price
-    }, 0)
-    const discount = calculateDiscount(invoiceData)
-    const tax = calculateTax(invoiceData)
-    return subtotal - discount + tax
-  }
-  // Used to calculate discount
-  function calculateDiscount(invoiceData: InvoiceData): number {
-    const subtotal = invoiceData.items.reduce((total: number, item: InvoiceItem) => {
-      const price = item.price === "" ? 0 : Number(item.price)
-      return total + item.quantity * price
-    }, 0)
-
-    if (!invoiceData.discount.value && invoiceData.discount.value !== 0) {
-      return 0
-    }
-
-    if (invoiceData.discount.type === "percentage") {
-      return (subtotal * Number(invoiceData.discount.value)) / 100
-    } else {
-      return Math.min(subtotal, Number(invoiceData.discount.value))
-    }
-  }
-  // Used to calculate tax
-  function calculateTax(invoiceData: InvoiceData): number {
-    const subtotal: number = invoiceData.items.reduce((total: number, item: InvoiceItem) => {
-      const price = item.price === "" ? 0 : Number(item.price)
-      return total + item.quantity * price
-    }, 0)
-    const discountAmount: number = calculateDiscount(invoiceData)
-    const afterDiscount: number = subtotal - discountAmount
-
-    if (!invoiceData.tax.value && invoiceData.tax.value !== 0) {
-      return 0
-    }
-
-    if (invoiceData.tax.type === "percentage") {
-      return (afterDiscount * Number(invoiceData.tax.value)) / 100
-    } else {
-      return Number(invoiceData.tax.value)
-    }
-  }
 
   // Fix the formatCurrency function - it has typos in the property names
   function formatCurrency(amount: number): string {
@@ -274,9 +211,7 @@ export default function InvoiceForm() {
 
       // Calculate totals for the invoice
       const subtotal = calculateTotal()
-      const discountAmount = calculateDiscount(invoiceData)
-      const taxAmount = calculateTax(invoiceData)
-      const total = calculateFinalTotal(invoiceData)
+      const total = calculateTotal()
 
       // Get the original invoice ID
       const originalInvoiceId = invoiceToEdit.id || invoiceToEdit.invoiceNumber
@@ -291,14 +226,6 @@ export default function InvoiceForm() {
             id: originalInvoiceId, // Ensure we're using the original ID
             invoiceNumber: originalInvoiceId, // Use the same ID for invoiceNumber
             amount: total,
-            tax: {
-              type: invoiceData.tax.type,
-              value: invoiceData.tax.value || 0
-            },
-            discount: {
-              type: invoiceData.discount.type,
-              value: invoiceData.discount.value || 0
-            },
             status: invoiceToEdit.status
           },
           invoiceId: originalInvoiceId, // Use the same ID here
@@ -351,9 +278,7 @@ export default function InvoiceForm() {
 
       // Calculate totals for the invoice
       const subtotal = calculateTotal()
-      const discountAmount = calculateDiscount(invoiceData)
-      const taxAmount = calculateTax(invoiceData)
-      const total = calculateFinalTotal(invoiceData)
+      const total = calculateTotal()
 
       // Prepare the save request
       const saveResponse = await axios.post(
@@ -363,14 +288,6 @@ export default function InvoiceForm() {
           invoiceData: {
             ...invoiceData,
             amount: total,
-            tax: {
-              type: invoiceData.tax.type,
-              value: invoiceData.tax.value || 0
-            },
-            discount: {
-              type: invoiceData.discount.type,
-              value: invoiceData.discount.value || 0
-            },
             status: 'Pending'
           },
           sheetUrl: invoicesSheet.sheetUrl
@@ -517,9 +434,7 @@ export default function InvoiceForm() {
         items: Array.isArray(invoiceToEdit.items)
           ? invoiceToEdit.items
           : [{ name: "", description: "", quantity: 1, price: "", discount: { type: "percentage", value: "" }, tax: { type: "percentage", value: "" } }],
-        amount: invoiceToEdit.amount, // Added invoice amount field
-        tax: parseFinancialField(invoiceToEdit.tax, "tax", { type: "percentage", value: "" }),
-        discount: parseFinancialField(invoiceToEdit.discount, "discount", { type: "fixed", value: "" }),
+        amount: invoiceToEdit.amount,
         notes: typeof invoiceToEdit.notes === "string" ? invoiceToEdit.notes : "",
         template: "classic",
         status: invoiceToEdit.status === "Paid" ? "Paid" : "Pending",
@@ -528,8 +443,6 @@ export default function InvoiceForm() {
       // Debug log the processed data
       console.log("Processed Invoice Data:", {
         ...invoiceToEdit,
-        tax: invoiceToEdit.tax || { type: "percentage", value: 0 },
-        discount: invoiceToEdit.discount || { type: "fixed", value: 0 },
       })
     }
   }, [invoiceToEdit])
@@ -541,18 +454,7 @@ export default function InvoiceForm() {
       (sum, item) => sum + item.quantity * (item.price === "" ? 0 : Number(item.price)),
       0,
     )
-    const discountAmount = data.discount?.value
-      ? data.discount.type === "percentage"
-        ? (subtotal * Number(data.discount.value)) / 100
-        : Math.min(subtotal, Number(data.discount.value))
-      : 0
-    const taxableAmount = subtotal - discountAmount
-    const taxAmount = data.tax?.value
-      ? data.tax.type === "percentage"
-        ? (taxableAmount * Number(data.tax.value)) / 100
-        : Number(data.tax.value)
-      : 0
-    const total = subtotal - discountAmount + taxAmount
+    const total = calculateTotal()
 
     // Format date to show month name, day and year
     const formatDate = (dateString: string) => {
@@ -660,27 +562,8 @@ export default function InvoiceForm() {
               <tbody>
                 <tr>
                   <td className="py-1 px-2 text-right text-gray-600">Subtotal</td>
-                  {/* And in the totals section: */}
                   <td className="py-1 px-2 text-right font-medium">${formatCurrency(subtotal)}</td>
                 </tr>
-
-                {Number(data.discount?.value) > 0 && (
-                  <tr>
-                    <td className="py-1 px-2 text-right text-gray-600">
-                      Discount {data.discount.type === "percentage" ? `(${data.discount.value}%)` : ""}
-                    </td>
-                    <td className="py-1 px-2 text-right  text-black font-medium">-${formatCurrency(discountAmount)}</td>
-                  </tr>
-                )}
-
-                {Number(data.tax?.value) > 0 && (
-                  <tr>
-                    <td className="py-1 px-2 text-right text-gray-600">
-                      Tax {data.tax.type === "percentage" ? `(${data.tax.value}%)` : ""}
-                    </td>
-                    <td className="py-1 px-2 text-right font-medium">+${formatCurrency(taxAmount)}</td>
-                  </tr>
-                )}
 
                 <tr className="">
                   <td className="py-2 px-2 text-right font-bold text-gray-800">Total</td>
@@ -1135,117 +1018,6 @@ export default function InvoiceForm() {
                       </div>
                     ))}
                   </div>
-
-                  <div className="mt-6 border rounded-md p-3">
-                    <h3 className="text-sm font-medium mb-2">Discount</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="discount-type">Type</Label>
-                        <select
-                          id="discount-type"
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                          value={invoiceData.discount.type}
-                          onChange={(e) =>
-                            updateInvoiceData("discount", {
-                              ...invoiceData.discount,
-                              type: e.target.value as "percentage" | "fixed",
-                            })
-                          }
-                        >
-                          <option value="percentage">Percentage (%)</option>
-                          <option value="fixed">Fixed Amount ($)</option>
-                        </select>
-                      </div>
-                      <div>
-                        <Label htmlFor="discount-value">
-                          {invoiceData.discount.type === "percentage" ? "Percentage" : "Amount"}
-                        </Label>
-                        <Input
-                          id="discount-value"
-                          type="number"
-                          min="0"
-                          step={invoiceData.discount.type === "percentage" ? "1" : "0.01"}
-                          max={invoiceData.discount.type === "percentage" ? "100" : undefined}
-                          value={invoiceData.discount.value}
-                          onChange={(e) =>
-                            updateInvoiceData("discount", {
-                              ...invoiceData.discount,
-                              value: e.target.value === "" ? "" : Number.parseFloat(e.target.value),
-                            })
-                          }
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 border rounded-md p-3">
-                    <h3 className="text-sm font-medium mb-2">Tax</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="tax-type">Type</Label>
-                        <select
-                          id="tax-type"
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                          value={invoiceData.tax.type}
-                          onChange={(e) =>
-                            updateInvoiceData("tax", {
-                              ...invoiceData.tax,
-                              type: e.target.value as "percentage" | "fixed",
-                            })
-                          }
-                        >
-                          <option value="percentage">Percentage (%)</option>
-                          <option value="fixed">Fixed Amount ($)</option>
-                        </select>
-                      </div>
-                      <div>
-                        <Label htmlFor="tax-value">
-                          {invoiceData.tax.type === "percentage" ? "Percentage" : "Amount"}
-                        </Label>
-                        <Input
-                          id="tax-value"
-                          type="number"
-                          min="0"
-                          step={invoiceData.tax.type === "percentage" ? "0.01" : "0.01"}
-                          value={invoiceData.tax.value}
-                          onChange={(e) =>
-                            updateInvoiceData("tax", {
-                              ...invoiceData.tax,
-                              value: e.target.value === "" ? "" : Number.parseFloat(e.target.value),
-                            })
-                          }
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Total */}
-                  <div className="flex justify-end mt-4 p-3 bg-muted/20 font-medium rounded-md">
-                    <div className="w-full sm:w-1/2 space-y-1">
-                      <div className="flex justify-between">
-                        <span>Subtotal:</span>
-                        {/* And in the form's total section: */}
-                        <span>${formatCurrency(calculateTotal())}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>
-                          Discount (
-                          {invoiceData.discount.type === "percentage" ? `${invoiceData.discount.value}%` : "fixed"}):
-                        </span>
-                        <span className="text-black">-${formatCurrency(calculateDiscount(invoiceData))}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>
-                          Tax ({invoiceData.tax.type === "percentage" ? `${invoiceData.tax.value}%` : "fixed"}):
-                        </span>
-                        <span className="text-green-600">+${formatCurrency(calculateTax(invoiceData))}</span>
-                      </div>
-                      <div className="flex justify-between text-base pt-2 border-t mt-2">
-                        <span>Total:</span>
-                        <span className="text-primary">${formatCurrency(calculateFinalTotal(invoiceData))}</span>
-                      </div>
-                    </div>
-                  </div>
                 </CardContent>
               </Card>
 
@@ -1255,13 +1027,18 @@ export default function InvoiceForm() {
                   <CardTitle className="flex items-center">Notes</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <Textarea
-                    id="notes"
-                    value={invoiceData.notes}
-                    onChange={(e) => updateInvoiceData("notes", e.target.value)}
-                    placeholder="Payment terms, bank details, or any other information"
-                    rows={2}
-                  />
+                  <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-2">
+                      <Label htmlFor="notes">Notes</Label>
+                      <Textarea
+                        id="notes"
+                        value={invoiceData.notes}
+                        onChange={(e) => updateInvoiceData("notes", e.target.value)}
+                        placeholder="Add any additional notes or terms..."
+                        className="min-h-[100px]"
+                      />
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 

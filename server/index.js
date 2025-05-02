@@ -285,28 +285,62 @@ async function getDefaultSheetId(accessToken) {
 {/*Helper Methods for calculations*/}
 ////////////////////////////////////////////////////////////////////
 function calculateSubtotal(items) {
-  return items.reduce((total, item) => total + item.quantity * item.price, 0);
+  return items.reduce((total, item) => {
+    const price = item.price === "" ? 0 : Number(item.price);
+    return total + item.quantity * price;
+  }, 0);
 }
-function calculateDiscount(subtotal, discount) {
-  if (discount.type === "percentage") {
-    return (subtotal * discount.value) / 100;
-  } else {
-    return Math.min(subtotal, discount.value); // Ensure discount doesn't exceed subtotal
-  }
-}
-function calculateTax(subtotal, discountAmount, tax) {
-  const afterDiscount = subtotal - discountAmount;
 
-  if (tax.type === "percentage") {
-    return (afterDiscount * tax.value) / 100;
-  } else {
-    return tax.value;
-  }
+function calculateDiscount(items) {
+  return items.reduce((total, item) => {
+    const price = item.price === "" ? 0 : Number(item.price);
+    const itemTotal = item.quantity * price;
+    
+    if (!item.discount?.value && item.discount?.value !== 0) {
+      return total;
+    }
+
+    if (item.discount.type === "percentage") {
+      return total + (itemTotal * Number(item.discount.value)) / 100;
+    } else {
+      return total + Math.min(itemTotal, Number(item.discount.value));
+    }
+  }, 0);
 }
+
+function calculateTax(items) {
+  return items.reduce((total, item) => {
+    const price = item.price === "" ? 0 : Number(item.price);
+    const itemTotal = item.quantity * price;
+    
+    // Calculate item discount first
+    let itemDiscount = 0;
+    if (item.discount?.value && item.discount?.value !== "") {
+      if (item.discount.type === "percentage") {
+        itemDiscount = (itemTotal * Number(item.discount.value)) / 100;
+      } else {
+        itemDiscount = Math.min(itemTotal, Number(item.discount.value));
+      }
+    }
+    
+    const afterDiscount = itemTotal - itemDiscount;
+    
+    if (!item.tax?.value && item.tax?.value !== 0) {
+      return total;
+    }
+
+    if (item.tax.type === "percentage") {
+      return total + (afterDiscount * Number(item.tax.value)) / 100;
+    } else {
+      return total + Number(item.tax.value);
+    }
+  }, 0);
+}
+
 function calculateFinalTotal(invoiceData) {
   const subtotal = calculateSubtotal(invoiceData.items);
-  const discountAmount = calculateDiscount(subtotal, invoiceData.discount);
-  const taxAmount = calculateTax(subtotal, discountAmount, invoiceData.tax);
+  const discountAmount = calculateDiscount(invoiceData.items);
+  const taxAmount = calculateTax(invoiceData.items);
 
   return (subtotal - discountAmount + taxAmount).toFixed(2);
 }
@@ -726,8 +760,8 @@ app.get('/api/sheets/data', async (req, res) => {
         
         // Calculate totals using helper functions
         const subtotal = calculateSubtotal(items);
-        const discountAmount = calculateDiscount(subtotal, discount);
-        const taxAmount = calculateTax(subtotal, discountAmount, tax);
+        const discountAmount = calculateDiscount(items);
+        const taxAmount = calculateTax(items);
         const amount = (subtotal - discountAmount + taxAmount).toFixed(2);
 
         return {
@@ -848,8 +882,8 @@ app.post('/api/saveInvoice', async (req, res) => {
 
     // Calculate totals
     const saveSubtotal = calculateSubtotal(invoiceData.items);
-    const saveDiscountAmount = calculateDiscount(saveSubtotal, invoiceData.discount);
-    const saveTaxAmount = calculateTax(saveSubtotal, saveDiscountAmount, invoiceData.tax);
+    const saveDiscountAmount = calculateDiscount(invoiceData.items);
+    const saveTaxAmount = calculateTax(invoiceData.items);
     const saveTotal = (saveSubtotal - saveDiscountAmount + saveTaxAmount).toFixed(2);
 
     // Get spreadsheet ID
@@ -1558,8 +1592,8 @@ app.post('/api/update-invoice', async (req, res) => {
 
     // Calculate totals
     const invoiceSubtotal = calculateSubtotal(invoiceData.items);
-    const invoiceDiscountAmount = calculateDiscount(invoiceSubtotal, invoiceData.discount);
-    const invoiceTaxAmount = calculateTax(invoiceSubtotal, invoiceDiscountAmount, invoiceData.tax);
+    const invoiceDiscountAmount = calculateDiscount(invoiceData.items);
+    const invoiceTaxAmount = calculateTax(invoiceData.items);
     const invoiceTotal = (invoiceSubtotal - invoiceDiscountAmount + invoiceTaxAmount).toFixed(2);
 
     // Prepare updated data with stringified objects

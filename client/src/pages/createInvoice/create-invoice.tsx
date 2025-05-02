@@ -43,6 +43,14 @@ export interface InvoiceItem {
   description: string
   quantity: number
   price: number | string
+  discount: {
+    type: "percentage" | "fixed"
+    value: number | string
+  }
+  tax: {
+    type: "percentage" | "fixed"
+    value: number | string
+  }
 }
 
 export interface Customer {
@@ -76,7 +84,20 @@ export default function InvoiceForm() {
       email: "",
       address: "",
     },
-    items: invoiceToEdit?.items || [{ name: "", description: "", quantity: 1, price: "" }],
+    items: invoiceToEdit?.items || [{ 
+      name: "", 
+      description: "", 
+      quantity: 1, 
+      price: "",
+      discount: {
+        type: "percentage",
+        value: ""
+      },
+      tax: {
+        type: "percentage",
+        value: ""
+      }
+    }],
     amount: invoiceToEdit?.amount, // Added invoice amount field
     tax: invoiceToEdit?.tax || {
       type: "percentage",
@@ -120,7 +141,20 @@ export default function InvoiceForm() {
   }
   // Used to Add Items
   const addItem = () => {
-    updateInvoiceData("items", [...invoiceData.items, { name: "", description: "", quantity: 1, price: "" }])
+    updateInvoiceData("items", [...invoiceData.items, { 
+      name: "", 
+      description: "", 
+      quantity: 1, 
+      price: "",
+      discount: {
+        type: "percentage",
+        value: ""
+      },
+      tax: {
+        type: "percentage",
+        value: ""
+      }
+    }])
   }
   // Used to Remove Items
   const removeItem = (index: number) => {
@@ -134,7 +168,30 @@ export default function InvoiceForm() {
   const calculateTotal = () => {
     return invoiceData.items.reduce((total, item) => {
       const price = item.price === "" ? 0 : Number(item.price)
-      return total + item.quantity * price
+      const itemTotal = item.quantity * price
+      
+      // Calculate item discount
+      let itemDiscount = 0
+      if (item.discount.value && item.discount.value !== "") {
+        if (item.discount.type === "percentage") {
+          itemDiscount = (itemTotal * Number(item.discount.value)) / 100
+        } else {
+          itemDiscount = Math.min(itemTotal, Number(item.discount.value))
+        }
+      }
+      
+      // Calculate item tax
+      let itemTax = 0
+      if (item.tax.value && item.tax.value !== "") {
+        const afterDiscount = itemTotal - itemDiscount
+        if (item.tax.type === "percentage") {
+          itemTax = (afterDiscount * Number(item.tax.value)) / 100
+        } else {
+          itemTax = Number(item.tax.value)
+        }
+      }
+      
+      return total + itemTotal - itemDiscount + itemTax
     }, 0)
   }
   // Used to Calculate Final Total
@@ -459,7 +516,7 @@ export default function InvoiceForm() {
         },
         items: Array.isArray(invoiceToEdit.items)
           ? invoiceToEdit.items
-          : [{ name: "", description: "", quantity: 1, price: "" }],
+          : [{ name: "", description: "", quantity: 1, price: "", discount: { type: "percentage", value: "" }, tax: { type: "percentage", value: "" } }],
         amount: invoiceToEdit.amount, // Added invoice amount field
         tax: parseFinancialField(invoiceToEdit.tax, "tax", { type: "percentage", value: "" }),
         discount: parseFinancialField(invoiceToEdit.discount, "discount", { type: "fixed", value: "" }),
@@ -964,8 +1021,115 @@ export default function InvoiceForm() {
                             </div>
                           </div>
 
+                          {/* Item Discount */}
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <Label htmlFor={`item-discount-type-${index}`}>Discount Type</Label>
+                              <select
+                                id={`item-discount-type-${index}`}
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                value={item.discount.type}
+                                onChange={(e) =>
+                                  updateItem(index, "discount", {
+                                    ...item.discount,
+                                    type: e.target.value as "percentage" | "fixed",
+                                  })
+                                }
+                              >
+                                <option value="percentage">Percentage (%)</option>
+                                <option value="fixed">Fixed Amount ($)</option>
+                              </select>
+                            </div>
+                            <div>
+                              <Label htmlFor={`item-discount-value-${index}`}>
+                                {item.discount.type === "percentage" ? "Discount %" : "Discount Amount"}
+                              </Label>
+                              <Input
+                                id={`item-discount-value-${index}`}
+                                type="number"
+                                min="0"
+                                step={item.discount.type === "percentage" ? "1" : "0.01"}
+                                max={item.discount.type === "percentage" ? "100" : undefined}
+                                value={item.discount.value}
+                                onChange={(e) =>
+                                  updateItem(index, "discount", {
+                                    ...item.discount,
+                                    value: e.target.value === "" ? "" : Number.parseFloat(e.target.value),
+                                  })
+                                }
+                              />
+                            </div>
+                          </div>
+
+                          {/* Item Tax */}
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <Label htmlFor={`item-tax-type-${index}`}>Tax Type</Label>
+                              <select
+                                id={`item-tax-type-${index}`}
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                value={item.tax.type}
+                                onChange={(e) =>
+                                  updateItem(index, "tax", {
+                                    ...item.tax,
+                                    type: e.target.value as "percentage" | "fixed",
+                                  })
+                                }
+                              >
+                                <option value="percentage">Percentage (%)</option>
+                                <option value="fixed">Fixed Amount ($)</option>
+                              </select>
+                            </div>
+                            <div>
+                              <Label htmlFor={`item-tax-value-${index}`}>
+                                {item.tax.type === "percentage" ? "Tax %" : "Tax Amount"}
+                              </Label>
+                              <Input
+                                id={`item-tax-value-${index}`}
+                                type="number"
+                                min="0"
+                                step={item.tax.type === "percentage" ? "0.01" : "0.01"}
+                                value={item.tax.value}
+                                onChange={(e) =>
+                                  updateItem(index, "tax", {
+                                    ...item.tax,
+                                    value: e.target.value === "" ? "" : Number.parseFloat(e.target.value),
+                                  })
+                                }
+                              />
+                            </div>
+                          </div>
+
                           <div className="text-right font-medium">
-                            Total: ${formatCurrency(item.quantity * (item.price === "" ? 0 : Number(item.price)))}
+                            Total: ${formatCurrency(
+                              (() => {
+                                const price = item.price === "" ? 0 : Number(item.price)
+                                const itemTotal = item.quantity * price
+                                
+                                // Calculate item discount
+                                let itemDiscount = 0
+                                if (item.discount.value && item.discount.value !== "") {
+                                  if (item.discount.type === "percentage") {
+                                    itemDiscount = (itemTotal * Number(item.discount.value)) / 100
+                                  } else {
+                                    itemDiscount = Math.min(itemTotal, Number(item.discount.value))
+                                  }
+                                }
+                                
+                                // Calculate item tax
+                                let itemTax = 0
+                                if (item.tax.value && item.tax.value !== "") {
+                                  const afterDiscount = itemTotal - itemDiscount
+                                  if (item.tax.type === "percentage") {
+                                    itemTax = (afterDiscount * Number(item.tax.value)) / 100
+                                  } else {
+                                    itemTax = Number(item.tax.value)
+                                  }
+                                }
+                                
+                                return itemTotal - itemDiscount + itemTax
+                              })()
+                            )}
                           </div>
                         </div>
                       </div>

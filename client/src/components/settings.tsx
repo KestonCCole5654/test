@@ -48,6 +48,7 @@ export default function SettingsPage() {
     addressLine2: "",
     email: "",
   })
+  const [selectedAddressLine, setSelectedAddressLine] = useState<'addressLine1' | 'addressLine2'>('addressLine1')
   const [isUpdatingBusiness, setIsUpdatingBusiness] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
 
@@ -320,8 +321,17 @@ export default function SettingsPage() {
               </div>
               <div>
                 <dt className="text-sm text-muted-foreground">Address</dt>
-                <dd>{businessData.addressLine1 || "—"}</dd>
-                <dd>{businessData.addressLine2 || ""}</dd>
+                <div className="flex items-center gap-2">
+                  <select
+                    value={selectedAddressLine}
+                    onChange={(e) => setSelectedAddressLine(e.target.value as 'addressLine1' | 'addressLine2')}
+                    className="text-sm border rounded px-2 py-1"
+                  >
+                    <option value="addressLine1">Address Line 1</option>
+                    <option value="addressLine2">Address Line 2</option>
+                  </select>
+                  <dd className="font-medium">{businessData[selectedAddressLine] || "—"}</dd>
+                </div>
               </div>
             </dl>
           ) : (
@@ -374,6 +384,17 @@ export default function SettingsPage() {
                     onChange={(e) => setBusinessData({ ...businessData, addressLine2: e.target.value })}
                     placeholder="Suite 100, City, State, ZIP"
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label>Display Address</Label>
+                  <select
+                    value={selectedAddressLine}
+                    onChange={(e) => setSelectedAddressLine(e.target.value as 'addressLine1' | 'addressLine2')}
+                    className="w-full px-3 py-2 border rounded-md"
+                  >
+                    <option value="addressLine1">Address Line 1</option>
+                    <option value="addressLine2">Address Line 2</option>
+                  </select>
                 </div>
               </div>
               <div className="flex justify-end gap-2">

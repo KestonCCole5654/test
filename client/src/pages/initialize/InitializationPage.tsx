@@ -9,6 +9,7 @@ import { Label } from "../../components/ui/label"
 import { useToast } from "../../components/ui/use-toast"
 import { Toaster } from "../../components/ui/toaster"
 import { Loader2, ArrowRight, ArrowLeft, CheckCircle } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 
 export default function InitializePage() {
   const { toast } = useToast()
@@ -35,6 +36,8 @@ export default function InitializePage() {
     companyName: "",
     email: "",
   })
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     // Get the auth session from storage
@@ -97,56 +100,56 @@ export default function InitializePage() {
   // Handle form submission - updated to match the backend API
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    // Check for required tokens
-    if (!supabaseToken || !googleAccessToken) {
-      setError("Authentication required. Please sign in and connect your Google account.")
+    
+    if (!businessData.companyName || !businessData.email || !businessData.phone || !businessData.addressLine1) {
+      setError("Please fill in all required fields")
       return
     }
-
-    setIsSubmitting(true)
-    setError("")
-
+    
     try {
-      // Call the API with all required data
-      const response = await fetch('https://sheetbills-server.vercel.app/api/create-business-sheet', {
-        method: 'POST',
+      setIsSubmitting(true)
+      setError("")
+
+      // Call the API to create business sheet
+      const response = await fetch("https://sheetbills-server.vercel.app/api/create-business-sheet", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'X-Supabase-Token': supabaseToken
+          "Content-Type": "application/json",
+          "x-supabase-token": supabaseToken
         },
         body: JSON.stringify({
           accessToken: googleAccessToken,
           businessData: businessData
-        })
+        }),
       })
-
-      const data = await response.json()
-
+      
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to set up your business')
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to save business details")
       }
-
-      // Handle successful response
+      
+      const { businessSheetId, spreadsheetUrl } = await response.json()
+      
       toast({
         title: "Setup Complete",
         description: "Your business sheet has been created successfully.",
       })
-
-      // Store the spreadsheet ID and URL for future use
-      if (data.businessSheetId) {
-        localStorage.setItem("business_sheet_id", data.businessSheetId)
-      }
       
-      if (data.spreadsheetUrl) {
-        localStorage.setItem("business_sheet_url", data.spreadsheetUrl)
-      }
-
-      // Redirect to dashboard after successful setup
-      setTimeout(() => (window.location.href = "/invoices"), 1500)
+      setTimeout(() => {
+        navigate("/dashboard", {
+          replace: true,
+          state: {
+            sheetAccessReady: true,
+            businessSheetId,
+            spreadsheetUrl,
+            businessSetupComplete: true,
+          },
+        })
+      }, 1500)
+      
     } catch (err) {
-      console.error("Setup error:", err)
-      setError((err instanceof Error ? err.message : "An unknown error occurred") || "Failed to save your business details. Please try again.")
+      const error = err as Error
+      setError(error.message || "An error occurred while saving business details")
     } finally {
       setIsSubmitting(false)
     }

@@ -157,10 +157,10 @@ export default function Login() {
 
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-screen-lg mx-auto">
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center space-y-12">
             {/* Centered content with login card as focus */}
-            <div className="text-center mb-8 max-w-xl">
-              <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+            <div className="text-center space-y-4 max-w-xl">
+              <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">
                 Invoice Management, <span className="text-green-600">Simplified</span>
               </h1>
               <p className="text-slate-600 text-lg">
@@ -169,19 +169,19 @@ export default function Login() {
             </div>
 
             {/* Login Card - Main Focus */}
-            <Card className="border-0 items-center justify-center text-center overflow-hidden w-full max-w-md">
-              <CardContent className="p-8">
+            <Card className="border-0 w-full max-w-md">
+              <CardContent className="p-8 space-y-6">
                 {error && (
-                  <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100 flex items-center gap-2 mb-6">
+                  <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100 flex items-center gap-2">
                     <Shield className="h-4 w-4 text-red-500 flex-shrink-0" />
                     <span>{error}</span>
                   </div>
                 )}
 
-                <p className="text-slate-600 text-center mb-6">Sign in to access your invoicing dashboard</p>
+                <p className="text-slate-600 text-center">Sign in to access your invoicing dashboard</p>
 
                 {/* Feature highlights inside the card */}
-                <div className="mb-6 space-y-3">
+                <div className="space-y-3">
                   <div className="flex items-center gap-2 text-sm text-slate-700">
                     <CheckCircle2 className="h-4 w-4 text-green-500" />
                     <span>Real-time sync with Google Sheets</span>
@@ -222,7 +222,7 @@ export default function Login() {
                   <span className="font-medium">Continue with Google</span>
                 </Button>
 
-                <div className="mt-6 text-center">
+                <div className="text-center">
                   <p className="text-xs text-slate-500">
                     By signing in, you agree to our{" "}
                     <Link to="#" className="text-green-600 hover:text-green-700 font-medium">
@@ -238,7 +238,7 @@ export default function Login() {
             </Card>
 
             {/* Trust indicators below the card */}
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-6">
+            <div className="flex flex-wrap items-center justify-center gap-6">
               <div className="flex items-center gap-1 text-xs text-slate-500">
                 <Shield className="h-3 w-3" />
                 <span>Secure Login</span>

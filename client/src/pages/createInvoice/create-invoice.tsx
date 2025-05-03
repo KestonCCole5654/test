@@ -857,12 +857,7 @@ export default function InvoiceForm() {
                       <div key={index} className="border rounded-md">
                         <div 
                           className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50"
-                          onClick={(e) => {
-                            // Only toggle if clicking on the header, not the content
-                            if (e.target === e.currentTarget || e.target === e.currentTarget.firstChild) {
-                              toggleItem(index);
-                            }
-                          }}
+                          onClick={() => toggleItem(index)}
                         >
                           <div className="flex items-center gap-2">
                             <ChevronDown className={`h-4 w-4 transition-transform ${collapsedItems[index] ? "rotate-180" : ""}`} />
@@ -887,18 +882,13 @@ export default function InvoiceForm() {
                             </Button>
                           </div>
                         </div>
-                        <div className={`p-4 space-y-4 ${collapsedItems[index] ? "hidden" : ""}`}>
+                        <div className={`p-4 space-y-4 ${collapsedItems[index] ? "hidden" : ""}`} onClick={(e) => e.stopPropagation()}>
                           <div className="flex flex-col gap-2">
                             <Label htmlFor={`item-name-${index}`}>Name</Label>
                             <Input
                               id={`item-name-${index}`}
                               value={item.name}
-                              onChange={(e) => {
-                                e.stopPropagation();
-                                updateItem(index, "name", e.target.value);
-                              }}
-                              onClick={(e) => e.stopPropagation()}
-                              onFocus={(e) => e.stopPropagation()}
+                              onChange={(e) => updateItem(index, "name", e.target.value)}
                               placeholder="Item name"
                             />
                           </div>
@@ -907,12 +897,7 @@ export default function InvoiceForm() {
                             <Textarea
                               id={`item-description-${index}`}
                               value={item.description}
-                              onChange={(e) => {
-                                e.stopPropagation();
-                                updateItem(index, "description", e.target.value);
-                              }}
-                              onClick={(e) => e.stopPropagation()}
-                              onFocus={(e) => e.stopPropagation()}
+                              onChange={(e) => updateItem(index, "description", e.target.value)}
                               placeholder="Item description"
                             />
                           </div>
@@ -923,12 +908,7 @@ export default function InvoiceForm() {
                                 id={`item-quantity-${index}`}
                                 type="number"
                                 value={item.quantity}
-                                onChange={(e) => {
-                                  e.stopPropagation();
-                                  updateItem(index, "quantity", parseInt(e.target.value) || 0);
-                                }}
-                                onClick={(e) => e.stopPropagation()}
-                                onFocus={(e) => e.stopPropagation()}
+                                onChange={(e) => updateItem(index, "quantity", parseInt(e.target.value) || 0)}
                                 min="0"
                               />
                             </div>
@@ -938,12 +918,7 @@ export default function InvoiceForm() {
                                 id={`item-price-${index}`}
                                 type="number"
                                 value={item.price}
-                                onChange={(e) => {
-                                  e.stopPropagation();
-                                  updateItem(index, "price", parseFloat(e.target.value) || 0);
-                                }}
-                                onClick={(e) => e.stopPropagation()}
-                                onFocus={(e) => e.stopPropagation()}
+                                onChange={(e) => updateItem(index, "price", parseFloat(e.target.value) || 0)}
                                 min="0"
                                 step="0.01"
                               />
@@ -959,7 +934,7 @@ export default function InvoiceForm() {
                                     updateItem(index, "discount", { ...item.discount, type: value });
                                   }}
                                 >
-                                  <SelectTrigger onClick={(e) => e.stopPropagation()}>
+                                  <SelectTrigger>
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -972,11 +947,8 @@ export default function InvoiceForm() {
                                   type="number"
                                   value={item.discount.value}
                                   onChange={(e) => {
-                                    e.stopPropagation();
                                     updateItem(index, "discount", { ...item.discount, value: parseFloat(e.target.value) || 0 });
                                   }}
-                                  onClick={(e) => e.stopPropagation()}
-                                  onFocus={(e) => e.stopPropagation()}
                                   min="0"
                                   step="0.01"
                                 />
@@ -991,7 +963,7 @@ export default function InvoiceForm() {
                                     updateItem(index, "tax", { ...item.tax, type: value });
                                   }}
                                 >
-                                  <SelectTrigger onClick={(e) => e.stopPropagation()}>
+                                  <SelectTrigger>
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -1004,11 +976,8 @@ export default function InvoiceForm() {
                                   type="number"
                                   value={item.tax.value}
                                   onChange={(e) => {
-                                    e.stopPropagation();
                                     updateItem(index, "tax", { ...item.tax, value: parseFloat(e.target.value) || 0 });
                                   }}
-                                  onClick={(e) => e.stopPropagation()}
-                                  onFocus={(e) => e.stopPropagation()}
                                   min="0"
                                   step="0.01"
                                 />

@@ -5,7 +5,7 @@ import { useNavigate, Link } from "react-router-dom"
 import supabase from "./supabaseClient"
 import { Button } from "../../components/ui/button"
 import { Card, CardContent } from "../../components/ui/card"
-import { Loader2, Shield, CheckCircle2, LockKeyhole, Database, BarChart3 } from "lucide-react"
+import { Loader2, Shield, CheckCircle2 } from "lucide-react"
 import Header from "../../components/header"
 import type { Session } from "@supabase/supabase-js"
 
@@ -140,17 +140,11 @@ export default function Login() {
   // Loading state
   if (!mounted || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-green-50">
-        <div className="text-center space-y-4">
-          <div className="relative">
-            <Loader2 className="h-12 w-12 animate-spin text-green-600 mx-auto" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="h-4 w-4 rounded-full bg-white"></div>
-            </div>
-          </div>
-          <p className="text-slate-700 font-medium">{loading ? "Connecting to Google..." : "Loading..."}</p>
-          <p className="text-slate-500 text-sm max-w-xs">
-            This may take a few moments while we securely connect to your account
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-green-600 mx-auto" />
+          <p className="mt-4 text-slate-600 text-sm font-medium">
+            {loading ? "Connecting to Google..." : "Loading..."}
           </p>
         </div>
       </div>
@@ -158,80 +152,50 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-green-50 to-green-100 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-white to-green-50 flex flex-col">
       <Header />
 
-      <main className="flex-1 flex items-center justify-center px-4 py-8 md:py-12">
-        <div className="w-full max-w-screen-xl mx-auto grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-          {/* Left side - Hero content */}
-          <div className="space-y-6 order-2 md:order-1">
-            <div className="space-y-4">
-              <div className="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium">
-                <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" />
-                Trusted by 1000+ businesses
-              </div>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight">
+      <main className="flex-1 flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-screen-lg mx-auto">
+          <div className="flex flex-col items-center space-y-12">
+            {/* Centered content with login card as focus */}
+            <div className="text-center space-y-4 max-w-xl">
+              <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">
                 Invoice Management, <span className="text-green-600">Simplified</span>
               </h1>
-              <p className="text-slate-600 text-lg max-w-md">
+              <p className="text-slate-600 text-lg mb-5">
                 Streamline your business finances with our secure, Google Sheets-powered invoicing platform.
               </p>
+              <p className="text-slate-600 text-center">Sign in to access your invoicing dashboard</p>
+
             </div>
 
-            {/* Feature list */}
-            <div className="grid gap-4 mt-8">
-              <div className="flex items-start gap-3">
-                <div className="bg-white p-2 rounded-lg shadow-sm">
-                  <Database className="h-5 w-5 text-green-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-slate-900">Real-time Google Sheets Sync</h3>
-                  <p className="text-slate-600 text-sm">
-                    Keep your data in familiar spreadsheets that update instantly
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="bg-white p-2 rounded-lg shadow-sm">
-                  <LockKeyhole className="h-5 w-5 text-green-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-slate-900">Enterprise-grade Security</h3>
-                  <p className="text-slate-600 text-sm">Your financial data is protected with bank-level encryption</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="bg-white p-2 rounded-lg shadow-sm">
-                  <BarChart3 className="h-5 w-5 text-green-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-slate-900">Advanced Analytics</h3>
-                  <p className="text-slate-600 text-sm">
-                    Gain insights into your business with powerful reporting tools
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right side - Login card */}
-          <div className="order-1 md:order-2">
-            <Card className="border-0 shadow-lg overflow-hidden bg-white/90 backdrop-blur-sm">
-              <div className="h-2 bg-gradient-to-r from-green-400 to-green-600"></div>
-              <CardContent className="p-8 space-y-6">
-                <div className="text-center space-y-2">
-                  <h2 className="text-2xl font-bold text-slate-900">Welcome Back</h2>
-                  <p className="text-slate-600 text-sm">Sign in to access your invoicing dashboard</p>
-                </div>
-
+            {/* Login Card - Main Focus */}
+            <Card className="border-0 w-full max-w-md">
+              <CardContent className="pt-0 pl-8 pr-8 pb-8 space-y-6">
                 {error && (
-                  <div className="bg-red-50 text-red-600 p-4 rounded-lg text-sm border border-red-100 flex items-center gap-2">
-                    <Shield className="h-5 w-5 text-red-500 flex-shrink-0" />
+                  <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100 flex items-center gap-2">
+                    <Shield className="h-4 w-4 text-red-500 flex-shrink-0" />
                     <span>{error}</span>
                   </div>
                 )}
+
+
+                {/* Feature highlights inside the card */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-center gap-2 text-sm text-slate-700">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Real-time sync with Google Sheets</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-2 text-sm text-slate-700">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Enterprise-grade security</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-2 text-sm text-slate-700">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span>Advanced analytics dashboard</span>
+                  </div>
+                </div>
 
                 <Button
                   onClick={handleGoogleLogin}
@@ -259,25 +223,6 @@ export default function Login() {
                   <span className="font-medium">Continue with Google</span>
                 </Button>
 
-                {/* Testimonial */}
-                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="flex">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <svg key={star} className="h-4 w-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
-                    </div>
-                    <span className="text-sm font-medium text-slate-700">5.0</span>
-                  </div>
-                  <p className="text-sm text-slate-600 italic">
-                    "This platform has transformed how we manage our invoices. The Google Sheets integration is
-                    brilliant!"
-                  </p>
-                  <p className="text-xs text-slate-500 mt-2">— Sarah T., Small Business Owner</p>
-                </div>
-
                 <div className="text-center">
                   <p className="text-xs text-slate-500">
                     By signing in, you agree to our{" "}
@@ -293,16 +238,16 @@ export default function Login() {
               </CardContent>
             </Card>
 
-            {/* Trust indicators */}
-            <div className="flex flex-wrap items-center justify-center gap-6 mt-4">
-              <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                <Shield className="h-3.5 w-3.5" />
+            {/* Trust indicators below the card */}
+            <div className="flex flex-wrap items-center justify-center gap-6">
+              <div className="flex items-center gap-1 text-xs text-slate-500">
+                <Shield className="h-3 w-3" />
                 <span>Secure Login</span>
               </div>
 
-              <div className="flex items-center gap-1.5 text-xs text-slate-500">
+              <div className="flex items-center gap-1 text-xs text-slate-500">
                 <svg
-                  className="h-3.5 w-3.5"
+                  className="h-3 w-3"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -318,9 +263,9 @@ export default function Login() {
                 <span>Cloud Powered</span>
               </div>
 
-              <div className="flex items-center gap-1.5 text-xs text-slate-500">
+              <div className="flex items-center gap-1 text-xs text-slate-500">
                 <svg
-                  className="h-3.5 w-3.5"
+                  className="h-3 w-3"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -336,9 +281,9 @@ export default function Login() {
                 <span>GDPR Compliant</span>
               </div>
 
-              <div className="flex items-center gap-1.5 text-xs text-slate-500">
+              <div className="flex items-center gap-1 text-xs text-slate-500">
                 <svg
-                  className="h-3.5 w-3.5"
+                  className="h-3 w-3"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"

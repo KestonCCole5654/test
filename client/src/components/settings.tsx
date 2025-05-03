@@ -172,15 +172,22 @@ export default function SettingsPage() {
       );
 
       if (response.data.success) {
+        // Update the local state with the response data
+        setBusinessData(prev => ({
+          ...prev,
+          companyName: response.data.businessDetails["Company Name"] || prev.companyName,
+          email: response.data.businessDetails["Business Email"] || prev.email,
+          phone: response.data.businessDetails["Phone Number"] || prev.phone,
+          addressLine1: response.data.businessDetails["Address Line 1"] || prev.addressLine1,
+          addressLine2: response.data.businessDetails["Address Line 2"] || prev.addressLine2,
+          selectedAddressLine: response.data.businessDetails["Selected Address Line"] || prev.selectedAddressLine
+        }));
+
         toast({
           title: "Success",
           description: "Business details updated successfully",
         });
         setIsEditing(false);
-        setBusinessData(prev => ({
-          ...prev,
-          selectedAddressLine: businessData.selectedAddressLine
-        }));
       }
 
     } catch (error) {
@@ -329,16 +336,27 @@ export default function SettingsPage() {
                 <div className="flex items-center gap-2">
                   <select
                     value={businessData.selectedAddressLine}
-                    onChange={(e) => setBusinessData(prev => ({
-                      ...prev,
-                      selectedAddressLine: e.target.value as "addressLine1" | "addressLine2"
-                    }))}
+                    onChange={(e) => {
+                      const newValue = e.target.value as "addressLine1" | "addressLine2";
+                      setBusinessData(prev => ({
+                        ...prev,
+                        selectedAddressLine: newValue
+                      }));
+                      // Immediately update the display
+                      const addressToShow = businessData[newValue] || "—";
+                      const ddElement = document.querySelector(`dd[data-address="${newValue}"]`);
+                      if (ddElement) {
+                        ddElement.textContent = addressToShow;
+                      }
+                    }}
                     className="text-sm border rounded px-2 py-1"
                   >
                     <option value="addressLine1">Address Line 1</option>
                     <option value="addressLine2">Address Line 2</option>
                   </select>
-                  <dd className="font-medium">{businessData[businessData.selectedAddressLine] || "—"}</dd>
+                  <dd className="font-medium" data-address={businessData.selectedAddressLine}>
+                    {businessData[businessData.selectedAddressLine] || "—"}
+                  </dd>
                 </div>
               </div>
             </dl>

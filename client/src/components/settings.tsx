@@ -363,21 +363,12 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="addressLine1">Address Line 1</Label>
+                  <Label htmlFor="addressLine1">Address</Label>
                   <Input
                     id="addressLine1"
                     value={businessData.addressLine1}
                     onChange={(e) => setBusinessData(prev => ({ ...prev, addressLine1: e.target.value }))}
-                    placeholder="123 Business St"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="addressLine2">Address Line 2</Label>
-                  <Input
-                    id="addressLine2"
-                    value={businessData.addressLine2}
-                    onChange={(e) => setBusinessData(prev => ({ ...prev, addressLine2: e.target.value }))}
-                    placeholder="Suite 100, City, State, ZIP"
+                    placeholder="123 Business St, Suite 100, City, State, ZIP"
                   />
                 </div>
               </div>

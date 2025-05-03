@@ -19,7 +19,6 @@ export default function BusinessSetup() {
     email: "",
     phone: "",
     addressLine1: "",
-    addressLine2: "",
   })
 
   useEffect(() => {
@@ -155,7 +154,7 @@ export default function BusinessSetup() {
               
               <div>
                 <label htmlFor="addressLine1" className="block text-sm font-medium text-gray-700 mb-1">
-                  Address Line 1 <span className="text-red-500">*</span>
+                  Address <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -164,21 +163,8 @@ export default function BusinessSetup() {
                   value={formData.addressLine1}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  placeholder="123 Business St, Suite 100, City, State, ZIP"
                   required
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="addressLine2" className="block text-sm font-medium text-gray-700 mb-1">
-                  Address Line 2
-                </label>
-                <input
-                  type="text"
-                  id="addressLine2"
-                  name="addressLine2"
-                  value={formData.addressLine2}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
             </div>

@@ -76,10 +76,10 @@ export default function InvoiceForm() {
       email: "",
       address: "",
     },
-    items: invoiceToEdit?.items || [{ 
-      name: "", 
-      description: "", 
-      quantity: 1, 
+    items: invoiceToEdit?.items || [{
+      name: "",
+      description: "",
+      quantity: 1,
       price: "",
       discount: {
         type: "percentage",
@@ -126,10 +126,10 @@ export default function InvoiceForm() {
   }
   // Used to Add Items
   const addItem = () => {
-    updateInvoiceData("items", [...invoiceData.items, { 
-      name: "", 
-      description: "", 
-      quantity: 1, 
+    updateInvoiceData("items", [...invoiceData.items, {
+      name: "",
+      description: "",
+      quantity: 1,
       price: "",
       discount: {
         type: "percentage",
@@ -154,7 +154,7 @@ export default function InvoiceForm() {
     return invoiceData.items.reduce((total, item) => {
       const price = item.price === "" ? 0 : Number(item.price)
       const itemTotal = item.quantity * price
-      
+
       // Calculate item discount
       let itemDiscount = 0
       if (item.discount.value && item.discount.value !== "") {
@@ -164,7 +164,7 @@ export default function InvoiceForm() {
           itemDiscount = Math.min(itemTotal, Number(item.discount.value))
         }
       }
-      
+
       // Calculate item tax
       let itemTax = 0
       if (item.tax.value && item.tax.value !== "") {
@@ -175,7 +175,7 @@ export default function InvoiceForm() {
           itemTax = Number(item.tax.value)
         }
       }
-      
+
       return total + itemTotal - itemDiscount + itemTax
     }, 0)
   }
@@ -434,11 +434,11 @@ export default function InvoiceForm() {
         },
         items: Array.isArray(invoiceToEdit.items)
           ? invoiceToEdit.items.map((item: InvoiceItem) => ({
-              ...item,
-              price: item.price === 0 ? "" : item.price,
-              discount: parseFinancialField(item.discount, "discount", { type: "percentage", value: "" }),
-              tax: parseFinancialField(item.tax, "tax", { type: "percentage", value: "" })
-            }))
+            ...item,
+            price: item.price === 0 ? "" : item.price,
+            discount: parseFinancialField(item.discount, "discount", { type: "percentage", value: "" }),
+            tax: parseFinancialField(item.tax, "tax", { type: "percentage", value: "" })
+          }))
           : [{ name: "", description: "", quantity: 1, price: "", discount: { type: "percentage", value: "" }, tax: { type: "percentage", value: "" } }],
         amount: invoiceToEdit.amount || 0,
         notes: typeof invoiceToEdit.notes === "string" ? invoiceToEdit.notes : "",
@@ -476,7 +476,7 @@ export default function InvoiceForm() {
     }
 
     return (
-      <div 
+      <div
         className="bg-white"
         style={{
           width: "210mm",
@@ -489,7 +489,7 @@ export default function InvoiceForm() {
           justifyContent: "flex-start",
         }}
       >
-      
+
 
         {/* Header with logo */}
         <div className="flex justify-between mt-8 items-center mb-8">
@@ -700,8 +700,8 @@ export default function InvoiceForm() {
       </div>
       
       */}
-      
-      
+
+
       {/* Main Content */}
       <div className=" mt-0 font-AfacadFlux w-full py-4 sm:py-8 px-4 mx-auto  rounded-b-3xl mb-10">
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gradient-to-r from-emerald-600 to-emerald-700 shadow-lg rounded-2xl px-6 py-8">
@@ -721,11 +721,10 @@ export default function InvoiceForm() {
                   {invoiceToEdit ? "Invoice Details" : "Create Invoice"}
                 </h1>
                 {invoiceToEdit && (
-                  <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                    invoiceToEdit.status === "Paid" 
-                      ? "bg-green-100 border border-green-200 text-green-800" 
+                  <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${invoiceToEdit.status === "Paid"
+                      ? "bg-green-100 border border-green-200 text-green-800"
                       : "bg-yellow-100 text-yellow-800"
-                  }`}>
+                    }`}>
                     {invoiceToEdit.status === "Paid" ? (
                       <CheckCircle className="h-3 w-3" />
                     ) : (
@@ -736,7 +735,7 @@ export default function InvoiceForm() {
                 )}
               </div>
               <p className="mt-2 text-sm sm:text-base text-emerald-50">
-                {invoiceToEdit 
+                {invoiceToEdit
                   ? `Invoice #${invoiceData.invoiceNumber} - ${new Date(invoiceData.date).toLocaleDateString()}`
                   : "Generate and download professional invoices, and Click (Hide form) to view the invoice only"}
               </p>
@@ -855,7 +854,7 @@ export default function InvoiceForm() {
                   <div className="space-y-4">
                     {invoiceData.items.map((item, index) => (
                       <div key={index} className="border rounded-md">
-                        <div 
+                        <div
                           className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50"
                           onClick={() => toggleItem(index)}
                         >
@@ -882,109 +881,112 @@ export default function InvoiceForm() {
                             </Button>
                           </div>
                         </div>
-                        <div className={`p-4 space-y-4 ${collapsedItems[index] ? "hidden" : ""}`} onClick={(e) => e.stopPropagation()}>
-                          <div className="flex flex-col gap-2">
-                            <Label htmlFor={`item-name-${index}`}>Name</Label>
-                            <Input
-                              id={`item-name-${index}`}
-                              value={item.name}
-                              onChange={(e) => updateItem(index, "name", e.target.value)}
-                              placeholder="Item name"
-                            />
-                          </div>
-                          <div className="flex flex-col gap-2">
-                            <Label htmlFor={`item-description-${index}`}>Description</Label>
-                            <Textarea
-                              id={`item-description-${index}`}
-                              value={item.description}
-                              onChange={(e) => updateItem(index, "description", e.target.value)}
-                              placeholder="Item description"
-                            />
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
+                        {/* The issue is here - we need to prevent propagation of events from the input fields */}
+                        <Collapsible open={!collapsedItems[index]}>
+                          <CollapsibleContent className="p-4 space-y-4">
                             <div className="flex flex-col gap-2">
-                              <Label htmlFor={`item-quantity-${index}`}>Quantity</Label>
+                              <Label htmlFor={`item-name-${index}`}>Name</Label>
                               <Input
-                                id={`item-quantity-${index}`}
-                                type="number"
-                                value={item.quantity}
-                                onChange={(e) => updateItem(index, "quantity", parseInt(e.target.value) || 0)}
-                                min="0"
+                                id={`item-name-${index}`}
+                                value={item.name}
+                                onChange={(e) => updateItem(index, "name", e.target.value)}
+                                placeholder="Item name"
                               />
                             </div>
                             <div className="flex flex-col gap-2">
-                              <Label htmlFor={`item-price-${index}`}>Price</Label>
-                              <Input
-                                id={`item-price-${index}`}
-                                type="number"
-                                value={item.price}
-                                onChange={(e) => updateItem(index, "price", parseFloat(e.target.value) || 0)}
-                                min="0"
-                                step="0.01"
+                              <Label htmlFor={`item-description-${index}`}>Description</Label>
+                              <Textarea
+                                id={`item-description-${index}`}
+                                value={item.description}
+                                onChange={(e) => updateItem(index, "description", e.target.value)}
+                                placeholder="Item description"
                               />
                             </div>
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="flex flex-col gap-2">
-                              <Label htmlFor={`item-discount-${index}`}>Discount</Label>
-                              <div className="flex gap-2">
-                                <Select
-                                  value={item.discount.type}
-                                  onValueChange={(value) => {
-                                    updateItem(index, "discount", { ...item.discount, type: value });
-                                  }}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="percentage">%</SelectItem>
-                                    <SelectItem value="fixed">$</SelectItem>
-                                  </SelectContent>
-                                </Select>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="flex flex-col gap-2">
+                                <Label htmlFor={`item-quantity-${index}`}>Quantity</Label>
                                 <Input
-                                  id={`item-discount-${index}`}
+                                  id={`item-quantity-${index}`}
                                   type="number"
-                                  value={item.discount.value}
-                                  onChange={(e) => {
-                                    updateItem(index, "discount", { ...item.discount, value: parseFloat(e.target.value) || 0 });
-                                  }}
+                                  value={item.quantity}
+                                  onChange={(e) => updateItem(index, "quantity", parseInt(e.target.value) || 0)}
+                                  min="0"
+                                />
+                              </div>
+                              <div className="flex flex-col gap-2">
+                                <Label htmlFor={`item-price-${index}`}>Price</Label>
+                                <Input
+                                  id={`item-price-${index}`}
+                                  type="number"
+                                  value={item.price}
+                                  onChange={(e) => updateItem(index, "price", parseFloat(e.target.value) || 0)}
                                   min="0"
                                   step="0.01"
                                 />
                               </div>
                             </div>
-                            <div className="flex flex-col gap-2">
-                              <Label htmlFor={`item-tax-${index}`}>Tax</Label>
-                              <div className="flex gap-2">
-                                <Select
-                                  value={item.tax.type}
-                                  onValueChange={(value) => {
-                                    updateItem(index, "tax", { ...item.tax, type: value });
-                                  }}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="percentage">%</SelectItem>
-                                    <SelectItem value="fixed">$</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <Input
-                                  id={`item-tax-${index}`}
-                                  type="number"
-                                  value={item.tax.value}
-                                  onChange={(e) => {
-                                    updateItem(index, "tax", { ...item.tax, value: parseFloat(e.target.value) || 0 });
-                                  }}
-                                  min="0"
-                                  step="0.01"
-                                />
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="flex flex-col gap-2">
+                                <Label htmlFor={`item-discount-${index}`}>Discount</Label>
+                                <div className="flex gap-2">
+                                  <Select
+                                    value={item.discount.type}
+                                    onValueChange={(value) => {
+                                      updateItem(index, "discount", { ...item.discount, type: value });
+                                    }}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="percentage">%</SelectItem>
+                                      <SelectItem value="fixed">$</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <Input
+                                    id={`item-discount-${index}`}
+                                    type="number"
+                                    value={item.discount.value}
+                                    onChange={(e) => {
+                                      updateItem(index, "discount", { ...item.discount, value: parseFloat(e.target.value) || 0 });
+                                    }}
+                                    min="0"
+                                    step="0.01"
+                                  />
+                                </div>
+                              </div>
+                              <div className="flex flex-col gap-2">
+                                <Label htmlFor={`item-tax-${index}`}>Tax</Label>
+                                <div className="flex gap-2">
+                                  <Select
+                                    value={item.tax.type}
+                                    onValueChange={(value) => {
+                                      updateItem(index, "tax", { ...item.tax, type: value });
+                                    }}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="percentage">%</SelectItem>
+                                      <SelectItem value="fixed">$</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <Input
+                                    id={`item-tax-${index}`}
+                                    type="number"
+                                    value={item.tax.value}
+                                    onChange={(e) => {
+                                      updateItem(index, "tax", { ...item.tax, value: parseFloat(e.target.value) || 0 });
+                                    }}
+                                    min="0"
+                                    step="0.01"
+                                  />
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </div>
+                          </CollapsibleContent>
+                        </Collapsible>
                       </div>
                     ))}
                   </div>
@@ -1015,17 +1017,17 @@ export default function InvoiceForm() {
               {/* Save and Download Invoice Button */}
               <div className="flex gap-3 justify-end no-print">
                 {invoiceToEdit ? (
-                  <Button 
-                    variant="outline" 
-                    onClick={handleUpdate} 
+                  <Button
+                    variant="outline"
+                    onClick={handleUpdate}
                     className="w-full sm:w-auto bg-green-600 text-white hover:bg-green-700"
                   >
                     Update Invoice
                   </Button>
                 ) : (
-                  <Button 
-                    variant="outline" 
-                    onClick={handleSave} 
+                  <Button
+                    variant="outline"
+                    onClick={handleSave}
                     className="w-full sm:w-auto bg-green-600 text-white hover:bg-green-700"
                   >
                     Save Invoice
@@ -1055,12 +1057,12 @@ export default function InvoiceForm() {
             <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col items-center">
               {/* Checkmark animation */}
               <svg className="w-16 h-16 text-green-600 mb-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
-                <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M8 12l3 3 5-5"/>
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" />
+                <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M8 12l3 3 5-5" />
               </svg>
               <h2 className="text-2xl font-bold mb-2 text-green-700">Invoice Saved!</h2>
               <p className="mb-4 text-gray-600">Your invoice has been saved successfully.</p>
-              
+
             </div>
           </div>
         )}

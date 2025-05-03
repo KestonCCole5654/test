@@ -72,7 +72,11 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const location = useLocation()
   const [user, setUser] = useState<User | null>(null)
-  const [invoices, setInvoices] = useState<Invoice[]>([])
+  const [invoices, setInvoices] = useState<Invoice[]>(() => {
+    // Try to load cached data on initial render
+    const cachedData = localStorage.getItem('cachedInvoices');
+    return cachedData ? JSON.parse(cachedData) : [];
+  })
   const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([])
   const [isStateLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -88,6 +92,10 @@ export default function Dashboard() {
   }>({ key: null, direction: "ascending" })
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [invoiceToDelete, setInvoiceToDelete] = useState<Invoice | null>(null)
+  const [lastFetchTime, setLastFetchTime] = useState<number>(() => {
+    const cachedTime = localStorage.getItem('lastFetchTime');
+    return cachedTime ? parseInt(cachedTime) : 0;
+  });
 
   // Calculate totals
   const totalInvoices = invoices.length
@@ -260,6 +268,16 @@ export default function Dashboard() {
     try {
       setIsLoading(true)
 
+      // Check if we need to refresh the data (5 minutes cache)
+      const currentTime = Date.now();
+      const timeSinceLastFetch = currentTime - lastFetchTime;
+      const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+      if (timeSinceLastFetch < CACHE_DURATION && invoices.length > 0) {
+        setIsLoading(false);
+        return; // Use cached data
+      }
+
       // Validate URL format first
       if (!isValidGoogleSheetUrl(sheetUrl)) {
         throw new Error("Invalid Google Sheets URL format")
@@ -371,6 +389,11 @@ export default function Dashboard() {
       if (transformedData.length === 0) {
         throw new Error("No valid invoices found in spreadsheet")
       }
+
+      // Cache the data
+      localStorage.setItem('cachedInvoices', JSON.stringify(transformedData));
+      localStorage.setItem('lastFetchTime', currentTime.toString());
+      setLastFetchTime(currentTime);
 
       setInvoices(transformedData.filter((invoice): invoice is Invoice => invoice !== null))
       setError(null)

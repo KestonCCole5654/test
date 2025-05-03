@@ -163,9 +163,11 @@ export default function Login() {
               <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">
                 Invoice Management, <span className="text-green-600">Simplified</span>
               </h1>
-              <p className="text-slate-600 text-lg">
+              <p className="text-slate-600 text-lg mb-5">
                 Streamline your business finances with our secure, Google Sheets-powered invoicing platform.
               </p>
+              <p className="text-slate-600 text-center">Sign in to access your invoicing dashboard</p>
+
             </div>
 
             {/* Login Card - Main Focus */}
@@ -178,19 +180,18 @@ export default function Login() {
                   </div>
                 )}
 
-                <p className="text-slate-600 text-center">Sign in to access your invoicing dashboard</p>
 
                 {/* Feature highlights inside the card */}
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-sm text-slate-700">
+                  <div className="flex items-center justify-center gap-2 text-sm text-slate-700">
                     <CheckCircle2 className="h-4 w-4 text-green-500" />
                     <span>Real-time sync with Google Sheets</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-slate-700">
+                  <div className="flex items-center justify-center gap-2 text-sm text-slate-700">
                     <CheckCircle2 className="h-4 w-4 text-green-500" />
                     <span>Enterprise-grade security</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-slate-700">
+                  <div className="flex items-center justify-center gap-2 text-sm text-slate-700">
                     <CheckCircle2 className="h-4 w-4 text-green-500" />
                     <span>Advanced analytics dashboard</span>
                   </div>

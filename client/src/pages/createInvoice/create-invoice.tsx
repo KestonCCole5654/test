@@ -482,11 +482,19 @@ export default function InvoiceForm() {
         }
       }
 
-      return subtotal - discount + tax;
+      return {
+        subtotal,
+        discount,
+        tax,
+        total: subtotal - discount + tax
+      };
     };
 
     const itemTotals = data.items.map(calculateItemTotal);
-    const total = itemTotals.reduce((sum, itemTotal) => sum + itemTotal, 0);
+    const subtotal = itemTotals.reduce((sum, item) => sum + item.subtotal, 0);
+    const totalDiscount = itemTotals.reduce((sum, item) => sum + item.discount, 0);
+    const totalTax = itemTotals.reduce((sum, item) => sum + item.tax, 0);
+    const total = subtotal - totalDiscount + totalTax;
 
     // Format date to show month name, day and year
     const formatDate = (dateString: string) => {
@@ -578,7 +586,7 @@ export default function InvoiceForm() {
                     ${formatCurrency(item.price === "" ? 0 : Number(item.price))}
                   </td>
                   <td className="py-3 px-4 text-right font-medium">
-                    ${formatCurrency(calculateItemTotal(item))}
+                    ${formatCurrency(calculateItemTotal(item).total)}
                   </td>
                 </tr>
               ))}
@@ -591,6 +599,18 @@ export default function InvoiceForm() {
           <div className="float-right w-full md:w-1/2">
             <table className="w-full">
               <tbody>
+                <tr>
+                  <td className="py-1 px-2 text-right text-gray-600">Subtotal</td>
+                  <td className="py-1 px-2 text-right font-medium">${formatCurrency(subtotal)}</td>
+                </tr>
+                <tr>
+                  <td className="py-1 px-2 text-right text-gray-600">Discount</td>
+                  <td className="py-1 px-2 text-right font-medium text-red-600">-${formatCurrency(totalDiscount)}</td>
+                </tr>
+                <tr>
+                  <td className="py-1 px-2 text-right text-gray-600">Tax</td>
+                  <td className="py-1 px-2 text-right font-medium text-green-600">+${formatCurrency(totalTax)}</td>
+                </tr>
                 <tr className="border-t">
                   <td className="py-2 px-2 text-right font-bold text-gray-800">Total</td>
                   <td className="py-2 px-2 text-right font-bold text-lg text-gray-800">${formatCurrency(total)}</td>

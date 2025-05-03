@@ -13,7 +13,6 @@ import { Collapsible, CollapsibleContent } from "../../components/ui/collapsible
 import axios from "axios"
 import { useLocation, useNavigate } from "react-router-dom"
 import supabase from "../../components/Auth/supabaseClient"
-import { Dialog, DialogContent } from "../../components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 
 
@@ -457,11 +456,45 @@ export default function InvoiceForm() {
   // Invoice Classic Template
   const InvoiceClassic = ({ data, businessData }: { data: InvoiceData; businessData: BusinessData }) => {
     // Calculate all amounts
-    const subtotal = data.items.reduce(
-      (sum, item) => sum + item.quantity * (item.price === "" ? 0 : Number(item.price)),
-      0,
-    )
-    const total = calculateTotal()
+    const calculateItemTotal = (item: InvoiceItem) => {
+      const price = item.price === "" ? 0 : Number(item.price);
+      const quantity = item.quantity;
+      const subtotal = price * quantity;
+
+      // Calculate discount
+      let discount = 0;
+      if (item.discount.value && item.discount.value !== "") {
+        if (item.discount.type === "percentage") {
+          discount = (subtotal * Number(item.discount.value)) / 100;
+        } else {
+          discount = Number(item.discount.value);
+        }
+      }
+
+      // Calculate tax
+      let tax = 0;
+      if (item.tax.value && item.tax.value !== "") {
+        const afterDiscount = subtotal - discount;
+        if (item.tax.type === "percentage") {
+          tax = (afterDiscount * Number(item.tax.value)) / 100;
+        } else {
+          tax = Number(item.tax.value);
+        }
+      }
+
+      return {
+        subtotal,
+        discount,
+        tax,
+        total: subtotal - discount + tax
+      };
+    };
+
+    const itemTotals = data.items.map(calculateItemTotal);
+    const subtotal = itemTotals.reduce((sum, item) => sum + item.subtotal, 0);
+    const totalDiscount = itemTotals.reduce((sum, item) => sum + item.discount, 0);
+    const totalTax = itemTotals.reduce((sum, item) => sum + item.tax, 0);
+    const total = subtotal - totalDiscount + totalTax;
 
     // Format date to show month name, day and year
     const formatDate = (dateString: string) => {
@@ -540,24 +573,38 @@ export default function InvoiceForm() {
                 <th className="py-3">Description</th>
                 <th className="py-3 text-right">Qty</th>
                 <th className="py-3 text-right">Price</th>
-                <th className="py-3 px-1 text-right">Amount</th>
+                <th className="py-3 text-right">Subtotal</th>
+                <th className="py-3 text-right">Discount</th>
+                <th className="py-3 text-right">Tax</th>
+                <th className="py-3 text-right">Total</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {data.items.map((item, i) => (
-                <tr key={i} className="text-gray-900">
-                  <td className="py-3 px-4">{item.name || `Item ${i + 1}`}</td>
-                  <td className="py-3 px-4">{item.description}</td>
-                  <td className="py-3 px-4 text-right">{item.quantity}</td>
-                  {/* Make sure all monetary values in the component use the formatCurrency function */}
-                  <td className="py-3 px-4 text-right">
-                    ${formatCurrency(item.price === "" ? 0 : Number(item.price))}
-                  </td>
-                  <td className="py-3 px-4 text-right">
-                    ${formatCurrency(item.quantity * (item.price === "" ? 0 : Number(item.price)))}
-                  </td>
-                </tr>
-              ))}
+              {data.items.map((item, i) => {
+                const itemTotal = calculateItemTotal(item);
+                return (
+                  <tr key={i} className="text-gray-900">
+                    <td className="py-3 px-4">{item.name || `Item ${i + 1}`}</td>
+                    <td className="py-3 px-4">{item.description}</td>
+                    <td className="py-3 px-4 text-right">{item.quantity}</td>
+                    <td className="py-3 px-4 text-right">
+                      ${formatCurrency(item.price === "" ? 0 : Number(item.price))}
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      ${formatCurrency(itemTotal.subtotal)}
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      {itemTotal.discount > 0 ? `-${formatCurrency(itemTotal.discount)}` : "-"}
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      {itemTotal.tax > 0 ? `+${formatCurrency(itemTotal.tax)}` : "-"}
+                    </td>
+                    <td className="py-3 px-4 text-right font-medium">
+                      ${formatCurrency(itemTotal.total)}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -571,8 +618,15 @@ export default function InvoiceForm() {
                   <td className="py-1 px-2 text-right text-gray-600">Subtotal</td>
                   <td className="py-1 px-2 text-right font-medium">${formatCurrency(subtotal)}</td>
                 </tr>
-
-                <tr className="">
+                <tr>
+                  <td className="py-1 px-2 text-right text-gray-600">Discount</td>
+                  <td className="py-1 px-2 text-right font-medium text-red-600">-${formatCurrency(totalDiscount)}</td>
+                </tr>
+                <tr>
+                  <td className="py-1 px-2 text-right text-gray-600">Tax</td>
+                  <td className="py-1 px-2 text-right font-medium text-green-600">+${formatCurrency(totalTax)}</td>
+                </tr>
+                <tr className="border-t">
                   <td className="py-2 px-2 text-right font-bold text-gray-800">Total</td>
                   <td className="py-2 px-2 text-right font-bold text-lg text-gray-800">${formatCurrency(total)}</td>
                 </tr>

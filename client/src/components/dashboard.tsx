@@ -477,7 +477,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen w-full ">
       {/* Premium Welcome Header */}
-      <div className="max-w-7xl mx-auto bg-gradient-to-r from-emerald-600 to-emerald-400 py-10 shadow-lg rounded-b-3xl">
+      <div className="max-w-7xl mx-auto bg-gradient-to-r from-emerald-600 to-emerald-700 py-10 shadow-lg rounded-b-3xl">
         <div className="container max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between">
           <div className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-4 sm:gap-6">
             <div className="relative">

@@ -8,13 +8,10 @@ import { Button } from "./ui/button"
 import { Input } from "./ui/input"
 import { Label } from "./ui/label"
 import { useToast } from "./ui/use-toast"
-import { Toaster } from "./ui/toaster"
 import { Loader2, Edit, Save, X, Info, Calendar, Mail, User } from "lucide-react"
 import axios from "axios"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
-import { Separator } from "./ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
-import { Alert, AlertDescription } from "./ui/alert"
 import supabase from "./Auth/supabaseClient"
 
 interface UserData {

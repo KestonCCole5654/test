@@ -722,8 +722,8 @@ export default function InvoiceForm() {
                 </h1>
                 {invoiceToEdit && (
                   <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${invoiceToEdit.status === "Paid"
-                      ? "bg-green-100 border border-green-200 text-green-800"
-                      : "bg-yellow-100 text-yellow-800"
+                    ? "bg-green-100 border border-green-200 text-green-800"
+                    : "bg-yellow-100 text-yellow-800"
                     }`}>
                     {invoiceToEdit.status === "Paid" ? (
                       <CheckCircle className="h-3 w-3" />
@@ -841,179 +841,161 @@ export default function InvoiceForm() {
 
               {/* Invoice Items */}
               {/* Invoice Items */}
-<Card>
-  <CardHeader>
-    <CardTitle className="flex items-center justify-between">
-      <div>Items</div>
-      <Button variant="outline" type="button" onClick={addItem} size="sm">
-        <Plus className="h-4 w-4 mr-2" />
-        Add Item
-      </Button>
-    </CardTitle>
-  </CardHeader>
-  <CardContent>
-    <div className="space-y-4">
-      {invoiceData.items.map((item, index) => (
-        <div key={index} className="border rounded-md">
-          <div
-            className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50"
-            onClick={() => toggleItem(index)}
-          >
-            <div className="flex items-center gap-2">
-              <ChevronDown className={`h-4 w-4 transition-transform ${collapsedItems[index] ? "rotate-180" : ""}`} />
-              <span className="font-medium">Item {index + 1}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-slate-500">
-                {item.name || "Unnamed Item"}
-              </span>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={(e) => {
-                  e.stopPropagation(); // Prevent the event from bubbling up
-                  removeItem(index);
-                }}
-                className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50"
-              >
-                <Trash2 className="h-4 w-4" />
-                <span className="sr-only">Remove item</span>
-              </Button>
-            </div>
-          </div>
-          <Collapsible open={!collapsedItems[index]}>
-            <CollapsibleContent 
-              className="p-4 space-y-4"
-              onClick={(e) => e.stopPropagation()} // Stop events from bubbling up
-            >
-              <div className="flex flex-col gap-2">
-                <Label htmlFor={`item-name-${index}`}>Name</Label>
-                <Input
-                  id={`item-name-${index}`}
-                  value={item.name}
-                  onChange={(e) => {
-                    e.stopPropagation(); // Stop event propagation
-                    updateItem(index, "name", e.target.value);
-                  }}
-                  placeholder="Item name"
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label htmlFor={`item-description-${index}`}>Description</Label>
-                <Textarea
-                  id={`item-description-${index}`}
-                  value={item.description}
-                  onChange={(e) => {
-                    e.stopPropagation(); // Stop event propagation
-                    updateItem(index, "description", e.target.value);
-                  }}
-                  placeholder="Item description"
-                  onClick={(e) => e.stopPropagation()} // Stop click events
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor={`item-quantity-${index}`}>Quantity</Label>
-                  <Input
-                    id={`item-quantity-${index}`}
-                    type="number"
-                    value={item.quantity}
-                    onChange={(e) => {
-                      e.stopPropagation(); // Stop event propagation
-                      updateItem(index, "quantity", parseInt(e.target.value) || 0);
-                    }}
-                    onClick={(e) => e.stopPropagation()} // Stop click events
-                    min="0"
-                  />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor={`item-price-${index}`}>Price</Label>
-                  <Input
-                    id={`item-price-${index}`}
-                    type="number"
-                    value={item.price}
-                    onChange={(e) => {
-                      e.stopPropagation(); // Stop event propagation
-                      updateItem(index, "price", parseFloat(e.target.value) || 0);
-                    }}
-                    onClick={(e) => e.stopPropagation()} // Stop click events
-                    min="0"
-                    step="0.01"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor={`item-discount-${index}`}>Discount</Label>
-                  <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-                    <Select
-                      value={item.discount.type}
-                      onValueChange={(value) => {
-                        updateItem(index, "discount", { ...item.discount, type: value });
-                      }}
-                    >
-                      <SelectTrigger onClick={(e) => e.stopPropagation()}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="percentage">%</SelectItem>
-                        <SelectItem value="fixed">$</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Input
-                      id={`item-discount-${index}`}
-                      type="number"
-                      value={item.discount.value}
-                      onChange={(e) => {
-                        e.stopPropagation(); // Stop event propagation
-                        updateItem(index, "discount", { ...item.discount, value: parseFloat(e.target.value) || 0 });
-                      }}
-                      onClick={(e) => e.stopPropagation()} // Stop click events
-                      min="0"
-                      step="0.01"
-                    />
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <div>Items</div>
+                    <Button variant="outline" type="button" onClick={addItem} size="sm">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Item
+                    </Button>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {invoiceData.items.map((item, index) => (
+                      <div key={index} className="border rounded-md">
+                        <div
+                          className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50"
+                          onClick={() => toggleItem(index)}
+                        >
+                          <div className="flex items-center gap-2">
+                            <ChevronDown className={`h-4 w-4 transition-transform ${collapsedItems[index] ? "rotate-180" : ""}`} />
+                            <span className="font-medium">Item {index + 1}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-slate-500">
+                              {item.name || "Unnamed Item"}
+                            </span>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeItem(index);
+                              }}
+                              className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">Remove item</span>
+                            </Button>
+                          </div>
+                        </div>
+                        <Collapsible open={!collapsedItems[index]}>
+                          <CollapsibleContent className="p-4 space-y-4">
+                            <div className="flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
+                              <Label htmlFor={`item-name-${index}`}>Name</Label>
+                              <Input
+                                id={`item-name-${index}`}
+                                value={item.name}
+                                onChange={(e) => updateItem(index, "name", e.target.value)}
+                                placeholder="Item name"
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                            </div>
+                            <div className="flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
+                              <Label htmlFor={`item-description-${index}`}>Description</Label>
+                              <Textarea
+                                id={`item-description-${index}`}
+                                value={item.description}
+                                onChange={(e) => updateItem(index, "description", e.target.value)}
+                                placeholder="Item description"
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
+                                <Label htmlFor={`item-quantity-${index}`}>Quantity</Label>
+                                <Input
+                                  id={`item-quantity-${index}`}
+                                  type="number"
+                                  value={item.quantity}
+                                  onChange={(e) => updateItem(index, "quantity", parseInt(e.target.value) || 0)}
+                                  onClick={(e) => e.stopPropagation()}
+                                  min="0"
+                                />
+                              </div>
+                              <div className="flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
+                                <Label htmlFor={`item-price-${index}`}>Price</Label>
+                                <Input
+                                  id={`item-price-${index}`}
+                                  type="number"
+                                  value={item.price}
+                                  onChange={(e) => updateItem(index, "price", parseFloat(e.target.value) || 0)}
+                                  onClick={(e) => e.stopPropagation()}
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
+                                <Label htmlFor={`item-discount-${index}`}>Discount</Label>
+                                <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                                  <Select
+                                    value={item.discount.type}
+                                    onValueChange={(value) => {
+                                      updateItem(index, "discount", { ...item.discount, type: value });
+                                    }}
+                                  >
+                                    <SelectTrigger className="w-24" onClick={(e) => e.stopPropagation()}>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="percentage">%</SelectItem>
+                                      <SelectItem value="fixed">$</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <Input
+                                    id={`item-discount-${index}`}
+                                    type="number"
+                                    value={item.discount.value}
+                                    onChange={(e) => updateItem(index, "discount", { ...item.discount, value: parseFloat(e.target.value) || 0 })}
+                                    onClick={(e) => e.stopPropagation()}
+                                    min="0"
+                                    step="0.01"
+                                    className="flex-1"
+                                  />
+                                </div>
+                              </div>
+                              <div className="flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
+                                <Label htmlFor={`item-tax-${index}`}>Tax</Label>
+                                <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                                  <Select
+                                    value={item.tax.type}
+                                    onValueChange={(value) => {
+                                      updateItem(index, "tax", { ...item.tax, type: value });
+                                    }}
+                                  >
+                                    <SelectTrigger className="w-24" onClick={(e) => e.stopPropagation()}>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="percentage">%</SelectItem>
+                                      <SelectItem value="fixed">$</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <Input
+                                    id={`item-tax-${index}`}
+                                    type="number"
+                                    value={item.tax.value}
+                                    onChange={(e) => updateItem(index, "tax", { ...item.tax, value: parseFloat(e.target.value) || 0 })}
+                                    onClick={(e) => e.stopPropagation()}
+                                    min="0"
+                                    step="0.01"
+                                    className="flex-1"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </CollapsibleContent>
+                        </Collapsible>
+                      </div>
+                    ))}
                   </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor={`item-tax-${index}`}>Tax</Label>
-                  <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-                    <Select
-                      value={item.tax.type}
-                      onValueChange={(value) => {
-                        updateItem(index, "tax", { ...item.tax, type: value });
-                      }}
-                    >
-                      <SelectTrigger onClick={(e) => e.stopPropagation()}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="percentage">%</SelectItem>
-                        <SelectItem value="fixed">$</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Input
-                      id={`item-tax-${index}`}
-                      type="number"
-                      value={item.tax.value}
-                      onChange={(e) => {
-                        e.stopPropagation(); // Stop event propagation
-                        updateItem(index, "tax", { ...item.tax, value: parseFloat(e.target.value) || 0 });
-                      }}
-                      onClick={(e) => e.stopPropagation()} // Stop click events
-                      min="0"
-                      step="0.01"
-                    />
-                  </div>
-                </div>
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-        </div>
-      ))}
-    </div>
-  </CardContent>
-</Card>
+                </CardContent>
+              </Card>
 
               {/* Notes */}
               <Card className="shadow-sm">

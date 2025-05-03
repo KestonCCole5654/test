@@ -44,10 +44,8 @@ export default function SettingsPage() {
   const [businessData, setBusinessData] = useState({
     companyName: "",
     phone: "",
-    addressLine1: "",
-    addressLine2: "",
+    address: "",
     email: "",
-    selectedAddressLine: "addressLine1" as "addressLine1" | "addressLine2"
   })
   const [isUpdatingBusiness, setIsUpdatingBusiness] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -91,9 +89,7 @@ export default function SettingsPage() {
           companyName: businessResponse.data.businessDetails["Company Name"] || "",
           email: businessResponse.data.businessDetails["Business Email"] || "",
           phone: businessResponse.data.businessDetails["Phone Number"] || "",
-          addressLine1: businessResponse.data.businessDetails["Address Line 1"] || "",
-          addressLine2: businessResponse.data.businessDetails["Address Line 2"] || "",
-          selectedAddressLine: businessResponse.data.businessDetails["Address Line 1"] ? "addressLine1" : "addressLine2"
+          address: businessResponse.data.businessDetails["Address"] || "",
         });
       }
 
@@ -159,9 +155,7 @@ export default function SettingsPage() {
           companyName: businessData.companyName,
           email: businessData.email,
           phone: businessData.phone,
-          addressLine1: businessData.addressLine1,
-          addressLine2: businessData.addressLine2,
-          selectedAddressLine: businessData.selectedAddressLine
+          address: businessData.address
         },
         {
           headers: {
@@ -178,9 +172,7 @@ export default function SettingsPage() {
           companyName: response.data.businessDetails["Company Name"] || prev.companyName,
           email: response.data.businessDetails["Business Email"] || prev.email,
           phone: response.data.businessDetails["Phone Number"] || prev.phone,
-          addressLine1: response.data.businessDetails["Address Line 1"] || prev.addressLine1,
-          addressLine2: response.data.businessDetails["Address Line 2"] || prev.addressLine2,
-          selectedAddressLine: response.data.businessDetails["Selected Address Line"] || prev.selectedAddressLine
+          address: response.data.businessDetails["Address"] || prev.address
         }));
 
         toast({
@@ -295,8 +287,8 @@ export default function SettingsPage() {
       </Card>
 
       {/* Business Information Card */}
-      <Card className="shadow-lg border mb-6 border-emerald-100">
-        <CardHeader className="flex  mb-6 flex-row items-center justify-between bg-emerald-50 rounded-t-lg">
+      <Card className="mb-8 shadow-lg border border-emerald-100">
+        <CardHeader className="flex mb-6 flex-row items-center justify-between bg-emerald-50 rounded-t-lg">
           <div>
             <CardTitle>Business Information</CardTitle>
             <CardDescription>These details appear on your invoices and documents</CardDescription>
@@ -333,31 +325,7 @@ export default function SettingsPage() {
               </div>
               <div>
                 <dt className="text-sm text-muted-foreground">Address</dt>
-                <div className="flex items-center gap-2">
-                  <select
-                    value={businessData.selectedAddressLine}
-                    onChange={(e) => {
-                      const newValue = e.target.value as "addressLine1" | "addressLine2";
-                      setBusinessData(prev => ({
-                        ...prev,
-                        selectedAddressLine: newValue
-                      }));
-                      // Immediately update the display
-                      const addressToShow = businessData[newValue] || "—";
-                      const ddElement = document.querySelector(`dd[data-address="${newValue}"]`);
-                      if (ddElement) {
-                        ddElement.textContent = addressToShow;
-                      }
-                    }}
-                    className="text-sm border rounded px-2 py-1"
-                  >
-                    <option value="addressLine1">Address Line 1</option>
-                    <option value="addressLine2">Address Line 2</option>
-                  </select>
-                  <dd className="font-medium" data-address={businessData.selectedAddressLine}>
-                    {businessData[businessData.selectedAddressLine] || "—"}
-                  </dd>
-                </div>
+                <dd className="font-medium">{businessData.address || "—"}</dd>
               </div>
             </dl>
           ) : (
@@ -394,36 +362,13 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="addressLine1">Address Line 1</Label>
+                  <Label htmlFor="address">Address</Label>
                   <Input
-                    id="addressLine1"
-                    value={businessData.addressLine1}
-                    onChange={(e) => setBusinessData(prev => ({ ...prev, addressLine1: e.target.value }))}
-                    placeholder="123 Business St"
+                    id="address"
+                    value={businessData.address}
+                    onChange={(e) => setBusinessData(prev => ({ ...prev, address: e.target.value }))}
+                    placeholder="123 Business St, Suite 100, City, State, ZIP"
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="addressLine2">Address Line 2</Label>
-                  <Input
-                    id="addressLine2"
-                    value={businessData.addressLine2}
-                    onChange={(e) => setBusinessData(prev => ({ ...prev, addressLine2: e.target.value }))}
-                    placeholder="Suite 100, City, State, ZIP"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Display Address</Label>
-                  <select
-                    value={businessData.selectedAddressLine}
-                    onChange={(e) => setBusinessData(prev => ({
-                      ...prev,
-                      selectedAddressLine: e.target.value as "addressLine1" | "addressLine2"
-                    }))}
-                    className="w-full px-3 py-2 border rounded-md"
-                  >
-                    <option value="addressLine1">Address Line 1</option>
-                    <option value="addressLine2">Address Line 2</option>
-                  </select>
                 </div>
               </div>
               <div className="flex justify-end gap-4">

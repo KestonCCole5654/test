@@ -155,24 +155,24 @@ export default function Login() {
     <div className="min-h-screen bg-gradient-to-b from-white to-green-50 flex flex-col">
       <Header />
 
-      <main className="flex-1 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-screen-lg mx-auto">
-          <div className="flex flex-col items-center space-y-12">
-            {/* Centered content with login card as focus */}
-            <div className="text-center space-y-4 max-w-xl">
-              <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">
+      <main className="flex-1 flex items-center justify-center p-6">
+        <div className="w-full max-w-md mx-auto">
+          <div className="flex flex-col items-center space-y-8">
+            {/* Heading section */}
+            <div className="text-center space-y-4 w-full">
+              <h1 className="text-3xl font-bold text-slate-900">
                 Invoice Management, <span className="text-green-600">Simplified</span>
               </h1>
-              <p className="text-slate-600 text-lg mb-5">
+              <p className="text-slate-600">
                 Streamline your business finances with our secure, Google Sheets-powered invoicing platform.
               </p>
-              <p className="text-slate-600 text-center">Sign in to access your invoicing dashboard</p>
-
             </div>
 
-            {/* Login Card - Main Focus */}
-            <Card className="border-0 w-full max-w-md">
-              <CardContent className="pt-0 pl-8 pr-8 pb-8 space-y-6">
+            {/* Login Card */}
+            <Card className="w-full border shadow-md">
+              <CardContent className="p-6 space-y-6">
+                <p className="text-slate-600 text-center font-medium">Sign in to access your invoicing dashboard</p>
+
                 {error && (
                   <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100 flex items-center gap-2">
                     <Shield className="h-4 w-4 text-red-500 flex-shrink-0" />
@@ -180,18 +180,17 @@ export default function Login() {
                   </div>
                 )}
 
-
-                {/* Feature highlights inside the card */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-center gap-2 text-sm text-slate-700">
+                {/* Feature highlights */}
+                <div className="space-y-3 py-2">
+                  <div className="flex items-center gap-2 text-sm text-slate-700">
                     <CheckCircle2 className="h-4 w-4 text-green-500" />
                     <span>Real-time sync with Google Sheets</span>
                   </div>
-                  <div className="flex items-center justify-center gap-2 text-sm text-slate-700">
+                  <div className="flex items-center gap-2 text-sm text-slate-700">
                     <CheckCircle2 className="h-4 w-4 text-green-500" />
                     <span>Enterprise-grade security</span>
                   </div>
-                  <div className="flex items-center justify-center gap-2 text-sm text-slate-700">
+                  <div className="flex items-center gap-2 text-sm text-slate-700">
                     <CheckCircle2 className="h-4 w-4 text-green-500" />
                     <span>Advanced analytics dashboard</span>
                   </div>
@@ -223,7 +222,7 @@ export default function Login() {
                   <span className="font-medium">Continue with Google</span>
                 </Button>
 
-                <div className="text-center">
+                <div className="text-center pt-2">
                   <p className="text-xs text-slate-500">
                     By signing in, you agree to our{" "}
                     <Link to="#" className="text-green-600 hover:text-green-700 font-medium">
@@ -238,8 +237,8 @@ export default function Login() {
               </CardContent>
             </Card>
 
-            {/* Trust indicators below the card */}
-            <div className="flex flex-wrap items-center justify-center gap-6">
+            {/* Trust indicators */}
+            <div className="flex flex-wrap items-center justify-center gap-6 pt-4">
               <div className="flex items-center gap-1 text-xs text-slate-500">
                 <Shield className="h-3 w-3" />
                 <span>Secure Login</span>

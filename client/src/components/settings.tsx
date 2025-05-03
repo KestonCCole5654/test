@@ -300,7 +300,7 @@ export default function SettingsPage() {
               Edit
             </Button>
           ) : (
-            <Button variant="outline" size="sm" className=" text-white" onClick={() => {
+            <Button variant="outline" size="sm" className="text-white" onClick={() => {
               setIsEditing(false);
               fetchData();
             }}>
@@ -329,7 +329,10 @@ export default function SettingsPage() {
                 <div className="flex items-center gap-2">
                   <select
                     value={businessData.selectedAddressLine}
-                    onChange={(e) => setBusinessData({ ...businessData, selectedAddressLine: e.target.value as "addressLine1" | "addressLine2" })}
+                    onChange={(e) => setBusinessData(prev => ({
+                      ...prev,
+                      selectedAddressLine: e.target.value as "addressLine1" | "addressLine2"
+                    }))}
                     className="text-sm border rounded px-2 py-1"
                   >
                     <option value="addressLine1">Address Line 1</option>
@@ -348,7 +351,7 @@ export default function SettingsPage() {
                     id="companyName"
                     required
                     value={businessData.companyName}
-                    onChange={(e) => setBusinessData({ ...businessData, companyName: e.target.value })}
+                    onChange={(e) => setBusinessData(prev => ({ ...prev, companyName: e.target.value }))}
                     placeholder="Your company name"
                   />
                 </div>
@@ -359,7 +362,7 @@ export default function SettingsPage() {
                     type="email"
                     required
                     value={businessData.email}
-                    onChange={(e) => setBusinessData({ ...businessData, email: e.target.value })}
+                    onChange={(e) => setBusinessData(prev => ({ ...prev, email: e.target.value }))}
                     placeholder="contact@example.com"
                   />
                 </div>
@@ -368,7 +371,7 @@ export default function SettingsPage() {
                   <Input
                     id="phone"
                     value={businessData.phone}
-                    onChange={(e) => setBusinessData({ ...businessData, phone: e.target.value })}
+                    onChange={(e) => setBusinessData(prev => ({ ...prev, phone: e.target.value }))}
                     placeholder="+1 (555) 123-4567"
                   />
                 </div>
@@ -377,7 +380,7 @@ export default function SettingsPage() {
                   <Input
                     id="addressLine1"
                     value={businessData.addressLine1}
-                    onChange={(e) => setBusinessData({ ...businessData, addressLine1: e.target.value })}
+                    onChange={(e) => setBusinessData(prev => ({ ...prev, addressLine1: e.target.value }))}
                     placeholder="123 Business St"
                   />
                 </div>
@@ -386,7 +389,7 @@ export default function SettingsPage() {
                   <Input
                     id="addressLine2"
                     value={businessData.addressLine2}
-                    onChange={(e) => setBusinessData({ ...businessData, addressLine2: e.target.value })}
+                    onChange={(e) => setBusinessData(prev => ({ ...prev, addressLine2: e.target.value }))}
                     placeholder="Suite 100, City, State, ZIP"
                   />
                 </div>
@@ -394,7 +397,10 @@ export default function SettingsPage() {
                   <Label>Display Address</Label>
                   <select
                     value={businessData.selectedAddressLine}
-                    onChange={(e) => setBusinessData({ ...businessData, selectedAddressLine: e.target.value as "addressLine1" | "addressLine2" })}
+                    onChange={(e) => setBusinessData(prev => ({
+                      ...prev,
+                      selectedAddressLine: e.target.value as "addressLine1" | "addressLine2"
+                    }))}
                     className="w-full px-3 py-2 border rounded-md"
                   >
                     <option value="addressLine1">Address Line 1</option>
@@ -402,7 +408,7 @@ export default function SettingsPage() {
                   </select>
                 </div>
               </div>
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-end gap-4">
                 <Button
                   type="button"
                   variant="outline"

@@ -90,7 +90,13 @@ const Header: React.FC = () => {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation
+          <Link
+                  to="/template-generator"
+                  className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                >
+                  Invoices Template Generator
+                </Link> */}
            <nav className="hidden md:flex items-center space-x-1">
             {user && (
               <>
@@ -100,12 +106,7 @@ const Header: React.FC = () => {
                 >
                   Dashboard
                 </Link>
-                <Link
-                  to="/template-generator"
-                  className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-                >
-                  Invoices Template Generator
-                </Link>
+                
                 <Link
                   to="/settings"
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"

@@ -605,11 +605,11 @@ export default function InvoiceForm() {
                 </tr>
                 <tr>
                   <td className="py-1 px-2 text-right text-gray-600">Discount</td>
-                  <td className="py-1 px-2 text-right font-medium text-red-600">-${formatCurrency(totalDiscount)}</td>
+                  <td className="py-1 px-2 text-right font-medium text-gray-800">-${formatCurrency(totalDiscount)}</td>
                 </tr>
                 <tr>
                   <td className="py-1 px-2 text-right text-gray-600">Tax</td>
-                  <td className="py-1 px-2 text-right font-medium text-green-600">+${formatCurrency(totalTax)}</td>
+                  <td className="py-1 px-2 text-right font-medium text-gray-800">+${formatCurrency(totalTax)}</td>
                 </tr>
                 <tr className="border-t">
                   <td className="py-2 px-2 text-right font-bold text-gray-800">Total</td>

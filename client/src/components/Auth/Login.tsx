@@ -161,7 +161,7 @@ export default function Login() {
             {/* Heading section */}
             <div className="text-center space-y-4 w-full">
               <h1 className="text-3xl font-bold text-slate-900">
-                Invoice Management, <span className="text-green-600">Simplified</span>
+                Invoice Management, <span className="text-green-600">Simplified SheetBills</span>
               </h1>
               <p className="text-slate-600">
                 Streamline your business finances with our secure, Google Sheets-powered invoicing platform.

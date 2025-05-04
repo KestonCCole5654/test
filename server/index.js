@@ -1283,8 +1283,14 @@ async function createBusinessSheet(accessToken, businessData) {
       }
     });
 
-    // Ensure the SheetBills Invoices sheet is created for this user
-    await getDefaultSheetId(accessToken);
+    // Get Google user id to ensure correct context for getDefaultSheetId
+    const userInfo = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    const googleUserId = userInfo.data.sub;
+
+    // Ensure the SheetBills Invoices sheet is created and registered for this user
+    await getDefaultSheetId(accessToken, googleUserId);
 
     return {
       spreadsheetId,

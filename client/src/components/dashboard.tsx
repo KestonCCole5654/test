@@ -481,7 +481,7 @@ export default function Dashboard() {
     })
   }
 
-  function handleRefresh(event: React.MouseEvent<HTMLButtonElement>): void {
+  function handleRefresh(event?: React.MouseEvent<HTMLButtonElement>): void {
     if (selectedSpreadsheetUrl && user) {
       // Clear cache before fetching
       localStorage.removeItem('cachedInvoices');
@@ -720,6 +720,7 @@ export default function Dashboard() {
                   // Update local state by removing the deleted invoice
                   const updatedInvoices = invoices.filter((inv) => inv.id !== invoiceToDelete.id)
                   setInvoices(updatedInvoices)
+                  handleRefresh()
 
                   toast({
                     title: "Invoice Deleted",
@@ -909,6 +910,7 @@ export default function Dashboard() {
                             inv.id === invoice.id ? { ...inv, status: "Paid" as const } : inv,
                           )
                           setInvoices(updatedInvoices)
+                          handleRefresh()
 
                           toast({
                             title: "Status Updated",
@@ -969,6 +971,7 @@ export default function Dashboard() {
                             inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv,
                           )
                           setInvoices(updatedInvoices)
+                          handleRefresh()
 
                           // Update filtered invoices as well
                           const updatedFilteredInvoices = filteredInvoices.map((inv) =>
@@ -1065,6 +1068,7 @@ export default function Dashboard() {
                                 inv.id === invoice.id ? { ...inv, status: "Paid" as const } : inv,
                               )
                               setInvoices(updatedInvoices)
+                              handleRefresh()
 
                               toast({
                                 title: "Status Updated",
@@ -1124,6 +1128,7 @@ export default function Dashboard() {
                                 inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv,
                               )
                               setInvoices(updatedInvoices)
+                              handleRefresh()
 
                               toast({
                                 title: "Status Updated",

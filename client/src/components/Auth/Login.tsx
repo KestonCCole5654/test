@@ -155,33 +155,33 @@ export default function Login() {
     <div className="min-h-screen bg-gradient-to-b from-white to-green-50 flex flex-col">
       <Header />
 
-      <main className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-md mx-auto">
-          <div className="flex flex-col items-center space-y-8">
-            {/* Heading section */}
-            <div className="text-center space-y-4 w-full">
-              <h1 className="text-3xl font-bold text-slate-900">
+      <main className="flex-1 flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-screen-lg mx-auto">
+          <div className="flex flex-col items-center">
+            {/* Centered content with login card as focus */}
+            <div className="text-center mb-8 max-w-xl">
+              <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
                 Invoice Management, <span className="text-green-600">Simplified</span>
               </h1>
-              <p className="text-slate-600">
+              <p className="text-slate-600 text-lg">
                 Streamline your business finances with our secure, Google Sheets-powered invoicing platform.
               </p>
             </div>
 
-            {/* Login Card */}
-            <Card className="w-full border shadow-md">
-              <CardContent className="p-6 space-y-6">
-                <p className="text-slate-600 text-center font-medium">Sign in to access your invoicing dashboard</p>
-
+            {/* Login Card - Main Focus */}
+            <Card className="border-0 items-center justify-center text-center overflow-hidden w-full max-w-md">
+              <CardContent className="p-8">
                 {error && (
-                  <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100 flex items-center gap-2">
+                  <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100 flex items-center gap-2 mb-6">
                     <Shield className="h-4 w-4 text-red-500 flex-shrink-0" />
                     <span>{error}</span>
                   </div>
                 )}
 
-                {/* Feature highlights */}
-                <div className="space-y-3 py-2">
+                <p className="text-slate-600 text-center mb-6">Sign in to access your invoicing dashboard</p>
+
+                {/* Feature highlights inside the card */}
+                <div className="mb-6 space-y-3">
                   <div className="flex items-center gap-2 text-sm text-slate-700">
                     <CheckCircle2 className="h-4 w-4 text-green-500" />
                     <span>Real-time sync with Google Sheets</span>
@@ -222,7 +222,7 @@ export default function Login() {
                   <span className="font-medium">Continue with Google</span>
                 </Button>
 
-                <div className="text-center pt-2">
+                <div className="mt-6 text-center">
                   <p className="text-xs text-slate-500">
                     By signing in, you agree to our{" "}
                     <Link to="#" className="text-green-600 hover:text-green-700 font-medium">
@@ -237,14 +237,30 @@ export default function Login() {
               </CardContent>
             </Card>
 
-            {/* Trust indicators */}
-            <div className="flex flex-wrap items-center justify-center gap-6 pt-4">
+            {/* Trust indicators below the card */}
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-6">
               <div className="flex items-center gap-1 text-xs text-slate-500">
                 <Shield className="h-3 w-3" />
                 <span>Secure Login</span>
               </div>
 
-            
+              <div className="flex items-center gap-1 text-xs text-slate-500">
+                <svg
+                  className="h-3 w-3"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"
+                  />
+                </svg>
+                <span>Cloud Powered</span>
+              </div>
 
               <div className="flex items-center gap-1 text-xs text-slate-500">
                 <svg

@@ -483,6 +483,10 @@ export default function Dashboard() {
 
   function handleRefresh(event: React.MouseEvent<HTMLButtonElement>): void {
     if (selectedSpreadsheetUrl && user) {
+      // Clear cache before fetching
+      localStorage.removeItem('cachedInvoices');
+      localStorage.removeItem('lastFetchTime');
+      setLastFetchTime(0);
       fetchInvoices(selectedSpreadsheetUrl)
       toast({
         title: "Data Refreshed",

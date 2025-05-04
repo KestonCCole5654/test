@@ -64,13 +64,12 @@ export default function BusinessSetup() {
         }),
       })
       
-      if (!response.ok) {
-        const errorData = await response.json()
-        console.error("Business sheet creation failed:", errorData)
-        throw new Error(errorData.details || errorData.error || "Business sheet creation failed")
-      }
+      const responseData = await response.json()
       
-      const { businessSheetId, spreadsheetUrl } = await response.json()
+      if (!response.ok) {
+        console.error("Business sheet creation failed:", responseData)
+        throw new Error(responseData.details || responseData.error || "Business sheet creation failed")
+      }
       
       setSuccess("Business details saved successfully! Redirecting...")
       
@@ -79,8 +78,8 @@ export default function BusinessSetup() {
           replace: true,
           state: {
             sheetAccessReady: true,
-            businessSheetId,
-            spreadsheetUrl,
+            businessSheetId: responseData.businessSheetId,
+            spreadsheetUrl: responseData.spreadsheetUrl,
             businessSetupComplete: true,
           },
         })

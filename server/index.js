@@ -1051,27 +1051,37 @@ app.get('/api/business-details', async (req, res) => {
     const dataRows = response.data.values || [];
     console.log('[Business Details] Raw business details data:', dataRows);
 
-    // Step 10: Convert rows to a structured object with proper field names
-    const businessDetails = {};
-    dataRows.forEach((row) => {
-      if (row.length >= 2) {
-        const key = row[0]?.trim();
-        const value = row[1]?.trim();
-        console.log(`[Business Details] Processing field: "${key}" = "${value}"`);
-        
-        // Handle variations in field names
-        if (key.toLowerCase().includes('company') || key.toLowerCase().includes('name')) {
-          businessDetails['Company Name'] = value;
-        } else if (key.toLowerCase().includes('email') || key.toLowerCase().includes('business email')) {
-          businessDetails['Business Email'] = value;
-          console.log('[Business Details] Found email field:', value);
-        } else if (key.toLowerCase().includes('phone') || key.toLowerCase().includes('number')) {
-          businessDetails['Phone Number'] = value;
-          console.log('[Business Details] Found phone field:', value);
-        } else if (key.toLowerCase().includes('address')) {
-          businessDetails['Address'] = value;
-        }
-      }
+    // Migration: Ensure each row in Business Details!A2:C6 has 3 columns
+    const getRangeResponse = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: 'Business Details!A2:C6',
+    });
+    let existingRows = getRangeResponse.data.values || [];
+    // Pad each row to 3 columns
+    existingRows = existingRows.map(row => {
+      while (row.length < 3) row.push("");
+      return row;
+    });
+    // If fewer than 5 rows, pad with empty rows
+    while (existingRows.length < 5) {
+      existingRows.push(["", "", ""]);
+    }
+    // Now update with new data
+    const now = new Date().toISOString();
+    const updateData = [
+      ['Company Name', businessData.companyName, now],
+      ['Business Email', businessData.email, now],
+      ['Phone Number', businessData.phone, now],
+      ['Address', businessData.address, now],
+      ['Created At', now, now]
+    ];
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: 'Business Details!A2:C6',
+      valueInputOption: 'USER_ENTERED',
+      requestBody: {
+        values: updateData
+      },
     });
 
     console.log('[Business Details] Final business details object:', businessDetails);

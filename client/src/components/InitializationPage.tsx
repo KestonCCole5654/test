@@ -45,8 +45,8 @@ export default function BusinessSetup() {
       setError("")
       setSuccess("")
 
-      // Call the API to create business sheet and update master
-      const response = await fetch("https://sheetbills-server.vercel.app/api/check-business-sheet", {
+      // Call the API to create business sheet
+      const response = await fetch("https://sheetbills-server.vercel.app/api/create-business-sheet", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -54,14 +54,14 @@ export default function BusinessSetup() {
         },
         body: JSON.stringify({
           accessToken: session?.provider_token,
-          createIfMissing: true,
           businessData: formData
         }),
       })
       
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || "Failed to save business details")
+        console.error("Business sheet creation failed:", errorData)
+        throw new Error(errorData.error || "Business sheet creation failed")
       }
       
       const { businessSheetId, spreadsheetUrl } = await response.json()
@@ -69,7 +69,7 @@ export default function BusinessSetup() {
       setSuccess("Business details saved successfully! Redirecting...")
       
       setTimeout(() => {
-        navigate("/dashboard", {
+        navigate("/invoices", {
           replace: true,
           state: {
             sheetAccessReady: true,
@@ -82,6 +82,7 @@ export default function BusinessSetup() {
       
     } catch (err) {
       const error = err as Error
+      console.error("Setup error:", error)
       setError(error.message || "An error occurred while saving business details")
     } finally {
       setLoading(false)

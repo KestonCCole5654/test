@@ -1181,7 +1181,16 @@ export default function InitializePage() {
       </header>
 
       <main className="flex-1 flex items-center justify-center p-4 md:p-8 relative z-10">
-        {showSuccess ? renderSuccessScreen() : showReview ? renderReviewScreen() : renderCurrentQuestion()}
+        {showSuccess
+          ? renderSuccessScreen()
+          : showReview
+            ? renderReviewScreen()
+            : renderCurrentQuestion()
+        }
+        {/* Fallback for debugging */}
+        <div style={{position: 'absolute', top: 0, left: 0, color: 'red', zIndex: 9999}}>
+          Onboarding page loaded
+        </div>
       </main>
     </div>
   )

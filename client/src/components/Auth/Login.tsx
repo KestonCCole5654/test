@@ -22,18 +22,30 @@ export default function Login() {
   // Handle auth state changes
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event: string, session: Session | null) => {
+      console.log("Auth state changed:", event, session)
+      
       if (event === "SIGNED_IN" && session) {
         try {
+          console.log("Storing session data...")
           sessionStorage.setItem("supabase_token", session.access_token)
           if (session.provider_token) {
             sessionStorage.setItem("google_access_token", session.provider_token)
           }
+          
+          // Check if we have the necessary tokens
+          if (!session.provider_token) {
+            console.error("No Google access token available")
+            setError("Failed to get Google access token")
+            return
+          }
+          
           await checkBusinessSheet(session)
         } catch (err) {
-          console.error("Error storing session:", err)
+          console.error("Error in auth state change:", err)
           setError("Failed to store session data")
         }
       } else if (event === "SIGNED_OUT") {
+        console.log("User signed out")
         sessionStorage.clear()
         localStorage.clear()
       }
@@ -45,6 +57,7 @@ export default function Login() {
     async (session: Session) => {
       try {
         setLoading(true)
+        console.log("Checking business sheet...")
 
         const response = await fetch("https://sheetbills-server.vercel.app/api/check-business-sheet", {
           method: "POST",
@@ -60,12 +73,17 @@ export default function Login() {
 
         if (!response.ok) {
           const errorData = await response.json()
+          console.error("Business sheet check failed:", errorData)
           throw new Error(errorData.error || "Business sheet check failed")
         }
 
         const { hasBusinessSheet } = await response.json()
+        console.log("Business sheet check result:", hasBusinessSheet)
+        
+        // Use window.location.href for a full page reload
         window.location.href = hasBusinessSheet ? "/invoices" : "/businessSetup"
       } catch (err: any) {
+        console.error("Error in checkBusinessSheet:", err)
         setError(err instanceof Error ? err.message : "Check failed")
         await supabase.auth.signOut()
       } finally {
@@ -79,21 +97,25 @@ export default function Login() {
     try {
       setLoading(true)
       setError("")
+      console.log("Initiating Google login...")
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          scopes: ["https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/spreadsheets"].join(" "),
-          redirectTo: window.location.origin,
+          scopes: "https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/spreadsheets",
+          redirectTo: `${window.location.origin}/businessSetup`,
           queryParams: {
             access_type: "offline",
-            include_granted_scopes: "true",
-          },
-          skipBrowserRedirect: false,
+            prompt: "consent",
+            include_granted_scopes: "true"
+          }
         },
       })
 
-      if (error) throw error
+      if (error) {
+        console.error("Google login error:", error)
+        throw error
+      }
     } catch (err: any) {
       console.error("Google login error:", err)
       setError(err instanceof Error ? err.message : "Login failed")

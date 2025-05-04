@@ -74,6 +74,11 @@ export default function Login() {
         if (!response.ok) {
           const errorData = await response.json()
           console.error("Business sheet check failed:", errorData)
+          // Only sign out if it's an authentication error
+          if (response.status === 401 || response.status === 403) {
+            await supabase.auth.signOut()
+            throw new Error("Authentication failed. Please log in again.")
+          }
           throw new Error(errorData.error || "Business sheet check failed")
         }
 
@@ -85,7 +90,7 @@ export default function Login() {
       } catch (err: any) {
         console.error("Error in checkBusinessSheet:", err)
         setError(err instanceof Error ? err.message : "Check failed")
-        await supabase.auth.signOut()
+        // Don't automatically sign out on all errors
       } finally {
         setLoading(false)
       }

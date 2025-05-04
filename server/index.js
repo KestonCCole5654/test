@@ -1250,7 +1250,9 @@ async function createBusinessSheet(accessToken, businessData) {
       }
     });
 
-    // Format the headers
+    // Get the correct sheetId from the spreadsheet creation response
+    const sheetId = spreadsheet.data.sheets[0].properties.sheetId;
+
     await sheets.spreadsheets.batchUpdate({
       spreadsheetId,
       requestBody: {
@@ -1258,7 +1260,7 @@ async function createBusinessSheet(accessToken, businessData) {
           {
             repeatCell: {
               range: {
-                sheetId: 0,
+                sheetId: sheetId, // <-- Use the actual sheetId
                 startRowIndex: 0,
                 endRowIndex: 1
               },
@@ -1610,10 +1612,6 @@ app.post('/api/check-business-sheet', async (req, res) => {
     });
   }
 });
-
-
-
-
 
 // Function to test if the backend if running properly 
 app.get('/api/test', (req, res) => {

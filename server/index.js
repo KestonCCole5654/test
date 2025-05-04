@@ -1155,17 +1155,18 @@ app.put('/api/update-business-details', async (req, res) => {
     }
 
     // Update business details
+    const now = new Date().toISOString();
     const updateData = [
-      ['Company Name', businessData.companyName],
-      ['Business Email', businessData.email],
-      ['Phone Number', businessData.phone],
-      ['Address', businessData.address],
-      ['Created At', new Date().toISOString()]
+      ['Company Name', businessData.companyName, now],
+      ['Business Email', businessData.email, now],
+      ['Phone Number', businessData.phone, now],
+      ['Address', businessData.address, now],
+      ['Created At', now, now]
     ];
 
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: 'Business Details!A2:B6',
+      range: 'Business Details!A2:C6',
       valueInputOption: 'USER_ENTERED',
       requestBody: {
         values: updateData

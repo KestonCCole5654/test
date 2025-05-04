@@ -1051,22 +1051,12 @@ app.get('/api/business-details', async (req, res) => {
     const dataRows = response.data.values || [];
     console.log('[Business Details] Raw business details data:', dataRows);
 
-    // Migration: Ensure each row in Business Details!A2:C6 has 3 columns
-    const getRangeResponse = await sheets.spreadsheets.values.get({
+    // Step: Clear the old 2-column range to prevent column mismatch errors
+    await sheets.spreadsheets.values.clear({
       spreadsheetId,
-      range: 'Business Details!A2:C6',
+      range: 'Business Details!A2:B6',
     });
-    let existingRows = getRangeResponse.data.values || [];
-    // Pad each row to 3 columns
-    existingRows = existingRows.map(row => {
-      while (row.length < 3) row.push("");
-      return row;
-    });
-    // If fewer than 5 rows, pad with empty rows
-    while (existingRows.length < 5) {
-      existingRows.push(["", "", ""]);
-    }
-    // Now update with new data
+    // Now update with new 3-column data
     const now = new Date().toISOString();
     const updateData = [
       ['Company Name', businessData.companyName, now],

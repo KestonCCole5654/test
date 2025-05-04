@@ -42,8 +42,6 @@ export default function SettingsPage() {
     companyName: "",
     phone: "",
     address: "",
-    addressLine1: "",
-    addressLine2: "",
     email: "",
   })
   const [isUpdatingBusiness, setIsUpdatingBusiness] = useState(false)
@@ -89,8 +87,6 @@ export default function SettingsPage() {
           email: businessResponse.data.businessDetails["Business Email"] || "",
           phone: businessResponse.data.businessDetails["Phone Number"] || "",
           address: businessResponse.data.businessDetails["Address"] || "",
-          addressLine1: businessResponse.data.businessDetails["Address Line 1"] || "",
-          addressLine2: businessResponse.data.businessDetails["Address Line 2"] || "",
         });
       }
 
@@ -156,8 +152,7 @@ export default function SettingsPage() {
           companyName: businessData.companyName,
           email: businessData.email,
           phone: businessData.phone,
-          addressLine1: businessData.addressLine1,
-          addressLine2: businessData.addressLine2
+          address: businessData.address,
         },
         {
           headers: {
@@ -175,8 +170,6 @@ export default function SettingsPage() {
           email: response.data.businessDetails["Business Email"] || prev.email,
           phone: response.data.businessDetails["Phone Number"] || prev.phone,
           address: response.data.businessDetails["Address"] || prev.address,
-          addressLine1: response.data.businessDetails["Address Line 1"] || prev.addressLine1,
-          addressLine2: response.data.businessDetails["Address Line 2"] || prev.addressLine2
         }));
 
         toast({
@@ -366,9 +359,9 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="addressLine1">Address</Label>
+                  <Label htmlFor="address">Address</Label>
                   <Input
-                    id="addressLine1"
+                    id="address"
                     value={businessData.address}
                     onChange={(e) => setBusinessData(prev => ({ ...prev, address: e.target.value }))}
                     placeholder="123 Business St, Suite 100, City, State, ZIP"

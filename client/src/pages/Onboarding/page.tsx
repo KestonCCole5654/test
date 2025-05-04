@@ -1166,7 +1166,7 @@ export default function OnboardingPage() {
       <Header hideNav={true} />
       {/* Progress Bar Section */}
       <div className="w-full bg-white mt-10 p-4 flex flex-col items-center z-10">
-        <h2 className="text-2xl font-bold mb-2">User Onboarding: Getting Started With SheetBills</h2>
+        <h2 className="text-2xl font-bold mb-2">User Onboarding</h2>
         <div className="w-full max-w-md">
           <div className="flex justify-between mb-1 text-sm text-gray-600">
             <span>Step {showReview ? questions.length : currentQuestion + 1} of {questions.length}</span>

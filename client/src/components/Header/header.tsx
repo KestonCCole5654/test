@@ -17,11 +17,7 @@ import {
 } from "../ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "../ui/avatar"
 
-interface HeaderProps {
-  hideNav?: boolean;
-}
-
-const Header: React.FC<HeaderProps> = ({ hideNav = false }) => {
+const Header: React.FC = () => {
   const navigate = useNavigate()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -101,33 +97,31 @@ const Header: React.FC<HeaderProps> = ({ hideNav = false }) => {
                 >
                   Invoices Template Generator
           </Link> */}
-           {!hideNav && (
-            <nav className="hidden md:flex items-center space-x-1">
-              {user && (
-                <>
-                  <Link
-                    to="/dashboard"
-                    className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-                  >
-                    Dashboard
-                  </Link>
-                  
-                  <Link
-                    to="/settings"
-                    className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-                  >
-                    Account & Settings
-                  </Link>
-                  <Link
-                    to="/contact"
-                    className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-                  >
-                    Contact & Support
-                  </Link>
-                </>
-              )}
-            </nav>
-           )}
+           <nav className="hidden md:flex items-center space-x-1">
+            {user && (
+              <>
+                <Link
+                  to="/dashboard"
+                  className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                >
+                  Dashboard
+                </Link>
+                
+                <Link
+                  to="/settings"
+                  className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                >
+                  Account & Settings
+                </Link>
+                <Link
+                  to="/contact"
+                  className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                >
+                  Contact & Support
+                </Link>
+              </>
+            )}
+          </nav>
         
 
           {/* User profile section - desktop */}

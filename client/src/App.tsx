@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Route, Routes, Navigate, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import { InvoiceProvider } from './components/context/InvoiceContext';
 import supabase from './components/Auth/supabaseClient';
 import Login from './components/Auth/Login';
 import Dashboard from './pages/Dashboard/dashboard';
@@ -143,7 +142,7 @@ function App() {
 
   return (
     <HelmetProvider>
-      <InvoiceProvider>
+    
         <Routes>
           {/* Public Routes */}
             <Route path="/login" element={<Login />} />
@@ -169,7 +168,7 @@ function App() {
             <Navigate to={user ? "/invoices" : "/login"} replace />
           } />
         </Routes>
-      </InvoiceProvider>
+     
     </HelmetProvider>
   );
 }

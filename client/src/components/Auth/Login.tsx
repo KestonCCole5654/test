@@ -83,13 +83,13 @@ export default function Login() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          scopes: ["https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/spreadsheets"].join(" "),
-          redirectTo: window.location.origin,
+          scopes: "https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/spreadsheets",
+          redirectTo: `${window.location.origin}/businessSetup`,
           queryParams: {
             access_type: "offline",
-            include_granted_scopes: "true",
-          },
-          skipBrowserRedirect: false,
+            prompt: "consent",
+            include_granted_scopes: "true"
+          }
         },
       })
 

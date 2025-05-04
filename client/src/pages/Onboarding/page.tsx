@@ -1163,7 +1163,29 @@ export default function OnboardingPage() {
 
       <FloatingElements />
 
-      <Header />
+      <Header hideNav={true} />
+      {/* Progress Bar Section */}
+      <div className="w-full bg-white shadow p-4 flex flex-col items-center z-10">
+        <h2 className="text-2xl font-bold mb-2">User Onboarding</h2>
+        <div className="w-full max-w-md">
+          <div className="flex justify-between mb-1 text-sm text-gray-600">
+            <span>Step {showReview ? questions.length : currentQuestion + 1} of {questions.length}</span>
+            <span>
+              {showReview
+                ? "Review"
+                : questions[currentQuestion]?.question || ""}
+            </span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+            <div
+              className="bg-green-500 h-2 rounded-full transition-all"
+              style={{
+                width: `${showReview ? 100 : ((currentQuestion + 1) / questions.length) * 100}%`
+              }}
+            />
+          </div>
+        </div>
+      </div>
 
       <main className="flex-1 flex items-center justify-center p-4 md:p-8 relative z-10">
         {showSuccess ? renderSuccessScreen() : showReview ? renderReviewScreen() : renderCurrentQuestion()}

@@ -4,8 +4,8 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Menu, X, ChevronDown, LogOut, Settings, User, Bell, HelpCircle } from "lucide-react"
-import supabase from "../components/Auth/supabaseClient"
-import { Button } from "./ui/button"
+import supabase from "../../components/Auth/supabaseClient"
+import { Button } from "../ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,8 +14,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu"
-import { Avatar, AvatarFallback } from "./ui/avatar"
+} from "../ui/dropdown-menu"
+import { Avatar, AvatarFallback } from "../ui/avatar"
 
 const Header: React.FC = () => {
   const navigate = useNavigate()

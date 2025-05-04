@@ -45,6 +45,12 @@ export default function BusinessSetup() {
       setError("")
       setSuccess("")
 
+      // Get the Google access token from session storage
+      const googleAccessToken = sessionStorage.getItem("google_access_token")
+      if (!googleAccessToken) {
+        throw new Error("Google access token not found. Please try logging in again.")
+      }
+
       // Call the API to create business sheet
       const response = await fetch("https://sheetbills-server.vercel.app/api/create-business-sheet", {
         method: "POST",
@@ -53,7 +59,7 @@ export default function BusinessSetup() {
           "x-supabase-token": session?.access_token || ""
         },
         body: JSON.stringify({
-          accessToken: session?.provider_token,
+          accessToken: googleAccessToken,
           businessData: formData
         }),
       })

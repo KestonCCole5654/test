@@ -2,12 +2,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import supabase from './supabaseClient';
 import { AuthChangeEvent, Session } from '@supabase/supabase-js';
-import { Loader2 } from 'lucide-react';
 
 export default function AuthCallback() {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
@@ -18,86 +16,76 @@ export default function AuthCallback() {
 
       try {
         if (event === 'SIGNED_IN' && session?.user) {
-          // Store tokens
-          sessionStorage.setItem('supabase_token', session.access_token);
-          if (session.provider_token) {
-            sessionStorage.setItem('google_access_token', session.provider_token);
+          // Verify session with Supabase
+          const { error: userError } = await supabase.auth.getUser();
+          if (userError) throw userError;
+
+          // Store tokens with error handling
+          try {
+            sessionStorage.setItem('supabase_token', session.access_token);
+            if (session.provider_token) {
+              sessionStorage.setItem('google_access_token', session.provider_token);
+            }
+          } catch (storageError) {
+            console.error('Error storing session:', storageError);
+            throw new Error('Failed to store session data');
           }
 
-          // Check business sheet
-          const response = await fetch("https://sheetbills-server.vercel.app/api/check-business-sheet", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "x-supabase-token": session.access_token,
-            },
-            body: JSON.stringify({
-              accessToken: session.provider_token,
-              createIfMissing: false,
-            }),
-          });
-
-          if (!response.ok) {
-            throw new Error("Failed to check business sheet");
-          }
-
-          const { hasBusinessSheet } = await response.json();
+          // Clean URL only after successful validation
+          window.history.replaceState({}, document.title, window.location.pathname);
           
-          // Navigate based on business sheet status
-          navigate(hasBusinessSheet ? "/invoices" : "/businessSetup", {
-            replace: true,
-            state: { session }
-          });
+          // Navigate to dashboard
+          navigate('/dashboard', { replace: true });
+        } else if (event === 'TOKEN_REFRESHED') {
+          console.log('Token refreshed successfully');
         } else if (event === 'SIGNED_OUT') {
+          // Clear all storage on sign out
           sessionStorage.clear();
           localStorage.clear();
           navigate('/login', { replace: true });
         }
-      } catch (err) {
-        console.error('Auth callback error:', err);
-        setError(err instanceof Error ? err.message : 'Authentication failed');
-        navigate('/login', { replace: true });
-      } finally {
-        setLoading(false);
+      } catch (error) {
+        console.error('Auth validation failed:', error);
+        setError(error instanceof Error ? error.message : 'Authentication failed');
+        navigate('/login', { replace: true, state: { error: 'Authentication failed' } });
       }
     };
 
-    // Subscribe to auth changes
-    authSubscription = supabase.auth.onAuthStateChange(handleAuthChange);
+    // Subscribe to auth state changes
+    authSubscription = supabase.auth.onAuthStateChange(handleAuthChange).data.subscription;
+
+    // Check for existing session
+    const checkSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        if (session) {
+          await handleAuthChange('SIGNED_IN', session);
+        }
+      } catch (error) {
+        console.error('Session check failed:', error);
+        setError('Failed to check session');
+        navigate('/login', { replace: true });
+      }
+    };
+
+    checkSession();
 
     return () => {
       mounted = false;
-      authSubscription?.subscription.unsubscribe();
+      authSubscription?.unsubscribe();
     };
   }, [navigate]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-          <p className="text-gray-600">Completing authentication...</p>
-        </div>
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        {error ? (
+          <div className="text-red-500 mb-4">{error}</div>
+        ) : (
+          <div className="animate-pulse">Finishing authentication...</div>
+        )}
       </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="bg-red-50 p-6 rounded-lg max-w-md text-center">
-          <h2 className="text-lg font-semibold text-red-800 mb-2">Authentication Error</h2>
-          <p className="text-red-600">{error}</p>
-          <button
-            onClick={() => navigate('/login')}
-            className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-          >
-            Return to Login
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return null;
+    </div>
+  );
 }

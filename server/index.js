@@ -1045,7 +1045,7 @@ app.get('/api/business-details', async (req, res) => {
     console.log('[Business Details] Fetching business details from sheet');
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: 'Business Info!A2:B6',
+      range: 'Business Details!A2:B6',
     });
 
     const dataRows = response.data.values || [];
@@ -1167,7 +1167,7 @@ app.put('/api/update-business-details', async (req, res) => {
 
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: 'Business Info!A2:B6',
+      range: 'Business Details!A2:B6',
       valueInputOption: 'USER_ENTERED',
       requestBody: {
         values: updateData

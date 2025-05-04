@@ -282,6 +282,96 @@ async function getDefaultSheetId(accessToken) {
   }
 }
 
+// Add this function after getDefaultSheetId
+async function getOrCreateBusinessSheet(accessToken, userId) {
+  const auth = new google.auth.OAuth2();
+  auth.setCredentials({ access_token: accessToken });
+  const sheets = google.sheets({ version: 'v4', auth });
+
+  try {
+    // Get master sheet
+    const masterSheet = await getOrCreateMasterSheet(accessToken, userId);
+
+    // Look for existing business sheet
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: masterSheet.id,
+      range: 'My Sheets!A:E',
+    });
+
+    const rows = response.data.values || [];
+    const businessSheet = rows.find(row => row[1]?.toLowerCase().includes('business'));
+
+    if (businessSheet) {
+      const sheetId = extractSheetIdFromUrl(businessSheet[4]);
+      if (sheetId) return { id: sheetId, isNew: false };
+    }
+
+    // Create new business sheet if none exists
+    const newSheet = await sheets.spreadsheets.create({
+      requestBody: {
+        properties: {
+          title: 'Business Details',
+        },
+        sheets: [{
+          properties: {
+            title: 'Business Details',
+            gridProperties: { frozenRowCount: 1 }
+          }
+        }]
+      }
+    });
+
+    const spreadsheetId = newSheet.data.spreadsheetId;
+
+    // Initialize the sheet with headers and empty data
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: 'Business Details!A1:C1',
+      valueInputOption: 'RAW',
+      requestBody: {
+        values: [['Field', 'Value', 'Last Updated']]
+      }
+    });
+
+    // Add initial rows
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: 'Business Details!A2:C6',
+      valueInputOption: 'RAW',
+      requestBody: {
+        values: [
+          ['Company Name', '', new Date().toISOString()],
+          ['Business Email', '', new Date().toISOString()],
+          ['Phone Number', '', new Date().toISOString()],
+          ['Address', '', new Date().toISOString()],
+          ['Created At', new Date().toISOString(), new Date().toISOString()]
+        ]
+      }
+    });
+
+    // Add to master sheet
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: masterSheet.id,
+      range: 'My Sheets!A:E',
+      valueInputOption: 'RAW',
+      requestBody: {
+        values: [[
+          new Date().toISOString(),
+          'Business Details',
+          'Settings',
+          'Active',
+          newSheet.data.spreadsheetUrl
+        ]]
+      }
+    });
+
+    return { id: spreadsheetId, isNew: true };
+  } catch (error) {
+    console.error('Error in getOrCreateBusinessSheet:', error);
+    throw error;
+  }
+}
+
 // ==========================
 // Calculation Utilities
 // ==========================
@@ -975,49 +1065,31 @@ app.post('/api/saveInvoice', async (req, res) => {
 // Save business details to Google Sheet 
 app.get('/api/business-details', async (req, res) => {
   try {
-    // Get authentication tokens from headers
+    // Verify Supabase authentication
     const supabaseToken = req.headers['x-supabase-token'];
-    const googleToken = req.headers.authorization?.split(' ')[1];
-
-    if (!supabaseToken || !googleToken) {
-      return res.status(401).json({ error: 'Authentication tokens required' });
+    if (!supabaseToken) {
+      return res.status(401).json({ error: 'Missing Supabase token' });
     }
 
-    // Verify Supabase session
+    // Verify the Supabase user session is valid
     const { data: { user }, error } = await supabase.auth.getUser(supabaseToken);
     if (error || !user) {
       return res.status(401).json({ error: 'Invalid Supabase session' });
     }
 
+    // Extract and validate Google authentication token
+    const googleToken = req.headers.authorization?.split(' ')[1];
+    if (!googleToken) {
+      return res.status(401).json({ error: 'Missing Google credentials' });
+    }
+
+    // Get or create business sheet
+    const { id: spreadsheetId, isNew } = await getOrCreateBusinessSheet(googleToken, user.id);
+
     // Initialize Google Sheets API
     const auth = new google.auth.OAuth2();
     auth.setCredentials({ access_token: googleToken });
     const sheets = google.sheets({ version: 'v4', auth });
-
-    // Get user's master sheet
-    const userInfo = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
-      headers: { Authorization: `Bearer ${googleToken}` }
-    });
-    const masterSheet = await getOrCreateMasterSheet(googleToken, userInfo.data.sub);
-
-    // Find business sheet in master
-    const masterData = await sheets.spreadsheets.values.get({
-      spreadsheetId: masterSheet.id,
-      range: 'My Sheets!A:E',
-    });
-
-    const businessSheet = masterData.data.values?.find(row => 
-      row[1]?.toLowerCase().includes('business')
-    );
-
-    if (!businessSheet) {
-      return res.status(404).json({ error: 'Business sheet not found' });
-    }
-
-    const spreadsheetId = extractSheetIdFromUrl(businessSheet[4]);
-    if (!spreadsheetId) {
-      return res.status(400).json({ error: 'Invalid sheet URL' });
-    }
 
     // Get business details
     const response = await sheets.spreadsheets.values.get({

@@ -1068,8 +1068,12 @@ app.get('/api/business-details', async (req, res) => {
         } else if (key.toLowerCase().includes('phone') || key.toLowerCase().includes('number')) {
           businessDetails['Phone Number'] = value;
           console.log('[Business Details] Found phone field:', value);
-        } else if (key.toLowerCase().includes('address 1') || key.toLowerCase().includes('address line 1')) {
-          businessDetails['Address Line 1'] = value;
+        } else if (
+          key.toLowerCase().includes('address 1') ||
+          key.toLowerCase().includes('address line 1') ||
+          key.toLowerCase() === 'address'
+        ) {
+          businessDetails['Address'] = value;
         } else if (key.toLowerCase().includes('address 2') || key.toLowerCase().includes('address line 2')) {
           businessDetails['Address Line 2'] = value;
         }
@@ -1161,8 +1165,8 @@ app.put('/api/update-business-details', async (req, res) => {
       ['Company Name', businessData.companyName],
       ['Business Email', businessData.email],
       ['Phone Number', businessData.phone],
-      ['Address Line 1', businessData.addressLine1],
-      ['Address Line 2', businessData.addressLine2 || '']
+      ['Address', businessData.addressLine1, businessData.addressLine2 || ''],
+      ['Created At', new Date().toISOString(), new Date().toISOString()]
     ];
 
     await sheets.spreadsheets.values.update({
@@ -1228,7 +1232,7 @@ async function createBusinessSheet(accessToken, businessData) {
       ['Company Name', businessData.companyName, new Date().toISOString()],
       ['Email', businessData.email, new Date().toISOString()],
       ['Phone', businessData.phone, new Date().toISOString()],
-      ['Address', businessData.addressLine1, new Date().toISOString()],
+      ['Address', businessData.addressLine1, businessData.addressLine2 || ''],
       ['Created At', new Date().toISOString(), new Date().toISOString()]
     ];
 

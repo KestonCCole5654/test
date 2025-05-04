@@ -720,7 +720,7 @@ export default function Dashboard() {
                   // Update local state by removing the deleted invoice
                   const updatedInvoices = invoices.filter((inv) => inv.id !== invoiceToDelete.id)
                   setInvoices(updatedInvoices)
-                  handleRefresh()
+                  if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
 
                   toast({
                     title: "Invoice Deleted",
@@ -910,7 +910,7 @@ export default function Dashboard() {
                             inv.id === invoice.id ? { ...inv, status: "Paid" as const } : inv,
                           )
                           setInvoices(updatedInvoices)
-                          handleRefresh()
+                          if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
 
                           toast({
                             title: "Status Updated",
@@ -971,7 +971,7 @@ export default function Dashboard() {
                             inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv,
                           )
                           setInvoices(updatedInvoices)
-                          handleRefresh()
+                          if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
 
                           // Update filtered invoices as well
                           const updatedFilteredInvoices = filteredInvoices.map((inv) =>
@@ -1068,7 +1068,7 @@ export default function Dashboard() {
                                 inv.id === invoice.id ? { ...inv, status: "Paid" as const } : inv,
                               )
                               setInvoices(updatedInvoices)
-                              handleRefresh()
+                              if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
 
                               toast({
                                 title: "Status Updated",
@@ -1128,7 +1128,7 @@ export default function Dashboard() {
                                 inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv,
                               )
                               setInvoices(updatedInvoices)
-                              handleRefresh()
+                              if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
 
                               toast({
                                 title: "Status Updated",

@@ -537,7 +537,7 @@ const SuccessIllustration = () => (
   </motion.svg>
 )
 
-export default function InitializePage() {
+export default function OnboardingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)

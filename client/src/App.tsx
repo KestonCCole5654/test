@@ -19,6 +19,7 @@ import SettingsPage from './pages/Settings/settings';
 import OnboardingPage from './pages/Onboarding/page';
 import ContactPage from './pages/Contact/contact';
 import { LoadingSpinner } from "./components/ui/loadingSpinner";
+import { InvoiceProvider } from './components/context/InvoiceContext';
 
 
 const AuthenticatedLayout = () => (
@@ -143,7 +144,8 @@ function App() {
   }
 
   return (
-    <HelmetProvider>
+    <InvoiceProvider>
+      <HelmetProvider>
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
@@ -178,7 +180,8 @@ function App() {
             <Navigate to={user ? "/invoices" : "/login"} replace />
           } />
         </Routes>
-    </HelmetProvider>
+      </HelmetProvider>
+    </InvoiceProvider>
   );
 }
 

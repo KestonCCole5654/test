@@ -53,8 +53,7 @@ export interface Customer {
 export interface BusinessData {
   companyName: string
   phone: string
-  addressLine1: string
-  addressLine2?: string
+  address: string
   email: string
   logo?: string
 }
@@ -542,7 +541,7 @@ export default function InvoiceForm() {
             <div className="space-y-1">
               <p className="font-medium">{businessData.companyName || "Loading Company Details..."}</p>
               <p>{businessData.email || "contact@company.com"}</p>
-              <p>{businessData.addressLine1 || "123 Business St"}</p>
+              <p>{businessData.address || "123 Business St"}</p>
             </div>
           </div>
 
@@ -632,12 +631,12 @@ export default function InvoiceForm() {
   }
 
   const [isLoading, setIsLoading] = useState(true)
-  const [businessData, setBusinessData] = useState({
+  const [businessData, setBusinessData] = useState<BusinessData>({
     companyName: "",
     phone: "",
-    addressLine1: "",
-    addressLine2: "",
+    address: "",
     email: "",
+    logo: "",
   })
   const [sheetConnection, setSheetConnection] = useState({
     connected: false,
@@ -654,8 +653,7 @@ export default function InvoiceForm() {
     businessData.companyName ||
     businessData.email ||
     businessData.phone ||
-    businessData.addressLine1 ||
-    businessData.addressLine2
+    businessData.address
 
   // Used to fetch business Details from the server/backend
   const fetchBusinessDetails = async () => {
@@ -671,8 +669,8 @@ export default function InvoiceForm() {
 
       const response = await axios.get("https://sheetbills-server.vercel.app/api/business-details", {
         headers: {
-          Authorization: `Bearer ${session.provider_token}`, // Google access token
-          "X-Supabase-Token": session.access_token, // Supabase session token
+          Authorization: `Bearer ${session.provider_token}`,
+          "X-Supabase-Token": session.access_token,
         },
       })
 
@@ -681,8 +679,8 @@ export default function InvoiceForm() {
           companyName: response.data.businessDetails["Company Name"] || "",
           email: response.data.businessDetails["Business Email"] || "",
           phone: response.data.businessDetails["Phone Number"] || "",
-          addressLine1: response.data.businessDetails["Address Line 1"] || "",
-          addressLine2: response.data.businessDetails["Address Line 2"] || "",
+          address: response.data.businessDetails["Address"] || "",
+          logo: response.data.businessDetails["Logo"] || "",
         })
       }
 

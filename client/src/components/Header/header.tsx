@@ -77,16 +77,16 @@ const Header: React.FC = () => {
   if (!mounted || loading) return null
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gray-50 bg-white shadow-sm">
+    <header className="sticky top-0 z-50 border-b border-gray-50 bg-white shadow-xs">
       <div className="container max-w-8xl mx-auto  sm:px-6">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded bg-green-700 flex items-center justify-center">
+              <div className="h-8 w-8 rounded bg-green-600 flex items-center justify-center">
                 <span className="text-white font-bold text-lg">$</span>
               </div>
-              <span className="text-green-700 font-bold text-xl hidden sm:inline-block">SHEETBILLS <sup className="text-xs text-green-700">TM</sup></span>
+              <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparen">SHEETBILLS <sup className="text-xs text-green-700">TM</sup></span>
             </Link>
           </div>
 

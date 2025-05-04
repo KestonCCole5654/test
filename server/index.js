@@ -975,137 +975,66 @@ app.post('/api/saveInvoice', async (req, res) => {
 // Save business details to Google Sheet 
 app.get('/api/business-details', async (req, res) => {
   try {
-    console.log('[Business Details] Starting request processing');
-    
-    // Step 1: Verify Supabase authentication
+    // Get authentication tokens from headers
     const supabaseToken = req.headers['x-supabase-token'];
-    if (!supabaseToken) {
-      console.log('[Business Details] Missing Supabase token');
-      return res.status(401).json({ error: 'Missing Supabase token' });
+    const googleToken = req.headers.authorization?.split(' ')[1];
+
+    if (!supabaseToken || !googleToken) {
+      return res.status(401).json({ error: 'Authentication tokens required' });
     }
 
-    // Verify the Supabase user session is valid
+    // Verify Supabase session
     const { data: { user }, error } = await supabase.auth.getUser(supabaseToken);
     if (error || !user) {
-      console.log('[Business Details] Invalid Supabase session:', error?.message);
       return res.status(401).json({ error: 'Invalid Supabase session' });
     }
 
-    // Step 2: Extract and validate Google authentication token
-    const googleToken = req.headers['authorization']?.split(' ')[1];
-    if (!googleToken) {
-      console.log('[Business Details] Missing Google token');
-      return res.status(401).json({ error: 'Missing Google credentials' });
-    }
-
-    // Step 3: Initialize Google OAuth client with the token
+    // Initialize Google Sheets API
     const auth = new google.auth.OAuth2();
     auth.setCredentials({ access_token: googleToken });
-
-    // Initialize Google Sheets API client
     const sheets = google.sheets({ version: 'v4', auth });
 
-    // Step 4: Get Google user information to identify the user
-    const userInfoResponse = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
-      headers: { Authorization: `Bearer ${googleToken}` },
+    // Get user's master sheet
+    const userInfo = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${googleToken}` }
     });
+    const masterSheet = await getOrCreateMasterSheet(googleToken, userInfo.data.sub);
 
-    const userId = userInfoResponse.data.sub;
-    console.log('[Business Details] User ID:', userId);
-
-    // Step 5: Fetch or create the master tracking sheet for this user
-    const masterSheet = await getOrCreateMasterSheet(googleToken, userId);
-    console.log('[Business Details] Master sheet ID:', masterSheet.id);
-
-    // Step 6: Read the master tracking sheet to find the business details sheet
-    const masterSheetResponse = await sheets.spreadsheets.values.get({
+    // Find business sheet in master
+    const masterData = await sheets.spreadsheets.values.get({
       spreadsheetId: masterSheet.id,
       range: 'My Sheets!A:E',
     });
 
-    const rows = masterSheetResponse.data.values || [];
-    console.log('[Business Details] Master sheet rows:', rows);
-
-    // Step 7: Look specifically for "Business Details" sheet
-    const businessSheet = rows.find(row => row[1]?.trim() === 'Business Details');
-    console.log('[Business Details] Found business sheet:', businessSheet);
+    const businessSheet = masterData.data.values?.find(row => 
+      row[1]?.toLowerCase().includes('business')
+    );
 
     if (!businessSheet) {
-      console.log('[Business Details] Business details sheet not found in master sheet');
-      return res.status(404).json({ error: 'Business details sheet not found' });
+      return res.status(404).json({ error: 'Business sheet not found' });
     }
 
-    // Step 8: Extract the spreadsheet ID from the URL in column E
     const spreadsheetId = extractSheetIdFromUrl(businessSheet[4]);
-    console.log('[Business Details] Extracted spreadsheet ID:', spreadsheetId);
-
     if (!spreadsheetId) {
-      console.error('[Business Details] Failed to extract spreadsheet ID from URL:', businessSheet[4]);
-      return res.status(500).json({ error: 'Invalid spreadsheet URL format' });
+      return res.status(400).json({ error: 'Invalid sheet URL' });
     }
 
-    // Step 9: Fetch the business details from the Google Sheet
-    console.log('[Business Details] Fetching business details from sheet');
+    // Get business details
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
       range: 'Business Details!A2:C6',
     });
 
-    const dataRows = response.data.values || [];
-    console.log('[Business Details] Raw business details data:', dataRows);
-
-    // Ensure the 'Business Details' sheet has at least 3 columns
-    const spreadsheetMeta = await sheets.spreadsheets.get({ spreadsheetId });
-    const businessDetailsSheet = spreadsheetMeta.data.sheets.find(
-      s => s.properties.title === 'Business Details'
-    );
-    if (businessDetailsSheet && businessDetailsSheet.properties.gridProperties.columnCount < 3) {
-      await sheets.spreadsheets.batchUpdate({
-        spreadsheetId,
-        requestBody: {
-          requests: [
-            {
-              updateSheetProperties: {
-                properties: {
-                  sheetId: businessDetailsSheet.properties.sheetId,
-                  gridProperties: { columnCount: 3 }
-                },
-                fields: 'gridProperties.columnCount'
-              }
-            }
-          ]
-        }
-      });
-    }
-    // Step: Clear the old 2-column range to prevent column mismatch errors
-    await sheets.spreadsheets.values.clear({
-      spreadsheetId,
-      range: 'Business Details!A2:B6',
-    });
-    // Now update with new 3-column data
-    const now = new Date().toISOString();
-    const updateData = [
-      ['Company Name', businessData.companyName, now],
-      ['Business Email', businessData.email, now],
-      ['Phone Number', businessData.phone, now],
-      ['Address', businessData.address, now],
-      ['Created At', now, now]
-    ];
-    await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range: 'Business Details!A2:C6',
-      valueInputOption: 'USER_ENTERED',
-      requestBody: {
-        values: updateData
-      },
+    const rows = response.data.values || [];
+    const businessDetails = {};
+    
+    rows.forEach(row => {
+      if (row[0] && row[1]) {
+        businessDetails[row[0]] = row[1];
+      }
     });
 
-    console.log('[Business Details] Final business details object:', businessDetails);
-    console.log('[Business Details] Email field exists:', 'Business Email' in businessDetails);
-    console.log('[Business Details] Phone field exists:', 'Phone Number' in businessDetails);
-
-    // Step 11: Return the business details as JSON
-    const responseData = { 
+    res.json({ 
       businessDetails,
       sheetConnection: {
         connected: true,
@@ -1113,21 +1042,13 @@ app.get('/api/business-details', async (req, res) => {
         sheetId: spreadsheetId,
         lastSynced: new Date().toISOString()
       }
-    };
-    
-    console.log('[Business Details] Sending response:', responseData);
-    res.json(responseData);
+    });
 
   } catch (error) {
-    // Comprehensive error logging
-    console.error('[Business Details] Error:', error);
-    console.error('[Business Details] Error details:', error.response ? error.response.data : error.message);
-    console.error('[Business Details] Error stack:', error.stack);
-
-    // Return a meaningful error response
-    res.status(500).json({
+    console.error('Business details fetch error:', error);
+    res.status(500).json({ 
       error: 'Failed to fetch business details',
-      details: error.message
+      details: error.message 
     });
   }
 });

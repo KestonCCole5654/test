@@ -9,6 +9,7 @@ import { useToast } from "../../components/ui/use-toast"
 import { Toaster } from "../../components/ui/toaster"
 import { motion } from "framer-motion"
 import Header from "../Header/header"
+import supabase from "./supabaseClient"
 
 // Custom SVG Illustration
 const InvoiceIllustration = () => (
@@ -247,39 +248,48 @@ export default function LoginPage() {
 
   useEffect(() => {
     setMounted(true)
-  }, [])
+    // Check if user is already logged in
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        navigate("/invoices")
+      }
+    }
+    checkUser()
+  }, [navigate])
 
-  // Mock function for Google login
   const handleGoogleLogin = useCallback(async () => {
     try {
       setLoading(true)
       setError("")
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      // Success - would redirect to dashboard in real implementation
-      toast({
-        title: "Login successful",
-        description: "Redirecting to your dashboard...",
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/invoices`
+        }
       })
 
-      // Simulate redirect
-      setTimeout(() => {
-        navigate("/dashboard")
-      }, 1000)
+      if (error) throw error
+
+      if (data) {
+        toast({
+          title: "Login successful",
+          description: "Redirecting to your dashboard...",
+        })
+      }
     } catch (err: any) {
       console.error("Google login error:", err)
-      setError(err instanceof Error ? err.message : "Login failed")
+      setError(err.message || "Login failed")
       toast({
         title: "Login failed",
-        description: err instanceof Error ? err.message : "An error occurred during login",
+        description: err.message || "An error occurred during login",
         variant: "destructive",
       })
     } finally {
       setLoading(false)
     }
-  }, [navigate, toast])
+  }, [toast])
 
   // Floating elements for visual interest
   const FloatingElements = () => {

@@ -67,7 +67,7 @@ export default function BusinessSetup() {
       if (!response.ok) {
         const errorData = await response.json()
         console.error("Business sheet creation failed:", errorData)
-        throw new Error(errorData.error || "Business sheet creation failed")
+        throw new Error(errorData.details || errorData.error || "Business sheet creation failed")
       }
       
       const { businessSheetId, spreadsheetUrl } = await response.json()

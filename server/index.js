@@ -1187,6 +1187,110 @@ app.put('/api/update-business-details', async (req, res) => {
     });
   }
 });
+async function createBusinessSheet(accessToken, businessData) {
+  try {
+    // Initialize Google Sheets API
+    const auth = new google.auth.OAuth2();
+    auth.setCredentials({ access_token: accessToken });
+    const sheets = google.sheets({ version: 'v4', auth });
+
+    // Create new spreadsheet
+    const spreadsheet = await sheets.spreadsheets.create({
+      requestBody: {
+        properties: {
+          title: `${businessData.companyName} - Business Details`,
+          locale: 'en_US',
+          timeZone: 'America/New_York'
+        },
+        sheets: [{
+          properties: {
+            title: 'Business Details',
+            gridProperties: {
+              rowCount: 1000,
+              columnCount: 10
+            }
+          }
+        }]
+      }
+    });
+
+    const spreadsheetId = spreadsheet.data.spreadsheetId;
+    const spreadsheetUrl = spreadsheet.data.spreadsheetUrl;
+
+    // Add headers and business details
+    const headers = [
+      'Field',
+      'Value',
+      'Last Updated'
+    ];
+
+    const businessDetails = [
+      ['Company Name', businessData.companyName, new Date().toISOString()],
+      ['Email', businessData.email, new Date().toISOString()],
+      ['Phone', businessData.phone, new Date().toISOString()],
+      ['Address', businessData.addressLine1, new Date().toISOString()],
+      ['Created At', new Date().toISOString(), new Date().toISOString()]
+    ];
+
+    // Update the sheet with headers and data
+    await sheets.spreadsheets.values.batchUpdate({
+      spreadsheetId,
+      requestBody: {
+        valueInputOption: 'USER_ENTERED',
+        data: [
+          {
+            range: 'Business Details!A1:C1',
+            values: [headers]
+          },
+          {
+            range: 'Business Details!A2:C6',
+            values: businessDetails
+          }
+        ]
+      }
+    });
+
+    // Format the headers
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: {
+        requests: [
+          {
+            repeatCell: {
+              range: {
+                sheetId: 0,
+                startRowIndex: 0,
+                endRowIndex: 1
+              },
+              cell: {
+                userEnteredFormat: {
+                  backgroundColor: {
+                    red: 0.8,
+                    green: 0.8,
+                    blue: 0.8
+                  },
+                  textFormat: {
+                    bold: true
+                  }
+                }
+              },
+              fields: 'userEnteredFormat(backgroundColor,textFormat)'
+            }
+          }
+        ]
+      }
+    });
+
+    return {
+      spreadsheetId,
+      spreadsheetUrl
+    };
+  } catch (error) {
+    console.error('Business sheet creation error:', error);
+    throw new Error(`Failed to create business sheet: ${error.message}`);
+  }
+}
+
 app.post('/api/create-business-sheet', async (req, res) => {
   console.log('[CREATE] Initiating business sheet creation request');
   

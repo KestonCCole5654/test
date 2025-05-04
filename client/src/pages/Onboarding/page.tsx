@@ -5,8 +5,6 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
-import { useToast } from "../../components/ui/use-toast"
-import { Toaster } from "../../components/ui/toaster"
 import {
   Loader2,
   ArrowRight,
@@ -540,7 +538,6 @@ const SuccessIllustration = () => (
 )
 
 export default function InitializePage() {
-  const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
@@ -710,11 +707,8 @@ export default function InitializePage() {
     // Validate current question
     const validationError = currentQ.validate(value)
     if (validationError) {
-      toast({
-        title: "Error",
-        description: validationError,
-        variant: "destructive",
-      })
+      setError(validationError)
+      alert(validationError)
       setInputValid(false)
       return
     }
@@ -758,11 +752,8 @@ export default function InitializePage() {
 
     // Check for required tokens AFTER user clicks submit
     if (!supabaseToken || !googleAccessToken) {
-      toast({
-        title: "Authentication Required",
-        description: "Please sign in and connect your Google account to continue.",
-        variant: "destructive",
-      })
+      setError("Please sign in and connect your Google account to continue.")
+      alert("Please sign in and connect your Google account to continue.")
       setIsSubmitting(false)
       return
     }
@@ -788,10 +779,7 @@ export default function InitializePage() {
       }
 
       // Handle successful response
-      toast({
-        title: "Setup Complete",
-        description: "Your business sheet has been created successfully.",
-      })
+      alert("Your business sheet has been created successfully.")
 
       // Store the spreadsheet ID and URL for future use
       if (data.businessSheetId) {
@@ -813,11 +801,8 @@ export default function InitializePage() {
     } catch (err) {
       console.error("Setup error:", err)
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred"
-      toast({
-        title: "Error",
-        description: errorMessage || "Failed to save your business details. Please try again.",
-        variant: "destructive",
-      })
+      setError(errorMessage)
+      alert(errorMessage || "Failed to save your business details. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
@@ -1153,7 +1138,6 @@ export default function InitializePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 relative overflow-hidden">
-      <Toaster />
       <canvas
         ref={confettiCanvasRef}
         className="fixed inset-0 pointer-events-none z-50"

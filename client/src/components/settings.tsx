@@ -41,8 +41,7 @@ export default function SettingsPage() {
   const [businessData, setBusinessData] = useState({
     companyName: "",
     phone: "",
-    addressLine1: "",
-    addressLine2: "",
+    address: "",
     email: "",
   })
   const [isUpdatingBusiness, setIsUpdatingBusiness] = useState(false)
@@ -87,8 +86,7 @@ export default function SettingsPage() {
           companyName: businessResponse.data.businessDetails["Company Name"] || "",
           email: businessResponse.data.businessDetails["Business Email"] || "",
           phone: businessResponse.data.businessDetails["Phone Number"] || "",
-          addressLine1: businessResponse.data.businessDetails["Address Line 1"] || "",
-          addressLine2: businessResponse.data.businessDetails["Address Line 2"] || "",
+          address: businessResponse.data.businessDetails["Address"] || "",
         });
       }
 
@@ -154,8 +152,7 @@ export default function SettingsPage() {
           companyName: businessData.companyName,
           email: businessData.email,
           phone: businessData.phone,
-          addressLine1: businessData.addressLine1,
-          addressLine2: businessData.addressLine2
+          address: businessData.address
         },
         {
           headers: {
@@ -172,8 +169,7 @@ export default function SettingsPage() {
           companyName: response.data.businessDetails["Company Name"] || prev.companyName,
           email: response.data.businessDetails["Business Email"] || prev.email,
           phone: response.data.businessDetails["Phone Number"] || prev.phone,
-          addressLine1: response.data.businessDetails["Address Line 1"] || prev.addressLine1,
-          addressLine2: response.data.businessDetails["Address Line 2"] || prev.addressLine2
+          address: response.data.businessDetails["Address"] || prev.address
         }));
 
         toast({
@@ -326,7 +322,7 @@ export default function SettingsPage() {
               </div>
               <div>
                 <dt className="text-sm text-muted-foreground">Address</dt>
-                <dd className="font-medium">{businessData.addressLine1 || "—"}</dd>
+                <dd className="font-medium">{businessData.address || "—"}</dd>
               </div>
             </dl>
           ) : (
@@ -363,11 +359,11 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="addressLine1">Address</Label>
+                  <Label htmlFor="address">Address</Label>
                   <Input
-                    id="addressLine1"
-                    value={businessData.addressLine1}
-                    onChange={(e) => setBusinessData(prev => ({ ...prev, addressLine1: e.target.value }))}
+                    id="address"
+                    value={businessData.address}
+                    onChange={(e) => setBusinessData(prev => ({ ...prev, address: e.target.value }))}
                     placeholder="123 Business St, Suite 100, City, State, ZIP"
                   />
                 </div>

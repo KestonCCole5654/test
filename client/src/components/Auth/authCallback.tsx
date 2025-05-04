@@ -18,35 +18,37 @@ export default function AuthCallback() {
 
       try {
         if (event === 'SIGNED_IN' && session?.user) {
-          // Verify session with Supabase
-          const { error: userError } = await supabase.auth.getUser();
-          if (userError) throw userError;
-
-          // Store tokens with error handling
-          try {
-            sessionStorage.setItem('supabase_token', session.access_token);
-            if (session.provider_token) {
-              sessionStorage.setItem('google_access_token', session.provider_token);
-            }
-          } catch (storageError) {
-            console.error('Error storing session:', storageError);
-            throw new Error('Failed to store session data');
+          // Store tokens
+          sessionStorage.setItem('supabase_token', session.access_token);
+          if (session.provider_token) {
+            sessionStorage.setItem('google_access_token', session.provider_token);
           }
 
-          // Check if we have the required Google scopes
-          if (!session.provider_token) {
-            throw new Error('Google authentication failed. Please try again.');
+          // Check business sheet
+          const response = await fetch("https://sheetbills-server.vercel.app/api/check-business-sheet", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-supabase-token": session.access_token,
+            },
+            body: JSON.stringify({
+              accessToken: session.provider_token,
+              createIfMissing: false,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to check business sheet");
           }
 
-          // Clean URL only after successful validation
-          window.history.replaceState({}, document.title, window.location.pathname);
+          const { hasBusinessSheet } = await response.json();
           
-          // Navigate to dashboard
-          navigate('/dashboard', { replace: true });
-        } else if (event === 'TOKEN_REFRESHED') {
-          console.log('Token refreshed successfully');
+          // Navigate based on business sheet status
+          navigate(hasBusinessSheet ? "/invoices" : "/businessSetup", {
+            replace: true,
+            state: { session }
+          });
         } else if (event === 'SIGNED_OUT') {
-          // Clear all storage on sign out
           sessionStorage.clear();
           localStorage.clear();
           navigate('/login', { replace: true });

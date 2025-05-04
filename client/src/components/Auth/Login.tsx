@@ -24,14 +24,17 @@ export default function Login() {
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event: string, session: Session | null) => {
       if (event === "SIGNED_IN" && session) {
         try {
+          // Store tokens
           sessionStorage.setItem("supabase_token", session.access_token)
           if (session.provider_token) {
             sessionStorage.setItem("google_access_token", session.provider_token)
           }
+          
+          // Check business sheet and redirect
           await checkBusinessSheet(session)
         } catch (err) {
-          console.error("Error storing session:", err)
-          setError("Failed to store session data")
+          console.error("Error handling sign in:", err)
+          setError("Failed to complete sign in")
         }
       } else if (event === "SIGNED_OUT") {
         sessionStorage.clear()
@@ -45,6 +48,7 @@ export default function Login() {
     async (session: Session) => {
       try {
         setLoading(true)
+        setError("")
 
         const response = await fetch("https://sheetbills-server.vercel.app/api/check-business-sheet", {
           method: "POST",
@@ -64,8 +68,14 @@ export default function Login() {
         }
 
         const { hasBusinessSheet } = await response.json()
-        window.location.href = hasBusinessSheet ? "/invoices" : "/businessSetup"
+        
+        // Use navigate instead of window.location
+        navigate(hasBusinessSheet ? "/invoices" : "/businessSetup", { 
+          replace: true,
+          state: { session }
+        })
       } catch (err: any) {
+        console.error("Business sheet check error:", err)
         setError(err instanceof Error ? err.message : "Check failed")
         await supabase.auth.signOut()
       } finally {
@@ -107,10 +117,7 @@ export default function Login() {
   useEffect(() => {
     const checkExistingSession = async () => {
       try {
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession()
+        const { data: { session }, error } = await supabase.auth.getSession()
 
         if (error) {
           console.error("Session check error:", error)
@@ -118,16 +125,7 @@ export default function Login() {
         }
 
         if (session) {
-          try {
-            sessionStorage.setItem("supabase_token", session.access_token)
-            if (session.provider_token) {
-              sessionStorage.setItem("google_access_token", session.provider_token)
-            }
-            await checkBusinessSheet(session as Session)
-          } catch (err) {
-            console.error("Error storing session:", err)
-            setError("Failed to store session data")
-          }
+          await checkBusinessSheet(session)
         }
       } catch (err) {
         console.error("Session check failed:", err)
@@ -161,7 +159,7 @@ export default function Login() {
             {/* Heading section */}
             <div className="text-center space-y-4 w-full">
               <h1 className="text-3xl font-bold text-slate-900">
-                Invoice Management, <span className="text-green-600">Simplified SheetBills</span>
+                Invoice Management, <span className="text-green-600">Simplified</span>
               </h1>
               <p className="text-slate-600">
                 Streamline your business finances with our secure, Google Sheets-powered invoicing platform.
@@ -243,8 +241,6 @@ export default function Login() {
                 <Shield className="h-3 w-3" />
                 <span>Secure Login</span>
               </div>
-
-            
 
               <div className="flex items-center gap-1 text-xs text-slate-500">
                 <svg

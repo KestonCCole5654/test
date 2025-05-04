@@ -86,7 +86,7 @@ const Header: React.FC = () => {
               <div className="h-8 w-8 rounded bg-green-600 flex items-center justify-center">
                 <span className="text-white font-bold text-lg">$</span>
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparen">SHEETBILLS <sup className="text-xs text-green-700">TM</sup></span>
+              <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">SHEETBILLS <sup className="text-xs text-green-700">TM</sup></span>
             </Link>
           </div>
 

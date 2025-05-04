@@ -82,8 +82,10 @@ function App() {
 
       if (session) {
         sessionStorage.setItem('sb-auth-token', JSON.stringify(session));
+        localStorage.setItem('sb-auth-token', JSON.stringify(session));
       } else {
         sessionStorage.removeItem('sb-auth-token');
+        localStorage.removeItem('sb-auth-token');
       }
 
       setUser(session?.user ?? null);
@@ -129,15 +131,8 @@ function App() {
     return () => {
       isMounted = false;
       authSubscription?.unsubscribe();
-      sessionStorage.removeItem('sb-auth-token');
     };
-  }, []);
-
-  useEffect(() => {
-    if (!session?.provider_token) {
-      navigate("/login", { replace: true })
-    }
-  }, [session, navigate])
+  }, [navigate]);
 
   if (loading) {
     return (

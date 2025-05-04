@@ -99,7 +99,7 @@ export default function Login() {
       setError("")
       console.log("Initiating Google login...")
 
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { error, data } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           scopes: "https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/spreadsheets",
@@ -116,12 +116,19 @@ export default function Login() {
         console.error("Google login error:", error)
         throw error
       }
+
+      // If we have a URL, redirect to it
+      if (data?.url) {
+        window.location.href = data.url
+      }
     } catch (err: any) {
       console.error("Google login error:", err)
       setError(err instanceof Error ? err.message : "Login failed")
       await supabase.auth.signOut()
       sessionStorage.clear()
       localStorage.clear()
+    } finally {
+      setLoading(false)
     }
   }, [])
 

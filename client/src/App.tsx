@@ -96,9 +96,9 @@ function App() {
 
           const currentPath = window.location.pathname;
           
-          if (!hasSheet && currentPath !== '/businessSetup') {
-            navigate('/businessSetup', { replace: true });
-          } else if (hasSheet && currentPath === '/businessSetup') {
+          if (!hasSheet && currentPath !== '/Onboarding') {
+            navigate('/Onboarding', { replace: true });
+          } else if (hasSheet && currentPath === '/Onboarding') {
             navigate('/invoices', { replace: true });
           }
         } catch (error) {
@@ -160,8 +160,7 @@ function App() {
               <Route path="/invoices" element={<Dashboard />} />
               <Route path="/create-invoice" element={<InvoiceForm />} />
               <Route path="/settings" element={<SettingsPage />} />
-             
-             
+              <Route path="/Onboarding" element={<OnboardingPage />} />
               {/*<Route path="/template-generator" element={<TemplateGenerator />} />*/}
               <Route path="/contact" element={<ContactPage />} />
             </Route>

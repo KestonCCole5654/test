@@ -248,13 +248,33 @@ export default function LoginPage() {
 
   const checkUserOnboarding = async (userId: string) => {
     try {
+      // First try to get existing settings
       const { data, error } = await supabase
         .from('user_settings')
         .select('onboarding_completed')
         .eq('user_id', userId)
         .single()
 
-      if (error) throw error
+      if (error) {
+        // If no record exists, create one with default values
+        if (error.code === 'PGRST116') {
+          const { error: insertError } = await supabase
+            .from('user_settings')
+            .insert([
+              {
+                user_id: userId,
+                onboarding_completed: false,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              }
+            ])
+          
+          if (insertError) throw insertError
+          return true // Return true to show onboarding since it's a new user
+        }
+        throw error
+      }
+
       return !data?.onboarding_completed
     } catch (err) {
       console.error('Error checking onboarding status:', err)

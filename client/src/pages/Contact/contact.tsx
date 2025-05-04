@@ -2,14 +2,14 @@
 
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Button } from "./ui/button"
-import { Input } from "./ui/input"
-import { Textarea } from "./ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card"
+import { Button } from "../../components/ui/button"
+import { Input } from "../../components/ui/input"
+import { Textarea } from "../../components/ui/textarea"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card"
 import { Loader2, ArrowLeft, Mail, MessageSquare, HelpCircle, Send } from "lucide-react"
-import { toast } from "./ui/use-toast"
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
-import supabase from "./Auth/supabaseClient"
+import { toast } from "../../components/ui/use-toast"
+import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar"
+import supabase from "../../components/Auth/supabaseClient"
 
 export default function ContactPage() {
   const navigate = useNavigate()

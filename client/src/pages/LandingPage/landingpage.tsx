@@ -1,9 +1,9 @@
 "use client"
 
 import React from "react"
-import { Button } from "./ui/button"
+import { Button } from "../../components/ui/button"
 import { CheckCircle2, ChevronDown, ArrowRight, Check, Badge, X } from "lucide-react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
 
 export default function LandingPage() {
   const betaFeatures = [

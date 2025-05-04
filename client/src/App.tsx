@@ -3,13 +3,11 @@ import { Route, Routes, Navigate, useNavigate, Outlet, useLocation } from 'react
 import { HelmetProvider } from 'react-helmet-async';
 import { InvoiceProvider } from './components/context/InvoiceContext';
 import supabase from './components/Auth/supabaseClient';
-import LandingPage from './components/landingpage';
 import Login from './components/Auth/Login';
-import Dashboard from './components/dashboard';
-import Header from './components/header';
+import Dashboard from './pages/Dashboard/dashboard';
+import Header from './components/Header/header';
 import AuthenticatedRoute from './components/Auth/authenticatedRoute';
-import UnauthenticatedRoute from './components/Auth/authCheckedRoute';
-import InvoiceForm from './pages/createInvoice/create-invoice';
+import InvoiceForm from './pages/CreateInvoices/create-invoice';
 import type { 
   Subscription,
   AuthChangeEvent,
@@ -18,12 +16,10 @@ import type {
 import './App.css';
 import './global.css';
 import './index.css';
-import SettingsPage from './components/settings';
-import InvoiceTemplatePage from './components/support';
-import InitializePage from './pages/initialize/InitializationPage';
-import TemplateGenerator from "./components/template-generator"
-import ContactPage from './components/contact';
-import { LoadingSpinner } from "./components/loadingSpinner";
+import SettingsPage from './pages/Settings/settings';
+import OnboardingPage from './pages/Onboarding/page';
+import ContactPage from './pages/Contact/contact';
+import { LoadingSpinner } from "./components/ui/loadingSpinner";
 
 
 const AuthenticatedLayout = () => (
@@ -164,7 +160,7 @@ function App() {
               <Route path="/invoices" element={<Dashboard />} />
               <Route path="/create-invoice" element={<InvoiceForm />} />
               <Route path="/settings" element={<SettingsPage />} />
-             <Route path="/invoiceTemplates" element={<InvoiceTemplatePage />} />
+             
              
               {/*<Route path="/template-generator" element={<TemplateGenerator />} />*/}
               <Route path="/contact" element={<ContactPage />} />

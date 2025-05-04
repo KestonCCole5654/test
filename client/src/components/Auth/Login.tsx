@@ -6,7 +6,7 @@ import supabase from "./supabaseClient"
 import { Button } from "../../components/ui/button"
 import { Card, CardContent } from "../../components/ui/card"
 import { Loader2, Shield, CheckCircle2 } from "lucide-react"
-import Header from "../../components/header"
+import Header from "../Header/header"
 import type { Session } from "@supabase/supabase-js"
 
 export default function Login() {

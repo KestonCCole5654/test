@@ -3,25 +3,25 @@
 import type React from "react"
 import { useEffect, useState } from "react"
 import { Trash2, Edit, MoreVertical, Plus, RefreshCw, ArrowUpDown, CheckCircle, Clock } from "lucide-react"
-import { Button } from "./ui/button"
-import { Input } from "./ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
+import { Button } from "../../components/ui/button"
+import { Input } from "../../components/ui/input"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu"
+} from "../../components/ui/dropdown-menu"
 import { useNavigate, useLocation } from "react-router-dom"
-import { Badge } from "./ui/badge"
-import { Skeleton } from "./ui/skeleton"
-import { toast } from "./ui/use-toast"
-import supabase from "./Auth/supabaseClient"
+import { Badge } from "../../components/ui/badge"
+import { Skeleton } from "../../components/ui/skeleton"
+import { toast } from "../../components/ui/use-toast"
+import supabase from "../../components/Auth/supabaseClient"
 import type { User } from "@supabase/supabase-js"
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
-import { Avatar, AvatarFallback } from "./ui/avatar"
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
+import { Avatar, AvatarFallback } from "../../components/ui/avatar"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,7 +31,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "./ui/alert-dialog"
+} from "../../components/ui/alert-dialog"
 
 interface Invoice {
   id: string

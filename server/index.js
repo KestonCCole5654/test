@@ -1,16 +1,22 @@
-import express from 'express'; // Import express package
-import axios from 'axios'; // Import the axios package
-import dotenv from 'dotenv'; // Import the dotenv package
-import cors from 'cors'; // Import the cors package
-import { google } from 'googleapis'; // Import the googleapis package
-import nodemailer from 'nodemailer'; // Import nodemailer package
-
-import { createClient } from '@supabase/supabase-js';
+// ==========================
+// Imports and Configuration
+// ==========================
+import express from 'express'; // Express web framework
+import axios from 'axios'; // HTTP client for API calls
+import dotenv from 'dotenv'; // Loads environment variables from .env
+import cors from 'cors'; // Cross-Origin Resource Sharing middleware
+import { google } from 'googleapis'; // Google APIs client
+import nodemailer from 'nodemailer'; // Email sending
+import { createClient } from '@supabase/supabase-js'; // Supabase client
 
 dotenv.config(); // Load environment variables
-const app = express(); // Create an Express app
-const drive = google.drive('v3'); // Initialize Drive API
-// CORS configuration for Vercel deployment
+
+const app = express(); // Create Express app
+const drive = google.drive('v3'); // Google Drive API
+
+// ==========================
+// Middleware
+// ==========================
 app.use(cors({
   origin: [
     'https://sheetbills-client.vercel.app',
@@ -21,34 +27,31 @@ app.use(cors({
   credentials: true,
   optionsSuccessStatus: 200
 }));
-app.use(express.json()); // Enable JSON body parsing
+app.use(express.json()); // Parse JSON request bodies
 
-
-// Creation of Supabase Client
+// ==========================
+// Supabase Client
+// ==========================
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-// Initialize with API key
-function createAuthClient(accessToken) {
-  const auth = new OAuth2(process.env.GOOGLE_API_KEY); // <-- Only new line
-  auth.setCredentials({ access_token: accessToken }); // Existing Supabase flow
-  return auth;
-}
+// ==========================
+// Helper Functions
+// ==========================
 
-////////////////////////////////////////////////////////////////////
-{/*Helper Methods*/}
-////////////////////////////////////////////////////////////////////
-// Function to Extract Sheet ID from URL
+/**
+ * Extracts the Google Sheet ID from a full URL.
+ * @param {string} url - The Google Sheet URL.
+ * @returns {string|null} The extracted Sheet ID or null if not found.
+ */
 function extractSheetIdFromUrl(url) {
   if (!url) {
     console.error("Sheet URL is undefined");
     return null;
   }
-
   try {
-    // Your existing extraction logic
     const match = url.match(/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
     return match ? match[1] : null;
   } catch (error) {
@@ -56,6 +59,13 @@ function extractSheetIdFromUrl(url) {
     return null;
   }
 }
+
+/**
+ * Gets or creates the master tracking sheet for a user.
+ * @param {string} accessToken - Google OAuth access token.
+ * @param {string} userId - Google user ID.
+ * @returns {Promise<{id: string, url: string, created: boolean}>}
+ */
 async function getOrCreateMasterSheet(accessToken, userId) {
   // Initialize authentication with API key
   const auth = new google.auth.OAuth2({
@@ -70,7 +80,6 @@ async function getOrCreateMasterSheet(accessToken, userId) {
     auth,
     params: { key: process.env.GOOGLE_API_KEY }
   });
-
   const sheetsAPI = google.sheets({
     version: 'v4',
     auth,
@@ -78,7 +87,7 @@ async function getOrCreateMasterSheet(accessToken, userId) {
   });
 
   try {
-    // 1. Search for existing master sheet with combined credentials
+    // 1. Search for existing master sheet
     const driveResponse = await drive.files.list({
       q: "name='Master Tracking Sheet' and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false",
       fields: 'files(id, name, webViewLink)',
@@ -86,7 +95,6 @@ async function getOrCreateMasterSheet(accessToken, userId) {
       auth: auth,
       key: process.env.GOOGLE_API_KEY
     });
-
     if (driveResponse.data.files.length > 0) {
       return {
         id: driveResponse.data.files[0].id,
@@ -94,8 +102,7 @@ async function getOrCreateMasterSheet(accessToken, userId) {
         created: false
       };
     }
-
-    // 2. Create new master sheet with enhanced security
+    // 2. Create new master sheet
     const createResponse = await sheetsAPI.spreadsheets.create({
       requestBody: {
         properties: {
@@ -107,11 +114,9 @@ async function getOrCreateMasterSheet(accessToken, userId) {
       auth: auth,
       key: process.env.GOOGLE_API_KEY
     });
-
     const spreadsheetId = createResponse.data.spreadsheetId;
     const spreadsheetUrl = createResponse.data.spreadsheetUrl;
-
-    // 3. Initialize sheet structure with proper authentication
+    // 3. Initialize sheet structure
     await sheetsAPI.spreadsheets.batchUpdate({
       spreadsheetId,
       requestBody: {
@@ -133,8 +138,7 @@ async function getOrCreateMasterSheet(accessToken, userId) {
       auth: auth,
       key: process.env.GOOGLE_API_KEY
     });
-
-    // 4. Add headers with validation
+    // 4. Add headers
     await sheetsAPI.spreadsheets.values.update({
       spreadsheetId,
       range: 'My Sheets!A1:E1',
@@ -151,7 +155,6 @@ async function getOrCreateMasterSheet(accessToken, userId) {
       auth: auth,
       key: process.env.GOOGLE_API_KEY
     });
-
     // 5. Add basic protection to header row
     await sheetsAPI.spreadsheets.batchUpdate({
       spreadsheetId,
@@ -173,18 +176,17 @@ async function getOrCreateMasterSheet(accessToken, userId) {
       auth: auth,
       key: process.env.GOOGLE_API_KEY
     });
-
     return {
       id: spreadsheetId,
       url: spreadsheetUrl,
       created: true
     };
-
   } catch (error) {
     console.error('[CREATE] Master sheet error:', error);
     throw new Error(`Master sheet initialization failed: ${error.message}`);
   }
 }
+
 // Helper function to get or create default sheet
 async function getDefaultSheetId(accessToken) {
   const auth = new google.auth.OAuth2();
@@ -280,10 +282,15 @@ async function getDefaultSheetId(accessToken) {
   }
 }
 
+// ==========================
+// Calculation Utilities
+// ==========================
 
-////////////////////////////////////////////////////////////////////
-{/*Helper Methods for calculations*/}
-////////////////////////////////////////////////////////////////////
+/**
+ * Calculates the subtotal for invoice items.
+ * @param {Array} items - Array of invoice items.
+ * @returns {number} The subtotal amount.
+ */
 function calculateSubtotal(items) {
   return items.reduce((total, item) => {
     const price = item.price === "" ? 0 : Number(item.price);
@@ -291,15 +298,18 @@ function calculateSubtotal(items) {
   }, 0);
 }
 
+/**
+ * Calculates the total discount for invoice items.
+ * @param {Array} items - Array of invoice items.
+ * @returns {number} The total discount amount.
+ */
 function calculateDiscount(items) {
   return items.reduce((total, item) => {
     const price = item.price === "" ? 0 : Number(item.price);
     const itemTotal = item.quantity * price;
-    
     if (!item.discount?.value && item.discount?.value !== 0) {
       return total;
     }
-
     if (item.discount.type === "percentage") {
       return total + (itemTotal * Number(item.discount.value)) / 100;
     } else {
@@ -308,11 +318,15 @@ function calculateDiscount(items) {
   }, 0);
 }
 
+/**
+ * Calculates the total tax for invoice items.
+ * @param {Array} items - Array of invoice items.
+ * @returns {number} The total tax amount.
+ */
 function calculateTax(items) {
   return items.reduce((total, item) => {
     const price = item.price === "" ? 0 : Number(item.price);
     const itemTotal = item.quantity * price;
-    
     // Calculate item discount first
     let itemDiscount = 0;
     if (item.discount?.value && item.discount?.value !== "") {
@@ -322,13 +336,10 @@ function calculateTax(items) {
         itemDiscount = Math.min(itemTotal, Number(item.discount.value));
       }
     }
-    
     const afterDiscount = itemTotal - itemDiscount;
-    
     if (!item.tax?.value && item.tax?.value !== 0) {
       return total;
     }
-
     if (item.tax.type === "percentage") {
       return total + (afterDiscount * Number(item.tax.value)) / 100;
     } else {
@@ -337,22 +348,27 @@ function calculateTax(items) {
   }, 0);
 }
 
+/**
+ * Calculates the final total for an invoice.
+ * @param {Object} invoiceData - The invoice data object.
+ * @returns {string} The final total as a string (fixed to 2 decimals).
+ */
 function calculateFinalTotal(invoiceData) {
   const subtotal = calculateSubtotal(invoiceData.items);
   const discountAmount = calculateDiscount(invoiceData.items);
   const taxAmount = calculateTax(invoiceData.items);
-
   return (subtotal - discountAmount + taxAmount).toFixed(2);
 }
 
+// ==========================
+// Google Sheet Operations Endpoints
+// ==========================
 
-
-
-
-////////////////////////////////////////////////////////////////////
-{/*Methods to Hanlde Google Sheet Operations*/}
-////////////////////////////////////////////////////////////////////
-// Function to Create Invoice 
+/**
+ * Creates a new Google Sheet for invoices and adds it to the master sheet.
+ * @route POST /api/create-sheet
+ * @access Protected (Supabase + Google Auth)
+ */
 app.post('/api/create-sheet', async (req, res) => {
   try {
     // Verify Supabase session first
@@ -360,27 +376,22 @@ app.post('/api/create-sheet', async (req, res) => {
     if (!supabaseToken) {
       return res.status(401).json({ error: 'Missing Supabase session token' });
     }
-
     // Validate Supabase user
     const { data: { user }, error } = await supabase.auth.getUser(supabaseToken);
     if (error || !user) {
       return res.status(401).json({ error: 'Invalid Supabase session' });
     }
-
     // Get Google access token from headers
     const accessToken = req.headers.authorization?.split(' ')[1];
     if (!accessToken) {
       return res.status(400).json({ error: 'Google access token required' });
     }
-
     // Get request parameters
     const { name = 'New Sheet', description = '' } = req.body;
-
     // Initialize Google Sheets client
     const auth = new google.auth.OAuth2();
     auth.setCredentials({ access_token: accessToken });
     const sheets = google.sheets({ version: 'v4', auth });
-
     // Create new spreadsheet
     const newSheet = await sheets.spreadsheets.create({
       resource: {
@@ -395,17 +406,14 @@ app.post('/api/create-sheet', async (req, res) => {
         }]
       }
     });
-
     const newSheetId = newSheet.data.spreadsheetId;
     const newSheetUrl = newSheet.data.spreadsheetUrl;
-
     // Prepare invoice headers
     const headers = [
       'Invoice ID', 'Invoice Date', 'Due Date', 'Customer Name',
       'Customer Email', 'Customer Address', 'Items', 'Amount',
       'Tax', 'Discount', 'Notes', 'Template', 'Status'
     ];
-
     // Add headers to the sheet
     await sheets.spreadsheets.values.update({
       spreadsheetId: newSheetId,
@@ -413,7 +421,6 @@ app.post('/api/create-sheet', async (req, res) => {
       valueInputOption: 'RAW',
       resource: { values: [headers] }
     });
-
     // Format headers
     const firstSheetId = newSheet.data.sheets[0].properties.sheetId;
     await sheets.spreadsheets.batchUpdate({
@@ -444,11 +451,9 @@ app.post('/api/create-sheet', async (req, res) => {
         }]
       }
     });
-
     // Add to master sheet
     const masterSheet = await getOrCreateMasterSheet(accessToken, user.id);
     const sheetId = `SHEET-${Date.now().toString().slice(-6)}`;
-
     await sheets.spreadsheets.values.append({
       spreadsheetId: masterSheet.id,
       range: 'My Sheets!A:E',
@@ -463,7 +468,6 @@ app.post('/api/create-sheet', async (req, res) => {
         ]]
       }
     });
-
     res.json({
       success: true,
       sheetId,
@@ -471,7 +475,6 @@ app.post('/api/create-sheet', async (req, res) => {
       spreadsheetUrl: newSheetUrl,
       headers
     });
-
   } catch (error) {
     console.error('Sheet creation error:', error);
     res.status(500).json({

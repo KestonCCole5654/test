@@ -1,6 +1,6 @@
 // src/components/AuthenticatedRoute.tsx
 import { Navigate } from "react-router-dom";
-import { LoadingSpinner } from "../loadingSpinner";
+import { LoadingSpinner } from "../ui/loadingSpinner";
 
 interface Props {
   authenticated: boolean;

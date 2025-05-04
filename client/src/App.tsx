@@ -152,7 +152,7 @@ function App() {
           
           {/* Onboarding Route - Separate from other authenticated routes */}
           <Route
-            path="/Onboarding"
+            path="/onboarding"
             element={
               <AuthenticatedRoute authenticated={!!user} isLoading={loading}>
                 <OnboardingPage />

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Route, Routes, Navigate, useNavigate, Outlet } from 'react-router-dom';
+import { Route, Routes, Navigate, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { InvoiceProvider } from './components/context/InvoiceContext';
 import supabase from './components/Auth/supabaseClient';
@@ -60,6 +60,18 @@ function App() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Try to get session from location.state, or from storage
+  let session = location.state?.session
+  if (!session) {
+    const sessionString = localStorage.getItem("sb-auth-token") || sessionStorage.getItem("sb-auth-token")
+    if (sessionString) {
+      try {
+        session = JSON.parse(sessionString)
+      } catch {}
+    }
+  }
 
   useEffect(() => {
     let isMounted = true;
@@ -120,6 +132,12 @@ function App() {
       sessionStorage.removeItem('sb-auth-token');
     };
   }, []);
+
+  useEffect(() => {
+    if (!session?.provider_token) {
+      navigate("/login", { replace: true })
+    }
+  }, [session, navigate])
 
   if (loading) {
     return (

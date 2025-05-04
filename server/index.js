@@ -1045,7 +1045,7 @@ app.get('/api/business-details', async (req, res) => {
     console.log('[Business Details] Fetching business details from sheet');
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: 'Business Details!A2:B6',
+      range: 'Business Details!A2:C6',
     });
 
     const dataRows = response.data.values || [];

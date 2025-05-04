@@ -246,13 +246,30 @@ export default function LoginPage() {
   const navigate = useNavigate()
   const { toast } = useToast()
 
+  const checkUserOnboarding = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_settings')
+        .select('onboarding_completed')
+        .eq('user_id', userId)
+        .single()
+
+      if (error) throw error
+      return !data?.onboarding_completed
+    } catch (err) {
+      console.error('Error checking onboarding status:', err)
+      return true // Default to showing onboarding if there's an error
+    }
+  }
+
   useEffect(() => {
     setMounted(true)
     // Check if user is already logged in
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
-        navigate("/invoices")
+        const needsOnboarding = await checkUserOnboarding(session.user.id)
+        navigate(needsOnboarding ? "/Onboarding" : "/invoices")
       }
     }
     checkUser()
@@ -266,7 +283,7 @@ export default function LoginPage() {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/invoices`
+          redirectTo: `${window.location.origin}/auth-callback`
         }
       })
 
@@ -275,7 +292,7 @@ export default function LoginPage() {
       if (data) {
         toast({
           title: "Login successful",
-          description: "Redirecting to your dashboard...",
+          description: "Setting up your account...",
         })
       }
     } catch (err: any) {

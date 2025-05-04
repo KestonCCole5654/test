@@ -19,6 +19,7 @@ import SettingsPage from './pages/Settings/settings';
 import OnboardingPage from './pages/Onboarding/page';
 import ContactPage from './pages/Contact/contact';
 import { LoadingSpinner } from "./components/ui/loadingSpinner";
+import AuthCallback from './pages/auth-callback'
 
 
 
@@ -149,10 +150,11 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
+          <Route path="/auth-callback" element={<AuthCallback />} />
           
           {/* Onboarding Route - Separate from other authenticated routes */}
           <Route
-            path="/onboarding"
+            path="/Onboarding"
             element={
               <AuthenticatedRoute authenticated={!!user} isLoading={loading}>
                 <OnboardingPage />

@@ -1283,6 +1283,9 @@ async function createBusinessSheet(accessToken, businessData) {
       }
     });
 
+    // Ensure the SheetBills Invoices sheet is created for this user
+    await getDefaultSheetId(accessToken);
+
     return {
       spreadsheetId,
       spreadsheetUrl

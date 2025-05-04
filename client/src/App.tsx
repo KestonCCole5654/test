@@ -144,11 +144,20 @@ function App() {
 
   return (
     <HelmetProvider>
-    
         <Routes>
           {/* Public Routes */}
-            <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Login />} />
           
+          {/* Onboarding Route - Separate from other authenticated routes */}
+          <Route
+            path="/Onboarding"
+            element={
+              <AuthenticatedRoute authenticated={!!user} isLoading={loading}>
+                <OnboardingPage />
+              </AuthenticatedRoute>
+            }
+          />
+
           {/* Protected Routes */}
           <Route
             element={
@@ -158,19 +167,17 @@ function App() {
             }
           >
             <Route path="/" element={<Navigate to="/invoices" replace />} />
-              <Route path="/invoices" element={<Dashboard />} />
-              <Route path="/create-invoice" element={<InvoiceForm />} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/Onboarding" element={<OnboardingPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-            </Route>
+            <Route path="/invoices" element={<Dashboard />} />
+            <Route path="/create-invoice" element={<InvoiceForm />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+          </Route>
 
           {/* Catch all route */}
           <Route path="*" element={
             <Navigate to={user ? "/invoices" : "/login"} replace />
           } />
         </Routes>
-     
     </HelmetProvider>
   );
 }

@@ -163,19 +163,11 @@ export default function SettingsPage() {
       );
 
       if (response.data.success) {
-        // Update the local state with the response data
-        setBusinessData(prev => ({
-          ...prev,
-          companyName: response.data.businessDetails["Company Name"] || prev.companyName,
-          email: response.data.businessDetails["Business Email"] || prev.email,
-          phone: response.data.businessDetails["Phone Number"] || prev.phone,
-          address: response.data.businessDetails["Address"] || prev.address,
-        }));
-
         toast({
           title: "Success",
           description: "Business details updated successfully",
         });
+        await fetchData();
         setIsEditing(false);
       }
 

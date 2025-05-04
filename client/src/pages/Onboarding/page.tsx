@@ -23,6 +23,7 @@ import {
 } from "lucide-react"
 import { motion } from "framer-motion"
 import confetti from "canvas-confetti"
+import Header from "../../components/Header/header"
 
 // Custom SVG Illustrations
 const CompanyIllustration = () => (
@@ -539,7 +540,7 @@ const SuccessIllustration = () => (
   </motion.svg>
 )
 
-export default function InitializePage() {
+export default function OnboardingPage() {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")
@@ -1162,38 +1163,7 @@ export default function InitializePage() {
 
       <FloatingElements />
 
-      <header className="border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md py-4 px-4 shadow-md relative z-10">
-        <div className="max-w-md mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <motion.div
-              initial={{ rotate: -10, scale: 0.8 }}
-              animate={{ rotate: 10, scale: 1 }}
-              transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, repeatType: "reverse" }}
-            >
-              <Sparkles className="h-6 w-6 text-green-500" />
-            </motion.div>
-            <div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-                USER ONBOARDING 
-              </h1>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-end">
-            <div className="w-32 mb-1">
-              <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-green-500 to-green-600"
-                  style={{ width: `${progress}%`, transition: "width 0.5s ease" }}
-                />
-              </div>
-            </div>
-            <p className="text-xs text-gray-500">
-              {showReview ? "Review" : `Question ${currentQuestion + 1} of ${questions.length}`}
-            </p>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main className="flex-1 flex items-center justify-center p-4 md:p-8 relative z-10">
         {showSuccess ? renderSuccessScreen() : showReview ? renderReviewScreen() : renderCurrentQuestion()}

@@ -161,7 +161,6 @@ function App() {
               <Route path="/create-invoice" element={<InvoiceForm />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/Onboarding" element={<OnboardingPage />} />
-              {/*<Route path="/template-generator" element={<TemplateGenerator />} />*/}
               <Route path="/contact" element={<ContactPage />} />
             </Route>
 

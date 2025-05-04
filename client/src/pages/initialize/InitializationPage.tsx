@@ -25,8 +25,7 @@ export default function InitializePage() {
   const [businessData, setBusinessData] = useState({
     companyName: "",
     phone: "",
-    addressLine1: "",
-    addressLine2: "",
+    address: "",
     email: "",
   })
 
@@ -239,22 +238,12 @@ export default function InitializePage() {
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-center mb-4">Address Information</h3>
             <div className="space-y-2">
-              <Label htmlFor="addressLine1">Address Line 1</Label>
+              <Label htmlFor="address">Address</Label>
               <Input
-                id="addressLine1"
-                value={businessData.addressLine1}
-                onChange={(e) => setBusinessData({ ...businessData, addressLine1: e.target.value })}
-                placeholder="Street address, P.O. box, etc."
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="addressLine2">Address Line 2</Label>
-              <Input
-                id="addressLine2"
-                value={businessData.addressLine2}
-                onChange={(e) => setBusinessData({ ...businessData, addressLine2: e.target.value })}
-                placeholder="Apartment, suite, unit, building, floor, etc."
+                id="address"
+                value={businessData.address}
+                onChange={(e) => setBusinessData({ ...businessData, address: e.target.value })}
+                placeholder="123 Business St, Suite 100, City, State, ZIP"
               />
             </div>
           </div>
@@ -277,12 +266,8 @@ export default function InitializePage() {
                 <p className="text-sm">{businessData.phone || "Not provided"}</p>
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Address Line 1:</p>
-                <p className="text-sm">{businessData.addressLine1 || "Not provided"}</p>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Address Line 2:</p>
-                <p className="text-sm">{businessData.addressLine2 || "Not provided"}</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Address:</p>
+                <p className="text-sm">{businessData.address || "Not provided"}</p>
               </div>
             </div>
             

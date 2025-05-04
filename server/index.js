@@ -1248,8 +1248,8 @@ async function createBusinessSheet(accessToken, businessData) {
 
     const businessDetails = [
       ['Company Name', businessData.companyName, new Date().toISOString()],
-      ['Email', businessData.email, new Date().toISOString()],
-      ['Phone', businessData.phone, new Date().toISOString()],
+      ['Business Email', businessData.email, new Date().toISOString()],
+      ['Phone Number', businessData.phone, new Date().toISOString()],
       ['Address', businessData.address, new Date().toISOString()],
       ['Created At', new Date().toISOString(), new Date().toISOString()]
     ];

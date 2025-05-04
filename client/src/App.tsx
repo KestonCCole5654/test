@@ -29,7 +29,9 @@ const AuthenticatedLayout = () => (
     </main>
   </>
 );
-
+{/*
+  
+  */}
 async function checkBusinessSheet(supabaseToken: string, googleToken: string) {
   try {
     const response = await fetch("https://sheetbills-server.vercel.app/api/check-business-sheet", {

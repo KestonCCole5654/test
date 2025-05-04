@@ -19,7 +19,7 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        sans: ["var(--font-poppins)", "system-ui", "sans-serif"],
+        sans: ['Poppins', 'system-ui', 'sans-serif'],
         inter: ["var(--font-inter)", "system-ui", "sans-serif"],
       },
       colors: {

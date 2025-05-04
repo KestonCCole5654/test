@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
+import { Building2, Mail, Phone, MapPin, CheckCircle2, Loader2 } from "lucide-react"
 
 export default function BusinessSetup() {
   const navigate = useNavigate()
@@ -9,6 +10,7 @@ export default function BusinessSetup() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
+  const [currentStep, setCurrentStep] = useState(0)
   
   // Get session data from location state
   const { session } = location.state || {}
@@ -18,8 +20,7 @@ export default function BusinessSetup() {
     companyName: "",
     email: "",
     phone: "",
-    addressLine1: "",
-    addressLine2: "",
+    address: "",
   })
 
   useEffect(() => {
@@ -36,7 +37,7 @@ export default function BusinessSetup() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!formData.companyName || !formData.email || !formData.phone || !formData.addressLine1) {
+    if (!formData.companyName || !formData.email || !formData.phone || !formData.address) {
       setError("Please fill in all required fields")
       return
     }
@@ -89,129 +90,153 @@ export default function BusinessSetup() {
     }
   }
 
+  const steps = [
+    {
+      icon: <Building2 className="h-8 w-8 text-emerald-600" />,
+      question: "What should we call your business?",
+      description: "This will be used for your invoices and business identity.",
+      field: "companyName",
+      placeholder: "e.g., Acme Corporation"
+    },
+    {
+      icon: <Mail className="h-8 w-8 text-emerald-600" />,
+      question: "What's your business email?",
+      description: "We'll use this for important notifications and communications.",
+      field: "email",
+      placeholder: "hello@yourbusiness.com"
+    },
+    {
+      icon: <Phone className="h-8 w-8 text-emerald-600" />,
+      question: "What's your business phone number?",
+      description: "This will be displayed on your invoices for customer contact.",
+      field: "phone",
+      placeholder: "+1 (555) 123-4567"
+    },
+    {
+      icon: <MapPin className="h-8 w-8 text-emerald-600" />,
+      question: "Where is your business located?",
+      description: "This will be used for your business address on invoices.",
+      field: "address",
+      placeholder: "123 Business St, Suite 100, City, State, ZIP"
+    }
+  ]
+
+  const handleNext = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(prev => prev + 1)
+    }
+  }
+
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep(prev => prev - 1)
+    }
+  }
+
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <div className="w-full max-w-3xl mx-auto p-8">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          {/* Logo and Heading */}
-          <div className="flex flex-col items-center justify-center mb-8">
-            <div className="w-20 h-20 bg-emerald-600 rounded-full flex items-center justify-center mb-4">
-              <div className="text-white text-2xl font-bold">SB</div>
-            </div>
-            <h1 className="text-2xl font-bold text-gray-800">Complete Your Business Setup</h1>
-            <p className="text-gray-600 mt-2 text-center">
-              We need some details about your business for invoicing purposes. 
-              This information will be saved to your Google Sheets account.
-            </p>
-          </div>
-          
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Company Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="companyName"
-                  name="companyName"
-                  value={formData.companyName}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  required
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                  Business Email <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  required
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone Number <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  required
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="addressLine1" className="block text-sm font-medium text-gray-700 mb-1">
-                  Address Line 1 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="addressLine1"
-                  name="addressLine1"
-                  value={formData.addressLine1}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  required
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="addressLine2" className="block text-sm font-medium text-gray-700 mb-1">
-                  Address Line 2
-                </label>
-                <input
-                  type="text"
-                  id="addressLine2"
-                  name="addressLine2"
-                  value={formData.addressLine2}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                />
-              </div>
-            </div>
-            
-            {error && (
-              <div className="p-3 text-sm text-center text-red-700 bg-red-100 rounded-lg">
-                {error}
-              </div>
-            )}
-            
-            {success && (
-              <div className="p-3 text-sm text-center text-green-700 bg-green-100 rounded-lg">
-                {success}
-                <div className="mt-2 flex items-center justify-center">
-                  <svg className="animate-spin h-5 w-5 mr-2 text-green-600" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-                  </svg>
-                  <span>Redirecting...</span>
+    <div className="min-h-screen bg-gradient-to-b from-white to-green-50 flex flex-col">
+      <div className="flex-1 flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-2xl mx-auto">
+          <div className="bg-white rounded-2xl shadow-lg p-8">
+            {/* Progress indicator */}
+            <div className="flex justify-between items-center mb-8">
+              {steps.map((_, index) => (
+                <div key={index} className="flex items-center">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    index < currentStep ? 'bg-emerald-600 text-white' : 
+                    index === currentStep ? 'bg-emerald-100 text-emerald-600' : 
+                    'bg-gray-100 text-gray-400'
+                  }`}>
+                    {index < currentStep ? (
+                      <CheckCircle2 className="h-5 w-5" />
+                    ) : (
+                      <span className="text-sm font-medium">{index + 1}</span>
+                    )}
+                  </div>
+                  {index < steps.length - 1 && (
+                    <div className={`h-1 w-12 ${
+                      index < currentStep ? 'bg-emerald-600' : 'bg-gray-200'
+                    }`} />
+                  )}
                 </div>
-              </div>
-            )}
-            
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-6 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50"
-              >
-                {loading ? "Saving..." : "Save Business Details"}
-              </button>
+              ))}
             </div>
-          </form>
+
+            {/* Current step content */}
+            <div className="text-center space-y-6">
+              <div className="flex justify-center">
+                {steps[currentStep].icon}
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900">
+                {steps[currentStep].question}
+              </h2>
+              <p className="text-gray-600">
+                {steps[currentStep].description}
+              </p>
+
+              <div className="mt-6">
+                <input
+                  type={steps[currentStep].field === "email" ? "email" : "text"}
+                  name={steps[currentStep].field}
+                  value={formData[steps[currentStep].field as keyof typeof formData]}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  placeholder={steps[currentStep].placeholder}
+                  required
+                />
+              </div>
+
+              {error && (
+                <div className="p-3 text-sm text-center text-red-700 bg-red-100 rounded-lg">
+                  {error}
+                </div>
+              )}
+
+              {success && (
+                <div className="p-3 text-sm text-center text-green-700 bg-green-100 rounded-lg">
+                  {success}
+                  <div className="mt-2 flex items-center justify-center">
+                    <Loader2 className="animate-spin h-5 w-5 mr-2 text-green-600" />
+                    <span>Redirecting...</span>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-between mt-8">
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  disabled={currentStep === 0}
+                  className={`px-6 py-2 rounded-lg ${
+                    currentStep === 0 
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Back
+                </button>
+
+                {currentStep === steps.length - 1 ? (
+                  <button
+                    type="button"
+                    onClick={handleSubmit}
+                    disabled={loading}
+                    className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50"
+                  >
+                    {loading ? "Saving..." : "Complete Setup"}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                  >
+                    Next
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

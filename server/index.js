@@ -1051,6 +1051,29 @@ app.get('/api/business-details', async (req, res) => {
     const dataRows = response.data.values || [];
     console.log('[Business Details] Raw business details data:', dataRows);
 
+    // Ensure the 'Business Details' sheet has at least 3 columns
+    const spreadsheetMeta = await sheets.spreadsheets.get({ spreadsheetId });
+    const businessDetailsSheet = spreadsheetMeta.data.sheets.find(
+      s => s.properties.title === 'Business Details'
+    );
+    if (businessDetailsSheet && businessDetailsSheet.properties.gridProperties.columnCount < 3) {
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId,
+        requestBody: {
+          requests: [
+            {
+              updateSheetProperties: {
+                properties: {
+                  sheetId: businessDetailsSheet.properties.sheetId,
+                  gridProperties: { columnCount: 3 }
+                },
+                fields: 'gridProperties.columnCount'
+              }
+            }
+          ]
+        }
+      });
+    }
     // Step: Clear the old 2-column range to prevent column mismatch errors
     await sheets.spreadsheets.values.clear({
       spreadsheetId,

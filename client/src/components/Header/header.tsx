@@ -106,13 +106,7 @@ const Header: React.FC = () => {
                 >
                   Dashboard
                 </Link>
-                
-                <Link
-                  to="/ai-agent"
-                  className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-                >
-                  AI Agent
-                </Link>
+             
 
                 <Link
                   to="/settings"
@@ -219,19 +213,13 @@ const Header: React.FC = () => {
                 >
                   Dashboard
                 </Link>
-                <Link
-                  to="/template-generator"
-                  className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-                  onClick={handleNavigation}
-                >
-                  Invoices Template Generator
-                </Link>
+              
                 <Link
                   to="/settings"
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                   onClick={handleNavigation}
                 >
-                  Settings
+                  Account & Settings
                 </Link>
                 <Link
                   to="/contact"

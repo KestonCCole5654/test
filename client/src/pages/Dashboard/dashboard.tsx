@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useEffect, useState } from "react"
-import { Trash2, Edit, MoreVertical, Plus, RefreshCw, ArrowUpDown, CheckCircle, Clock } from "lucide-react"
+import { Trash2, Edit, MoreVertical, Plus, RefreshCw, ArrowUpDown, CheckCircle, Clock, Mail, Settings } from "lucide-react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
@@ -32,6 +32,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../../components/ui/alert-dialog"
+import { Switch } from "../../components/ui/switch"
+import { Label } from "../../components/ui/label"
+import { Textarea } from "../../components/ui/textarea"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../../components/ui/dialog"
+import { ChevronRight } from "lucide-react"
 
 interface Invoice {
   id: string
@@ -59,6 +72,8 @@ interface Invoice {
   notes: string
   template: "modern" | "classic" | "minimal"
   status: "Paid" | "Pending"
+  emailStatus?: string
+  lastEmailSent?: string
 }
 
 interface Spreadsheet {
@@ -66,6 +81,13 @@ interface Spreadsheet {
   name: string
   sheetUrl: string
   isDefault: boolean
+}
+
+interface EmailSettings {
+  reminderDays: number
+  followUpDays: number
+  autoSend: boolean
+  customSignature: string
 }
 
 export default function Dashboard() {
@@ -99,6 +121,15 @@ export default function Dashboard() {
   // Add pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [emailSettings, setEmailSettings] = useState<EmailSettings>({
+    reminderDays: 7,
+    followUpDays: 3,
+    autoSend: false,
+    customSignature: "",
+  })
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
+  const [previewEmail, setPreviewEmail] = useState("")
+  const [isSendingEmail, setIsSendingEmail] = useState(false)
 
   // Calculate totals
   const totalInvoices = invoices.length
@@ -483,15 +514,27 @@ export default function Dashboard() {
     const direction = sortConfig.key === key && sortConfig.direction === "ascending" ? "descending" : "ascending"
 
     const sortedInvoices = [...filteredInvoices].sort((a, b) => {
-      let valueA = a[key]
-      let valueB = b[key]
+      let valueA: string | number = ""
+      let valueB: string | number = ""
 
       if (key === "date" || key === "dueDate") {
-        valueA = typeof valueA === "string" || typeof valueA === "number" ? new Date(valueA).getTime() : 0
-        valueB = typeof valueB === "string" || typeof valueB === "number" ? new Date(valueB).getTime() : 0
+        valueA = new Date(a[key] || "").getTime()
+        valueB = new Date(b[key] || "").getTime()
       } else if (key === "amount") {
         valueA = a.amount
         valueB = b.amount
+      } else if (key === "customer") {
+        valueA = typeof a.customer === "object" ? a.customer.name : String(a.customer || "")
+        valueB = typeof b.customer === "object" ? b.customer.name : String(b.customer || "")
+      } else if (key === "status") {
+        valueA = a.status
+        valueB = b.status
+      } else if (key === "id") {
+        valueA = a.id
+        valueB = b.id
+      } else {
+        valueA = String(a[key] || "")
+        valueB = String(b[key] || "")
       }
 
       if (valueA < valueB) return direction === "ascending" ? -1 : 1
@@ -527,6 +570,127 @@ export default function Dashboard() {
       toast({
         title: "Error",
         description: "Unable to refresh data. Please ensure a spreadsheet is selected.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const generateEmailContent = (invoice: Invoice) => {
+    const items = invoice.items.map(item => 
+      `- ${item.description}: ${item.quantity} x $${item.price.toFixed(2)}`
+    ).join('\n')
+
+    const emailContent = `Dear ${invoice.customer.name},
+
+I hope this email finds you well. I am writing to share the invoice for our recent services.
+
+Invoice Details:
+Invoice #: ${invoice.id}
+Date: ${invoice.date}
+Due Date: ${invoice.dueDate}
+
+Services Provided:
+${items}
+
+Total Amount: $${invoice.amount.toFixed(2)}
+
+Please find the invoice attached to this email. Payment is due by ${invoice.dueDate}.
+
+${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
+
+    return emailContent
+  }
+
+  const handlePreviewEmail = (invoice: Invoice) => {
+    setSelectedInvoice(invoice)
+    const emailContent = generateEmailContent(invoice)
+    setPreviewEmail(emailContent)
+  }
+
+  const handleSendEmail = async () => {
+    if (!selectedInvoice) return
+
+    try {
+      setIsSendingEmail(true)
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      if (!session?.provider_token) {
+        throw new Error("Authentication required")
+      }
+
+      const response = await fetch("https://sheetbills-server.vercel.app/api/send-invoice-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.provider_token}`,
+          "X-Supabase-Token": session.access_token,
+        },
+        body: JSON.stringify({
+          invoiceId: selectedInvoice.id,
+          emailContent: previewEmail,
+          customerEmail: selectedInvoice.customer.email,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to send email")
+      }
+
+      // Update local state
+      setInvoices(invoices.map(inv => 
+        inv.id === selectedInvoice.id 
+          ? { ...inv, emailStatus: "Sent", lastEmailSent: new Date().toISOString() }
+          : inv
+      ))
+
+      toast({
+        title: "Email Sent",
+        description: "Invoice email has been sent successfully.",
+      })
+
+      setSelectedInvoice(null)
+      setPreviewEmail("")
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send email",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSendingEmail(false)
+    }
+  }
+
+  const handleSaveEmailSettings = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      if (!session?.provider_token) {
+        throw new Error("Authentication required")
+      }
+
+      const response = await fetch("https://sheetbills-server.vercel.app/api/save-email-settings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.provider_token}`,
+          "X-Supabase-Token": session.access_token,
+        },
+        body: JSON.stringify(emailSettings),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to save settings")
+      }
+
+      toast({
+        title: "Settings Saved",
+        description: "Email settings have been updated successfully.",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save settings",
         variant: "destructive",
       })
     }
@@ -588,7 +752,7 @@ export default function Dashboard() {
 
       <div className="container max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {/* Stats Cards Section */}
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
           {/* Total Invoices Card */}
           <Card>
             <CardHeader className="pb-1 sm:pb-2 px-3 sm:px-6">
@@ -659,8 +823,71 @@ export default function Dashboard() {
           </Card>
         </div>
 
+        {/* AI Email Composer Section */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Mail className="h-5 w-5" />
+              AI Email Composer
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="auto-send">Auto-send emails</Label>
+                <Switch
+                  id="auto-send"
+                  checked={emailSettings.autoSend}
+                  onCheckedChange={(checked) => 
+                    setEmailSettings({ ...emailSettings, autoSend: checked })
+                  }
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="reminder-days">Reminder days before due date</Label>
+                  <Input
+                    id="reminder-days"
+                    type="number"
+                    value={emailSettings.reminderDays}
+                    onChange={(e) => 
+                      setEmailSettings({ ...emailSettings, reminderDays: parseInt(e.target.value) })
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="followup-days">Follow-up days after due date</Label>
+                  <Input
+                    id="followup-days"
+                    type="number"
+                    value={emailSettings.followUpDays}
+                    onChange={(e) => 
+                      setEmailSettings({ ...emailSettings, followUpDays: parseInt(e.target.value) })
+                    }
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="signature">Email Signature</Label>
+                <Textarea
+                  id="signature"
+                  value={emailSettings.customSignature}
+                  onChange={(e) => 
+                    setEmailSettings({ ...emailSettings, customSignature: e.target.value })
+                  }
+                  placeholder="Enter your email signature..."
+                  className="mt-1"
+                />
+              </div>
+              <Button onClick={handleSaveEmailSettings} className="w-full sm:w-auto">
+                Save Settings
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Tabs and Content */}
-        <Tabs defaultValue="all" className="mb-8">
+        <Tabs defaultValue="all" className="space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
             <TabsList className="mb-4 sm:mb-0">
               <TabsTrigger value="all" onClick={() => setStatusFilter("all")}>
@@ -1032,167 +1259,87 @@ export default function Dashboard() {
                       </Button>
                     </div>
                   </TableCell>
-                  <TableCell onClick={(e) => e.stopPropagation()}>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Open menu</span>
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
-                            const invoicesSheetUrl = invoicesSheet?.sheetUrl
-
-                            navigate("/create-invoice", {
-                              state: {
-                                invoiceToEdit: invoice,
-                                selectedSpreadsheetUrl: invoicesSheetUrl,
-                              },
-                            })
-                          }}
-                        >
-                          <Edit className="mr-2 h-4 w-4" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        {invoice.status === "Pending" && (
-                          <DropdownMenuItem
-                            onClick={async () => {
-                              try {
-                                const {
-                                  data: { session },
-                                  error: sessionError,
-                                } = await supabase.auth.getSession()
-
-                                if (sessionError) {
-                                  throw new Error(sessionError.message)
-                                }
-
-                                const response = await fetch(
-                                  "https://sheetbills-server.vercel.app/api/sheets/mark-as-paid",
-                                  {
-                                    method: "PUT",
-                                    headers: {
-                                      "Content-Type": "application/json",
-                                      Authorization: `Bearer ${session?.provider_token}`,
-                                      "X-Supabase-Token": session?.access_token || "",
-                                    },
-                                    body: JSON.stringify({
-                                      invoiceId: invoice.id,
-                                      sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
-                                        ?.sheetUrl,
-                                    }),
-                                  },
-                                )
-
-                                if (!response.ok) {
-                                  const errorData = await response.json()
-                                  throw new Error(errorData.error || "Failed to mark invoice as paid")
-                                }
-
-                                // Update local state
-                                const updatedInvoices = invoices.map((inv) =>
-                                  inv.id === invoice.id ? { ...inv, status: "Paid" as const } : inv,
-                                )
-                                setInvoices(updatedInvoices)
-                                if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
-
-                                toast({
-                                  title: "Status Updated",
-                                  description: "Invoice marked as paid successfully.",
-                                })
-                              } catch (error) {
-                                toast({
-                                  title: "Error",
-                                  description:
-                                    error instanceof Error ? error.message : "Failed to update invoice status",
-                                  variant: "destructive",
-                                })
-                              }
+                  <TableCell>
+                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handlePreviewEmail(invoice)
                             }}
                           >
-                            <CheckCircle className="mr-2 h-4 w-4 text-emerald-500" />
-                            Mark as Paid
-                          </DropdownMenuItem>
-                        )}
-                        {invoice.status === "Paid" && (
+                            <Mail className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl">
+                          <DialogHeader>
+                            <DialogTitle>Preview Email</DialogTitle>
+                            <DialogDescription>
+                              Review the email before sending to {invoice.customer.email}
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="py-4">
+                            <Textarea
+                              value={previewEmail}
+                              onChange={(e) => setPreviewEmail(e.target.value)}
+                              className="min-h-[300px] font-mono"
+                            />
+                          </div>
+                          <DialogFooter>
+                            <Button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleSendEmail()
+                              }}
+                              disabled={isSendingEmail}
+                            >
+                              {isSendingEmail ? "Sending..." : "Send Email"}
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" onClick={(e) => e.stopPropagation()}>
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
                           <DropdownMenuItem
-                            onClick={async () => {
-                              try {
-                                const {
-                                  data: { session },
-                                  error: sessionError,
-                                } = await supabase.auth.getSession()
-
-                                if (sessionError) {
-                                  throw new Error(sessionError.message)
-                                }
-
-                                const response = await fetch(
-                                  "https://sheetbills-server.vercel.app/api/sheets/mark-as-pending",
-                                  {
-                                    method: "PUT",
-                                    headers: {
-                                      "Content-Type": "application/json",
-                                      Authorization: `Bearer ${session?.provider_token}`,
-                                      "X-Supabase-Token": session?.access_token || "",
-                                    },
-                                    body: JSON.stringify({ 
-                                      invoiceId: invoice.id,
-                                      sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
-                                        ?.sheetUrl,
-                                    }),
-                                  },
-                                )
-
-                                if (!response.ok) {
-                                  const errorData = await response.json()
-                                  throw new Error(errorData.error || "Failed to mark invoice as pending")
-                                }
-
-                                // Update local state
-                                const updatedInvoices = invoices.map((inv) =>
-                                  inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv,
-                                )
-                                setInvoices(updatedInvoices)
-                                if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
-
-                                toast({
-                                  title: "Status Updated",
-                                  description: "Invoice marked as pending successfully.",
-                                })
-                              } catch (error) {
-                                toast({
-                                  title: "Error",
-                                  description:
-                                    error instanceof Error ? error.message : "Failed to update invoice status",
-                                  variant: "destructive",
-                                })
-                              }
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
+                              const invoicesSheetUrl = invoicesSheet?.sheetUrl
+                              navigate("/create-invoice", {
+                                state: {
+                                  invoiceToEdit: invoice,
+                                  selectedSpreadsheetUrl: invoicesSheetUrl,
+                                },
+                              })
+                              localStorage.setItem("invoiceToEdit", JSON.stringify(invoice))
                             }}
                           >
-                            <Clock className="mr-2 h-4 w-4 text-amber-500" />
-                            Mark as Pending
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit
                           </DropdownMenuItem>
-                        )}
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setInvoiceToDelete(invoice)
-                            setIsDeleteDialogOpen(true)
-                          }}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setInvoiceToDelete(invoice)
+                              setIsDeleteDialogOpen(true)
+                            }}
+                            className="text-red-600"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

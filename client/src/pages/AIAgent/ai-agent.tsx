@@ -10,7 +10,7 @@ import { Skeleton } from "../../components/ui/skeleton"
 import { toast } from "../../components/ui/use-toast"
 import supabase from "../../components/Auth/supabaseClient"
 import { Avatar, AvatarFallback } from "../../components/ui/avatar"
-import { Bot, Send, Clock, AlertCircle, CheckCircle, ChevronRight, RefreshCw } from "lucide-react"
+import { Bot, Send, Mail, Clock, AlertCircle, CheckCircle, ChevronRight, RefreshCw, Settings } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -28,6 +28,8 @@ import {
   DialogTrigger,
 } from "../../components/ui/dialog"
 import { Textarea } from "../../components/ui/textarea"
+import { Switch } from "../../components/ui/switch"
+import { Label } from "../../components/ui/label"
 
 interface Invoice {
   id: string
@@ -39,29 +41,36 @@ interface Invoice {
     email: string
     address: string
   }
+  items: {
+    description: string
+    quantity: number
+    price: number
+  }[]
   status: "Paid" | "Pending"
-  daysOverdue: number
-  aiSuggestions: {
-    action: "reminder" | "extend" | "escalate"
-    message: string
-    priority: "high" | "medium" | "low"
-  }
+  emailStatus: "Not Sent" | "Sent" | "Reminder Sent"
+  lastEmailSent?: string
 }
 
 export default function AIAgent() {
   const navigate = useNavigate()
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [selectedAction, setSelectedAction] = useState<string>("all")
-  const [selectedInvoices, setSelectedInvoices] = useState<string[]>([])
-  const [reminderMessage, setReminderMessage] = useState("")
-  const [isSendingReminder, setIsSendingReminder] = useState(false)
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
+  const [previewEmail, setPreviewEmail] = useState("")
+  const [isSendingEmail, setIsSendingEmail] = useState(false)
+  const [autoSendEnabled, setAutoSendEnabled] = useState(false)
+  const [emailSettings, setEmailSettings] = useState({
+    reminderDays: 7,
+    followUpDays: 3,
+    autoSend: false,
+    customSignature: "",
+  })
 
   useEffect(() => {
-    fetchOverdueInvoices()
+    fetchInvoices()
   }, [])
 
-  const fetchOverdueInvoices = async () => {
+  const fetchInvoices = async () => {
     try {
       setIsLoading(true)
       const { data: { session } } = await supabase.auth.getSession()
@@ -70,7 +79,7 @@ export default function AIAgent() {
         throw new Error("Authentication required")
       }
 
-      const response = await fetch("https://sheetbills-server.vercel.app/api/invoices/overdue", {
+      const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/invoices", {
         headers: {
           Authorization: `Bearer ${session.provider_token}`,
           "X-Supabase-Token": session.access_token,
@@ -78,23 +87,15 @@ export default function AIAgent() {
       })
 
       if (!response.ok) {
-        throw new Error("Failed to fetch overdue invoices")
+        throw new Error("Failed to fetch invoices")
       }
 
       const data = await response.json()
-      
-      // Process and enhance the data with AI suggestions
-      const enhancedInvoices = data.map((invoice: any) => ({
-        ...invoice,
-        daysOverdue: calculateDaysOverdue(invoice.dueDate),
-        aiSuggestions: generateAISuggestions(invoice)
-      }))
-
-      setInvoices(enhancedInvoices)
+      setInvoices(data)
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to fetch overdue invoices",
+        description: "Failed to fetch invoices",
         variant: "destructive",
       })
     } finally {
@@ -102,59 +103,50 @@ export default function AIAgent() {
     }
   }
 
-  const calculateDaysOverdue = (dueDate: string) => {
-    const due = new Date(dueDate)
-    const today = new Date()
-    const diffTime = today.getTime() - due.getTime()
-    return Math.floor(diffTime / (1000 * 60 * 60 * 24))
+  const generateEmailContent = (invoice: Invoice) => {
+    const items = invoice.items.map(item => 
+      `- ${item.description}: ${item.quantity} x $${item.price.toFixed(2)}`
+    ).join('\n')
+
+    const emailContent = `Dear ${invoice.customer.name},
+
+I hope this email finds you well. I am writing to share the invoice for our recent services.
+
+Invoice Details:
+Invoice #: ${invoice.id}
+Date: ${invoice.date}
+Due Date: ${invoice.dueDate}
+
+Services Provided:
+${items}
+
+Total Amount: $${invoice.amount.toFixed(2)}
+
+Please find the invoice attached to this email. Payment is due by ${invoice.dueDate}.
+
+${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
+
+    return emailContent
   }
 
-  const generateAISuggestions = (invoice: any) => {
-    const daysOverdue = calculateDaysOverdue(invoice.dueDate)
-    const amount = invoice.amount
-
-    // Simple AI logic for suggestions
-    let action: "reminder" | "extend" | "escalate"
-    let priority: "high" | "medium" | "low"
-    let message = ""
-
-    if (daysOverdue > 30) {
-      action = "escalate"
-      priority = "high"
-      message = `Urgent: Invoice #${invoice.id} is ${daysOverdue} days overdue. Consider escalating to collections.`
-    } else if (daysOverdue > 15) {
-      action = "extend"
-      priority = "medium"
-      message = `Invoice #${invoice.id} is ${daysOverdue} days overdue. Consider offering a payment extension.`
-    } else {
-      action = "reminder"
-      priority = "low"
-      message = `Send a friendly reminder for invoice #${invoice.id} which is ${daysOverdue} days overdue.`
-    }
-
-    return { action, message, priority }
+  const handlePreviewEmail = (invoice: Invoice) => {
+    setSelectedInvoice(invoice)
+    const emailContent = generateEmailContent(invoice)
+    setPreviewEmail(emailContent)
   }
 
-  const handleSendReminder = async () => {
-    if (selectedInvoices.length === 0) {
-      toast({
-        title: "No Invoices Selected",
-        description: "Please select at least one invoice to send a reminder.",
-        variant: "destructive",
-      })
-      return
-    }
+  const handleSendEmail = async () => {
+    if (!selectedInvoice) return
 
     try {
-      setIsSendingReminder(true)
+      setIsSendingEmail(true)
       const { data: { session } } = await supabase.auth.getSession()
       
       if (!session?.provider_token) {
         throw new Error("Authentication required")
       }
 
-      // Send reminder emails
-      const response = await fetch("https://sheetbills-server.vercel.app/api/invoices/reminders", {
+      const response = await fetch("https://sheetbills-server.vercel.app/api/send-invoice-email", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -162,35 +154,42 @@ export default function AIAgent() {
           "X-Supabase-Token": session.access_token,
         },
         body: JSON.stringify({
-          invoiceIds: selectedInvoices,
-          message: reminderMessage,
+          invoiceId: selectedInvoice.id,
+          emailContent: previewEmail,
+          customerEmail: selectedInvoice.customer.email,
         }),
       })
 
       if (!response.ok) {
-        throw new Error("Failed to send reminders")
+        throw new Error("Failed to send email")
       }
 
+      // Update local state
+      setInvoices(invoices.map(inv => 
+        inv.id === selectedInvoice.id 
+          ? { ...inv, emailStatus: "Sent", lastEmailSent: new Date().toISOString() }
+          : inv
+      ))
+
       toast({
-        title: "Reminders Sent",
-        description: `Successfully sent reminders for ${selectedInvoices.length} invoice(s).`,
+        title: "Email Sent",
+        description: "Invoice email has been sent successfully.",
       })
 
-      // Clear selection and message
-      setSelectedInvoices([])
-      setReminderMessage("")
+      setSelectedInvoice(null)
+      setPreviewEmail("")
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to send reminders",
+        description: "Failed to send email",
         variant: "destructive",
       })
     } finally {
-      setIsSendingReminder(false)
+      setIsSendingEmail(false)
     }
   }
 
-  const handleExtendDueDate = async (invoiceId: string, days: number) => {
+  const handleSaveSettings = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession()
       
@@ -198,43 +197,32 @@ export default function AIAgent() {
         throw new Error("Authentication required")
       }
 
-      const response = await fetch("https://sheetbills-server.vercel.app/api/invoices/extend-due-date", {
+      const response = await fetch("https://sheetbills-server.vercel.app/api/save-email-settings", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${session.provider_token}`,
           "X-Supabase-Token": session.access_token,
         },
-        body: JSON.stringify({
-          invoiceId,
-          days,
-        }),
+        body: JSON.stringify(emailSettings),
       })
 
       if (!response.ok) {
-        throw new Error("Failed to extend due date")
+        throw new Error("Failed to save settings")
       }
 
       toast({
-        title: "Due Date Extended",
-        description: "Successfully extended the due date.",
+        title: "Settings Saved",
+        description: "Email settings have been updated successfully.",
       })
-
-      // Refresh the invoice list
-      fetchOverdueInvoices()
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to extend due date",
+        description: "Failed to save settings",
         variant: "destructive",
       })
     }
   }
-
-  const filteredInvoices = invoices.filter(invoice => {
-    if (selectedAction === "all") return true
-    return invoice.aiSuggestions.action === selectedAction
-  })
 
   return (
     <div className="min-h-screen w-full">
@@ -246,9 +234,9 @@ export default function AIAgent() {
               <Bot className="h-8 w-8 text-purple-600" />
             </Avatar>
             <div>
-              <h1 className="text-3xl font-bold text-white">AI Invoice Assistant</h1>
+              <h1 className="text-3xl font-bold text-white">AI Email Composer</h1>
               <p className="text-purple-100 mt-1">
-                Smart suggestions and automated actions for your overdue invoices
+                Automatically draft and send professional invoice emails
               </p>
             </div>
           </div>
@@ -256,100 +244,70 @@ export default function AIAgent() {
       </div>
 
       <div className="container max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-slate-500">Total Overdue</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{invoices.length}</div>
-              <p className="text-xs text-slate-500 mt-1">Invoices requiring attention</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-slate-500">Total Amount</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                ${invoices.reduce((sum, inv) => sum + inv.amount, 0).toLocaleString()}
-              </div>
-              <p className="text-xs text-slate-500 mt-1">In overdue payments</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-slate-500">Average Days Overdue</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {Math.round(invoices.reduce((sum, inv) => sum + inv.daysOverdue, 0) / invoices.length || 0)}
-              </div>
-              <p className="text-xs text-slate-500 mt-1">Days</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Action Bar */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <Select value={selectedAction} onValueChange={setSelectedAction}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by action" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Actions</SelectItem>
-              <SelectItem value="reminder">Send Reminder</SelectItem>
-              <SelectItem value="extend">Extend Due Date</SelectItem>
-              <SelectItem value="escalate">Escalate</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Button
-            onClick={fetchOverdueInvoices}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <RefreshCw className="h-4 w-4" />
-            Refresh
-          </Button>
-
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                className="flex items-center gap-2"
-                disabled={selectedInvoices.length === 0}
-              >
-                <Send className="h-4 w-4" />
-                Send Bulk Reminders
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Send Reminder Messages</DialogTitle>
-                <DialogDescription>
-                  Send reminder messages to {selectedInvoices.length} selected customers.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="py-4">
-                <Textarea
-                  placeholder="Enter your reminder message..."
-                  value={reminderMessage}
-                  onChange={(e) => setReminderMessage(e.target.value)}
-                  className="min-h-[100px]"
+        {/* Settings Card */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Settings className="h-5 w-5" />
+              Email Settings
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="auto-send">Auto-send emails</Label>
+                <Switch
+                  id="auto-send"
+                  checked={emailSettings.autoSend}
+                  onCheckedChange={(checked) => 
+                    setEmailSettings({ ...emailSettings, autoSend: checked })
+                  }
                 />
               </div>
-              <DialogFooter>
-                <Button
-                  onClick={handleSendReminder}
-                  disabled={isSendingReminder || !reminderMessage.trim()}
-                >
-                  {isSendingReminder ? "Sending..." : "Send Reminders"}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="reminder-days">Reminder days before due date</Label>
+                  <input
+                    id="reminder-days"
+                    type="number"
+                    value={emailSettings.reminderDays}
+                    onChange={(e) => 
+                      setEmailSettings({ ...emailSettings, reminderDays: parseInt(e.target.value) })
+                    }
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="followup-days">Follow-up days after due date</Label>
+                  <input
+                    id="followup-days"
+                    type="number"
+                    value={emailSettings.followUpDays}
+                    onChange={(e) => 
+                      setEmailSettings({ ...emailSettings, followUpDays: parseInt(e.target.value) })
+                    }
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="signature">Email Signature</Label>
+                <Textarea
+                  id="signature"
+                  value={emailSettings.customSignature}
+                  onChange={(e) => 
+                    setEmailSettings({ ...emailSettings, customSignature: e.target.value })
+                  }
+                  placeholder="Enter your email signature..."
+                  className="mt-1"
+                />
+              </div>
+              <Button onClick={handleSaveSettings} className="w-full sm:w-auto">
+                Save Settings
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Invoices Table */}
         <Card>
@@ -357,24 +315,11 @@ export default function AIAgent() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[50px]">
-                    <input
-                      type="checkbox"
-                      checked={selectedInvoices.length === filteredInvoices.length}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedInvoices(filteredInvoices.map(inv => inv.id))
-                        } else {
-                          setSelectedInvoices([])
-                        }
-                      }}
-                    />
-                  </TableHead>
                   <TableHead>Invoice</TableHead>
                   <TableHead>Customer</TableHead>
                   <TableHead>Amount</TableHead>
-                  <TableHead>Days Overdue</TableHead>
-                  <TableHead>AI Suggestion</TableHead>
+                  <TableHead>Due Date</TableHead>
+                  <TableHead>Email Status</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -382,37 +327,23 @@ export default function AIAgent() {
                 {isLoading ? (
                   Array.from({ length: 5 }).map((_, i) => (
                     <TableRow key={i}>
-                      <TableCell><Skeleton className="h-4 w-4" /></TableCell>
                       <TableCell><Skeleton className="h-4 w-24" /></TableCell>
                       <TableCell><Skeleton className="h-4 w-32" /></TableCell>
                       <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-                      <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-                      <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
                       <TableCell><Skeleton className="h-4 w-24" /></TableCell>
                     </TableRow>
                   ))
-                ) : filteredInvoices.length === 0 ? (
+                ) : invoices.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8">
-                      No overdue invoices found
+                    <TableCell colSpan={6} className="text-center py-8">
+                      No invoices found
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredInvoices.map((invoice) => (
+                  invoices.map((invoice) => (
                     <TableRow key={invoice.id}>
-                      <TableCell>
-                        <input
-                          type="checkbox"
-                          checked={selectedInvoices.includes(invoice.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedInvoices([...selectedInvoices, invoice.id])
-                            } else {
-                              setSelectedInvoices(selectedInvoices.filter(id => id !== invoice.id))
-                            }
-                          }}
-                        />
-                      </TableCell>
                       <TableCell>
                         <div className="font-medium">#{invoice.id}</div>
                         <div className="text-sm text-slate-500">{invoice.date}</div>
@@ -425,29 +356,61 @@ export default function AIAgent() {
                         ${invoice.amount.toLocaleString()}
                       </TableCell>
                       <TableCell>
+                        <div className="font-medium">{invoice.dueDate}</div>
+                        {invoice.lastEmailSent && (
+                          <div className="text-sm text-slate-500">
+                            Last sent: {new Date(invoice.lastEmailSent).toLocaleDateString()}
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
                         <Badge
-                          variant={invoice.daysOverdue > 30 ? "destructive" : "default"}
-                          className="whitespace-nowrap"
+                          variant={
+                            invoice.emailStatus === "Sent" ? "default" :
+                            invoice.emailStatus === "Reminder Sent" ? "secondary" :
+                            "outline"
+                          }
                         >
-                          {invoice.daysOverdue} days
+                          {invoice.emailStatus}
                         </Badge>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          {invoice.aiSuggestions.action === "reminder" && (
-                            <Send className="h-4 w-4 text-blue-500" />
-                          )}
-                          {invoice.aiSuggestions.action === "extend" && (
-                            <Clock className="h-4 w-4 text-amber-500" />
-                          )}
-                          {invoice.aiSuggestions.action === "escalate" && (
-                            <AlertCircle className="h-4 w-4 text-red-500" />
-                          )}
-                          <span className="text-sm">{invoice.aiSuggestions.message}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handlePreviewEmail(invoice)}
+                              >
+                                <Mail className="h-4 w-4 mr-2" />
+                                Preview
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl">
+                              <DialogHeader>
+                                <DialogTitle>Preview Email</DialogTitle>
+                                <DialogDescription>
+                                  Review the email before sending to {invoice.customer.email}
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="py-4">
+                                <Textarea
+                                  value={previewEmail}
+                                  onChange={(e) => setPreviewEmail(e.target.value)}
+                                  className="min-h-[300px] font-mono"
+                                />
+                              </div>
+                              <DialogFooter>
+                                <Button
+                                  onClick={handleSendEmail}
+                                  disabled={isSendingEmail}
+                                >
+                                  {isSendingEmail ? "Sending..." : "Send Email"}
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
                           <Button
                             variant="ghost"
                             size="sm"
@@ -455,15 +418,6 @@ export default function AIAgent() {
                           >
                             <ChevronRight className="h-4 w-4" />
                           </Button>
-                          {invoice.aiSuggestions.action === "extend" && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleExtendDueDate(invoice.id, 15)}
-                            >
-                              Extend 15 Days
-                            </Button>
-                          )}
                         </div>
                       </TableCell>
                     </TableRow>

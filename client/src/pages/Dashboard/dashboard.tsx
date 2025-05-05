@@ -1114,7 +1114,7 @@ export default function Dashboard() {
                 </TableHead>
                 <TableHead className="font-medium text-center">Overdue</TableHead>
                 <TableHead className="font-medium text-center">Payment Actions</TableHead>
-                <TableHead className="w-[80px] font-medium">Actions</TableHead>
+                <TableHead className="w-[80px] font-medium">Other Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

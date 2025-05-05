@@ -876,8 +876,8 @@ export default function Dashboard() {
                       variant={invoice.status === "Paid" ? "default" : "secondary"}
                       className={
                         invoice.status === "Paid"
-                          ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50 text-base px-0"
-                          : "bg-amber-50 text-amber-700 hover:bg-amber-50 text-base px-0"
+                          ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50 text-md px-4"
+                          : "bg-amber-50 text-amber-700 hover:bg-amber-50 text-md px-4"
                       }
                     >
                       {invoice.status}
@@ -944,7 +944,7 @@ export default function Dashboard() {
                         size="sm"
                         disabled={invoice.status === "Paid"}
                       >
-                        <CheckCircle className="mr-2 h-4 w-4" />
+                       
                         Mark as Paid
                       </Button>
                       <Button
@@ -1005,7 +1005,7 @@ export default function Dashboard() {
                         size="sm"
                         disabled={invoice.status === "Pending"}
                       >
-                        <Clock className="mr-2 h-4 w-4" />
+                     
                         Mark as Pending
                       </Button>
                       <Button
@@ -1021,7 +1021,7 @@ export default function Dashboard() {
                         size="sm"
                         disabled={invoice.status === "Paid"}
                       >
-                        <DollarSign className="mr-2 h-4 w-4" />
+                     
                         Partial Payment
                       </Button>
                     </div>

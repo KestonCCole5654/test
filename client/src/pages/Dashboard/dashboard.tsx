@@ -90,6 +90,17 @@ interface EmailSettings {
   customSignature: string
 }
 
+interface ChatMessage {
+  id: string
+  type: 'ai' | 'user'
+  content: string
+  timestamp: Date
+  action?: {
+    type: 'preview' | 'send' | 'remind'
+    invoiceId?: string
+  }
+}
+
 export default function Dashboard() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -131,6 +142,9 @@ export default function Dashboard() {
   const [previewEmail, setPreviewEmail] = useState("")
   const [isSendingEmail, setIsSendingEmail] = useState(false)
   const [showEmailSettings, setShowEmailSettings] = useState(false)
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
+  const [inputMessage, setInputMessage] = useState("")
+  const [isTyping, setIsTyping] = useState(false)
 
   // Calculate totals
   const totalInvoices = invoices.length
@@ -697,6 +711,95 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
     }
   }
 
+  const handleSendMessage = async (message: string) => {
+    if (!message.trim()) return
+
+    // Add user message
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: message,
+      timestamp: new Date()
+    }
+    setChatMessages(prev => [...prev, userMessage])
+    setInputMessage("")
+    setIsTyping(true)
+
+    // Process the message and generate AI response
+    try {
+      let response: ChatMessage
+      const lowerMessage = message.toLowerCase()
+
+      if (lowerMessage.includes('send') && lowerMessage.includes('invoice')) {
+        // Extract invoice ID if mentioned
+        const invoiceId = message.match(/invoice\s+#?(\w+)/i)?.[1]
+        const invoice = invoices.find(inv => inv.id === invoiceId)
+
+        if (invoice) {
+          const emailContent = generateEmailContent(invoice)
+          response = {
+            id: Date.now().toString(),
+            type: 'ai',
+            content: `I've prepared an email for Invoice #${invoice.id}. Would you like to preview it before sending?`,
+            timestamp: new Date(),
+            action: {
+              type: 'preview',
+              invoiceId: invoice.id
+            }
+          }
+        } else {
+          response = {
+            id: Date.now().toString(),
+            type: 'ai',
+            content: "I couldn't find that invoice. Could you please provide the correct invoice number?",
+            timestamp: new Date()
+          }
+        }
+      } else if (lowerMessage.includes('remind') || lowerMessage.includes('follow up')) {
+        const pendingInvoices = invoices.filter(inv => inv.status === "Pending")
+        response = {
+          id: Date.now().toString(),
+          type: 'ai',
+          content: `I found ${pendingInvoices.length} pending invoices. Would you like me to send reminders for any of them?`,
+          timestamp: new Date(),
+          action: {
+            type: 'remind'
+          }
+        }
+      } else if (lowerMessage.includes('settings') || lowerMessage.includes('configure')) {
+        setShowEmailSettings(true)
+        response = {
+          id: Date.now().toString(),
+          type: 'ai',
+          content: "I've opened the settings panel. You can configure your email preferences there.",
+          timestamp: new Date()
+        }
+      } else {
+        response = {
+          id: Date.now().toString(),
+          type: 'ai',
+          content: "I can help you with:\n• Sending invoice emails\n• Setting up reminders\n• Following up on overdue invoices\n• Configuring email settings\n\nWhat would you like to do?",
+          timestamp: new Date()
+        }
+      }
+
+      // Simulate typing delay
+      setTimeout(() => {
+        setChatMessages(prev => [...prev, response])
+        setIsTyping(false)
+      }, 1000)
+    } catch (error) {
+      const errorResponse: ChatMessage = {
+        id: Date.now().toString(),
+        type: 'ai',
+        content: "I apologize, but I encountered an error. Please try again.",
+        timestamp: new Date()
+      }
+      setChatMessages(prev => [...prev, errorResponse])
+      setIsTyping(false)
+    }
+  }
+
   return (
     <div className="min-h-screen w-full ">
       {/* Premium Welcome Header */}
@@ -824,12 +927,14 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
           </Card>
         </div>
 
-        {/* AI Email Composer Section */}
+        {/* AI Email Assistant Chat */}
         <Card className="mb-8">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
-                <Mail className="h-5 w-5" />
+                <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
+                  <Mail className="h-4 w-4 text-purple-600" />
+                </div>
                 AI Email Assistant
               </CardTitle>
               <Button
@@ -897,47 +1002,115 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                 </Button>
               </div>
             ) : (
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 p-3 bg-slate-50 rounded-lg">
-                  <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
-                    <Mail className="h-4 w-4 text-purple-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">AI Email Assistant</p>
-                    <p className="text-xs text-slate-500">
-                      {emailSettings.autoSend 
-                        ? "Auto-send enabled. I'll handle your invoice emails automatically."
-                        : "Ready to help you compose and send invoice emails."}
-                    </p>
-                  </div>
+              <div className="flex flex-col h-[400px]">
+                <div className="flex-1 overflow-y-auto space-y-4 p-4">
+                  {chatMessages.length === 0 ? (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-center space-y-2">
+                        <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto">
+                          <Mail className="h-6 w-6 text-purple-600" />
+                        </div>
+                        <p className="text-sm font-medium">AI Email Assistant</p>
+                        <p className="text-xs text-slate-500">How can I help you with your invoices today?</p>
+                      </div>
+                    </div>
+                  ) : (
+                    chatMessages.map((message) => (
+                      <div
+                        key={message.id}
+                        className={`flex items-start gap-3 ${
+                          message.type === 'user' ? 'justify-end' : ''
+                        }`}
+                      >
+                        {message.type === 'ai' && (
+                          <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
+                            <Mail className="h-4 w-4 text-purple-600" />
+                          </div>
+                        )}
+                        <div
+                          className={`max-w-[80%] rounded-lg p-3 ${
+                            message.type === 'user'
+                              ? 'bg-purple-600 text-white'
+                              : 'bg-slate-100'
+                          }`}
+                        >
+                          <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                          {message.action && (
+                            <div className="mt-2 flex gap-2">
+                              {message.action.type === 'preview' && message.action.invoiceId && (
+                                <Button
+                                  size="sm"
+                                  variant={message.type === 'user' ? 'secondary' : 'default'}
+                                  onClick={() => {
+                                    const invoice = invoices.find(inv => inv.id === message.action?.invoiceId)
+                                    if (invoice) {
+                                      handlePreviewEmail(invoice)
+                                    }
+                                  }}
+                                >
+                                  Preview Email
+                                </Button>
+                              )}
+                              {message.action.type === 'remind' && (
+                                <Button
+                                  size="sm"
+                                  variant={message.type === 'user' ? 'secondary' : 'default'}
+                                  onClick={() => {
+                                    // Handle sending reminders
+                                  }}
+                                >
+                                  Send Reminders
+                                </Button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        {message.type === 'user' && (
+                          <div className="h-8 w-8 rounded-full bg-purple-600 flex items-center justify-center">
+                            <span className="text-white text-sm">
+                              {user?.email?.[0]?.toUpperCase() || 'U'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                  {isTyping && (
+                    <div className="flex items-start gap-3">
+                      <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
+                        <Mail className="h-4 w-4 text-purple-600" />
+                      </div>
+                      <div className="bg-slate-100 rounded-lg p-3">
+                        <div className="flex gap-1">
+                          <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce" />
+                          <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce delay-100" />
+                          <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce delay-200" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Card className="p-4 hover:bg-slate-50 cursor-pointer transition-colors">
-                    <div className="flex items-start gap-3">
-                      <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center">
-                        <Clock className="h-4 w-4 text-emerald-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-medium">Pending Reminders</h4>
-                        <p className="text-sm text-slate-500">
-                          {invoices.filter(inv => inv.status === "Pending").length} invoices need attention
-                        </p>
-                      </div>
-                    </div>
-                  </Card>
-                  <Card className="p-4 hover:bg-slate-50 cursor-pointer transition-colors">
-                    <div className="flex items-start gap-3">
-                      <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center">
-                        <RefreshCw className="h-4 w-4 text-amber-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-medium">Follow-ups</h4>
-                        <p className="text-sm text-slate-500">
-                          {invoices.filter(inv => inv.status === "Pending" && new Date(inv.dueDate) < new Date()).length} overdue invoices
-                        </p>
-                      </div>
-                    </div>
-                  </Card>
+                <div className="border-t p-4">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Type your message..."
+                      value={inputMessage}
+                      onChange={(e) => setInputMessage(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault()
+                          handleSendMessage(inputMessage)
+                        }
+                      }}
+                    />
+                    <Button
+                      onClick={() => handleSendMessage(inputMessage)}
+                      disabled={!inputMessage.trim() || isTyping}
+                    >
+                      <Mail className="h-4 w-4 mr-2" />
+                      Send
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}

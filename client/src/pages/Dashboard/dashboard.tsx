@@ -1429,6 +1429,50 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                             Edit
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
+                          {invoice.status === "Pending" ? (
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                // Update invoice status to Paid
+                                const updatedInvoices = invoices.map((inv) =>
+                                  inv.id === invoice.id
+                                    ? { ...inv, status: "Paid" as const }
+                                    : inv
+                                )
+                                setInvoices(updatedInvoices)
+                                toast({
+                                  title: "Status Updated",
+                                  description: "Invoice marked as paid.",
+                                })
+                              }}
+                              className="text-emerald-600"
+                            >
+                              <CheckCircle className="mr-2 h-4 w-4" />
+                              Mark as Paid
+                            </DropdownMenuItem>
+                          ) : (
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                // Update invoice status to Pending
+                                const updatedInvoices = invoices.map((inv) =>
+                                  inv.id === invoice.id
+                                    ? { ...inv, status: "Pending" as const }
+                                    : inv
+                                )
+                                setInvoices(updatedInvoices)
+                                toast({
+                                  title: "Status Updated",
+                                  description: "Invoice marked as pending.",
+                                })
+                              }}
+                              className="text-amber-600"
+                            >
+                              <Clock className="mr-2 h-4 w-4" />
+                              Mark as Pending
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuSeparator />
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation()

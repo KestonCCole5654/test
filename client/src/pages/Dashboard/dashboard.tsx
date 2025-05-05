@@ -1633,6 +1633,68 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                         <CheckCircle className="mr-2 h-4 w-4" />
                         Mark as Paid
                       </Button>
+                      <Button
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          try {
+                            const {
+                              data: { session },
+                              error: sessionError,
+                            } = await supabase.auth.getSession();
+
+                            if (sessionError) {
+                              throw new Error(sessionError.message);
+                            }
+
+                            const response = await fetch(
+                              "https://sheetbills-server.vercel.app/api/sheets/mark-as-pending",
+                              {
+                                method: "PUT",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                  Authorization: `Bearer ${session?.provider_token}`,
+                                  "X-Supabase-Token": session?.access_token || "",
+                                },
+                                body: JSON.stringify({
+                                  invoiceId: invoice.id,
+                                  sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
+                                }),
+                              }
+                            );
+
+                            if (!response.ok) {
+                              const errorData = await response.json();
+                              throw new Error(errorData.error || "Failed to mark invoice as pending");
+                            }
+
+                            // Update local state
+                            const updatedInvoices = invoices.map((inv) =>
+                              inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv
+                            );
+                            setInvoices(updatedInvoices);
+                            if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl);
+
+                            toast({
+                              title: "Status Updated",
+                              description: "Invoice marked as pending successfully.",
+                            });
+                          } catch (error) {
+                            toast({
+                              title: "Error",
+                              description: error instanceof Error ? error.message : "Failed to update invoice status",
+                              variant: "destructive",
+                            });
+                          }
+                        }}
+                        className={`${
+                          invoice.status === "Pending" ? "bg-amber-100 text-amber-700" : "bg-amber-50 text-amber-700 hover:bg-amber-100"
+                        }`}
+                        size="sm"
+                        disabled={invoice.status === "Pending"}
+                      >
+                        <Clock className="mr-2 h-4 w-4" />
+                        Mark as Pending
+                      </Button>
                     </div>
                   </TableCell>
                   <TableCell>

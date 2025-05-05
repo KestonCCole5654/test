@@ -2,7 +2,20 @@
 
 import type React from "react"
 import { useEffect, useState } from "react"
-import { Trash2, Edit, MoreVertical, Plus, RefreshCw, ArrowUpDown, CheckCircle, Clock, Mail, Settings, DollarSign } from "lucide-react"
+import {
+  Trash2,
+  Edit,
+  MoreVertical,
+  Plus,
+  RefreshCw,
+  ArrowUpDown,
+  CheckCircle,
+  Clock,
+  Mail,
+  DollarSign,
+  File,
+  Search,
+} from "lucide-react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
@@ -19,7 +32,7 @@ import { Skeleton } from "../../components/ui/skeleton"
 import { toast } from "../../components/ui/use-toast"
 import supabase from "../../components/Auth/supabaseClient"
 import type { User } from "@supabase/supabase-js"
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
+import { Card, CardContent } from "../../components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
 import { Avatar, AvatarFallback } from "../../components/ui/avatar"
 import {
@@ -32,7 +45,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../../components/ui/alert-dialog"
-import { Switch } from "../../components/ui/switch"
 import { Label } from "../../components/ui/label"
 import { Textarea } from "../../components/ui/textarea"
 import {
@@ -44,12 +56,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../../components/ui/dialog"
-import { ChevronRight } from "lucide-react"
 
 interface PartialPayment {
-  amount: number;
-  date: string;
-  notes?: string;
+  amount: number
+  date: string
+  notes?: string
 }
 
 interface Invoice {
@@ -103,8 +114,8 @@ export default function Dashboard() {
   const location = useLocation()
   const [user, setUser] = useState<User | null>(null)
   const [invoices, setInvoices] = useState<Invoice[]>(() => {
-    const cachedData = localStorage.getItem('cachedInvoices');
-    return cachedData ? JSON.parse(cachedData) : [];
+    const cachedData = localStorage.getItem("cachedInvoices")
+    return cachedData ? JSON.parse(cachedData) : []
   })
   const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([])
   const [isStateLoading, setIsLoading] = useState(true)
@@ -122,11 +133,11 @@ export default function Dashboard() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [invoiceToDelete, setInvoiceToDelete] = useState<Invoice | null>(null)
   const [lastFetchTime, setLastFetchTime] = useState<number>(() => {
-    const cachedTime = localStorage.getItem('lastFetchTime');
-    return cachedTime ? parseInt(cachedTime) : 0;
-  });
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+    const cachedTime = localStorage.getItem("lastFetchTime")
+    return cachedTime ? Number.parseInt(cachedTime) : 0
+  })
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage] = useState(10)
   const [emailSettings, setEmailSettings] = useState<EmailSettings>({
     reminderDays: 7,
     followUpDays: 3,
@@ -137,10 +148,10 @@ export default function Dashboard() {
   const [previewEmail, setPreviewEmail] = useState("")
   const [isSendingEmail, setIsSendingEmail] = useState(false)
   const [showEmailSettings, setShowEmailSettings] = useState(false)
-  const [isPartialPaymentDialogOpen, setIsPartialPaymentDialogOpen] = useState(false);
-  const [selectedInvoiceForPayment, setSelectedInvoiceForPayment] = useState<Invoice | null>(null);
-  const [partialPaymentAmount, setPartialPaymentAmount] = useState("");
-  const [partialPaymentNotes, setPartialPaymentNotes] = useState("");
+  const [isPartialPaymentDialogOpen, setIsPartialPaymentDialogOpen] = useState(false)
+  const [selectedInvoiceForPayment, setSelectedInvoiceForPayment] = useState<Invoice | null>(null)
+  const [partialPaymentAmount, setPartialPaymentAmount] = useState("")
+  const [partialPaymentNotes, setPartialPaymentNotes] = useState("")
 
   // Calculate totals
   const totalInvoices = invoices.length
@@ -156,17 +167,17 @@ export default function Dashboard() {
   // Add effect to check for navigation state
   useEffect(() => {
     // Check if we're returning from invoice edit
-    const state = location.state as { fromInvoiceEdit?: boolean } | null;
+    const state = location.state as { fromInvoiceEdit?: boolean } | null
     if (state?.fromInvoiceEdit) {
       toast({
         title: "Changes Detected",
         description: "Please click the refresh button to see your updated invoice data.",
         duration: 5000,
-      });
+      })
       // Clear the state to prevent showing the toast again
-      window.history.replaceState({}, document.title);
+      window.history.replaceState({}, document.title)
     }
-  }, [location]);
+  }, [location])
 
   useEffect(() => {
     let isMounted = true
@@ -295,62 +306,63 @@ export default function Dashboard() {
   // Filter and sort invoices
   useEffect(() => {
     const filtered = invoices.filter((invoice) => {
-      const searchLower = searchQuery.toLowerCase();
+      const searchLower = searchQuery.toLowerCase()
       const matchesSearch =
         invoice.id.toLowerCase().includes(searchLower) ||
         invoice.customer.name.toLowerCase().includes(searchLower) ||
-        invoice.customer.email.toLowerCase().includes(searchLower);
+        invoice.customer.email.toLowerCase().includes(searchLower)
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const dueDate = new Date(invoice.dueDate);
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const dueDate = new Date(invoice.dueDate)
 
-      let matchesStatus = true;
+      let matchesStatus = true
       switch (statusFilter.toLowerCase()) {
         case "paid":
-          matchesStatus = invoice.status === "Paid";
-          break;
+          matchesStatus = invoice.status === "Paid"
+          break
         case "pending":
-          matchesStatus = invoice.status === "Pending" && (!invoice.partialPayments || invoice.partialPayments.length === 0);
-          break;
+          matchesStatus =
+            invoice.status === "Pending" && (!invoice.partialPayments || invoice.partialPayments.length === 0)
+          break
         case "partial":
-          matchesStatus = invoice.status === "Pending" && (invoice.partialPayments?.length ?? 0) > 0;
-          break;
+          matchesStatus = invoice.status === "Pending" && (invoice.partialPayments?.length ?? 0) > 0
+          break
         case "overdue":
-          matchesStatus = invoice.status === "Pending" && dueDate < today;
-          break;
+          matchesStatus = invoice.status === "Pending" && dueDate < today
+          break
       }
 
-      return matchesSearch && matchesStatus;
-    });
+      return matchesSearch && matchesStatus
+    })
 
-    setFilteredInvoices(filtered);
-    setCurrentPage(1);
-  }, [invoices, searchQuery, statusFilter]);
+    setFilteredInvoices(filtered)
+    setCurrentPage(1)
+  }, [invoices, searchQuery, statusFilter])
 
   // Calculate pagination values
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredInvoices.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage
+  const currentItems = filteredInvoices.slice(indexOfFirstItem, indexOfLastItem)
+  const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage)
 
   // Handle page change
   const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-  };
+    setCurrentPage(pageNumber)
+  }
 
   const fetchInvoices = async (sheetUrl: string) => {
     try {
       setIsLoading(true)
 
       // Check if we need to refresh the data (5 minutes cache)
-      const currentTime = Date.now();
-      const timeSinceLastFetch = currentTime - lastFetchTime;
-      const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+      const currentTime = Date.now()
+      const timeSinceLastFetch = currentTime - lastFetchTime
+      const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes in milliseconds
 
       if (timeSinceLastFetch < CACHE_DURATION && invoices.length > 0) {
-        setIsLoading(false);
-        return; // Use cached data
+        setIsLoading(false)
+        return // Use cached data
       }
 
       // Validate URL format first
@@ -466,9 +478,9 @@ export default function Dashboard() {
       }
 
       // Cache the data
-      localStorage.setItem('cachedInvoices', JSON.stringify(transformedData));
-      localStorage.setItem('lastFetchTime', currentTime.toString());
-      setLastFetchTime(currentTime);
+      localStorage.setItem("cachedInvoices", JSON.stringify(transformedData))
+      localStorage.setItem("lastFetchTime", currentTime.toString())
+      setLastFetchTime(currentTime)
 
       setInvoices(transformedData.filter((invoice): invoice is Invoice => invoice !== null))
       setError(null)
@@ -571,9 +583,9 @@ export default function Dashboard() {
   function handleRefresh(event?: React.MouseEvent<HTMLButtonElement>): void {
     if (selectedSpreadsheetUrl && user) {
       // Clear cache before fetching
-      localStorage.removeItem('cachedInvoices');
-      localStorage.removeItem('lastFetchTime');
-      setLastFetchTime(0);
+      localStorage.removeItem("cachedInvoices")
+      localStorage.removeItem("lastFetchTime")
+      setLastFetchTime(0)
       fetchInvoices(selectedSpreadsheetUrl)
       toast({
         title: "Data Refreshed",
@@ -589,9 +601,9 @@ export default function Dashboard() {
   }
 
   const generateEmailContent = (invoice: Invoice) => {
-    const items = invoice.items.map(item => 
-      `- ${item.description}: ${item.quantity} x $${item.price.toFixed(2)}`
-    ).join('\n')
+    const items = invoice.items
+      .map((item) => `- ${item.description}: ${item.quantity} x $${item.price.toFixed(2)}`)
+      .join("\n")
 
     const emailContent = `Dear ${invoice.customer.name},
 
@@ -625,8 +637,10 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
 
     try {
       setIsSendingEmail(true)
-      const { data: { session } } = await supabase.auth.getSession()
-      
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
       if (!session?.provider_token) {
         throw new Error("Authentication required")
       }
@@ -650,11 +664,13 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
       }
 
       // Update local state
-      setInvoices(invoices.map(inv => 
-        inv.id === selectedInvoice.id 
-          ? { ...inv, emailStatus: "Sent", lastEmailSent: new Date().toISOString() }
-          : inv
-      ))
+      setInvoices(
+        invoices.map((inv) =>
+          inv.id === selectedInvoice.id
+            ? { ...inv, emailStatus: "Sent", lastEmailSent: new Date().toISOString() }
+            : inv,
+        ),
+      )
 
       toast({
         title: "Email Sent",
@@ -676,8 +692,10 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
 
   const handleSaveEmailSettings = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-      
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
       if (!session?.provider_token) {
         throw new Error("Authentication required")
       }
@@ -711,78 +729,75 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
 
   // Add this helper function near the other utility functions
   const getOverdueStatus = (dueDate: string, status: string) => {
-    if (status === "Paid") return null;
-    const today = new Date();
-    const due = new Date(dueDate);
-    const diffDays = Math.floor((today.getTime() - due.getTime()) / (1000 * 60 * 60 * 24));
-    
+    if (status === "Paid") return null
+    const today = new Date()
+    const due = new Date(dueDate)
+    const diffDays = Math.floor((today.getTime() - due.getTime()) / (1000 * 60 * 60 * 24))
+
     if (diffDays > 0) {
       return {
         days: diffDays,
-        type: "overdue"
-      };
+        type: "overdue",
+      }
     } else if (diffDays >= -7) {
       return {
         days: Math.abs(diffDays),
-        type: "upcoming"
-      };
+        type: "upcoming",
+      }
     }
-    return null;
-  };
+    return null
+  }
 
   const handlePartialPayment = (invoice: Invoice) => {
-    setSelectedInvoiceForPayment(invoice);
-    setPartialPaymentAmount("");
-    setPartialPaymentNotes("");
-    setIsPartialPaymentDialogOpen(true);
-  };
+    setSelectedInvoiceForPayment(invoice)
+    setPartialPaymentAmount("")
+    setPartialPaymentNotes("")
+    setIsPartialPaymentDialogOpen(true)
+  }
 
   const submitPartialPayment = async () => {
-    if (!selectedInvoiceForPayment || !partialPaymentAmount) return;
+    if (!selectedInvoiceForPayment || !partialPaymentAmount) return
 
     try {
-      const paymentAmount = parseFloat(partialPaymentAmount);
+      const paymentAmount = Number.parseFloat(partialPaymentAmount)
       if (isNaN(paymentAmount) || paymentAmount <= 0) {
-        throw new Error("Please enter a valid payment amount");
+        throw new Error("Please enter a valid payment amount")
       }
 
-      const currentRemainingAmount = selectedInvoiceForPayment.remainingAmount || selectedInvoiceForPayment.amount;
-      const remainingAmount = currentRemainingAmount - paymentAmount;
+      const currentRemainingAmount = selectedInvoiceForPayment.remainingAmount || selectedInvoiceForPayment.amount
+      const remainingAmount = currentRemainingAmount - paymentAmount
       if (remainingAmount < 0) {
-        throw new Error("Payment amount cannot exceed remaining amount");
+        throw new Error("Payment amount cannot exceed remaining amount")
       }
 
       const {
         data: { session },
         error: sessionError,
-      } = await supabase.auth.getSession();
+      } = await supabase.auth.getSession()
 
       if (sessionError) {
-        throw new Error(sessionError.message);
+        throw new Error(sessionError.message)
       }
 
-      const response = await fetch(
-        "https://sheetbills-server.vercel.app/api/sheets/partial-payment",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session?.provider_token}`,
-            "X-Supabase-Token": session?.access_token || "",
-          },
-          body: JSON.stringify({
-            invoiceId: selectedInvoiceForPayment.id,
-            paymentAmount,
-            paymentNotes: partialPaymentNotes,
-            remainingAmount,
-            sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
-          }),
-        }
-      );
+      const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/partial-payment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.provider_token}`,
+          "X-Supabase-Token": session?.access_token || "",
+        },
+        body: JSON.stringify({
+          invoiceId: selectedInvoiceForPayment.id,
+          paymentAmount,
+          paymentNotes: partialPaymentNotes,
+          remainingAmount,
+          sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
+        }),
+      })
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to record partial payment");
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to record partial payment")
       }
 
       // Update local state
@@ -799,38 +814,38 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                 },
               ],
               remainingAmount,
-              status: remainingAmount === 0 ? "Paid" as const : "Pending" as const,
+              status: remainingAmount === 0 ? ("Paid" as const) : ("Pending" as const),
             }
-          : inv
-      );
-      setInvoices(updatedInvoices);
+          : inv,
+      )
+      setInvoices(updatedInvoices)
 
       toast({
         title: "Payment Recorded",
         description: `Partial payment of ${formatCurrency(paymentAmount)} has been recorded.`,
-      });
+      })
 
-      setIsPartialPaymentDialogOpen(false);
-      setSelectedInvoiceForPayment(null);
-      setPartialPaymentAmount("");
-      setPartialPaymentNotes("");
+      setIsPartialPaymentDialogOpen(false)
+      setSelectedInvoiceForPayment(null)
+      setPartialPaymentAmount("")
+      setPartialPaymentNotes("")
     } catch (error) {
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to record payment",
         variant: "destructive",
-      });
+      })
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen w-full ">
-      {/* Premium Welcome Header */}
-      <div className="max-w-7xl mx-auto bg-gradient-to-r from-emerald-600 to-emerald-700 py-10 shadow-lg rounded-b-3xl">
-        <div className="container max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between">
-          <div className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-4 sm:gap-6">
-            <div className="relative">
-              <Avatar className="h-14 w-14 sm:h-16 sm:w-16 ring-4 ring-white shadow-lg">
+    <div className="min-h-screen w-full bg-slate-50">
+      {/* Professional Welcome Header */}
+      <div className="w-full bg-white border-b">
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 py-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <Avatar className="h-12 w-12 border border-slate-200">
                 {user?.user_metadata?.avatar_url ? (
                   <img
                     src={user.user_metadata.avatar_url || "/placeholder.svg"}
@@ -841,24 +856,11 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                   <AvatarFallback>{user?.email?.[0]?.toUpperCase() || "U"}</AvatarFallback>
                 )}
               </Avatar>
-              <span className="absolute bottom-0 right-0 bg-gradient-to-tr from-yellow-400 to-yellow-600 text-white text-xs px-2 py-0.5 rounded-full shadow-md font-semibold border-2 border-white">
-                PRO
-              </span>
+              <div>
+                <h1 className="text-2xl font-semibold text-slate-900">Dashboard</h1>
+                <p className="text-slate-500">Manage your invoices and payments</p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white drop-shadow-lg flex flex-wrap justify-center sm:justify-start items-center gap-2">
-                Welcome back,
-                <span className="bg-white/20 px-3 py-1 rounded-xl text-yellow-200 font-bold shadow">
-                  {user?.email?.split("@")[0]}
-                </span>
-                <span className="ml-2 animate-bounce text-yellow-300 text-2xl">👋</span>
-              </h2>
-              <p className="text-slate-100 mt-2 text-base sm:text-lg font-medium">
-                Manage and track your invoices with ease.
-              </p>
-            </div>
-          </div>
-          <div className="mt-6 md:mt-0 flex gap-4">
             <Button
               onClick={() => {
                 const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
@@ -867,11 +869,11 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                   state: { selectedSpreadsheetUrl: invoicesSheetUrl },
                 })
               }}
-              className="bg-white text-slate-900 hover:bg-green-600 font-bold shadow-lg w-full sm:w-auto"
+              className="bg-slate-900 hover:bg-slate-800 text-white"
               disabled={isStateLoading}
             >
               <Plus className="mr-2 h-4 w-4" />
-              Create Invoice
+              New Invoice
             </Button>
           </div>
         </div>
@@ -879,105 +881,139 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
 
       <div className="container max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {/* Stats Cards Section */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
           {/* Total Invoices Card */}
-          <Card>
-            <CardHeader className="pb-1 sm:pb-2 px-3 sm:px-6">
-              <CardTitle className="text-xs sm:text-sm font-medium text-slate-500">Total Invoices</CardTitle>
-            </CardHeader>
-            <CardContent className="px-3 sm:px-6 py-1 sm:py-2">
-              {isStateLoading ? (
-                <Skeleton className="h-8 w-24" />
-              ) : (
-                <div className="flex items-center">
-                  <div className="text-xl sm:text-3xl font-bold text-slate-900">{totalInvoices}</div>
+          <Card className="border-0 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-slate-500">Total Invoices</p>
+                  <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center">
+                    <File className="h-4 w-4 text-slate-600" />
+                  </div>
                 </div>
-              )}
+                {isStateLoading ? (
+                  <Skeleton className="h-8 w-24" />
+                ) : (
+                  <p className="text-2xl font-semibold text-slate-900">{totalInvoices}</p>
+                )}
+              </div>
             </CardContent>
           </Card>
 
           {/* Pending Amount Card */}
-          <Card>
-            <CardHeader className="pb-1 sm:pb-2 px-3 sm:px-6">
-              <CardTitle className="text-xs sm:text-sm font-medium text-slate-500">Pending Amount</CardTitle>
-            </CardHeader>
-            <CardContent className="px-3 sm:px-6 py-1 sm:py-2">
-              {isStateLoading ? (
-                <Skeleton className="h-8 w-24" />
-              ) : (
-                <div className="flex items-center">
-                  <div className="text-xl sm:text-3xl font-bold text-slate-900">{formatCurrency(pendingAmount)}</div>
+          <Card className="border-0 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-slate-500">Pending Amount</p>
+                  <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center">
+                    <Clock className="h-4 w-4 text-amber-600" />
+                  </div>
                 </div>
-              )}
-              <p className="text-xs text-slate-500 mt-1">{pendingInvoices} pending</p>
+                {isStateLoading ? (
+                  <Skeleton className="h-8 w-24" />
+                ) : (
+                  <div>
+                    <p className="text-2xl font-semibold text-slate-900">{formatCurrency(pendingAmount)}</p>
+                    <p className="text-sm text-slate-500 mt-1">{pendingInvoices} pending</p>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
 
           {/* Paid Amount Card */}
-          <Card>
-            <CardHeader className="pb-1 sm:pb-2 px-3 sm:px-6">
-              <CardTitle className="text-xs sm:text-sm font-medium text-slate-500">Paid Amount</CardTitle>
-            </CardHeader>
-            <CardContent className="px-3 sm:px-6 py-1 sm:py-2">
-              {isStateLoading ? (
-                <Skeleton className="h-8 w-24" />
-              ) : (
-                <div className="flex items-center">
-                  <div className="text-xl sm:text-3xl font-bold text-slate-900">{formatCurrency(paidAmount)}</div>
+          <Card className="border-0 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-slate-500">Paid Amount</p>
+                  <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  </div>
                 </div>
-              )}
-              <p className="text-xs text-slate-500 mt-1">{paidInvoices} paid</p>
+                {isStateLoading ? (
+                  <Skeleton className="h-8 w-24" />
+                ) : (
+                  <div>
+                    <p className="text-2xl font-semibold text-slate-900">{formatCurrency(paidAmount)}</p>
+                    <p className="text-sm text-slate-500 mt-1">{paidInvoices} paid</p>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
 
           {/* Total Revenue Card */}
-          <Card>
-            <CardHeader className="pb-1 sm:pb-2 px-3 sm:px-6">
-              <CardTitle className="text-xs sm:text-sm font-medium text-slate-500">Total Revenue</CardTitle>
-            </CardHeader>
-            <CardContent className="px-3 sm:px-6 py-1 sm:py-2">
-              {isStateLoading ? (
-                <Skeleton className="h-8 w-24" />
-              ) : (
-                <div className="flex items-center">
-                  <div className="text-xl sm:text-3xl font-bold text-slate-900">
-                    {formatCurrency(paidAmount + pendingAmount)}
+          <Card className="border-0 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-slate-500">Total Revenue</p>
+                  <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center">
+                    <DollarSign className="h-4 w-4 text-slate-600" />
                   </div>
                 </div>
-              )}
-              <p className="text-xs text-slate-500 mt-1">All time</p>
+                {isStateLoading ? (
+                  <Skeleton className="h-8 w-24" />
+                ) : (
+                  <div>
+                    <p className="text-2xl font-semibold text-slate-900">
+                      {formatCurrency(paidAmount + pendingAmount)}
+                    </p>
+                    <p className="text-sm text-slate-500 mt-1">All time</p>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Tabs and Content */}
-        <Tabs defaultValue="all" className="space-y-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
-            <TabsList className="mb-4 sm:mb-0">
-              <TabsTrigger value="all" onClick={() => setStatusFilter("all")}>
+        <Tabs defaultValue="all" className="space-y-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <TabsList className="bg-slate-100 p-1">
+              <TabsTrigger
+                value="all"
+                onClick={() => setStatusFilter("all")}
+                className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm"
+              >
                 All Invoices
               </TabsTrigger>
-              <TabsTrigger value="pending" onClick={() => setStatusFilter("pending")}>
+              <TabsTrigger
+                value="pending"
+                onClick={() => setStatusFilter("pending")}
+                className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm"
+              >
                 Pending
               </TabsTrigger>
-              <TabsTrigger value="paid" onClick={() => setStatusFilter("paid")}>
+              <TabsTrigger
+                value="paid"
+                onClick={() => setStatusFilter("paid")}
+                className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm"
+              >
                 Paid
               </TabsTrigger>
             </TabsList>
 
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              <Input
-                placeholder="Search invoices..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="max-w-md"
-                disabled={isStateLoading}
-              />
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Input
+                  placeholder="Search invoices..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 w-full sm:w-[250px]"
+                  disabled={isStateLoading}
+                />
+              </div>
 
               {selectedSpreadsheetUrl && (
                 <Button
                   onClick={handleRefresh}
-                  className="bg-green-600 text-white hover:bg-green-700"
+                  variant="outline"
+                  className="border-slate-200"
                   disabled={isStateLoading}
                 >
                   <RefreshCw className={`mr-2 h-4 w-4 ${isStateLoading ? "animate-spin" : ""}`} />
@@ -1091,10 +1127,11 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                   placeholder="Enter payment amount"
                 />
                 <p className="text-sm text-slate-500 mt-1">
-                  Remaining amount: {formatCurrency(
+                  Remaining amount:{" "}
+                  {formatCurrency(
                     selectedInvoiceForPayment
-                      ? selectedInvoiceForPayment.amount - (parseFloat(partialPaymentAmount) || 0)
-                      : 0
+                      ? selectedInvoiceForPayment.amount - (Number.parseFloat(partialPaymentAmount) || 0)
+                      : 0,
                   )}
                 </p>
               </div>
@@ -1140,12 +1177,13 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
         </Card>
       )
     }
-
-    // Empty State
     if (filteredInvoices.length === 0) {
       return (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
+        <Card className="border-0 shadow-sm">
+          <CardContent className="flex flex-col items-center justify-center py-16">
+            <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+              <File className="h-6 w-6 text-slate-400" />
+            </div>
             <h3 className="text-lg font-medium text-slate-900 mb-2">No invoices found</h3>
             <p className="text-slate-500 text-center max-w-md mb-6">
               {searchQuery || statusFilter !== "all" ? (
@@ -1163,7 +1201,7 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                     state: { selectedSpreadsheetUrl: invoicesSheetUrl },
                   })
                 }}
-                className="bg-green-600 text-white hover:bg-green-700"
+                className="bg-slate-900 hover:bg-slate-800 text-white"
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Create Invoice
@@ -1176,31 +1214,32 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
 
     // Invoice Table
     return (
-      <Card>
+      <Card className="border-0 shadow-sm overflow-hidden">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow className="bg-slate-50 hover:bg-slate-50">
-                <TableHead onClick={() => handleSort("id")} className="cursor-pointer font-medium">
-                  Invoice ID <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
+              <TableRow className="bg-slate-50 hover:bg-slate-50 border-b border-slate-200">
+                <TableHead onClick={() => handleSort("id")} className="cursor-pointer font-medium text-slate-600">
+                  Invoice ID <ArrowUpDown className="inline h-3 w-3 ml-1 opacity-50" />
                 </TableHead>
-                <TableHead onClick={() => handleSort("customer")} className="cursor-pointer font-medium">
-                  Customer <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
+                <TableHead onClick={() => handleSort("customer")} className="cursor-pointer font-medium text-slate-600">
+                  Customer <ArrowUpDown className="inline h-3 w-3 ml-1 opacity-50" />
                 </TableHead>
-                <TableHead onClick={() => handleSort("date")} className="cursor-pointer font-medium">
-                  Date <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
+                <TableHead onClick={() => handleSort("date")} className="cursor-pointer font-medium text-slate-600">
+                  Date <ArrowUpDown className="inline h-3 w-3 ml-1 opacity-50" />
                 </TableHead>
-                <TableHead onClick={() => handleSort("status")} className="cursor-pointer font-medium">
-                  Status <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
+                <TableHead onClick={() => handleSort("status")} className="cursor-pointer font-medium text-slate-600">
+                  Status <ArrowUpDown className="inline h-3 w-3 ml-1 opacity-50" />
                 </TableHead>
-                <TableHead className="font-medium">
-                  Overdue Status
+                <TableHead className="font-medium text-slate-600">Overdue Status</TableHead>
+                <TableHead
+                  onClick={() => handleSort("amount")}
+                  className="cursor-pointer font-medium text-slate-600 text-right"
+                >
+                  Amount <ArrowUpDown className="inline h-3 w-3 ml-1 opacity-50" />
                 </TableHead>
-                <TableHead onClick={() => handleSort("amount")} className="cursor-pointer font-medium text-right">
-                  Amount <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
-                </TableHead>
-                <TableHead className="font-medium">Payment Action</TableHead>
-                <TableHead className="w-[80px] font-medium">Actions</TableHead>
+                <TableHead className="font-medium text-slate-600">Actions</TableHead>
+                <TableHead className="w-[80px]"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -1240,8 +1279,8 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                       variant={invoice.status === "Paid" ? "default" : "secondary"}
                       className={
                         invoice.status === "Paid"
-                          ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50"
-                          : "bg-amber-50 text-amber-700 hover:bg-amber-50"
+                          ? "bg-green-50 text-green-700 hover:bg-green-50 border-0"
+                          : "bg-amber-50 text-amber-700 hover:bg-amber-50 border-0"
                       }
                     >
                       {invoice.status}
@@ -1251,29 +1290,31 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                     {invoice.status === "Pending" && (
                       <div className="space-y-1">
                         {(() => {
-                          const status = getOverdueStatus(invoice.dueDate, invoice.status);
-                          if (!status) return (
-                            <div className="text-xs text-slate-500">
-                              Not due yet
-                            </div>
-                          );
-                          
+                          const status = getOverdueStatus(invoice.dueDate, invoice.status)
+                          if (!status) return <div className="text-xs text-slate-500">Not due yet</div>
+
                           if (status.type === "overdue") {
                             return (
                               <div className="flex items-center gap-1">
-                                <Badge variant="destructive" className="bg-red-100 text-red-700 hover:bg-red-100">
+                                <Badge
+                                  variant="destructive"
+                                  className="bg-red-50 text-red-700 hover:bg-red-50 border-0"
+                                >
                                   {status.days} days overdue
                                 </Badge>
                               </div>
-                            );
+                            )
                           } else {
                             return (
                               <div className="flex items-center gap-1">
-                                <Badge variant="secondary" className="bg-amber-100 text-amber-700 hover:bg-amber-100">
+                                <Badge
+                                  variant="secondary"
+                                  className="bg-slate-50 text-slate-700 hover:bg-slate-50 border-0"
+                                >
                                   Due in {status.days} days
                                 </Badge>
                               </div>
-                            );
+                            )
                           }
                         })()}
                       </div>
@@ -1282,9 +1323,7 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                   <TableCell className="text-right">
                     <div className="font-medium">{formatCurrency(invoice.amount)}</div>
                     {invoice.remainingAmount !== undefined && invoice.remainingAmount < invoice.amount && (
-                      <div className="text-xs text-slate-500">
-                        Remaining: {formatCurrency(invoice.remainingAmount)}
-                      </div>
+                      <div className="text-xs text-slate-500">Remaining: {formatCurrency(invoice.remainingAmount)}</div>
                     )}
                   </TableCell>
                   <TableCell>
@@ -1310,9 +1349,7 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                               </div>
                               <div>
                                 <p>Send Invoice Email</p>
-                                <p className="text-sm font-normal text-slate-500">
-                                  {invoice.customer.email}
-                                </p>
+                                <p className="text-sm font-normal text-slate-500">{invoice.customer.email}</p>
                               </div>
                             </DialogTitle>
                           </DialogHeader>
@@ -1381,9 +1418,7 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                         <DropdownMenuContent align="end">
                           {invoice.partialPayments && invoice.partialPayments.length > 0 && (
                             <>
-                              <div className="px-2 py-1.5 text-sm text-slate-500">
-                                Payment History
-                              </div>
+                              <div className="px-2 py-1.5 text-sm text-slate-500">Payment History</div>
                               {invoice.partialPayments.map((payment, index) => (
                                 <div key={index} className="px-2 py-1.5 text-sm">
                                   <div className="flex justify-between items-center">
@@ -1393,9 +1428,7 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                                     </span>
                                   </div>
                                   {payment.notes && (
-                                    <div className="text-xs text-slate-500 mt-0.5">
-                                      {payment.notes}
-                                    </div>
+                                    <div className="text-xs text-slate-500 mt-0.5">{payment.notes}</div>
                                   )}
                                 </div>
                               ))}
@@ -1435,9 +1468,7 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                                 e.stopPropagation()
                                 // Update invoice status to Paid
                                 const updatedInvoices = invoices.map((inv) =>
-                                  inv.id === invoice.id
-                                    ? { ...inv, status: "Paid" as const }
-                                    : inv
+                                  inv.id === invoice.id ? { ...inv, status: "Paid" as const } : inv,
                                 )
                                 setInvoices(updatedInvoices)
                                 toast({
@@ -1456,9 +1487,7 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                                 e.stopPropagation()
                                 // Update invoice status to Pending
                                 const updatedInvoices = invoices.map((inv) =>
-                                  inv.id === invoice.id
-                                    ? { ...inv, status: "Pending" as const }
-                                    : inv
+                                  inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv,
                                 )
                                 setInvoices(updatedInvoices)
                                 toast({
@@ -1494,13 +1523,14 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
           </Table>
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t">
+            <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 bg-slate-50">
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
+                  className="h-8 px-3 border-slate-200"
                 >
                   Previous
                 </Button>
@@ -1512,12 +1542,14 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                   size="sm"
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
+                  className="h-8 px-3 border-slate-200"
                 >
                   Next
                 </Button>
               </div>
               <div className="text-sm text-slate-500">
-                Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredInvoices.length)} of {filteredInvoices.length} invoices
+                Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredInvoices.length)} of{" "}
+                {filteredInvoices.length} invoices
               </div>
             </div>
           )}

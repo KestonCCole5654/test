@@ -108,6 +108,13 @@ const Header: React.FC = () => {
                 </Link>
                 
                 <Link
+                  to="/ai-agent"
+                  className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                >
+                  AI Agent
+                </Link>
+
+                <Link
                   to="/settings"
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >

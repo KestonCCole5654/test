@@ -312,36 +312,38 @@ export default function Dashboard() {
   // Filter and sort invoices
   useEffect(() => {
     const filtered = invoices.filter((invoice) => {
-      const searchLower = searchQuery.toLowerCase()
+      const searchLower = searchQuery.toLowerCase();
       const matchesSearch =
         invoice.id.toLowerCase().includes(searchLower) ||
         invoice.customer.name.toLowerCase().includes(searchLower) ||
-        invoice.customer.email.toLowerCase().includes(searchLower)
+        invoice.customer.email.toLowerCase().includes(searchLower);
 
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-      const dueDate = new Date(invoice.dueDate)
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const dueDate = new Date(invoice.dueDate);
 
-      let matchesStatus = true
+      let matchesStatus = true;
       switch (statusFilter.toLowerCase()) {
         case "paid":
-          matchesStatus = invoice.status === "Paid"
-          break
+          matchesStatus = invoice.status === "Paid";
+          break;
         case "pending":
-          matchesStatus = invoice.status === "Pending" && dueDate >= today
-          break
+          matchesStatus = invoice.status === "Pending" && (!invoice.partialPayments || invoice.partialPayments.length === 0);
+          break;
+        case "partial":
+          matchesStatus = invoice.status === "Pending" && (invoice.partialPayments?.length ?? 0) > 0;
+          break;
         case "overdue":
-          matchesStatus = invoice.status === "Pending" && dueDate < today
-          break
+          matchesStatus = invoice.status === "Pending" && dueDate < today;
+          break;
       }
 
-      return matchesSearch && matchesStatus
-    })
+      return matchesSearch && matchesStatus;
+    });
 
-    setFilteredInvoices(filtered)
-    // Reset to first page when filters change
-    setCurrentPage(1)
-  }, [invoices, searchQuery, statusFilter])
+    setFilteredInvoices(filtered);
+    setCurrentPage(1);
+  }, [invoices, searchQuery, statusFilter]);
 
   // Calculate pagination values
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -850,9 +852,10 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
         throw new Error("Please enter a valid payment amount");
       }
 
-      const remainingAmount = selectedInvoiceForPayment.amount - paymentAmount;
+      const currentRemainingAmount = selectedInvoiceForPayment.remainingAmount || selectedInvoiceForPayment.amount;
+      const remainingAmount = currentRemainingAmount - paymentAmount;
       if (remainingAmount < 0) {
-        throw new Error("Payment amount cannot exceed invoice amount");
+        throw new Error("Payment amount cannot exceed remaining amount");
       }
 
       const {

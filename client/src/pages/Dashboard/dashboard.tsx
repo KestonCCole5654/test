@@ -130,6 +130,7 @@ export default function Dashboard() {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
   const [previewEmail, setPreviewEmail] = useState("")
   const [isSendingEmail, setIsSendingEmail] = useState(false)
+  const [showEmailSettings, setShowEmailSettings] = useState(false)
 
   // Calculate totals
   const totalInvoices = invoices.length
@@ -825,64 +826,121 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
 
         {/* AI Email Composer Section */}
         <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Mail className="h-5 w-5" />
-              AI Email Composer
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="auto-send">Auto-send emails</Label>
-                <Switch
-                  id="auto-send"
-                  checked={emailSettings.autoSend}
-                  onCheckedChange={(checked) => 
-                    setEmailSettings({ ...emailSettings, autoSend: checked })
-                  }
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="reminder-days">Reminder days before due date</Label>
-                  <Input
-                    id="reminder-days"
-                    type="number"
-                    value={emailSettings.reminderDays}
-                    onChange={(e) => 
-                      setEmailSettings({ ...emailSettings, reminderDays: parseInt(e.target.value) })
-                    }
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="followup-days">Follow-up days after due date</Label>
-                  <Input
-                    id="followup-days"
-                    type="number"
-                    value={emailSettings.followUpDays}
-                    onChange={(e) => 
-                      setEmailSettings({ ...emailSettings, followUpDays: parseInt(e.target.value) })
-                    }
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="signature">Email Signature</Label>
-                <Textarea
-                  id="signature"
-                  value={emailSettings.customSignature}
-                  onChange={(e) => 
-                    setEmailSettings({ ...emailSettings, customSignature: e.target.value })
-                  }
-                  placeholder="Enter your email signature..."
-                  className="mt-1"
-                />
-              </div>
-              <Button onClick={handleSaveEmailSettings} className="w-full sm:w-auto">
-                Save Settings
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Mail className="h-5 w-5" />
+                AI Email Assistant
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowEmailSettings(!showEmailSettings)}
+                className="text-slate-500 hover:text-slate-700"
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Settings
               </Button>
             </div>
+          </CardHeader>
+          <CardContent>
+            {showEmailSettings ? (
+              <div className="grid gap-4 p-4 bg-slate-50 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="auto-send">Auto-send emails</Label>
+                  <Switch
+                    id="auto-send"
+                    checked={emailSettings.autoSend}
+                    onCheckedChange={(checked) => 
+                      setEmailSettings({ ...emailSettings, autoSend: checked })
+                    }
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="reminder-days">Reminder days before due date</Label>
+                    <Input
+                      id="reminder-days"
+                      type="number"
+                      value={emailSettings.reminderDays}
+                      onChange={(e) => 
+                        setEmailSettings({ ...emailSettings, reminderDays: parseInt(e.target.value) })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="followup-days">Follow-up days after due date</Label>
+                    <Input
+                      id="followup-days"
+                      type="number"
+                      value={emailSettings.followUpDays}
+                      onChange={(e) => 
+                        setEmailSettings({ ...emailSettings, followUpDays: parseInt(e.target.value) })
+                      }
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="signature">Email Signature</Label>
+                  <Textarea
+                    id="signature"
+                    value={emailSettings.customSignature}
+                    onChange={(e) => 
+                      setEmailSettings({ ...emailSettings, customSignature: e.target.value })
+                    }
+                    placeholder="Enter your email signature..."
+                    className="mt-1"
+                  />
+                </div>
+                <Button onClick={handleSaveEmailSettings} className="w-full sm:w-auto">
+                  Save Settings
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 p-3 bg-slate-50 rounded-lg">
+                  <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
+                    <Mail className="h-4 w-4 text-purple-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">AI Email Assistant</p>
+                    <p className="text-xs text-slate-500">
+                      {emailSettings.autoSend 
+                        ? "Auto-send enabled. I'll handle your invoice emails automatically."
+                        : "Ready to help you compose and send invoice emails."}
+                    </p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Card className="p-4 hover:bg-slate-50 cursor-pointer transition-colors">
+                    <div className="flex items-start gap-3">
+                      <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center">
+                        <Clock className="h-4 w-4 text-emerald-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium">Pending Reminders</h4>
+                        <p className="text-sm text-slate-500">
+                          {invoices.filter(inv => inv.status === "Pending").length} invoices need attention
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                  <Card className="p-4 hover:bg-slate-50 cursor-pointer transition-colors">
+                    <div className="flex items-start gap-3">
+                      <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center">
+                        <RefreshCw className="h-4 w-4 text-amber-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium">Follow-ups</h4>
+                        <p className="text-sm text-slate-500">
+                          {invoices.filter(inv => inv.status === "Pending" && new Date(inv.dueDate) < new Date()).length} overdue invoices
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -1276,27 +1334,70 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                         </DialogTrigger>
                         <DialogContent className="max-w-2xl">
                           <DialogHeader>
-                            <DialogTitle>Preview Email</DialogTitle>
-                            <DialogDescription>
-                              Review the email before sending to {invoice.customer.email}
-                            </DialogDescription>
+                            <DialogTitle className="flex items-center gap-2">
+                              <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
+                                <Mail className="h-4 w-4 text-purple-600" />
+                              </div>
+                              <div>
+                                <p>AI Email Assistant</p>
+                                <p className="text-sm font-normal text-slate-500">
+                                  Composing email for {invoice.customer.email}
+                                </p>
+                              </div>
+                            </DialogTitle>
                           </DialogHeader>
-                          <div className="py-4">
-                            <Textarea
-                              value={previewEmail}
-                              onChange={(e) => setPreviewEmail(e.target.value)}
-                              className="min-h-[300px] font-mono"
-                            />
+                          <div className="py-4 space-y-4">
+                            <div className="flex items-start gap-3">
+                              <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
+                                <Mail className="h-4 w-4 text-purple-600" />
+                              </div>
+                              <div className="flex-1 space-y-2">
+                                <div className="bg-slate-50 p-4 rounded-lg">
+                                  <Textarea
+                                    value={previewEmail}
+                                    onChange={(e) => setPreviewEmail(e.target.value)}
+                                    className="min-h-[200px] font-mono bg-transparent border-0 focus-visible:ring-0 p-0"
+                                  />
+                                </div>
+                                <div className="flex items-center gap-2 text-sm text-slate-500">
+                                  <Clock className="h-4 w-4" />
+                                  <span>Due: {invoice.dueDate}</span>
+                                  <span className="mx-2">•</span>
+                                  <span>Amount: {formatCurrency(invoice.amount)}</span>
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                          <DialogFooter>
+                          <DialogFooter className="gap-2">
+                            <Button
+                              variant="outline"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setSelectedInvoice(null)
+                                setPreviewEmail("")
+                              }}
+                            >
+                              Cancel
+                            </Button>
                             <Button
                               onClick={(e) => {
                                 e.stopPropagation()
                                 handleSendEmail()
                               }}
                               disabled={isSendingEmail}
+                              className="bg-purple-600 hover:bg-purple-700"
                             >
-                              {isSendingEmail ? "Sending..." : "Send Email"}
+                              {isSendingEmail ? (
+                                <>
+                                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                                  Sending...
+                                </>
+                              ) : (
+                                <>
+                                  <Mail className="mr-2 h-4 w-4" />
+                                  Send Email
+                                </>
+                              )}
                             </Button>
                           </DialogFooter>
                         </DialogContent>

@@ -232,56 +232,14 @@ export default function Dashboard() {
     let isMounted = true
 
     const fetchData = async () => {
-      try {
-        if (!user) return
-
-        setIsLoading(true)
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession()
-
-        if (!isMounted) return
-
-        if (error || !session) {
-          throw new Error(error?.message || "Session validation failed")
-        }
-
-        const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/spreadsheets", {
-          signal: abortController.signal,
-          headers: { Authorization: `Bearer ${session.provider_token}` },
-        })
-
-        if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
-        }
-
-        const data = await response.json()
-
-        if (!isMounted) return
-
-        const spreadsheets = data.spreadsheets || []
-        setSpreadsheets(spreadsheets)
-
-        const storedDefault = localStorage.getItem("defaultSheetUrl")
-        const validDefault = spreadsheets.some((s: Spreadsheet) => s.sheetUrl === storedDefault)
-
-        if (spreadsheets.length > 0) {
-          const newDefault = spreadsheets.find((s: Spreadsheet) => s.isDefault) || spreadsheets[0]
-          if (!validDefault) {
-            localStorage.setItem("defaultSheetUrl", newDefault.sheetUrl)
-            setSelectedSpreadsheetUrl(newDefault.sheetUrl)
+      if (selectedSpreadsheetUrl && user) {
+        try {
+          await fetchInvoices(selectedSpreadsheetUrl)
+        } catch (error) {
+          if (isMounted) {
+            console.error("Fetch error:", error)
           }
         }
-      } catch (err) {
-        if (!isMounted) return
-
-        if (err instanceof Error && err.message.includes("401")) {
-          navigate("/login", { state: { from: location.pathname }, replace: true })
-        }
-      } finally {
-        if (isMounted) setIsLoading(false)
       }
     }
 
@@ -289,9 +247,8 @@ export default function Dashboard() {
 
     return () => {
       isMounted = false
-      abortController.abort()
     }
-  }, [user, navigate, location.pathname])
+  }, [selectedSpreadsheetUrl, user])
 
   // Filter and sort invoices
   useEffect(() => {
@@ -344,6 +301,7 @@ export default function Dashboard() {
   const fetchInvoices = async (sheetUrl: string) => {
     try {
       setIsLoading(true)
+      setError(null) // Clear any previous errors
 
       // Check if we need to refresh the data (5 minutes cache)
       const currentTime = Date.now()
@@ -384,6 +342,8 @@ export default function Dashboard() {
         return
       }
 
+      console.log("Fetching invoices from:", sheetUrl) // Add debug log
+
       const response = await fetch(
         `https://sheetbills-server.vercel.app/api/sheets/data?sheetUrl=${encodeURIComponent(sheetUrl)}`,
         {
@@ -411,6 +371,7 @@ export default function Dashboard() {
       }
 
       const data = await response.json()
+      console.log("Received data:", data) // Add debug log
 
       // Validate response structure
       if (!Array.isArray(data)) {
@@ -477,6 +438,7 @@ export default function Dashboard() {
     } catch (err) {
       const error = err instanceof Error ? err : new Error("Unknown error occurred")
       setError(error.message)
+      console.error("Error fetching invoices:", error) // Add debug log
 
       toast({
         title: "Data Loading Failed",
@@ -830,6 +792,21 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
 
   return (
     <div className="min-h-screen w-full bg-white p-4 md:p-6">
+      {/* Add error display */}
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <h3 className="text-red-800 font-medium">Error Loading Data</h3>
+          <p className="text-red-600">{error}</p>
+        </div>
+      )}
+
+      {/* Add loading state visibility */}
+      {isStateLoading && (
+        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-blue-600">Loading invoices...</p>
+        </div>
+      )}
+
       {/* Simple header with create button */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
         <div className="flex items-center gap-3">

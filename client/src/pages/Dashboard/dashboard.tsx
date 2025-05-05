@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useEffect, useState } from "react"
-import { Trash2, Edit, MoreVertical, Plus, RefreshCw, ArrowUpDown, CheckCircle, Clock, Mail, Settings, DollarSign } from "lucide-react"
+import { Trash2, Edit, MoreVertical, Plus, RefreshCw, ArrowUpDown, CheckCircle, Clock, Mail, Settings } from "lucide-react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
@@ -46,12 +46,6 @@ import {
 } from "../../components/ui/dialog"
 import { ChevronRight } from "lucide-react"
 
-interface PartialPayment {
-  amount: number;
-  date: string;
-  notes?: string;
-}
-
 interface Invoice {
   id: string
   date: string
@@ -80,8 +74,6 @@ interface Invoice {
   status: "Paid" | "Pending"
   emailStatus?: string
   lastEmailSent?: string
-  partialPayments?: PartialPayment[]
-  remainingAmount?: number
 }
 
 interface Spreadsheet {
@@ -98,11 +90,23 @@ interface EmailSettings {
   customSignature: string
 }
 
+interface ChatMessage {
+  id: string
+  type: 'ai' | 'user'
+  content: string
+  timestamp: Date
+  action?: {
+    type: 'preview' | 'send' | 'remind'
+    invoiceId?: string
+  }
+}
+
 export default function Dashboard() {
   const navigate = useNavigate()
   const location = useLocation()
   const [user, setUser] = useState<User | null>(null)
   const [invoices, setInvoices] = useState<Invoice[]>(() => {
+    // Try to load cached data on initial render
     const cachedData = localStorage.getItem('cachedInvoices');
     return cachedData ? JSON.parse(cachedData) : [];
   })
@@ -125,6 +129,7 @@ export default function Dashboard() {
     const cachedTime = localStorage.getItem('lastFetchTime');
     return cachedTime ? parseInt(cachedTime) : 0;
   });
+  // Add pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [emailSettings, setEmailSettings] = useState<EmailSettings>({
@@ -137,10 +142,10 @@ export default function Dashboard() {
   const [previewEmail, setPreviewEmail] = useState("")
   const [isSendingEmail, setIsSendingEmail] = useState(false)
   const [showEmailSettings, setShowEmailSettings] = useState(false)
-  const [isPartialPaymentDialogOpen, setIsPartialPaymentDialogOpen] = useState(false);
-  const [selectedInvoiceForPayment, setSelectedInvoiceForPayment] = useState<Invoice | null>(null);
-  const [partialPaymentAmount, setPartialPaymentAmount] = useState("");
-  const [partialPaymentNotes, setPartialPaymentNotes] = useState("");
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
+  const [inputMessage, setInputMessage] = useState("")
+  const [isTyping, setIsTyping] = useState(false)
+  const [isChatOpen, setIsChatOpen] = useState(false)
 
   // Calculate totals
   const totalInvoices = invoices.length
@@ -295,38 +300,36 @@ export default function Dashboard() {
   // Filter and sort invoices
   useEffect(() => {
     const filtered = invoices.filter((invoice) => {
-      const searchLower = searchQuery.toLowerCase();
+      const searchLower = searchQuery.toLowerCase()
       const matchesSearch =
         invoice.id.toLowerCase().includes(searchLower) ||
         invoice.customer.name.toLowerCase().includes(searchLower) ||
-        invoice.customer.email.toLowerCase().includes(searchLower);
+        invoice.customer.email.toLowerCase().includes(searchLower)
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const dueDate = new Date(invoice.dueDate);
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const dueDate = new Date(invoice.dueDate)
 
-      let matchesStatus = true;
+      let matchesStatus = true
       switch (statusFilter.toLowerCase()) {
         case "paid":
-          matchesStatus = invoice.status === "Paid";
-          break;
+          matchesStatus = invoice.status === "Paid"
+          break
         case "pending":
-          matchesStatus = invoice.status === "Pending" && (!invoice.partialPayments || invoice.partialPayments.length === 0);
-          break;
-        case "partial":
-          matchesStatus = invoice.status === "Pending" && (invoice.partialPayments?.length ?? 0) > 0;
-          break;
+          matchesStatus = invoice.status === "Pending" && dueDate >= today
+          break
         case "overdue":
-          matchesStatus = invoice.status === "Pending" && dueDate < today;
-          break;
+          matchesStatus = invoice.status === "Pending" && dueDate < today
+          break
       }
 
-      return matchesSearch && matchesStatus;
-    });
+      return matchesSearch && matchesStatus
+    })
 
-    setFilteredInvoices(filtered);
-    setCurrentPage(1);
-  }, [invoices, searchQuery, statusFilter]);
+    setFilteredInvoices(filtered)
+    // Reset to first page when filters change
+    setCurrentPage(1)
+  }, [invoices, searchQuery, statusFilter])
 
   // Calculate pagination values
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -709,6 +712,95 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
     }
   }
 
+  const handleSendMessage = async (message: string) => {
+    if (!message.trim()) return
+
+    // Add user message
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: message,
+      timestamp: new Date()
+    }
+    setChatMessages(prev => [...prev, userMessage])
+    setInputMessage("")
+    setIsTyping(true)
+
+    // Process the message and generate AI response
+    try {
+      let response: ChatMessage
+      const lowerMessage = message.toLowerCase()
+
+      if (lowerMessage.includes('send') && lowerMessage.includes('invoice')) {
+        // Extract invoice ID if mentioned
+        const invoiceId = message.match(/invoice\s+#?(\w+)/i)?.[1]
+        const invoice = invoices.find(inv => inv.id === invoiceId)
+
+        if (invoice) {
+          const emailContent = generateEmailContent(invoice)
+          response = {
+            id: Date.now().toString(),
+            type: 'ai',
+            content: `I've prepared an email for Invoice #${invoice.id}. Would you like to preview it before sending?`,
+            timestamp: new Date(),
+            action: {
+              type: 'preview',
+              invoiceId: invoice.id
+            }
+          }
+        } else {
+          response = {
+            id: Date.now().toString(),
+            type: 'ai',
+            content: "I couldn't find that invoice. Could you please provide the correct invoice number?",
+            timestamp: new Date()
+          }
+        }
+      } else if (lowerMessage.includes('remind') || lowerMessage.includes('follow up')) {
+        const pendingInvoices = invoices.filter(inv => inv.status === "Pending")
+        response = {
+          id: Date.now().toString(),
+          type: 'ai',
+          content: `I found ${pendingInvoices.length} pending invoices. Would you like me to send reminders for any of them?`,
+          timestamp: new Date(),
+          action: {
+            type: 'remind'
+          }
+        }
+      } else if (lowerMessage.includes('settings') || lowerMessage.includes('configure')) {
+        setShowEmailSettings(true)
+        response = {
+          id: Date.now().toString(),
+          type: 'ai',
+          content: "I've opened the settings panel. You can configure your email preferences there.",
+          timestamp: new Date()
+        }
+      } else {
+        response = {
+          id: Date.now().toString(),
+          type: 'ai',
+          content: "I can help you with:\n• Sending invoice emails\n• Setting up reminders\n• Following up on overdue invoices\n• Configuring email settings\n\nWhat would you like to do?",
+          timestamp: new Date()
+        }
+      }
+
+      // Simulate typing delay
+      setTimeout(() => {
+        setChatMessages(prev => [...prev, response])
+        setIsTyping(false)
+      }, 1000)
+    } catch (error) {
+      const errorResponse: ChatMessage = {
+        id: Date.now().toString(),
+        type: 'ai',
+        content: "I apologize, but I encountered an error. Please try again.",
+        timestamp: new Date()
+      }
+      setChatMessages(prev => [...prev, errorResponse])
+      setIsTyping(false)
+    }
+  }
+
   // Add this helper function near the other utility functions
   const getOverdueStatus = (dueDate: string, status: string) => {
     if (status === "Paid") return null;
@@ -728,99 +820,6 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
       };
     }
     return null;
-  };
-
-  const handlePartialPayment = (invoice: Invoice) => {
-    setSelectedInvoiceForPayment(invoice);
-    setPartialPaymentAmount("");
-    setPartialPaymentNotes("");
-    setIsPartialPaymentDialogOpen(true);
-  };
-
-  const submitPartialPayment = async () => {
-    if (!selectedInvoiceForPayment || !partialPaymentAmount) return;
-
-    try {
-      const paymentAmount = parseFloat(partialPaymentAmount);
-      if (isNaN(paymentAmount) || paymentAmount <= 0) {
-        throw new Error("Please enter a valid payment amount");
-      }
-
-      const currentRemainingAmount = selectedInvoiceForPayment.remainingAmount || selectedInvoiceForPayment.amount;
-      const remainingAmount = currentRemainingAmount - paymentAmount;
-      if (remainingAmount < 0) {
-        throw new Error("Payment amount cannot exceed remaining amount");
-      }
-
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
-
-      if (sessionError) {
-        throw new Error(sessionError.message);
-      }
-
-      const response = await fetch(
-        "https://sheetbills-server.vercel.app/api/sheets/partial-payment",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session?.provider_token}`,
-            "X-Supabase-Token": session?.access_token || "",
-          },
-          body: JSON.stringify({
-            invoiceId: selectedInvoiceForPayment.id,
-            paymentAmount,
-            paymentNotes: partialPaymentNotes,
-            remainingAmount,
-            sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to record partial payment");
-      }
-
-      // Update local state
-      const updatedInvoices = invoices.map((inv) =>
-        inv.id === selectedInvoiceForPayment.id
-          ? {
-              ...inv,
-              partialPayments: [
-                ...(inv.partialPayments || []),
-                {
-                  amount: paymentAmount,
-                  date: new Date().toISOString(),
-                  notes: partialPaymentNotes,
-                },
-              ],
-              remainingAmount,
-              status: remainingAmount === 0 ? "Paid" as const : "Pending" as const,
-            }
-          : inv
-      );
-      setInvoices(updatedInvoices);
-
-      toast({
-        title: "Payment Recorded",
-        description: `Partial payment of ${formatCurrency(paymentAmount)} has been recorded.`,
-      });
-
-      setIsPartialPaymentDialogOpen(false);
-      setSelectedInvoiceForPayment(null);
-      setPartialPaymentAmount("");
-      setPartialPaymentNotes("");
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to record payment",
-        variant: "destructive",
-      });
-    }
   };
 
   return (
@@ -950,6 +949,141 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
           </Card>
         </div>
 
+        {/* Floating Chat Widget */}
+        <div className="fixed bottom-6 right-6 z-50">
+          {isChatOpen ? (
+            <Card className="w-[400px] shadow-xl">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
+                      <Mail className="h-4 w-4 text-purple-600" />
+                    </div>
+                    AI Email Assistant
+                  </CardTitle>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsChatOpen(false)}
+                    className="text-slate-500 hover:text-slate-700"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col h-[400px]">
+                  <div className="flex-1 overflow-y-auto space-y-4 p-4">
+                    {chatMessages.length === 0 ? (
+                      <div className="flex items-center justify-center h-full">
+                        <div className="text-center space-y-2">
+                          <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto">
+                            <Mail className="h-6 w-6 text-purple-600" />
+                          </div>
+                          <p className="text-sm font-medium">AI Email Assistant</p>
+                          <p className="text-xs text-slate-500">How can I help you with your invoices today?</p>
+                        </div>
+                      </div>
+                    ) : (
+                      chatMessages.map((message) => (
+                        <div
+                          key={message.id}
+                          className={`flex items-start gap-3 ${
+                            message.type === 'user' ? 'justify-end' : ''
+                          }`}
+                        >
+                          {message.type === 'ai' && (
+                            <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
+                              <Mail className="h-4 w-4 text-purple-600" />
+                            </div>
+                          )}
+                          <div
+                            className={`max-w-[80%] rounded-lg p-3 ${
+                              message.type === 'user'
+                                ? 'bg-purple-600 text-white'
+                                : 'bg-slate-100'
+                            }`}
+                          >
+                            <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                            {message.action && (
+                              <div className="mt-2 flex gap-2">
+                                {message.action.type === 'preview' && message.action.invoiceId && (
+                                  <Button
+                                    size="sm"
+                                    variant={message.type === 'user' ? 'secondary' : 'default'}
+                                    onClick={() => {
+                                      const invoice = invoices.find(inv => inv.id === message.action?.invoiceId)
+                                      if (invoice) {
+                                        handlePreviewEmail(invoice)
+                                      }
+                                    }}
+                                  >
+                                    Preview Email
+                                  </Button>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          {message.type === 'user' && (
+                            <div className="h-8 w-8 rounded-full bg-purple-600 flex items-center justify-center">
+                              <span className="text-white text-sm">
+                                {user?.email?.[0]?.toUpperCase() || 'U'}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      ))
+                    )}
+                    {isTyping && (
+                      <div className="flex items-start gap-3">
+                        <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
+                          <Mail className="h-4 w-4 text-purple-600" />
+                        </div>
+                        <div className="bg-slate-100 rounded-lg p-3">
+                          <div className="flex gap-1">
+                            <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce" />
+                            <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce delay-100" />
+                            <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce delay-200" />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="border-t p-4">
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Type your message..."
+                        value={inputMessage}
+                        onChange={(e) => setInputMessage(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault()
+                            handleSendMessage(inputMessage)
+                          }
+                        }}
+                      />
+                      <Button
+                        onClick={() => handleSendMessage(inputMessage)}
+                        disabled={!inputMessage.trim() || isTyping}
+                      >
+                        <Mail className="h-4 w-4 mr-2" />
+                        Send
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Button
+              onClick={() => setIsChatOpen(true)}
+              className="h-14 w-14 rounded-full bg-purple-600 hover:bg-purple-700 shadow-lg"
+            >
+              <Mail className="h-6 w-6 text-white" />
+            </Button>
+          )}
+        </div>
+
         {/* Tabs and Content */}
         <Tabs defaultValue="all" className="space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
@@ -1066,61 +1200,6 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <Dialog open={isPartialPaymentDialogOpen} onOpenChange={setIsPartialPaymentDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Record Partial Payment</DialogTitle>
-            <DialogDescription>
-              Enter the payment amount and any additional notes for invoice #{selectedInvoiceForPayment?.id}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="amount" className="text-right">
-                Amount
-              </Label>
-              <div className="col-span-3">
-                <Input
-                  id="amount"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  max={selectedInvoiceForPayment?.amount}
-                  value={partialPaymentAmount}
-                  onChange={(e) => setPartialPaymentAmount(e.target.value)}
-                  placeholder="Enter payment amount"
-                />
-                <p className="text-sm text-slate-500 mt-1">
-                  Remaining amount: {formatCurrency(
-                    selectedInvoiceForPayment
-                      ? selectedInvoiceForPayment.amount - (parseFloat(partialPaymentAmount) || 0)
-                      : 0
-                  )}
-                </p>
-              </div>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="notes" className="text-right">
-                Notes
-              </Label>
-              <div className="col-span-3">
-                <Textarea
-                  id="notes"
-                  value={partialPaymentNotes}
-                  onChange={(e) => setPartialPaymentNotes(e.target.value)}
-                  placeholder="Add any payment notes (optional)"
-                />
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsPartialPaymentDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={submitPartialPayment}>Record Payment</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 
@@ -1193,9 +1272,6 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                 <TableHead onClick={() => handleSort("status")} className="cursor-pointer font-medium">
                   Status <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                 </TableHead>
-                <TableHead className="font-medium">
-                  Overdue Status
-                </TableHead>
                 <TableHead onClick={() => handleSort("amount")} className="cursor-pointer font-medium text-right">
                   Amount <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                 </TableHead>
@@ -1236,6 +1312,7 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                     <div className="text-sm text-slate-500">Due: {invoice.dueDate}</div>
                   </TableCell>
                   <TableCell>
+                    <div className="space-y-1">
                     <Badge
                       variant={invoice.status === "Paid" ? "default" : "secondary"}
                       className={
@@ -1246,96 +1323,182 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                     >
                       {invoice.status}
                     </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {invoice.status === "Pending" && (
-                      <div className="space-y-1">
-                        {(() => {
-                          const status = getOverdueStatus(invoice.dueDate, invoice.status);
-                          if (!status) return (
-                            <div className="text-xs text-slate-500">
-                              Not due yet
-                            </div>
-                          );
-                          
-                          if (status.type === "overdue") {
-                            return (
-                              <div className="flex items-center gap-1">
-                                <Badge variant="destructive" className="bg-red-100 text-red-700 hover:bg-red-100">
-                                  {status.days} days overdue
-                                </Badge>
-                              </div>
-                            );
-                          } else {
-                            return (
-                              <div className="flex items-center gap-1">
-                                <Badge variant="secondary" className="bg-amber-100 text-amber-700 hover:bg-amber-100">
-                                  Due in {status.days} days
-                                </Badge>
-                              </div>
-                            );
-                          }
-                        })()}
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="font-medium">{formatCurrency(invoice.amount)}</div>
-                    {invoice.remainingAmount !== undefined && invoice.remainingAmount < invoice.amount && (
-                      <div className="text-xs text-slate-500">
-                        Remaining: {formatCurrency(invoice.remainingAmount)}
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                      {invoice.status === "Pending" ? (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            // Update invoice status to Paid
-                            const updatedInvoices = invoices.map((inv) =>
-                              inv.id === invoice.id
-                                ? { ...inv, status: "Paid" as const }
-                                : inv
-                            )
-                            setInvoices(updatedInvoices)
-                            toast({
-                              title: "Status Updated",
-                              description: "Invoice marked as paid.",
-                            })
-                          }}
-                          className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200"
-                        >
-                          <CheckCircle className="mr-2 h-4 w-4" />
-                          Mark as Paid
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            // Update invoice status to Pending
-                            const updatedInvoices = invoices.map((inv) =>
-                              inv.id === invoice.id
-                                ? { ...inv, status: "Pending" as const }
-                                : inv
-                            )
-                            setInvoices(updatedInvoices)
-                            toast({
-                              title: "Status Updated",
-                              description: "Invoice marked as pending.",
-                            })
-                          }}
-                          className="bg-amber-50 text-amber-700 hover:bg-amber-100 border-amber-200"
-                        >
-                          <Clock className="mr-2 h-4 w-4" />
-                          Mark as Pending
-                        </Button>
+                      {invoice.status === "Pending" && (
+                        <div className="text-xs text-slate-500">
+                          {(() => {
+                            const status = getOverdueStatus(invoice.dueDate, invoice.status);
+                            if (!status) return null;
+                            
+                            if (status.type === "overdue") {
+                              return (
+                                <div className="flex items-center gap-1 text-red-600">
+                                  <Clock className="h-3 w-3" />
+                                  <span>{status.days} days overdue</span>
+                                </div>
+                              );
+                            } else {
+                              return (
+                                <div className="flex items-center gap-1 text-amber-600">
+                                  <Clock className="h-3 w-3" />
+                                  <span>Due in {status.days} days</span>
+                                </div>
+                              );
+                            }
+                          })()}
+                        </div>
                       )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      <div className="font-medium">{formatCurrency(invoice.amount)}</div>
+                      {invoice.emailStatus && (
+                        <div className="text-xs text-slate-500">
+                          {invoice.emailStatus === "Sent" && (
+                            <div className="flex items-center gap-1 text-emerald-600">
+                              <Mail className="h-3 w-3" />
+                              <span>Invoice sent</span>
+                            </div>
+                          )}
+                          {invoice.emailStatus === "Reminder" && (
+                            <div className="flex items-center gap-1 text-amber-600">
+                              <Mail className="h-3 w-3" />
+                              <span>Reminder sent</span>
+                            </div>
+                          )}
+                          {invoice.lastEmailSent && (
+                            <div className="text-xs text-slate-400">
+                              {new Date(invoice.lastEmailSent).toLocaleDateString()}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={async (e) => {
+                          e.stopPropagation()
+                          try {
+                            const {
+                              data: { session },
+                              error: sessionError,
+                            } = await supabase.auth.getSession()
+
+                            if (sessionError) {
+                              throw new Error(sessionError.message)
+                            }
+
+                            const response = await fetch(
+                              "https://sheetbills-server.vercel.app/api/sheets/mark-as-paid",
+                              {
+                                method: "PUT",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                  Authorization: `Bearer ${session?.provider_token}`,
+                                  "X-Supabase-Token": session?.access_token || "",
+                                },
+                                body: JSON.stringify({
+                                  invoiceId: invoice.id,
+                                  sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
+                                    ?.sheetUrl,
+                                }),
+                              },
+                            )
+
+                            if (!response.ok) {
+                              const errorData = await response.json()
+                              throw new Error(errorData.error || "Failed to mark invoice as paid")
+                            }
+
+                            // Update local state
+                            const updatedInvoices = invoices.map((inv) =>
+                              inv.id === invoice.id ? { ...inv, status: "Paid" as const } : inv,
+                            )
+                            setInvoices(updatedInvoices)
+                            if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
+
+                            toast({
+                              title: "Status Updated",
+                              description: "Invoice marked as paid successfully.",
+                            })
+                          } catch (error) {
+                            toast({
+                              title: "Error",
+                              description: error instanceof Error ? error.message : "Failed to update invoice status",
+                              variant: "destructive",
+                            })
+                          }
+                        }}
+                        className={`${invoice.status === "Paid" ? "bg-emerald-100 text-emerald-700" : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"}`}
+                        size="sm"
+                        disabled={invoice.status === "Paid"}
+                      >
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        Mark as Paid
+                      </Button>
+                      <Button
+                        onClick={async (e) => {
+                          e.stopPropagation()
+                          try {
+                            const {
+                              data: { session },
+                              error: sessionError,
+                            } = await supabase.auth.getSession()
+
+                            if (sessionError) {
+                              throw new Error(sessionError.message)
+                            }
+
+                            const response = await fetch(
+                              "https://sheetbills-server.vercel.app/api/sheets/mark-as-pending",
+                              {
+                                method: "PUT",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                  Authorization: `Bearer ${session?.provider_token}`,
+                                  "X-Supabase-Token": session?.access_token || "",
+                                },
+                                body: JSON.stringify({ 
+                                  invoiceId: invoice.id,
+                                  sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
+                                    ?.sheetUrl,
+                                }),
+                              },
+                            )
+
+                            if (!response.ok) {
+                              const errorData = await response.json()
+                              throw new Error(errorData.error || "Failed to mark invoice as pending")
+                            }
+
+                            // Update local state
+                            const updatedInvoices = invoices.map((inv) =>
+                              inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv,
+                            )
+                            setInvoices(updatedInvoices)
+                            if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
+
+                            toast({
+                              title: "Status Updated",
+                              description: "Invoice marked as pending successfully.",
+                            })
+                          } catch (error) {
+                            toast({
+                              title: "Error",
+                              description: error instanceof Error ? error.message : "Failed to update invoice status",
+                              variant: "destructive",
+                            })
+                          }
+                        }}
+                        className={`${invoice.status === "Pending" ? "bg-amber-100 text-amber-700" : "bg-amber-50 text-amber-700 hover:bg-amber-100"}`}
+                        size="sm"
+                        disabled={invoice.status === "Pending"}
+                      >
+                        <Clock className="mr-2 h-4 w-4" />
+                        Mark as Pending
+                      </Button>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -1423,76 +1586,44 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                           </DialogFooter>
                         </DialogContent>
                       </Dialog>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="sm" onClick={(e) => e.stopPropagation()}>
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          {invoice.partialPayments && invoice.partialPayments.length > 0 && (
-                            <>
-                              <div className="px-2 py-1.5 text-sm text-slate-500">
-                                Payment History
-                              </div>
-                              {invoice.partialPayments.map((payment, index) => (
-                                <div key={index} className="px-2 py-1.5 text-sm">
-                                  <div className="flex justify-between items-center">
-                                    <span>{formatCurrency(payment.amount)}</span>
-                                    <span className="text-slate-500">
-                                      {new Date(payment.date).toLocaleDateString()}
-                                    </span>
-                                  </div>
-                                  {payment.notes && (
-                                    <div className="text-xs text-slate-500 mt-0.5">
-                                      {payment.notes}
-                                    </div>
-                                  )}
-                                </div>
-                              ))}
-                              <DropdownMenuSeparator />
-                            </>
-                          )}
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handlePartialPayment(invoice)
-                            }}
-                          >
-                            <DollarSign className="mr-2 h-4 w-4" />
-                            Record Payment
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
-                              const invoicesSheetUrl = invoicesSheet?.sheetUrl
-                              navigate("/create-invoice", {
-                                state: {
-                                  invoiceToEdit: invoice,
-                                  selectedSpreadsheetUrl: invoicesSheetUrl,
-                                },
-                              })
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
+                            const invoicesSheetUrl = invoicesSheet?.sheetUrl
+                            navigate("/create-invoice", {
+                              state: {
+                                invoiceToEdit: invoice,
+                                selectedSpreadsheetUrl: invoicesSheetUrl,
+                              },
+                            })
                               localStorage.setItem("invoiceToEdit", JSON.stringify(invoice))
-                            }}
-                          >
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setInvoiceToDelete(invoice)
-                              setIsDeleteDialogOpen(true)
-                            }}
-                            className="text-red-600"
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                          }}
+                        >
+                          <Edit className="mr-2 h-4 w-4" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setInvoiceToDelete(invoice)
+                            setIsDeleteDialogOpen(true)
+                          }}
+                          className="text-red-600"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                     </div>
                   </TableCell>
                 </TableRow>

@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard/dashboard';
 import Header from './components/Header/header';
 import AuthenticatedRoute from './components/Auth/authenticatedRoute';
 import InvoiceForm from './pages/CreateInvoices/create-invoice';
+import AIAgent from './pages/AIAgent/ai-agent';
 import type { 
   Subscription,
   AuthChangeEvent,
@@ -174,7 +175,7 @@ function App() {
             <Route path="/" element={<Navigate to="/invoices" replace />} />
             <Route path="/invoices" element={<Dashboard />} />
             <Route path="/create-invoice" element={<InvoiceForm />} />
-         
+            <Route path="/ai-agent" element={<AIAgent />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/contact" element={<ContactPage />} />
           </Route>

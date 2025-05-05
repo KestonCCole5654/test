@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Trash2, Edit, MoreVertical, Plus, RefreshCw, ArrowUpDown, CheckCircle, Clock, DollarSign } from "lucide-react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
@@ -45,6 +45,7 @@ import { Calendar } from "../../components/ui/calendar"
 import { format } from "date-fns"
 import { Checkbox } from "../../components/ui/checkbox"
 import { Check } from "lucide-react"
+import clsx from "clsx"
 
 interface Invoice {
   id: string
@@ -120,6 +121,7 @@ export default function Dashboard() {
   const [paymentDate, setPaymentDate] = useState<Date>(new Date())
   const [selectedInvoices, setSelectedInvoices] = useState<Set<string>>(new Set())
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false)
+  const headerCheckboxRef = useRef<HTMLInputElement>(null)
 
   // Calculate totals
   const totalInvoices = invoices.length
@@ -639,12 +641,29 @@ export default function Dashboard() {
     })
   }
 
-  // Add function to handle select all
-  const handleSelectAll = () => {
-    if (selectedInvoices.size === currentItems.length) {
+  // Add function to handle select all visible
+  const handleSelectAllVisible = () => {
+    const allVisibleIds = currentItems.map((invoice) => invoice.id)
+    const allSelected = allVisibleIds.every((id) => selectedInvoices.has(id))
+    setSelectedInvoices((prev) => {
+      const newSet = new Set(prev)
+      if (allSelected) {
+        // Deselect all visible
+        allVisibleIds.forEach((id) => newSet.delete(id))
+      } else {
+        // Select all visible
+        allVisibleIds.forEach((id) => newSet.add(id))
+      }
+      return newSet
+    })
+  }
+
+  // Add function to handle select all across all pages
+  const handleSelectAllGlobal = () => {
+    if (selectedInvoices.size === filteredInvoices.length) {
       setSelectedInvoices(new Set())
     } else {
-      setSelectedInvoices(new Set(currentItems.map((invoice) => invoice.id)))
+      setSelectedInvoices(new Set(filteredInvoices.map((invoice) => invoice.id)))
     }
   }
 
@@ -698,6 +717,17 @@ export default function Dashboard() {
       })
     }
   }
+
+  // For indeterminate state
+  const allVisibleIds = currentItems.map((invoice) => invoice.id)
+  const allVisibleSelected = allVisibleIds.every((id) => selectedInvoices.has(id))
+  const someVisibleSelected = allVisibleIds.some((id) => selectedInvoices.has(id)) && !allVisibleSelected
+
+  useEffect(() => {
+    if (headerCheckboxRef.current) {
+      headerCheckboxRef.current.indeterminate = someVisibleSelected
+    }
+  }, [someVisibleSelected])
 
   return (
     <div className="min-h-screen w-full ">
@@ -1061,41 +1091,65 @@ export default function Dashboard() {
       )
     }
 
-    // Invoice Table
+    // For indeterminate state
+    const allVisibleIds = currentItems.map((invoice) => invoice.id)
+    const allVisibleSelected = allVisibleIds.every((id) => selectedInvoices.has(id))
+    const someVisibleSelected = allVisibleIds.some((id) => selectedInvoices.has(id)) && !allVisibleSelected
+
+    useEffect(() => {
+      if (headerCheckboxRef.current) {
+        headerCheckboxRef.current.indeterminate = someVisibleSelected
+      }
+    }, [someVisibleSelected])
+
     return (
       <Card>
         <CardContent className="p-0">
-          <div className="flex items-center justify-between p-4 border-b">
-            <div className="flex items-center gap-2">
-              <Checkbox
-                checked={selectedInvoices.size === currentItems.length && currentItems.length > 0}
-                onCheckedChange={handleSelectAll}
-                aria-label="Select all invoices"
-              />
+          <div className="flex items-center justify-between p-4 border-b gap-2 flex-wrap">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSelectAllVisible}
+                className="font-medium"
+                disabled={currentItems.length === 0}
+              >
+                {allVisibleSelected ? "Deselect All (Page)" : "Select All (Page)"}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSelectAllGlobal}
+                className="font-medium"
+                disabled={filteredInvoices.length === 0}
+              >
+                {selectedInvoices.size === filteredInvoices.length ? "Deselect All (All)" : "Select All (All)"}
+              </Button>
               <span className="text-sm text-slate-500">
                 {selectedInvoices.size} selected
               </span>
             </div>
-            {selectedInvoices.size > 0 && (
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => setIsBulkDeleteDialogOpen(true)}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete Selected
-              </Button>
-            )}
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => setIsBulkDeleteDialogOpen(true)}
+              disabled={selectedInvoices.size === 0}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete Selected
+            </Button>
           </div>
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50 hover:bg-slate-50">
                 <TableHead className="w-[56px] px-4 py-2 align-middle text-center">
-                  <Checkbox
-                    checked={selectedInvoices.size === currentItems.length && currentItems.length > 0}
-                    onCheckedChange={handleSelectAll}
-                    aria-label="Select all invoices"
-                    className="mx-auto"
+                  <input
+                    type="checkbox"
+                    ref={headerCheckboxRef}
+                    checked={allVisibleSelected && currentItems.length > 0}
+                    onChange={handleSelectAllVisible}
+                    aria-label="Select all invoices on this page"
+                    className="mx-auto accent-blue-600 h-4 w-4 rounded border-gray-300"
                   />
                 </TableHead>
                 <TableHead onClick={() => handleSort("id")} className="cursor-pointer font-medium">
@@ -1122,7 +1176,10 @@ export default function Dashboard() {
               {currentItems.map((invoice) => (
                 <TableRow
                   key={invoice.id}
-                  className="cursor-pointer hover:bg-slate-50"
+                  className={clsx(
+                    "cursor-pointer hover:bg-slate-50",
+                    selectedInvoices.has(invoice.id) && "bg-blue-50/30"
+                  )}
                   onClick={() => {
                     const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
                     const invoicesSheetUrl = invoicesSheet?.sheetUrl

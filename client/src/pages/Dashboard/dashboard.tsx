@@ -884,8 +884,8 @@ export default function Dashboard() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right font-medium">{formatCurrency(invoice.amount)}</TableCell>
-                  <TableCell onClick={(e) => e.stopPropagation()}>
-                    <div className="flex gap-2">
+                  <TableCell onClick={(e) => e.stopPropagation()} className="pr-0">
+                    <div className="flex gap-1">
                       <Button
                         onClick={async (e) => {
                           e.stopPropagation()

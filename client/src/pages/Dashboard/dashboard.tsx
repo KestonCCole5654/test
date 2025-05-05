@@ -835,7 +835,8 @@ export default function Dashboard() {
                 <TableHead onClick={() => handleSort("amount")} className="cursor-pointer font-medium text-right">
                   Amount <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                 </TableHead>
-                <TableHead className="font-medium text-center">Payment Action</TableHead>
+                <TableHead className="font-medium text-center">Overdue</TableHead>
+                <TableHead className="font-medium text-center">Payment Actions</TableHead>
                 <TableHead className="w-[80px] font-medium">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -884,6 +885,15 @@ export default function Dashboard() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right font-medium">{formatCurrency(invoice.amount)}</TableCell>
+                  <TableCell className="text-center">
+                    {invoice.status === "Pending" && new Date(invoice.dueDate) < new Date() ? (
+                      <span className="text-red-600 font-medium">
+                        {Math.ceil((new Date().getTime() - new Date(invoice.dueDate).getTime()) / (1000 * 60 * 60 * 24))} days
+                      </span>
+                    ) : (
+                      <span className="text-slate-400">-</span>
+                    )}
+                  </TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()}>
                     <div className="flex justify-end gap-1">
                       <Button
@@ -1001,7 +1011,7 @@ export default function Dashboard() {
                             })
                           }
                         }}
-                        className={`${invoice.status === "Pending" ? "bg-amber-100 text-amber-700" : "bg-amber-50 text-amber-700 hover:bg-amber-100"}`}
+                        className={`${invoice.status === "Pending" ? "bg-amber-100 p-0 text-amber-700" : "bg-amber-50 text-amber-700 p-0 hover:bg-amber-100"}`}
                         size="sm"
                         disabled={invoice.status === "Pending"}
                       >

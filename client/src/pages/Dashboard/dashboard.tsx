@@ -111,6 +111,21 @@ export default function Dashboard() {
   const pendingInvoices = invoices.filter((invoice) => invoice.status === "Pending").length
   const paidInvoices = invoices.filter((invoice) => invoice.status === "Paid").length
 
+  // Add effect to check for navigation state
+  useEffect(() => {
+    // Check if we're returning from invoice edit
+    const state = location.state as { fromInvoiceEdit?: boolean } | null;
+    if (state?.fromInvoiceEdit) {
+      toast({
+        title: "Changes Detected",
+        description: "Please click the refresh button to see your updated invoice data.",
+        duration: 5000,
+      });
+      // Clear the state to prevent showing the toast again
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
+
   useEffect(() => {
     let isMounted = true
     const abortController = new AbortController()

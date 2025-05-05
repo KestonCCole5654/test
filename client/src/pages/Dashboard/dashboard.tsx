@@ -835,7 +835,7 @@ export default function Dashboard() {
                 <TableHead onClick={() => handleSort("amount")} className="cursor-pointer font-medium text-right">
                   Amount <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                 </TableHead>
-                <TableHead className="font-medium">Payment Action</TableHead>
+                <TableHead className="font-medium flex justify-end">Payment Action</TableHead>
                 <TableHead className="w-[80px] font-medium">Actions</TableHead>
               </TableRow>
             </TableHeader>

@@ -32,12 +32,25 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../../components/ui/alert-dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../../components/ui/dialog"
+import { Label } from "../../components/ui/label"
+import { Calendar } from "../../components/ui/calendar"
+import { format } from "date-fns"
 
 interface Invoice {
   id: string
   date: string
   dueDate: string
   amount: number
+  paidAmount?: number
+  lastPaymentDate?: string
   customer: {
     name: string
     email: string
@@ -58,7 +71,7 @@ interface Invoice {
   }
   notes: string
   template: "modern" | "classic" | "minimal"
-  status: "Paid" | "Pending"
+  status: "Paid" | "Pending" | "Partially Paid"
 }
 
 interface Spreadsheet {
@@ -99,6 +112,10 @@ export default function Dashboard() {
   // Add pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [isPartialPaymentModalOpen, setIsPartialPaymentModalOpen] = useState(false)
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
+  const [partialPaymentAmount, setPartialPaymentAmount] = useState("")
+  const [paymentDate, setPaymentDate] = useState<Date>(new Date())
 
   // Calculate totals
   const totalInvoices = invoices.length
@@ -468,8 +485,8 @@ export default function Dashboard() {
     const direction = sortConfig.key === key && sortConfig.direction === "ascending" ? "descending" : "ascending"
 
     const sortedInvoices = [...filteredInvoices].sort((a, b) => {
-      let valueA = a[key]
-      let valueB = b[key]
+      let valueA: any = a[key]
+      let valueB: any = b[key]
 
       if (key === "date" || key === "dueDate") {
         valueA = typeof valueA === "string" || typeof valueA === "number" ? new Date(valueA).getTime() : 0
@@ -477,7 +494,17 @@ export default function Dashboard() {
       } else if (key === "amount") {
         valueA = a.amount
         valueB = b.amount
+      } else if (key === "customer") {
+        valueA = typeof a.customer === "object" ? a.customer.name : a.customer
+        valueB = typeof b.customer === "object" ? b.customer.name : b.customer
+      } else if (key === "status") {
+        valueA = a.status
+        valueB = b.status
       }
+
+      // Ensure values are defined before comparison
+      if (valueA === undefined) valueA = ""
+      if (valueB === undefined) valueB = ""
 
       if (valueA < valueB) return direction === "ascending" ? -1 : 1
       if (valueA > valueB) return direction === "ascending" ? 1 : -1
@@ -512,6 +539,84 @@ export default function Dashboard() {
       toast({
         title: "Error",
         description: "Unable to refresh data. Please ensure a spreadsheet is selected.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handlePartialPayment = async () => {
+    if (!selectedInvoice) return
+
+    try {
+      const amount = parseFloat(partialPaymentAmount)
+      if (isNaN(amount) || amount <= 0 || amount >= selectedInvoice.amount) {
+        toast({
+          title: "Invalid Amount",
+          description: "Please enter a valid partial payment amount.",
+          variant: "destructive",
+        })
+        return
+      }
+
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession()
+
+      if (sessionError) {
+        throw new Error(sessionError.message)
+      }
+
+      const response = await fetch(
+        "https://sheetbills-server.vercel.app/api/sheets/partial-payment",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.provider_token}`,
+            "X-Supabase-Token": session?.access_token || "",
+          },
+          body: JSON.stringify({
+            invoiceId: selectedInvoice.id,
+            amount: amount,
+            paymentDate: paymentDate.toISOString(),
+            sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
+          }),
+        },
+      )
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to process partial payment")
+      }
+
+      // Update local state with proper typing
+      const updatedInvoices = invoices.map((inv) =>
+        inv.id === selectedInvoice.id
+          ? {
+              ...inv,
+              status: amount === inv.amount ? "Paid" : "Partially Paid",
+              paidAmount: amount,
+              lastPaymentDate: paymentDate.toISOString(),
+            } as Invoice
+          : inv,
+      )
+      setInvoices(updatedInvoices)
+      if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
+
+      toast({
+        title: "Payment Recorded",
+        description: "Partial payment has been recorded successfully.",
+      })
+
+      setIsPartialPaymentModalOpen(false)
+      setSelectedInvoice(null)
+      setPartialPaymentAmount("")
+      setPaymentDate(new Date())
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to process payment",
         variant: "destructive",
       })
     }
@@ -760,6 +865,51 @@ export default function Dashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Partial Payment Modal */}
+      <Dialog open={isPartialPaymentModalOpen} onOpenChange={setIsPartialPaymentModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Record Partial Payment</DialogTitle>
+            <DialogDescription>
+              Enter the payment amount and date for invoice #{selectedInvoice?.id}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="amount">Payment Amount</Label>
+              <Input
+                id="amount"
+                type="number"
+                value={partialPaymentAmount}
+                onChange={(e) => setPartialPaymentAmount(e.target.value)}
+                placeholder="Enter amount"
+                min="0"
+                max={selectedInvoice?.amount}
+                step="0.01"
+              />
+              <p className="text-sm text-slate-500">
+                Total invoice amount: {formatCurrency(selectedInvoice?.amount || 0)}
+              </p>
+            </div>
+            <div className="grid gap-2">
+              <Label>Payment Date</Label>
+              <Calendar
+                mode="single"
+                selected={paymentDate}
+                onSelect={(date) => date && setPaymentDate(date)}
+                className="rounded-md border"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsPartialPaymentModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handlePartialPayment}>Record Payment</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 
@@ -878,10 +1028,17 @@ export default function Dashboard() {
                       className={
                         invoice.status === "Paid"
                           ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50 text-md px-4"
+                          : invoice.status === "Partially Paid"
+                          ? "bg-blue-50 text-blue-700 hover:bg-blue-50 text-md px-4"
                           : "bg-amber-50 text-amber-700 hover:bg-amber-50 text-md px-4"
                       }
                     >
                       {invoice.status}
+                      {invoice.status === "Partially Paid" && invoice.paidAmount && (
+                        <span className="ml-2 text-sm">
+                          ({formatCurrency(invoice.paidAmount)})
+                        </span>
+                      )}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right font-medium">{formatCurrency(invoice.amount)}</TableCell>
@@ -1011,7 +1168,7 @@ export default function Dashboard() {
                             })
                           }
                         }}
-                        className={`${invoice.status === "Pending" ? "bg-amber-100 p-0 text-amber-700" : "bg-amber-50 text-amber-700 p-0 hover:bg-amber-100"}`}
+                        className={`${invoice.status === "Pending" ? "bg-amber-100  text-amber-700" : "bg-amber-50 text-amber-700 p-0 hover:bg-amber-100"}`}
                         size="sm"
                         disabled={invoice.status === "Pending"}
                       >
@@ -1021,17 +1178,13 @@ export default function Dashboard() {
                       <Button
                         onClick={async (e) => {
                           e.stopPropagation()
-                          // TODO: Implement partial payment functionality
-                          toast({
-                            title: "Partial Payment",
-                            description: "Partial payment functionality coming soon!",
-                          })
+                          setSelectedInvoice(invoice)
+                          setIsPartialPaymentModalOpen(true)
                         }}
                         className="bg-blue-50 text-blue-700 hover:bg-blue-100"
                         size="sm"
                         disabled={invoice.status === "Paid"}
                       >
-                     
                         Partial Payment
                       </Button>
                     </div>

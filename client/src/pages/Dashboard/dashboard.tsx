@@ -1272,6 +1272,9 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                 <TableHead onClick={() => handleSort("status")} className="cursor-pointer font-medium">
                   Status <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                 </TableHead>
+                <TableHead className="font-medium">
+                  Overdue Status
+                </TableHead>
                 <TableHead onClick={() => handleSort("amount")} className="cursor-pointer font-medium text-right">
                   Amount <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                 </TableHead>
@@ -1312,44 +1315,50 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                     <div className="text-sm text-slate-500">Due: {invoice.dueDate}</div>
                   </TableCell>
                   <TableCell>
-                    <div className="space-y-1">
-                      <Badge
-                        variant={invoice.status === "Paid" ? "default" : "secondary"}
-                        className={
-                          invoice.status === "Paid"
-                            ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50"
-                            : "bg-amber-50 text-amber-700 hover:bg-amber-50"
-                        }
-                      >
-                        {invoice.status}
-                      </Badge>
-                      {invoice.status === "Pending" && (
-                        <div className="text-xs text-slate-500">
-                          {(() => {
-                            const status = getOverdueStatus(invoice.dueDate, invoice.status);
-                            if (!status) return null;
-                            
-                            if (status.type === "overdue") {
-                              return (
-                                <div className="flex items-center gap-1 text-red-600">
-                                  <Clock className="h-3 w-3" />
-                                  <span>{status.days} days overdue</span>
-                                </div>
-                              );
-                            } else {
-                              return (
-                                <div className="flex items-center gap-1 text-amber-600">
-                                  <Clock className="h-3 w-3" />
-                                  <span>Due in {status.days} days</span>
-                                </div>
-                              );
-                            }
-                          })()}
-                        </div>
-                      )}
-                    </div>
+                    <Badge
+                      variant={invoice.status === "Paid" ? "default" : "secondary"}
+                      className={
+                        invoice.status === "Paid"
+                          ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50"
+                          : "bg-amber-50 text-amber-700 hover:bg-amber-50"
+                      }
+                    >
+                      {invoice.status}
+                    </Badge>
                   </TableCell>
                   <TableCell>
+                    {invoice.status === "Pending" && (
+                      <div className="space-y-1">
+                        {(() => {
+                          const status = getOverdueStatus(invoice.dueDate, invoice.status);
+                          if (!status) return (
+                            <div className="text-xs text-slate-500">
+                              Not due yet
+                            </div>
+                          );
+                          
+                          if (status.type === "overdue") {
+                            return (
+                              <div className="flex items-center gap-1">
+                                <Badge variant="destructive" className="bg-red-100 text-red-700 hover:bg-red-100">
+                                  {status.days} days overdue
+                                </Badge>
+                              </div>
+                            );
+                          } else {
+                            return (
+                              <div className="flex items-center gap-1">
+                                <Badge variant="secondary" className="bg-amber-100 text-amber-700 hover:bg-amber-100">
+                                  Due in {status.days} days
+                                </Badge>
+                              </div>
+                            );
+                          }
+                        })()}
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right">
                     <div className="space-y-1">
                       <div className="font-medium">{formatCurrency(invoice.amount)}</div>
                       {invoice.emailStatus && (

@@ -801,6 +801,27 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
     }
   }
 
+  // Add this helper function near the other utility functions
+  const getOverdueStatus = (dueDate: string, status: string) => {
+    if (status === "Paid") return null;
+    const today = new Date();
+    const due = new Date(dueDate);
+    const diffDays = Math.floor((today.getTime() - due.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays > 0) {
+      return {
+        days: diffDays,
+        type: "overdue"
+      };
+    } else if (diffDays >= -7) {
+      return {
+        days: Math.abs(diffDays),
+        type: "upcoming"
+      };
+    }
+    return null;
+  };
+
   return (
     <div className="min-h-screen w-full ">
       {/* Premium Welcome Header */}
@@ -1291,18 +1312,69 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                     <div className="text-sm text-slate-500">Due: {invoice.dueDate}</div>
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant={invoice.status === "Paid" ? "default" : "secondary"}
-                      className={
-                        invoice.status === "Paid"
-                          ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50"
-                          : "bg-amber-50 text-amber-700 hover:bg-amber-50"
-                      }
-                    >
-                      {invoice.status}
-                    </Badge>
+                    <div className="space-y-1">
+                      <Badge
+                        variant={invoice.status === "Paid" ? "default" : "secondary"}
+                        className={
+                          invoice.status === "Paid"
+                            ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50"
+                            : "bg-amber-50 text-amber-700 hover:bg-amber-50"
+                        }
+                      >
+                        {invoice.status}
+                      </Badge>
+                      {invoice.status === "Pending" && (
+                        <div className="text-xs text-slate-500">
+                          {(() => {
+                            const status = getOverdueStatus(invoice.dueDate, invoice.status);
+                            if (!status) return null;
+                            
+                            if (status.type === "overdue") {
+                              return (
+                                <div className="flex items-center gap-1 text-red-600">
+                                  <Clock className="h-3 w-3" />
+                                  <span>{status.days} days overdue</span>
+                                </div>
+                              );
+                            } else {
+                              return (
+                                <div className="flex items-center gap-1 text-amber-600">
+                                  <Clock className="h-3 w-3" />
+                                  <span>Due in {status.days} days</span>
+                                </div>
+                              );
+                            }
+                          })()}
+                        </div>
+                      )}
+                    </div>
                   </TableCell>
-                  <TableCell className="text-right font-medium">{formatCurrency(invoice.amount)}</TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      <div className="font-medium">{formatCurrency(invoice.amount)}</div>
+                      {invoice.emailStatus && (
+                        <div className="text-xs text-slate-500">
+                          {invoice.emailStatus === "Sent" && (
+                            <div className="flex items-center gap-1 text-emerald-600">
+                              <Mail className="h-3 w-3" />
+                              <span>Invoice sent</span>
+                            </div>
+                          )}
+                          {invoice.emailStatus === "Reminder" && (
+                            <div className="flex items-center gap-1 text-amber-600">
+                              <Mail className="h-3 w-3" />
+                              <span>Reminder sent</span>
+                            </div>
+                          )}
+                          {invoice.lastEmailSent && (
+                            <div className="text-xs text-slate-400">
+                              {new Date(invoice.lastEmailSent).toLocaleDateString()}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()}>
                     <div className="flex gap-2">
                       <Button
@@ -1408,18 +1480,11 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                             setInvoices(updatedInvoices)
                             if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
 
-                            // Update filtered invoices as well
-                            const updatedFilteredInvoices = filteredInvoices.map((inv) =>
-                              inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv,
-                            )
-                            setFilteredInvoices(updatedFilteredInvoices)
-
                             toast({
                               title: "Status Updated",
                               description: "Invoice marked as pending successfully.",
                             })
                           } catch (error) {
-                            console.error("Error marking invoice as pending:", error)
                             toast({
                               title: "Error",
                               description: error instanceof Error ? error.message : "Failed to update invoice status",
@@ -1458,9 +1523,9 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                                 <Mail className="h-4 w-4 text-purple-600" />
                               </div>
                               <div>
-                                <p>AI Email Assistant</p>
+                                <p>Send Invoice Email</p>
                                 <p className="text-sm font-normal text-slate-500">
-                                  Composing email for {invoice.customer.email}
+                                  {invoice.customer.email}
                                 </p>
                               </div>
                             </DialogTitle>

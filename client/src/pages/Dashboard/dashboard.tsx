@@ -940,192 +940,117 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                     </div>
                     AI Email Assistant
                   </CardTitle>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowEmailSettings(!showEmailSettings)}
-                      className="text-slate-500 hover:text-slate-700"
-                    >
-                      <Settings className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setIsChatOpen(false)}
-                      className="text-slate-500 hover:text-slate-700"
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsChatOpen(false)}
+                    className="text-slate-500 hover:text-slate-700"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
                 </div>
               </CardHeader>
               <CardContent>
-                {showEmailSettings ? (
-                  <div className="grid gap-4 p-4 bg-slate-50 rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="auto-send">Auto-send emails</Label>
-                      <Switch
-                        id="auto-send"
-                        checked={emailSettings.autoSend}
-                        onCheckedChange={(checked) => 
-                          setEmailSettings({ ...emailSettings, autoSend: checked })
-                        }
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="reminder-days">Reminder days before due date</Label>
-                        <Input
-                          id="reminder-days"
-                          type="number"
-                          value={emailSettings.reminderDays}
-                          onChange={(e) => 
-                            setEmailSettings({ ...emailSettings, reminderDays: parseInt(e.target.value) })
-                          }
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="followup-days">Follow-up days after due date</Label>
-                        <Input
-                          id="followup-days"
-                          type="number"
-                          value={emailSettings.followUpDays}
-                          onChange={(e) => 
-                            setEmailSettings({ ...emailSettings, followUpDays: parseInt(e.target.value) })
-                          }
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <Label htmlFor="signature">Email Signature</Label>
-                      <Textarea
-                        id="signature"
-                        value={emailSettings.customSignature}
-                        onChange={(e) => 
-                          setEmailSettings({ ...emailSettings, customSignature: e.target.value })
-                        }
-                        placeholder="Enter your email signature..."
-                        className="mt-1"
-                      />
-                    </div>
-                    <Button onClick={handleSaveEmailSettings} className="w-full sm:w-auto">
-                      Save Settings
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex flex-col h-[400px]">
-                    <div className="flex-1 overflow-y-auto space-y-4 p-4">
-                      {chatMessages.length === 0 ? (
-                        <div className="flex items-center justify-center h-full">
-                          <div className="text-center space-y-2">
-                            <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto">
-                              <Mail className="h-6 w-6 text-purple-600" />
-                            </div>
-                            <p className="text-sm font-medium">AI Email Assistant</p>
-                            <p className="text-xs text-slate-500">How can I help you with your invoices today?</p>
+                <div className="flex flex-col h-[400px]">
+                  <div className="flex-1 overflow-y-auto space-y-4 p-4">
+                    {chatMessages.length === 0 ? (
+                      <div className="flex items-center justify-center h-full">
+                        <div className="text-center space-y-2">
+                          <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto">
+                            <Mail className="h-6 w-6 text-purple-600" />
                           </div>
+                          <p className="text-sm font-medium">AI Email Assistant</p>
+                          <p className="text-xs text-slate-500">How can I help you with your invoices today?</p>
                         </div>
-                      ) : (
-                        chatMessages.map((message) => (
+                      </div>
+                    ) : (
+                      chatMessages.map((message) => (
+                        <div
+                          key={message.id}
+                          className={`flex items-start gap-3 ${
+                            message.type === 'user' ? 'justify-end' : ''
+                          }`}
+                        >
+                          {message.type === 'ai' && (
+                            <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
+                              <Mail className="h-4 w-4 text-purple-600" />
+                            </div>
+                          )}
                           <div
-                            key={message.id}
-                            className={`flex items-start gap-3 ${
-                              message.type === 'user' ? 'justify-end' : ''
+                            className={`max-w-[80%] rounded-lg p-3 ${
+                              message.type === 'user'
+                                ? 'bg-purple-600 text-white'
+                                : 'bg-slate-100'
                             }`}
                           >
-                            {message.type === 'ai' && (
-                              <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
-                                <Mail className="h-4 w-4 text-purple-600" />
-                              </div>
-                            )}
-                            <div
-                              className={`max-w-[80%] rounded-lg p-3 ${
-                                message.type === 'user'
-                                  ? 'bg-purple-600 text-white'
-                                  : 'bg-slate-100'
-                              }`}
-                            >
-                              <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                              {message.action && (
-                                <div className="mt-2 flex gap-2">
-                                  {message.action.type === 'preview' && message.action.invoiceId && (
-                                    <Button
-                                      size="sm"
-                                      variant={message.type === 'user' ? 'secondary' : 'default'}
-                                      onClick={() => {
-                                        const invoice = invoices.find(inv => inv.id === message.action?.invoiceId)
-                                        if (invoice) {
-                                          handlePreviewEmail(invoice)
-                                        }
-                                      }}
-                                    >
-                                      Preview Email
-                                    </Button>
-                                  )}
-                                  {message.action.type === 'remind' && (
-                                    <Button
-                                      size="sm"
-                                      variant={message.type === 'user' ? 'secondary' : 'default'}
-                                      onClick={() => {
-                                        // Handle sending reminders
-                                      }}
-                                    >
-                                      Send Reminders
-                                    </Button>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                            {message.type === 'user' && (
-                              <div className="h-8 w-8 rounded-full bg-purple-600 flex items-center justify-center">
-                                <span className="text-white text-sm">
-                                  {user?.email?.[0]?.toUpperCase() || 'U'}
-                                </span>
+                            <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                            {message.action && (
+                              <div className="mt-2 flex gap-2">
+                                {message.action.type === 'preview' && message.action.invoiceId && (
+                                  <Button
+                                    size="sm"
+                                    variant={message.type === 'user' ? 'secondary' : 'default'}
+                                    onClick={() => {
+                                      const invoice = invoices.find(inv => inv.id === message.action?.invoiceId)
+                                      if (invoice) {
+                                        handlePreviewEmail(invoice)
+                                      }
+                                    }}
+                                  >
+                                    Preview Email
+                                  </Button>
+                                )}
                               </div>
                             )}
                           </div>
-                        ))
-                      )}
-                      {isTyping && (
-                        <div className="flex items-start gap-3">
-                          <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
-                            <Mail className="h-4 w-4 text-purple-600" />
-                          </div>
-                          <div className="bg-slate-100 rounded-lg p-3">
-                            <div className="flex gap-1">
-                              <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce" />
-                              <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce delay-100" />
-                              <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce delay-200" />
+                          {message.type === 'user' && (
+                            <div className="h-8 w-8 rounded-full bg-purple-600 flex items-center justify-center">
+                              <span className="text-white text-sm">
+                                {user?.email?.[0]?.toUpperCase() || 'U'}
+                              </span>
                             </div>
+                          )}
+                        </div>
+                      ))
+                    )}
+                    {isTyping && (
+                      <div className="flex items-start gap-3">
+                        <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
+                          <Mail className="h-4 w-4 text-purple-600" />
+                        </div>
+                        <div className="bg-slate-100 rounded-lg p-3">
+                          <div className="flex gap-1">
+                            <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce" />
+                            <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce delay-100" />
+                            <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce delay-200" />
                           </div>
                         </div>
-                      )}
-                    </div>
-                    <div className="border-t p-4">
-                      <div className="flex gap-2">
-                        <Input
-                          placeholder="Type your message..."
-                          value={inputMessage}
-                          onChange={(e) => setInputMessage(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !e.shiftKey) {
-                              e.preventDefault()
-                              handleSendMessage(inputMessage)
-                            }
-                          }}
-                        />
-                        <Button
-                          onClick={() => handleSendMessage(inputMessage)}
-                          disabled={!inputMessage.trim() || isTyping}
-                        >
-                          <Mail className="h-4 w-4 mr-2" />
-                          Send
-                        </Button>
                       </div>
+                    )}
+                  </div>
+                  <div className="border-t p-4">
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Type your message..."
+                        value={inputMessage}
+                        onChange={(e) => setInputMessage(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault()
+                            handleSendMessage(inputMessage)
+                          }
+                        }}
+                      />
+                      <Button
+                        onClick={() => handleSendMessage(inputMessage)}
+                        disabled={!inputMessage.trim() || isTyping}
+                      >
+                        <Mail className="h-4 w-4 mr-2" />
+                        Send
+                      </Button>
                     </div>
                   </div>
-                )}
+                </div>
               </CardContent>
             </Card>
           ) : (

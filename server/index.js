@@ -2014,3 +2014,81 @@ app.post("/api/contact", async (req, res) => {
 app.get('/', (req, res) => {
   res.send('SheetBills API is running! Visit /health for status.');
 });
+
+app.delete('/api/sheets/bulk-delete', async (req, res) => {
+  try {
+    const { invoiceIds, sheetUrl } = req.body;
+
+    // Validate input
+    if (!invoiceIds || !Array.isArray(invoiceIds) || invoiceIds.length === 0 || !sheetUrl) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    // Validate tokens
+    const supabaseToken = req.headers['x-supabase-token'];
+    if (!supabaseToken) return res.status(401).json({ error: 'Supabase authentication required' });
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith('Bearer ')) return res.status(401).json({ error: 'Google authentication required' });
+    const googleToken = authHeader.split(' ')[1];
+
+    // Extract spreadsheet ID
+    const spreadsheetId = extractSheetIdFromUrl(sheetUrl);
+    if (!spreadsheetId) return res.status(400).json({ error: 'Invalid sheet URL' });
+
+    // Initialize Google Sheets API
+    const auth = new google.auth.OAuth2();
+    auth.setCredentials({ access_token: googleToken });
+    const sheets = google.sheets({ version: 'v4', auth });
+
+    // Get sheet metadata
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
+    const firstSheet = spreadsheet.data.sheets?.[0];
+    if (!firstSheet) return res.status(404).json({ error: 'No sheets found' });
+    const sheetId = firstSheet.properties.sheetId;
+    const sheetName = firstSheet.properties.title;
+
+    // Fetch invoice data
+    const valuesResponse = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${sheetName}!A2:M`,
+    });
+    const rows = valuesResponse.data.values || [];
+
+    // Find the rows to delete (in reverse order to avoid index shifting)
+    const rowsToDelete = rows
+      .map((row, index) => ({ row, index }))
+      .filter(({ row }) => invoiceIds.includes(row[0]))
+      .sort((a, b) => b.index - a.index);
+
+    // Delete rows in reverse order
+    for (const { index } of rowsToDelete) {
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId,
+        resource: {
+          requests: [
+            {
+              deleteDimension: {
+                range: {
+                  sheetId,
+                  dimension: 'ROWS',
+                  startIndex: index + 1, // +1 because A2:M skips header
+                  endIndex: index + 2,
+                },
+              },
+            },
+          ],
+        },
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `${rowsToDelete.length} invoice(s) deleted successfully`,
+    });
+  } catch (error) {
+    console.error('Error deleting invoices:', error);
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to delete invoices',
+    });
+  }
+});

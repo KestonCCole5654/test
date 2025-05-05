@@ -1091,17 +1091,6 @@ export default function Dashboard() {
       )
     }
 
-    // For indeterminate state
-    const allVisibleIds = currentItems.map((invoice) => invoice.id)
-    const allVisibleSelected = allVisibleIds.every((id) => selectedInvoices.has(id))
-    const someVisibleSelected = allVisibleIds.some((id) => selectedInvoices.has(id)) && !allVisibleSelected
-
-    useEffect(() => {
-      if (headerCheckboxRef.current) {
-        headerCheckboxRef.current.indeterminate = someVisibleSelected
-      }
-    }, [someVisibleSelected])
-
     return (
       <Card>
         <CardContent className="p-0">

@@ -842,20 +842,6 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
 
       {/* Search and filters */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6 items-start sm:items-center justify-between">
-        <Tabs defaultValue="all" className="w-full sm:w-auto">
-          <TabsList>
-            <TabsTrigger value="all" onClick={() => setStatusFilter("all")}>
-              All
-            </TabsTrigger>
-            <TabsTrigger value="pending" onClick={() => setStatusFilter("pending")}>
-              Pending
-            </TabsTrigger>
-            <TabsTrigger value="paid" onClick={() => setStatusFilter("paid")}>
-              Paid
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-
         <div className="flex gap-2 w-full sm:w-auto">
           <div className="relative flex-1 sm:flex-none">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
@@ -879,15 +865,28 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
 
       {/* Main content - Invoice Table */}
       <div>
-        <TabsContent value="all" className="mt-0">
-          {renderInvoiceTable()}
-        </TabsContent>
-        <TabsContent value="pending" className="mt-0">
-          {renderInvoiceTable()}
-        </TabsContent>
-        <TabsContent value="paid" className="mt-0">
-          {renderInvoiceTable()}
-        </TabsContent>
+        <Tabs defaultValue="all" className="w-full">
+          <TabsList className="mb-4">
+            <TabsTrigger value="all" onClick={() => setStatusFilter("all")}>
+              All
+            </TabsTrigger>
+            <TabsTrigger value="pending" onClick={() => setStatusFilter("pending")}>
+              Pending
+            </TabsTrigger>
+            <TabsTrigger value="paid" onClick={() => setStatusFilter("paid")}>
+              Paid
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="all" className="mt-0">
+            {renderInvoiceTable()}
+          </TabsContent>
+          <TabsContent value="pending" className="mt-0">
+            {renderInvoiceTable()}
+          </TabsContent>
+          <TabsContent value="paid" className="mt-0">
+            {renderInvoiceTable()}
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* Delete Confirmation Dialog */}

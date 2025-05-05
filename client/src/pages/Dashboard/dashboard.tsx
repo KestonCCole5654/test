@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useEffect, useState } from "react"
-import { Trash2, Edit, MoreVertical, Plus, RefreshCw, ArrowUpDown, CheckCircle, Clock, Mail, Settings } from "lucide-react"
+import { Trash2, Edit, MoreVertical, Plus, RefreshCw, ArrowUpDown, CheckCircle, Clock, Mail, Settings, DollarSign } from "lucide-react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
@@ -46,6 +46,12 @@ import {
 } from "../../components/ui/dialog"
 import { ChevronRight } from "lucide-react"
 
+interface PartialPayment {
+  amount: number;
+  date: string;
+  notes?: string;
+}
+
 interface Invoice {
   id: string
   date: string
@@ -74,6 +80,8 @@ interface Invoice {
   status: "Paid" | "Pending"
   emailStatus?: string
   lastEmailSent?: string
+  partialPayments?: PartialPayment[]
+  remainingAmount?: number
 }
 
 interface Spreadsheet {
@@ -146,6 +154,10 @@ export default function Dashboard() {
   const [inputMessage, setInputMessage] = useState("")
   const [isTyping, setIsTyping] = useState(false)
   const [isChatOpen, setIsChatOpen] = useState(false)
+  const [isPartialPaymentDialogOpen, setIsPartialPaymentDialogOpen] = useState(false);
+  const [selectedInvoiceForPayment, setSelectedInvoiceForPayment] = useState<Invoice | null>(null);
+  const [partialPaymentAmount, setPartialPaymentAmount] = useState("");
+  const [partialPaymentNotes, setPartialPaymentNotes] = useState("");
 
   // Calculate totals
   const totalInvoices = invoices.length
@@ -822,6 +834,98 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
     return null;
   };
 
+  const handlePartialPayment = async (invoice: Invoice) => {
+    setSelectedInvoiceForPayment(invoice);
+    setPartialPaymentAmount("");
+    setPartialPaymentNotes("");
+    setIsPartialPaymentDialogOpen(true);
+  };
+
+  const submitPartialPayment = async () => {
+    if (!selectedInvoiceForPayment || !partialPaymentAmount) return;
+
+    try {
+      const paymentAmount = parseFloat(partialPaymentAmount);
+      if (isNaN(paymentAmount) || paymentAmount <= 0) {
+        throw new Error("Please enter a valid payment amount");
+      }
+
+      const remainingAmount = selectedInvoiceForPayment.amount - paymentAmount;
+      if (remainingAmount < 0) {
+        throw new Error("Payment amount cannot exceed invoice amount");
+      }
+
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        throw new Error(sessionError.message);
+      }
+
+      const response = await fetch(
+        "https://sheetbills-server.vercel.app/api/sheets/partial-payment",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.provider_token}`,
+            "X-Supabase-Token": session?.access_token || "",
+          },
+          body: JSON.stringify({
+            invoiceId: selectedInvoiceForPayment.id,
+            paymentAmount,
+            paymentNotes: partialPaymentNotes,
+            remainingAmount,
+            sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to record partial payment");
+      }
+
+      // Update local state
+      const updatedInvoices = invoices.map((inv) =>
+        inv.id === selectedInvoiceForPayment.id
+          ? {
+              ...inv,
+              partialPayments: [
+                ...(inv.partialPayments || []),
+                {
+                  amount: paymentAmount,
+                  date: new Date().toISOString(),
+                  notes: partialPaymentNotes,
+                },
+              ],
+              remainingAmount,
+              status: remainingAmount === 0 ? "Paid" as const : "Pending" as const,
+            }
+          : inv
+      );
+      setInvoices(updatedInvoices);
+
+      toast({
+        title: "Payment Recorded",
+        description: `Partial payment of ${formatCurrency(paymentAmount)} has been recorded.`,
+      });
+
+      setIsPartialPaymentDialogOpen(false);
+      setSelectedInvoiceForPayment(null);
+      setPartialPaymentAmount("");
+      setPartialPaymentNotes("");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to record payment",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen w-full ">
       {/* Premium Welcome Header */}
@@ -1200,6 +1304,61 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <Dialog open={isPartialPaymentDialogOpen} onOpenChange={setIsPartialPaymentDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Record Partial Payment</DialogTitle>
+            <DialogDescription>
+              Enter the payment amount and any additional notes for invoice #{selectedInvoiceForPayment?.id}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="amount" className="text-right">
+                Amount
+              </Label>
+              <div className="col-span-3">
+                <Input
+                  id="amount"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max={selectedInvoiceForPayment?.amount}
+                  value={partialPaymentAmount}
+                  onChange={(e) => setPartialPaymentAmount(e.target.value)}
+                  placeholder="Enter payment amount"
+                />
+                <p className="text-sm text-slate-500 mt-1">
+                  Remaining amount: {formatCurrency(
+                    selectedInvoiceForPayment
+                      ? selectedInvoiceForPayment.amount - (parseFloat(partialPaymentAmount) || 0)
+                      : 0
+                  )}
+                </p>
+              </div>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="notes" className="text-right">
+                Notes
+              </Label>
+              <div className="col-span-3">
+                <Textarea
+                  id="notes"
+                  value={partialPaymentNotes}
+                  onChange={(e) => setPartialPaymentNotes(e.target.value)}
+                  placeholder="Add any payment notes (optional)"
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsPartialPaymentDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={submitPartialPayment}>Record Payment</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 
@@ -1361,6 +1520,21 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                   <TableCell className="text-right">
                     <div className="space-y-1">
                       <div className="font-medium">{formatCurrency(invoice.amount)}</div>
+                      {invoice.partialPayments && invoice.partialPayments.length > 0 && (
+                        <div className="text-xs text-slate-500">
+                          <div className="flex items-center gap-1 text-blue-600">
+                            <DollarSign className="h-3 w-3" />
+                            <span>
+                              {invoice.partialPayments.length} payment{invoice.partialPayments.length > 1 ? "s" : ""} received
+                            </span>
+                          </div>
+                          {invoice.remainingAmount !== undefined && (
+                            <div className="text-xs text-slate-400">
+                              Remaining: {formatCurrency(invoice.remainingAmount)}
+                            </div>
+                          )}
+                        </div>
+                      )}
                       {invoice.emailStatus && (
                         <div className="text-xs text-slate-500">
                           {invoice.emailStatus === "Sent" && (
@@ -1388,15 +1562,26 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                     <div className="flex gap-2">
                       <Button
                         onClick={async (e) => {
-                          e.stopPropagation()
+                          e.stopPropagation();
+                          handlePartialPayment(invoice);
+                        }}
+                        className="bg-blue-50 text-blue-700 hover:bg-blue-100"
+                        size="sm"
+                      >
+                        <DollarSign className="mr-2 h-4 w-4" />
+                        Partial Payment
+                      </Button>
+                      <Button
+                        onClick={async (e) => {
+                          e.stopPropagation();
                           try {
                             const {
                               data: { session },
                               error: sessionError,
-                            } = await supabase.auth.getSession()
+                            } = await supabase.auth.getSession();
 
                             if (sessionError) {
-                              throw new Error(sessionError.message)
+                              throw new Error(sessionError.message);
                             }
 
                             const response = await fetch(
@@ -1410,103 +1595,43 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                                 },
                                 body: JSON.stringify({
                                   invoiceId: invoice.id,
-                                  sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
-                                    ?.sheetUrl,
+                                  sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
                                 }),
-                              },
-                            )
+                              }
+                            );
 
                             if (!response.ok) {
-                              const errorData = await response.json()
-                              throw new Error(errorData.error || "Failed to mark invoice as paid")
+                              const errorData = await response.json();
+                              throw new Error(errorData.error || "Failed to mark invoice as paid");
                             }
 
                             // Update local state
                             const updatedInvoices = invoices.map((inv) =>
-                              inv.id === invoice.id ? { ...inv, status: "Paid" as const } : inv,
-                            )
-                            setInvoices(updatedInvoices)
-                            if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
+                              inv.id === invoice.id ? { ...inv, status: "Paid" as const } : inv
+                            );
+                            setInvoices(updatedInvoices);
+                            if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl);
 
                             toast({
                               title: "Status Updated",
                               description: "Invoice marked as paid successfully.",
-                            })
+                            });
                           } catch (error) {
                             toast({
                               title: "Error",
                               description: error instanceof Error ? error.message : "Failed to update invoice status",
                               variant: "destructive",
-                            })
+                            });
                           }
                         }}
-                        className={`${invoice.status === "Paid" ? "bg-emerald-100 text-emerald-700" : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"}`}
+                        className={`${
+                          invoice.status === "Paid" ? "bg-emerald-100 text-emerald-700" : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                        }`}
                         size="sm"
                         disabled={invoice.status === "Paid"}
                       >
                         <CheckCircle className="mr-2 h-4 w-4" />
                         Mark as Paid
-                      </Button>
-                      <Button
-                        onClick={async (e) => {
-                          e.stopPropagation()
-                          try {
-                            const {
-                              data: { session },
-                              error: sessionError,
-                            } = await supabase.auth.getSession()
-
-                            if (sessionError) {
-                              throw new Error(sessionError.message)
-                            }
-
-                            const response = await fetch(
-                              "https://sheetbills-server.vercel.app/api/sheets/mark-as-pending",
-                              {
-                                method: "PUT",
-                                headers: {
-                                  "Content-Type": "application/json",
-                                  Authorization: `Bearer ${session?.provider_token}`,
-                                  "X-Supabase-Token": session?.access_token || "",
-                                },
-                                body: JSON.stringify({ 
-                                  invoiceId: invoice.id,
-                                  sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
-                                    ?.sheetUrl,
-                                }),
-                              },
-                            )
-
-                            if (!response.ok) {
-                              const errorData = await response.json()
-                              throw new Error(errorData.error || "Failed to mark invoice as pending")
-                            }
-
-                            // Update local state
-                            const updatedInvoices = invoices.map((inv) =>
-                              inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv,
-                            )
-                            setInvoices(updatedInvoices)
-                            if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
-
-                            toast({
-                              title: "Status Updated",
-                              description: "Invoice marked as pending successfully.",
-                            })
-                          } catch (error) {
-                            toast({
-                              title: "Error",
-                              description: error instanceof Error ? error.message : "Failed to update invoice status",
-                              variant: "destructive",
-                            })
-                          }
-                        }}
-                        className={`${invoice.status === "Pending" ? "bg-amber-100 text-amber-700" : "bg-amber-50 text-amber-700 hover:bg-amber-100"}`}
-                        size="sm"
-                        disabled={invoice.status === "Pending"}
-                      >
-                        <Clock className="mr-2 h-4 w-4" />
-                        Mark as Pending
                       </Button>
                     </div>
                   </TableCell>

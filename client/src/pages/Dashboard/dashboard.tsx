@@ -43,6 +43,8 @@ import {
 import { Label } from "../../components/ui/label"
 import { Calendar } from "../../components/ui/calendar"
 import { format } from "date-fns"
+import { Checkbox } from "../../components/ui/checkbox"
+import { Check } from "lucide-react"
 
 interface Invoice {
   id: string
@@ -116,6 +118,8 @@ export default function Dashboard() {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
   const [partialPaymentAmount, setPartialPaymentAmount] = useState("")
   const [paymentDate, setPaymentDate] = useState<Date>(new Date())
+  const [selectedInvoices, setSelectedInvoices] = useState<Set<string>>(new Set())
+  const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false)
 
   // Calculate totals
   const totalInvoices = invoices.length
@@ -622,6 +626,79 @@ export default function Dashboard() {
     }
   }
 
+  // Add function to handle checkbox selection
+  const handleSelectInvoice = (invoiceId: string) => {
+    setSelectedInvoices((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(invoiceId)) {
+        newSet.delete(invoiceId)
+      } else {
+        newSet.add(invoiceId)
+      }
+      return newSet
+    })
+  }
+
+  // Add function to handle select all
+  const handleSelectAll = () => {
+    if (selectedInvoices.size === currentItems.length) {
+      setSelectedInvoices(new Set())
+    } else {
+      setSelectedInvoices(new Set(currentItems.map((invoice) => invoice.id)))
+    }
+  }
+
+  // Add function to handle bulk delete
+  const handleBulkDelete = async () => {
+    try {
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession()
+
+      if (sessionError) {
+        throw new Error(sessionError.message)
+      }
+
+      const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/bulk-delete", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.provider_token}`,
+          "X-Supabase-Token": session?.access_token || "",
+        },
+        body: JSON.stringify({
+          invoiceIds: Array.from(selectedInvoices),
+          sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to delete invoices")
+      }
+
+      // Update local state by removing the deleted invoices
+      const updatedInvoices = invoices.filter((inv) => !selectedInvoices.has(inv.id))
+      setInvoices(updatedInvoices)
+      if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
+
+      toast({
+        title: "Invoices Deleted",
+        description: `${selectedInvoices.size} invoice(s) have been deleted successfully.`,
+      })
+
+      setSelectedInvoices(new Set())
+      setIsBulkDeleteDialogOpen(false)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to delete invoices",
+        variant: "destructive",
+      })
+    }
+  }
+
   return (
     <div className="min-h-screen w-full ">
       {/* Premium Welcome Header */}
@@ -866,6 +943,27 @@ export default function Dashboard() {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Bulk Delete Confirmation Dialog */}
+      <AlertDialog open={isBulkDeleteDialogOpen} onOpenChange={setIsBulkDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete these invoices?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete {selectedInvoices.size} selected invoice(s).
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkDelete}
+              className="bg-red-600 focus:ring-red-600"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Partial Payment Modal */}
       <Dialog open={isPartialPaymentModalOpen} onOpenChange={setIsPartialPaymentModalOpen}>
         <DialogContent>
@@ -967,9 +1065,38 @@ export default function Dashboard() {
     return (
       <Card>
         <CardContent className="p-0">
+          <div className="flex items-center justify-between p-4 border-b">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                checked={selectedInvoices.size === currentItems.length && currentItems.length > 0}
+                onCheckedChange={handleSelectAll}
+                aria-label="Select all invoices"
+              />
+              <span className="text-sm text-slate-500">
+                {selectedInvoices.size} selected
+              </span>
+            </div>
+            {selectedInvoices.size > 0 && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => setIsBulkDeleteDialogOpen(true)}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete Selected
+              </Button>
+            )}
+          </div>
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50 hover:bg-slate-50">
+                <TableHead className="w-[50px]">
+                  <Checkbox
+                    checked={selectedInvoices.size === currentItems.length && currentItems.length > 0}
+                    onCheckedChange={handleSelectAll}
+                    aria-label="Select all invoices"
+                  />
+                </TableHead>
                 <TableHead onClick={() => handleSort("id")} className="cursor-pointer font-medium">
                   Invoice ID <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                 </TableHead>
@@ -1009,6 +1136,13 @@ export default function Dashboard() {
                     localStorage.setItem("invoiceToEdit", JSON.stringify(invoice))
                   }}
                 >
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <Checkbox
+                      checked={selectedInvoices.has(invoice.id)}
+                      onCheckedChange={() => handleSelectInvoice(invoice.id)}
+                      aria-label={`Select invoice ${invoice.id}`}
+                    />
+                  </TableCell>
                   <TableCell className="font-medium">{invoice.id}</TableCell>
                   <TableCell>
                     <div className="font-medium">

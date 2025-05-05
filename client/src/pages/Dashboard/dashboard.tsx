@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useEffect, useState } from "react"
-import { Trash2, Edit, MoreVertical, Plus, RefreshCw, ArrowUpDown, CheckCircle, Clock } from "lucide-react"
+import { Trash2, Edit, MoreVertical, Plus, RefreshCw, ArrowUpDown, CheckCircle, Clock, DollarSign } from "lucide-react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
@@ -950,70 +950,18 @@ export default function Dashboard() {
                       <Button
                         onClick={async (e) => {
                           e.stopPropagation()
-                          try {
-                            const {
-                              data: { session },
-                              error: sessionError,
-                            } = await supabase.auth.getSession()
-
-                            if (sessionError) {
-                              throw new Error(sessionError.message)
-                            }
-
-                            const response = await fetch(
-                              "https://sheetbills-server.vercel.app/api/sheets/mark-as-pending",
-                              {
-                                method: "PUT",
-                                headers: {
-                                  "Content-Type": "application/json",
-                                  Authorization: `Bearer ${session?.provider_token}`,
-                                  "X-Supabase-Token": session?.access_token || "",
-                                },
-                                body: JSON.stringify({ 
-                                  invoiceId: invoice.id,
-                                  sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
-                                    ?.sheetUrl,
-                                }),
-                              },
-                            )
-
-                            if (!response.ok) {
-                              const errorData = await response.json()
-                              throw new Error(errorData.error || "Failed to mark invoice as pending")
-                            }
-
-                            // Update local state
-                            const updatedInvoices = invoices.map((inv) =>
-                              inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv,
-                            )
-                            setInvoices(updatedInvoices)
-                            if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
-
-                            // Update filtered invoices as well
-                            const updatedFilteredInvoices = filteredInvoices.map((inv) =>
-                              inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv,
-                            )
-                            setFilteredInvoices(updatedFilteredInvoices)
-
-                            toast({
-                              title: "Status Updated",
-                              description: "Invoice marked as pending successfully.",
-                            })
-                          } catch (error) {
-                            console.error("Error marking invoice as pending:", error)
-                            toast({
-                              title: "Error",
-                              description: error instanceof Error ? error.message : "Failed to update invoice status",
-                              variant: "destructive",
-                            })
-                          }
+                          // TODO: Implement partial payment functionality
+                          toast({
+                            title: "Partial Payment",
+                            description: "Partial payment functionality coming soon!",
+                          })
                         }}
-                        className={`${invoice.status === "Pending" ? "bg-amber-100 text-amber-700" : "bg-amber-50 text-amber-700 hover:bg-amber-100"}`}
+                        className="bg-blue-50 text-blue-700 hover:bg-blue-100"
                         size="sm"
-                        disabled={invoice.status === "Pending"}
+                        disabled={invoice.status === "Paid"}
                       >
-                        <Clock className="mr-2 h-4 w-4" />
-                        Mark as Pending
+                        <DollarSign className="mr-2 h-4 w-4" />
+                        Partial Payment
                       </Button>
                     </div>
                   </TableCell>
@@ -1043,127 +991,6 @@ export default function Dashboard() {
                           <Edit className="mr-2 h-4 w-4" />
                           Edit
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        {invoice.status === "Pending" && (
-                          <DropdownMenuItem
-                            onClick={async () => {
-                              try {
-                                const {
-                                  data: { session },
-                                  error: sessionError,
-                                } = await supabase.auth.getSession()
-
-                                if (sessionError) {
-                                  throw new Error(sessionError.message)
-                                }
-
-                                const response = await fetch(
-                                  "https://sheetbills-server.vercel.app/api/sheets/mark-as-paid",
-                                  {
-                                    method: "PUT",
-                                    headers: {
-                                      "Content-Type": "application/json",
-                                      Authorization: `Bearer ${session?.provider_token}`,
-                                      "X-Supabase-Token": session?.access_token || "",
-                                    },
-                                    body: JSON.stringify({
-                                      invoiceId: invoice.id,
-                                      sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
-                                        ?.sheetUrl,
-                                    }),
-                                  },
-                                )
-
-                                if (!response.ok) {
-                                  const errorData = await response.json()
-                                  throw new Error(errorData.error || "Failed to mark invoice as paid")
-                                }
-
-                                // Update local state
-                                const updatedInvoices = invoices.map((inv) =>
-                                  inv.id === invoice.id ? { ...inv, status: "Paid" as const } : inv,
-                                )
-                                setInvoices(updatedInvoices)
-                                if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
-
-                                toast({
-                                  title: "Status Updated",
-                                  description: "Invoice marked as paid successfully.",
-                                })
-                              } catch (error) {
-                                toast({
-                                  title: "Error",
-                                  description:
-                                    error instanceof Error ? error.message : "Failed to update invoice status",
-                                  variant: "destructive",
-                                })
-                              }
-                            }}
-                          >
-                            <CheckCircle className="mr-2 h-4 w-4 text-emerald-500" />
-                            Mark as Paid
-                          </DropdownMenuItem>
-                        )}
-                        {invoice.status === "Paid" && (
-                          <DropdownMenuItem
-                            onClick={async () => {
-                              try {
-                                const {
-                                  data: { session },
-                                  error: sessionError,
-                                } = await supabase.auth.getSession()
-
-                                if (sessionError) {
-                                  throw new Error(sessionError.message)
-                                }
-
-                                const response = await fetch(
-                                  "https://sheetbills-server.vercel.app/api/sheets/mark-as-pending",
-                                  {
-                                    method: "PUT",
-                                    headers: {
-                                      "Content-Type": "application/json",
-                                      Authorization: `Bearer ${session?.provider_token}`,
-                                      "X-Supabase-Token": session?.access_token || "",
-                                    },
-                                    body: JSON.stringify({ 
-                                      invoiceId: invoice.id,
-                                      sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
-                                        ?.sheetUrl,
-                                    }),
-                                  },
-                                )
-
-                                if (!response.ok) {
-                                  const errorData = await response.json()
-                                  throw new Error(errorData.error || "Failed to mark invoice as pending")
-                                }
-
-                                // Update local state
-                                const updatedInvoices = invoices.map((inv) =>
-                                  inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv,
-                                )
-                                setInvoices(updatedInvoices)
-                                if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
-
-                                toast({
-                                  title: "Status Updated",
-                                  description: "Invoice marked as pending successfully.",
-                                })
-                              } catch (error) {
-                                toast({
-                                  title: "Error",
-                                  description:
-                                    error instanceof Error ? error.message : "Failed to update invoice status",
-                                  variant: "destructive",
-                                })
-                              }
-                            }}
-                          >
-                            <Clock className="mr-2 h-4 w-4 text-amber-500" />
-                            Mark as Pending
-                          </DropdownMenuItem>
-                        )}
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           onClick={(e) => {

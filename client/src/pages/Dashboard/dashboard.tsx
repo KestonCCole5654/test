@@ -150,10 +150,6 @@ export default function Dashboard() {
   const [previewEmail, setPreviewEmail] = useState("")
   const [isSendingEmail, setIsSendingEmail] = useState(false)
   const [showEmailSettings, setShowEmailSettings] = useState(false)
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
-  const [inputMessage, setInputMessage] = useState("")
-  const [isTyping, setIsTyping] = useState(false)
-  const [isChatOpen, setIsChatOpen] = useState(false)
   const [isPartialPaymentDialogOpen, setIsPartialPaymentDialogOpen] = useState(false);
   const [selectedInvoiceForPayment, setSelectedInvoiceForPayment] = useState<Invoice | null>(null);
   const [partialPaymentAmount, setPartialPaymentAmount] = useState("");
@@ -1056,141 +1052,6 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
           </Card>
         </div>
 
-        {/* Floating Chat Widget */}
-        <div className="fixed bottom-6 right-6 z-50">
-          {isChatOpen ? (
-            <Card className="w-[400px] shadow-xl">
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
-                      <Mail className="h-4 w-4 text-purple-600" />
-                    </div>
-                    AI Email Assistant
-                  </CardTitle>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setIsChatOpen(false)}
-                    className="text-slate-500 hover:text-slate-700"
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col h-[400px]">
-                  <div className="flex-1 overflow-y-auto space-y-4 p-4">
-                    {chatMessages.length === 0 ? (
-                      <div className="flex items-center justify-center h-full">
-                        <div className="text-center space-y-2">
-                          <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto">
-                            <Mail className="h-6 w-6 text-purple-600" />
-                          </div>
-                          <p className="text-sm font-medium">AI Email Assistant</p>
-                          <p className="text-xs text-slate-500">How can I help you with your invoices today?</p>
-                        </div>
-                      </div>
-                    ) : (
-                      chatMessages.map((message) => (
-                        <div
-                          key={message.id}
-                          className={`flex items-start gap-3 ${
-                            message.type === 'user' ? 'justify-end' : ''
-                          }`}
-                        >
-                          {message.type === 'ai' && (
-                            <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
-                              <Mail className="h-4 w-4 text-purple-600" />
-                            </div>
-                          )}
-                          <div
-                            className={`max-w-[80%] rounded-lg p-3 ${
-                              message.type === 'user'
-                                ? 'bg-purple-600 text-white'
-                                : 'bg-slate-100'
-                            }`}
-                          >
-                            <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                            {message.action && (
-                              <div className="mt-2 flex gap-2">
-                                {message.action.type === 'preview' && message.action.invoiceId && (
-                                  <Button
-                                    size="sm"
-                                    variant={message.type === 'user' ? 'secondary' : 'default'}
-                                    onClick={() => {
-                                      const invoice = invoices.find(inv => inv.id === message.action?.invoiceId)
-                                      if (invoice) {
-                                        handlePreviewEmail(invoice)
-                                      }
-                                    }}
-                                  >
-                                    Preview Email
-                                  </Button>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                          {message.type === 'user' && (
-                            <div className="h-8 w-8 rounded-full bg-purple-600 flex items-center justify-center">
-                              <span className="text-white text-sm">
-                                {user?.email?.[0]?.toUpperCase() || 'U'}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      ))
-                    )}
-                    {isTyping && (
-                      <div className="flex items-start gap-3">
-                        <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
-                          <Mail className="h-4 w-4 text-purple-600" />
-                        </div>
-                        <div className="bg-slate-100 rounded-lg p-3">
-                          <div className="flex gap-1">
-                            <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce" />
-                            <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce delay-100" />
-                            <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce delay-200" />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="border-t p-4">
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Type your message..."
-                        value={inputMessage}
-                        onChange={(e) => setInputMessage(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault()
-                            handleSendMessage(inputMessage)
-                          }
-                        }}
-                      />
-                      <Button
-                        onClick={() => handleSendMessage(inputMessage)}
-                        disabled={!inputMessage.trim() || isTyping}
-                      >
-                        <Mail className="h-4 w-4 mr-2" />
-                        Send
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <Button
-              onClick={() => setIsChatOpen(true)}
-              className="h-14 w-14 rounded-full bg-purple-600 hover:bg-purple-700 shadow-lg"
-            >
-              <Mail className="h-6 w-6 text-white" />
-            </Button>
-          )}
-        </div>
-
         {/* Tabs and Content */}
         <Tabs defaultValue="all" className="space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
@@ -1521,184 +1382,12 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                     )}
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="space-y-1">
-                      <div className="font-medium">{formatCurrency(invoice.amount)}</div>
-                      {invoice.partialPayments && invoice.partialPayments.length > 0 && (
-                        <div className="text-xs text-slate-500">
-                          <div className="flex items-center gap-1 text-blue-600">
-                            <DollarSign className="h-3 w-3" />
-                            <span>
-                              {invoice.partialPayments.length} payment{invoice.partialPayments.length > 1 ? "s" : ""} received
-                            </span>
-                          </div>
-                          {invoice.remainingAmount !== undefined && (
-                            <div className="text-xs text-slate-400">
-                              Remaining: {formatCurrency(invoice.remainingAmount)}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      {invoice.emailStatus && (
-                        <div className="text-xs text-slate-500">
-                          {invoice.emailStatus === "Sent" && (
-                            <div className="flex items-center gap-1 text-emerald-600">
-                              <Mail className="h-3 w-3" />
-                              <span>Invoice sent</span>
-                            </div>
-                          )}
-                          {invoice.emailStatus === "Reminder" && (
-                            <div className="flex items-center gap-1 text-amber-600">
-                              <Mail className="h-3 w-3" />
-                              <span>Reminder sent</span>
-                            </div>
-                          )}
-                          {invoice.lastEmailSent && (
-                            <div className="text-xs text-slate-400">
-                              {new Date(invoice.lastEmailSent).toLocaleDateString()}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell onClick={(e) => e.stopPropagation()}>
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={async (e) => {
-                          e.stopPropagation();
-                          handlePartialPayment(invoice);
-                        }}
-                        className="bg-blue-50 text-blue-700 hover:bg-blue-100"
-                        size="sm"
-                      >
-                        <DollarSign className="mr-2 h-4 w-4" />
-                        Partial Payment
-                      </Button>
-                      <Button
-                        onClick={async (e) => {
-                          e.stopPropagation();
-                          try {
-                            const {
-                              data: { session },
-                              error: sessionError,
-                            } = await supabase.auth.getSession();
-
-                            if (sessionError) {
-                              throw new Error(sessionError.message);
-                            }
-
-                            const response = await fetch(
-                              "https://sheetbills-server.vercel.app/api/sheets/mark-as-paid",
-                              {
-                                method: "PUT",
-                                headers: {
-                                  "Content-Type": "application/json",
-                                  Authorization: `Bearer ${session?.provider_token}`,
-                                  "X-Supabase-Token": session?.access_token || "",
-                                },
-                                body: JSON.stringify({
-                                  invoiceId: invoice.id,
-                                  sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
-                                }),
-                              }
-                            );
-
-                            if (!response.ok) {
-                              const errorData = await response.json();
-                              throw new Error(errorData.error || "Failed to mark invoice as paid");
-                            }
-
-                            // Update local state
-                            const updatedInvoices = invoices.map((inv) =>
-                              inv.id === invoice.id ? { ...inv, status: "Paid" as const } : inv
-                            );
-                            setInvoices(updatedInvoices);
-                            if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl);
-
-                            toast({
-                              title: "Status Updated",
-                              description: "Invoice marked as paid successfully.",
-                            });
-                          } catch (error) {
-                            toast({
-                              title: "Error",
-                              description: error instanceof Error ? error.message : "Failed to update invoice status",
-                              variant: "destructive",
-                            });
-                          }
-                        }}
-                        className={`${
-                          invoice.status === "Paid" ? "bg-emerald-100 text-emerald-700" : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                        }`}
-                        size="sm"
-                        disabled={invoice.status === "Paid"}
-                      >
-                        <CheckCircle className="mr-2 h-4 w-4" />
-                        Mark as Paid
-                      </Button>
-                      <Button
-                        onClick={async (e) => {
-                          e.stopPropagation();
-                          try {
-                            const {
-                              data: { session },
-                              error: sessionError,
-                            } = await supabase.auth.getSession();
-
-                            if (sessionError) {
-                              throw new Error(sessionError.message);
-                            }
-
-                            const response = await fetch(
-                              "https://sheetbills-server.vercel.app/api/sheets/mark-as-pending",
-                              {
-                                method: "PUT",
-                                headers: {
-                                  "Content-Type": "application/json",
-                                  Authorization: `Bearer ${session?.provider_token}`,
-                                  "X-Supabase-Token": session?.access_token || "",
-                                },
-                                body: JSON.stringify({
-                                  invoiceId: invoice.id,
-                                  sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
-                                }),
-                              }
-                            );
-
-                            if (!response.ok) {
-                              const errorData = await response.json();
-                              throw new Error(errorData.error || "Failed to mark invoice as pending");
-                            }
-
-                            // Update local state
-                            const updatedInvoices = invoices.map((inv) =>
-                              inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv
-                            );
-                            setInvoices(updatedInvoices);
-                            if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl);
-
-                            toast({
-                              title: "Status Updated",
-                              description: "Invoice marked as pending successfully.",
-                            });
-                          } catch (error) {
-                            toast({
-                              title: "Error",
-                              description: error instanceof Error ? error.message : "Failed to update invoice status",
-                              variant: "destructive",
-                            });
-                          }
-                        }}
-                        className={`${
-                          invoice.status === "Pending" ? "bg-amber-100 text-amber-700" : "bg-amber-50 text-amber-700 hover:bg-amber-100"
-                        }`}
-                        size="sm"
-                        disabled={invoice.status === "Pending"}
-                      >
-                        <Clock className="mr-2 h-4 w-4" />
-                        Mark as Pending
-                      </Button>
-                    </div>
+                    <div className="font-medium">{formatCurrency(invoice.amount)}</div>
+                    {invoice.remainingAmount !== undefined && invoice.remainingAmount < invoice.amount && (
+                      <div className="text-xs text-slate-500">
+                        Remaining: {formatCurrency(invoice.remainingAmount)}
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
@@ -1792,6 +1481,38 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          {invoice.partialPayments && invoice.partialPayments.length > 0 && (
+                            <>
+                              <div className="px-2 py-1.5 text-sm text-slate-500">
+                                Payment History
+                              </div>
+                              {invoice.partialPayments.map((payment, index) => (
+                                <div key={index} className="px-2 py-1.5 text-sm">
+                                  <div className="flex justify-between items-center">
+                                    <span>{formatCurrency(payment.amount)}</span>
+                                    <span className="text-slate-500">
+                                      {new Date(payment.date).toLocaleDateString()}
+                                    </span>
+                                  </div>
+                                  {payment.notes && (
+                                    <div className="text-xs text-slate-500 mt-0.5">
+                                      {payment.notes}
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                              <DropdownMenuSeparator />
+                            </>
+                          )}
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handlePartialPayment(invoice)
+                            }}
+                          >
+                            <DollarSign className="mr-2 h-4 w-4" />
+                            Record Payment
+                          </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation()

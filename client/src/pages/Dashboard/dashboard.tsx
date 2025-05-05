@@ -98,23 +98,11 @@ interface EmailSettings {
   customSignature: string
 }
 
-interface ChatMessage {
-  id: string
-  type: 'ai' | 'user'
-  content: string
-  timestamp: Date
-  action?: {
-    type: 'preview' | 'send' | 'remind'
-    invoiceId?: string
-  }
-}
-
 export default function Dashboard() {
   const navigate = useNavigate()
   const location = useLocation()
   const [user, setUser] = useState<User | null>(null)
   const [invoices, setInvoices] = useState<Invoice[]>(() => {
-    // Try to load cached data on initial render
     const cachedData = localStorage.getItem('cachedInvoices');
     return cachedData ? JSON.parse(cachedData) : [];
   })
@@ -137,7 +125,6 @@ export default function Dashboard() {
     const cachedTime = localStorage.getItem('lastFetchTime');
     return cachedTime ? parseInt(cachedTime) : 0;
   });
-  // Add pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [emailSettings, setEmailSettings] = useState<EmailSettings>({
@@ -722,95 +709,6 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
     }
   }
 
-  const handleSendMessage = async (message: string) => {
-    if (!message.trim()) return
-
-    // Add user message
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      type: 'user',
-      content: message,
-      timestamp: new Date()
-    }
-    setChatMessages(prev => [...prev, userMessage])
-    setInputMessage("")
-    setIsTyping(true)
-
-    // Process the message and generate AI response
-    try {
-      let response: ChatMessage
-      const lowerMessage = message.toLowerCase()
-
-      if (lowerMessage.includes('send') && lowerMessage.includes('invoice')) {
-        // Extract invoice ID if mentioned
-        const invoiceId = message.match(/invoice\s+#?(\w+)/i)?.[1]
-        const invoice = invoices.find(inv => inv.id === invoiceId)
-
-        if (invoice) {
-          const emailContent = generateEmailContent(invoice)
-          response = {
-            id: Date.now().toString(),
-            type: 'ai',
-            content: `I've prepared an email for Invoice #${invoice.id}. Would you like to preview it before sending?`,
-            timestamp: new Date(),
-            action: {
-              type: 'preview',
-              invoiceId: invoice.id
-            }
-          }
-        } else {
-          response = {
-            id: Date.now().toString(),
-            type: 'ai',
-            content: "I couldn't find that invoice. Could you please provide the correct invoice number?",
-            timestamp: new Date()
-          }
-        }
-      } else if (lowerMessage.includes('remind') || lowerMessage.includes('follow up')) {
-        const pendingInvoices = invoices.filter(inv => inv.status === "Pending")
-        response = {
-          id: Date.now().toString(),
-          type: 'ai',
-          content: `I found ${pendingInvoices.length} pending invoices. Would you like me to send reminders for any of them?`,
-          timestamp: new Date(),
-          action: {
-            type: 'remind'
-          }
-        }
-      } else if (lowerMessage.includes('settings') || lowerMessage.includes('configure')) {
-        setShowEmailSettings(true)
-        response = {
-          id: Date.now().toString(),
-          type: 'ai',
-          content: "I've opened the settings panel. You can configure your email preferences there.",
-          timestamp: new Date()
-        }
-      } else {
-        response = {
-          id: Date.now().toString(),
-          type: 'ai',
-          content: "I can help you with:\n• Sending invoice emails\n• Setting up reminders\n• Following up on overdue invoices\n• Configuring email settings\n\nWhat would you like to do?",
-          timestamp: new Date()
-        }
-      }
-
-      // Simulate typing delay
-      setTimeout(() => {
-        setChatMessages(prev => [...prev, response])
-        setIsTyping(false)
-      }, 1000)
-    } catch (error) {
-      const errorResponse: ChatMessage = {
-        id: Date.now().toString(),
-        type: 'ai',
-        content: "I apologize, but I encountered an error. Please try again.",
-        timestamp: new Date()
-      }
-      setChatMessages(prev => [...prev, errorResponse])
-      setIsTyping(false)
-    }
-  }
-
   // Add this helper function near the other utility functions
   const getOverdueStatus = (dueDate: string, status: string) => {
     if (status === "Paid") return null;
@@ -832,7 +730,7 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
     return null;
   };
 
-  const handlePartialPayment = async (invoice: Invoice) => {
+  const handlePartialPayment = (invoice: Invoice) => {
     setSelectedInvoiceForPayment(invoice);
     setPartialPaymentAmount("");
     setPartialPaymentNotes("");

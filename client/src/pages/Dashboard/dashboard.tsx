@@ -1090,11 +1090,12 @@ export default function Dashboard() {
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50 hover:bg-slate-50">
-                <TableHead className="w-[50px]">
+                <TableHead className="w-[56px] px-4 py-2 align-middle text-center">
                   <Checkbox
                     checked={selectedInvoices.size === currentItems.length && currentItems.length > 0}
                     onCheckedChange={handleSelectAll}
                     aria-label="Select all invoices"
+                    className="mx-auto"
                   />
                 </TableHead>
                 <TableHead onClick={() => handleSort("id")} className="cursor-pointer font-medium">
@@ -1136,11 +1137,12 @@ export default function Dashboard() {
                     localStorage.setItem("invoiceToEdit", JSON.stringify(invoice))
                   }}
                 >
-                  <TableCell onClick={(e) => e.stopPropagation()}>
+                  <TableCell onClick={(e) => e.stopPropagation()} className="w-[56px] px-4 py-2 align-middle text-center">
                     <Checkbox
                       checked={selectedInvoices.has(invoice.id)}
                       onCheckedChange={() => handleSelectInvoice(invoice.id)}
                       aria-label={`Select invoice ${invoice.id}`}
+                      className="mx-auto"
                     />
                   </TableCell>
                   <TableCell className="font-medium">{invoice.id}</TableCell>

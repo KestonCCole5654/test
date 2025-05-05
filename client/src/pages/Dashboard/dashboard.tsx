@@ -1289,6 +1289,57 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                      {invoice.status === "Pending" ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            // Update invoice status to Paid
+                            const updatedInvoices = invoices.map((inv) =>
+                              inv.id === invoice.id
+                                ? { ...inv, status: "Paid" as const }
+                                : inv
+                            )
+                            setInvoices(updatedInvoices)
+                            toast({
+                              title: "Status Updated",
+                              description: "Invoice marked as paid.",
+                            })
+                          }}
+                          className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200"
+                        >
+                          <CheckCircle className="mr-2 h-4 w-4" />
+                          Mark as Paid
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            // Update invoice status to Pending
+                            const updatedInvoices = invoices.map((inv) =>
+                              inv.id === invoice.id
+                                ? { ...inv, status: "Pending" as const }
+                                : inv
+                            )
+                            setInvoices(updatedInvoices)
+                            toast({
+                              title: "Status Updated",
+                              description: "Invoice marked as pending.",
+                            })
+                          }}
+                          className="bg-amber-50 text-amber-700 hover:bg-amber-100 border-amber-200"
+                        >
+                          <Clock className="mr-2 h-4 w-4" />
+                          Mark as Pending
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button
@@ -1428,50 +1479,6 @@ ${emailSettings.customSignature || "Best regards,\nYour Company Name"}`
                             <Edit className="mr-2 h-4 w-4" />
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          {invoice.status === "Pending" ? (
-                            <DropdownMenuItem
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                // Update invoice status to Paid
-                                const updatedInvoices = invoices.map((inv) =>
-                                  inv.id === invoice.id
-                                    ? { ...inv, status: "Paid" as const }
-                                    : inv
-                                )
-                                setInvoices(updatedInvoices)
-                                toast({
-                                  title: "Status Updated",
-                                  description: "Invoice marked as paid.",
-                                })
-                              }}
-                              className="text-emerald-600"
-                            >
-                              <CheckCircle className="mr-2 h-4 w-4" />
-                              Mark as Paid
-                            </DropdownMenuItem>
-                          ) : (
-                            <DropdownMenuItem
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                // Update invoice status to Pending
-                                const updatedInvoices = invoices.map((inv) =>
-                                  inv.id === invoice.id
-                                    ? { ...inv, status: "Pending" as const }
-                                    : inv
-                                )
-                                setInvoices(updatedInvoices)
-                                toast({
-                                  title: "Status Updated",
-                                  description: "Invoice marked as pending.",
-                                })
-                              }}
-                              className="text-amber-600"
-                            >
-                              <Clock className="mr-2 h-4 w-4" />
-                              Mark as Pending
-                            </DropdownMenuItem>
-                          )}
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             onClick={(e) => {

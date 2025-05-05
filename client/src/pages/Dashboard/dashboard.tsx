@@ -876,8 +876,8 @@ export default function Dashboard() {
                       variant={invoice.status === "Paid" ? "default" : "secondary"}
                       className={
                         invoice.status === "Paid"
-                          ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50"
-                          : "bg-amber-50 text-amber-700 hover:bg-amber-50"
+                          ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50 text-base px-0"
+                          : "bg-amber-50 text-amber-700 hover:bg-amber-50 text-base px-0"
                       }
                     >
                       {invoice.status}

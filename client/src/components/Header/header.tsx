@@ -101,26 +101,34 @@ const Header: React.FC = () => {
             {user && (
               <>
                 <button
-                  onClick={() => navigate("/dashboard")}
+                  onClick={() => {
+                    navigate("/invoices", { replace: true });
+                  }}
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
                   Dashboard
                 </button>
                 <button
-                  onClick={() => navigate("/reports")}
+                  onClick={() => {
+                    navigate("/reports", { replace: true });
+                  }}
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
                   Reports
                 </button>
                 
                 <button
-                  onClick={() => navigate("/settings")}
+                  onClick={() => {
+                    navigate("/settings", { replace: true });
+                  }}
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
                   Account & Settings
                 </button>
                 <button
-                  onClick={() => navigate("/contact")}
+                  onClick={() => {
+                    navigate("/contact", { replace: true });
+                  }}
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
                   Contact & Support
@@ -213,7 +221,7 @@ const Header: React.FC = () => {
               <nav className="flex flex-col space-y-1">
                 <button
                   onClick={() => {
-                    navigate("/dashboard");
+                    navigate("/invoices", { replace: true });
                     handleNavigation();
                   }}
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
@@ -222,7 +230,7 @@ const Header: React.FC = () => {
                 </button>
                 <button
                   onClick={() => {
-                    navigate("/reports");
+                    navigate("/reports", { replace: true });
                     handleNavigation();
                   }}
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
@@ -231,7 +239,7 @@ const Header: React.FC = () => {
                 </button>
                 <button
                   onClick={() => {
-                    navigate("/template-generator");
+                    navigate("/template-generator", { replace: true });
                     handleNavigation();
                   }}
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
@@ -240,7 +248,7 @@ const Header: React.FC = () => {
                 </button>
                 <button
                   onClick={() => {
-                    navigate("/settings");
+                    navigate("/settings", { replace: true });
                     handleNavigation();
                   }}
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
@@ -249,7 +257,7 @@ const Header: React.FC = () => {
                 </button>
                 <button
                   onClick={() => {
-                    navigate("/contact");
+                    navigate("/contact", { replace: true });
                     handleNavigation();
                   }}
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"

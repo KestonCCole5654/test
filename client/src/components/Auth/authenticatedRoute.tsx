@@ -1,5 +1,5 @@
 // src/components/AuthenticatedRoute.tsx
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { LoadingSpinner } from "../ui/loadingSpinner";
 
 interface Props {
@@ -13,6 +13,8 @@ export default function AuthenticatedRoute({
   isLoading = false,
   children,
 }: Props) {
+  const location = useLocation();
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -25,7 +27,7 @@ export default function AuthenticatedRoute({
   }
 
   if (!authenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
   return <>{children}</>;

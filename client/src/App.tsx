@@ -22,9 +22,6 @@ import { LoadingSpinner } from "./components/ui/loadingSpinner";
 import AuthCallback from './pages/auth-callback'
 import Reports from './pages/Reports/reports';
 
-
-
-
 const AuthenticatedLayout = () => (
   <>
     <Header />
@@ -33,9 +30,7 @@ const AuthenticatedLayout = () => (
     </main>
   </>
 );
-{/*
-  
-  */}
+
 async function checkBusinessSheet(supabaseToken: string, googleToken: string) {
   try {
     const response = await fetch("https://sheetbills-server.vercel.app/api/check-business-sheet", {
@@ -63,17 +58,6 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Try to get session from location.state, or from storage
-  let session = location.state?.session
-  if (!session) {
-    const sessionString = localStorage.getItem("sb-auth-token") || sessionStorage.getItem("sb-auth-token")
-    if (sessionString) {
-      try {
-        session = JSON.parse(sessionString)
-      } catch {}
-    }
-  }
-
   useEffect(() => {
     let isMounted = true;
     let authSubscription: Subscription;
@@ -84,109 +68,80 @@ function App() {
       if (session) {
         sessionStorage.setItem('sb-auth-token', JSON.stringify(session));
         localStorage.setItem('sb-auth-token', JSON.stringify(session));
+        setUser(session.user);
       } else {
         sessionStorage.removeItem('sb-auth-token');
         localStorage.removeItem('sb-auth-token');
+        setUser(null);
       }
-
-      setUser(session?.user ?? null);
       setLoading(false);
+    };
 
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        try {
-          const hasSheet = await checkBusinessSheet(
-            session.access_token,
-            session.provider_token || ''
-          );
-
-          const currentPath = window.location.pathname;
-          
-          if (!hasSheet && currentPath !== '/Onboarding') {
-            navigate('/Onboarding', { replace: true });
-          } else if (hasSheet && currentPath === '/Onboarding') {
-            navigate('/invoices', { replace: true });
-          }
-        } catch (error) {
-          console.error("Auth state change error:", error);
-          navigate('/login', { replace: true });
-        }
+        setUser(session.user);
       }
-    };
+      setLoading(false);
+    });
 
-    const initializeAuth = async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (!isMounted) return;
-
-        if (error) throw error;
-        if (session) await handleAuthStateChange('INITIAL_SESSION', session);
-        else setLoading(false);
-      } catch (error) {
-        if (isMounted) setLoading(false);
-      }
-    };
-
-    authSubscription = supabase.auth.onAuthStateChange(handleAuthStateChange).data.subscription;
-    initializeAuth();
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthStateChange);
+    authSubscription = subscription;
 
     return () => {
       isMounted = false;
       authSubscription?.unsubscribe();
     };
-  }, [navigate]);
+  }, []);
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <LoadingSpinner />
-          <p className="mt-4 text-slate-600">Loading application...</p>
-        </div>
+        <LoadingSpinner />
       </div>
     );
   }
 
   return (
-    
-      <HelmetProvider>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/auth-callback" element={<AuthCallback />} />
-          
-          {/* Onboarding Route - Separate from other authenticated routes */}
-          <Route
-            path="/Onboarding"
-            element={
-              <AuthenticatedRoute authenticated={!!user} isLoading={loading}>
-                <OnboardingPage />
-              </AuthenticatedRoute>
-            }
-          />
+    <HelmetProvider>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/auth-callback" element={<AuthCallback />} />
+        
+        {/* Onboarding Route */}
+        <Route
+          path="/Onboarding"
+          element={
+            <AuthenticatedRoute authenticated={!!user} isLoading={loading}>
+              <OnboardingPage />
+            </AuthenticatedRoute>
+          }
+        />
 
-          {/* Protected Routes */}
-          <Route
-            element={
-              <AuthenticatedRoute authenticated={!!user} isLoading={loading}>
-                <AuthenticatedLayout />
-              </AuthenticatedRoute>
-            }
-          >
-            <Route path="/" element={<Navigate to="/invoices" replace />} />
-            <Route path="/invoices" element={<Dashboard />} />
-            <Route path="/create-invoice" element={<InvoiceForm />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/reports" element={<Reports />} />
-          </Route>
+        {/* Protected Routes */}
+        <Route
+          element={
+            <AuthenticatedRoute authenticated={!!user} isLoading={loading}>
+              <AuthenticatedLayout />
+            </AuthenticatedRoute>
+          }
+        >
+          <Route path="/" element={<Navigate to="/invoices" replace />} />
+          <Route path="/invoices" element={<Dashboard />} />
+          <Route path="/create-invoice" element={<InvoiceForm />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/reports" element={<Reports />} />
+        </Route>
 
-          {/* Catch all route */}
-          <Route path="*" element={
-            <Navigate to={user ? "/invoices" : "/login"} replace />
-          } />
-        </Routes>
-      </HelmetProvider>
-  
+        {/* Catch all route */}
+        <Route path="*" element={
+          <Navigate to={user ? "/invoices" : "/login"} replace />
+        } />
+      </Routes>
+    </HelmetProvider>
   );
 }
 

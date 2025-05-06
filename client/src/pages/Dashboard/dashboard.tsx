@@ -49,6 +49,7 @@ import clsx from "clsx"
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { Sheet, SheetContent, SheetHeader, SheetFooter, SheetTitle, SheetDescription, SheetClose } from "../../components/ui/sheet"
 
 interface Invoice {
   id: string
@@ -1033,15 +1034,15 @@ export default function Dashboard() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Partial Payment Modal */}
-      <Dialog open={isPartialPaymentModalOpen} onOpenChange={setIsPartialPaymentModalOpen}>
-        <DialogContent className="max-w-md w-full p-4 sm:p-6">
-          <DialogHeader>
-            <DialogTitle>Record Partial Payment</DialogTitle>
-            <DialogDescription>
+      {/* Partial Payment Sidebar */}
+      <Sheet open={isPartialPaymentModalOpen} onOpenChange={setIsPartialPaymentModalOpen}>
+        <SheetContent side="right" className="max-w-md w-full p-4 sm:p-6">
+          <SheetHeader>
+            <SheetTitle>Record Partial Payment</SheetTitle>
+            <SheetDescription>
               Enter the payment amount and date for invoice #{selectedInvoice?.id}
-            </DialogDescription>
-          </DialogHeader>
+            </SheetDescription>
+          </SheetHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="amount">Payment Amount</Label>
@@ -1071,14 +1072,14 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-          <DialogFooter>
+          <SheetFooter>
             <Button variant="outline" onClick={() => setIsPartialPaymentModalOpen(false)}>
               Cancel
             </Button>
             <Button onClick={handlePartialPayment}>Record Payment</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </div>
   )
 

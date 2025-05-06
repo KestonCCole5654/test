@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useEffect, useState, useRef } from "react"
-import { Trash2, Edit, MoreVertical, Plus, RefreshCw, ArrowUpDown, CheckCircle, Clock, DollarSign } from "lucide-react"
+import { Trash2, Edit, MoreVertical, Plus, RefreshCw, ArrowUpDown, CheckCircle, Clock, DollarSign, X } from "lucide-react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
@@ -122,6 +122,7 @@ export default function Dashboard() {
   const [selectedInvoices, setSelectedInvoices] = useState<Set<string>>(new Set())
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false)
   const headerCheckboxRef = useRef<HTMLInputElement>(null)
+  const [bulkDeleteMessage, setBulkDeleteMessage] = useState<string | null>(null)
 
   // Calculate totals
   const totalInvoices = invoices.length
@@ -702,10 +703,7 @@ export default function Dashboard() {
       setInvoices(updatedInvoices)
       if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
 
-      toast({
-        title: "Invoices Deleted",
-        description: `${selectedInvoices.size} invoice(s) have been deleted successfully.`,
-      })
+      setBulkDeleteMessage(`${selectedInvoices.size} invoice(s) have been deleted successfully and removed from your dashboard.`)
 
       setSelectedInvoices(new Set())
       setIsBulkDeleteDialogOpen(false)
@@ -1094,357 +1092,371 @@ export default function Dashboard() {
     return (
       <Card>
         <CardContent className="p-0">
-          <div className="flex items-center justify-between p-4 border-b gap-2 flex-wrap">
-            <div className="flex items-center gap-2 flex-wrap">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleSelectAllVisible}
-                className="font-medium"
-                disabled={currentItems.length === 0}
-              >
-                {allVisibleSelected ? "Deselect All (Page)" : "Select All (Page)"}
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleSelectAllGlobal}
-                className="font-medium"
-                disabled={filteredInvoices.length === 0}
-              >
-                {selectedInvoices.size === filteredInvoices.length ? "Deselect All (All)" : "Select All (All)"}
-              </Button>
-              <span className="text-sm text-slate-500">
-                {selectedInvoices.size} selected
-              </span>
-            </div>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => setIsBulkDeleteDialogOpen(true)}
-              disabled={selectedInvoices.size === 0}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete Selected
-            </Button>
-          </div>
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-slate-50 hover:bg-slate-50">
-                <TableHead className="w-[56px] px-4 py-2 align-middle text-center">
-                  <input
-                    type="checkbox"
-                    ref={headerCheckboxRef}
-                    checked={allVisibleSelected && currentItems.length > 0}
-                    onChange={handleSelectAllVisible}
-                    aria-label="Select all invoices on this page"
-                    className="mx-auto accent-blue-600 h-4 w-4 rounded border-gray-300"
-                  />
-                </TableHead>
-                <TableHead onClick={() => handleSort("id")} className="cursor-pointer font-medium">
-                  Invoice ID <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
-                </TableHead>
-                <TableHead onClick={() => handleSort("customer")} className="cursor-pointer font-medium">
-                  Customer <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
-                </TableHead>
-                <TableHead onClick={() => handleSort("date")} className="cursor-pointer font-medium">
-                  Date <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
-                </TableHead>
-                <TableHead onClick={() => handleSort("status")} className="cursor-pointer font-medium">
-                  Status <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
-                </TableHead>
-                <TableHead onClick={() => handleSort("amount")} className="cursor-pointer font-medium text-right">
-                  Amount <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
-                </TableHead>
-                <TableHead className="font-medium text-center">Overdue</TableHead>
-                <TableHead className="font-medium text-center">Payment Actions</TableHead>
-                <TableHead className="w-[80px] font-medium">Other Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {currentItems.map((invoice) => (
-                <TableRow
-                  key={invoice.id}
-                  className={clsx(
-                    "cursor-pointer hover:bg-slate-50",
-                    selectedInvoices.has(invoice.id) && "bg-blue-50/30"
-                  )}
-                  onClick={() => {
-                    const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
-                    const invoicesSheetUrl = invoicesSheet?.sheetUrl
-
-                    navigate("/create-invoice", {
-                      state: {
-                        invoiceToEdit: invoice,
-                        selectedSpreadsheetUrl: invoicesSheetUrl,
-                        hideForm: true,
-                      },
-                    })
-                    localStorage.setItem("invoiceToEdit", JSON.stringify(invoice))
-                  }}
+          <div className="flex flex-col gap-2">
+            {bulkDeleteMessage && (
+              <div className="flex items-center justify-between bg-green-50 border border-green-200 text-green-800 rounded px-4 py-2 mb-2">
+                <span>{bulkDeleteMessage}</span>
+                <button
+                  onClick={() => setBulkDeleteMessage(null)}
+                  className="ml-4 p-1 rounded hover:bg-green-100 focus:outline-none"
+                  aria-label="Dismiss message"
                 >
-                  <TableCell onClick={(e) => e.stopPropagation()} className="w-[56px] px-4 py-2 align-middle text-center">
-                    <Checkbox
-                      checked={selectedInvoices.has(invoice.id)}
-                      onCheckedChange={() => handleSelectInvoice(invoice.id)}
-                      aria-label={`Select invoice ${invoice.id}`}
-                      className="mx-auto"
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+            <div className="flex items-center justify-between p-4 border-b gap-2 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSelectAllVisible}
+                  className="font-medium"
+                  disabled={currentItems.length === 0}
+                >
+                  {allVisibleSelected ? "Deselect All (Page)" : "Select All (Page)"}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleSelectAllGlobal}
+                  className="font-medium"
+                  disabled={filteredInvoices.length === 0}
+                >
+                  {selectedInvoices.size === filteredInvoices.length ? "Deselect All (All)" : "Select All (All)"}
+                </Button>
+                <span className="text-sm text-slate-500">
+                  {selectedInvoices.size} selected
+                </span>
+              </div>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => setIsBulkDeleteDialogOpen(true)}
+                disabled={selectedInvoices.size === 0}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete Selected
+              </Button>
+            </div>
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-slate-50 hover:bg-slate-50">
+                  <TableHead className="w-[56px] px-4 py-2 align-middle text-center">
+                    <input
+                      type="checkbox"
+                      ref={headerCheckboxRef}
+                      checked={allVisibleSelected && currentItems.length > 0}
+                      onChange={handleSelectAllVisible}
+                      aria-label="Select all invoices on this page"
+                      className="mx-auto accent-blue-600 h-4 w-4 rounded border-gray-300"
                     />
-                  </TableCell>
-                  <TableCell className="font-medium">{invoice.id}</TableCell>
-                  <TableCell>
-                    <div className="font-medium">
-                      {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}
-                    </div>
-                    <div className="text-sm text-slate-500">
-                      {typeof invoice.customer === "object" ? invoice.customer.email : ""}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-medium">{invoice.date}</div>
-                    <div className="text-sm text-slate-500">Due: {invoice.dueDate}</div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={invoice.status === "Paid" ? "default" : "secondary"}
-                      className={
-                        invoice.status === "Paid"
-                          ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50 text-md px-4"
-                          : invoice.status === "Partially Paid"
-                          ? "bg-blue-50 text-blue-700 hover:bg-blue-50 text-md px-4"
-                          : "bg-amber-50 text-amber-700 hover:bg-amber-50 text-md px-4"
-                      }
-                    >
-                      {invoice.status}
-                      {invoice.status === "Partially Paid" && invoice.paidAmount && (
-                        <span className="ml-2 text-sm">
-                          ({formatCurrency(invoice.paidAmount)})
-                        </span>
-                      )}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right font-medium">{formatCurrency(invoice.amount)}</TableCell>
-                  <TableCell className="text-center">
-                    {invoice.status === "Pending" && new Date(invoice.dueDate) < new Date() ? (
-                      <span className="text-red-600 font-medium">
-                        {Math.ceil((new Date().getTime() - new Date(invoice.dueDate).getTime()) / (1000 * 60 * 60 * 24))} days
-                      </span>
-                    ) : (
-                      <span className="text-slate-400">-</span>
-                    )}
-                  </TableCell>
-                  <TableCell onClick={(e) => e.stopPropagation()}>
-                    <div className="flex justify-end gap-1">
-                      <Button
-                        onClick={async (e) => {
-                          e.stopPropagation()
-                          try {
-                            const {
-                              data: { session },
-                              error: sessionError,
-                            } = await supabase.auth.getSession()
-
-                            if (sessionError) {
-                              throw new Error(sessionError.message)
-                            }
-
-                            const response = await fetch(
-                              "https://sheetbills-server.vercel.app/api/sheets/mark-as-paid",
-                              {
-                                method: "PUT",
-                                headers: {
-                                  "Content-Type": "application/json",
-                                  Authorization: `Bearer ${session?.provider_token}`,
-                                  "X-Supabase-Token": session?.access_token || "",
-                                },
-                                body: JSON.stringify({
-                                  invoiceId: invoice.id,
-                                  sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
-                                    ?.sheetUrl,
-                                }),
-                              },
-                            )
-
-                            if (!response.ok) {
-                              const errorData = await response.json()
-                              throw new Error(errorData.error || "Failed to mark invoice as paid")
-                            }
-
-                            // Update local state
-                            const updatedInvoices = invoices.map((inv) =>
-                              inv.id === invoice.id ? { ...inv, status: "Paid" as const } : inv,
-                            )
-                            setInvoices(updatedInvoices)
-                            if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
-
-                            toast({
-                              title: "Status Updated",
-                              description: "Invoice marked as paid successfully.",
-                            })
-                          } catch (error) {
-                            toast({
-                              title: "Error",
-                              description: error instanceof Error ? error.message : "Failed to update invoice status",
-                              variant: "destructive",
-                            })
-                          }
-                        }}
-                        className={`${invoice.status === "Paid" ? "bg-emerald-100 text-emerald-700" : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"}`}
-                        size="sm"
-                        disabled={invoice.status === "Paid"}
-                      >
-                       
-                        Mark as Paid
-                      </Button>
-                      <Button
-                        onClick={async (e) => {
-                          e.stopPropagation()
-                          try {
-                            const {
-                              data: { session },
-                              error: sessionError,
-                            } = await supabase.auth.getSession()
-
-                            if (sessionError) {
-                              throw new Error(sessionError.message)
-                            }
-
-                            const response = await fetch(
-                              "https://sheetbills-server.vercel.app/api/sheets/mark-as-pending",
-                              {
-                                method: "PUT",
-                                headers: {
-                                  "Content-Type": "application/json",
-                                  Authorization: `Bearer ${session?.provider_token}`,
-                                  "X-Supabase-Token": session?.access_token || "",
-                                },
-                                body: JSON.stringify({ 
-                                  invoiceId: invoice.id,
-                                  sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
-                                    ?.sheetUrl,
-                                }),
-                              },
-                            )
-
-                            if (!response.ok) {
-                              const errorData = await response.json()
-                              throw new Error(errorData.error || "Failed to mark invoice as pending")
-                            }
-
-                            // Update local state
-                            const updatedInvoices = invoices.map((inv) =>
-                              inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv,
-                            )
-                            setInvoices(updatedInvoices)
-                            if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
-
-                            toast({
-                              title: "Status Updated",
-                              description: "Invoice marked as pending successfully.",
-                            })
-                          } catch (error) {
-                            toast({
-                              title: "Error",
-                              description: error instanceof Error ? error.message : "Failed to update invoice status",
-                              variant: "destructive",
-                            })
-                          }
-                        }}
-                        className={`${invoice.status === "Pending" ? "bg-amber-100  text-amber-700" : "bg-amber-50 text-amber-700 p-0 hover:bg-amber-100"}`}
-                        size="sm"
-                        disabled={invoice.status === "Pending"}
-                      >
-                     
-                        Mark as Pending
-                      </Button>
-                      <Button
-                        onClick={async (e) => {
-                          e.stopPropagation()
-                          setSelectedInvoice(invoice)
-                          setIsPartialPaymentModalOpen(true)
-                        }}
-                        className="bg-blue-50 text-blue-700 hover:bg-blue-100"
-                        size="sm"
-                        disabled={invoice.status === "Paid"}
-                      >
-                        Partial Payment
-                      </Button>
-                    </div>
-                  </TableCell>
-                  <TableCell onClick={(e) => e.stopPropagation()}>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Open menu</span>
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
-                            const invoicesSheetUrl = invoicesSheet?.sheetUrl
-
-                            navigate("/create-invoice", {
-                              state: {
-                                invoiceToEdit: invoice,
-                                selectedSpreadsheetUrl: invoicesSheetUrl,
-                              },
-                            })
-                          }}
-                        >
-                          <Edit className="mr-2 h-4 w-4" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setInvoiceToDelete(invoice)
-                            setIsDeleteDialogOpen(true)
-                          }}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+                  </TableHead>
+                  <TableHead onClick={() => handleSort("id")} className="cursor-pointer font-medium">
+                    Invoice ID <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
+                  </TableHead>
+                  <TableHead onClick={() => handleSort("customer")} className="cursor-pointer font-medium">
+                    Customer <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
+                  </TableHead>
+                  <TableHead onClick={() => handleSort("date")} className="cursor-pointer font-medium">
+                    Date <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
+                  </TableHead>
+                  <TableHead onClick={() => handleSort("status")} className="cursor-pointer font-medium">
+                    Status <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
+                  </TableHead>
+                  <TableHead onClick={() => handleSort("amount")} className="cursor-pointer font-medium text-right">
+                    Amount <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
+                  </TableHead>
+                  <TableHead className="font-medium text-center">Overdue</TableHead>
+                  <TableHead className="font-medium text-center">Payment Actions</TableHead>
+                  <TableHead className="w-[80px] font-medium">Other Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t">
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                >
-                  Previous
-                </Button>
-                <div className="text-sm text-slate-500">
-                  Page {currentPage} of {totalPages}
+              </TableHeader>
+              <TableBody>
+                {currentItems.map((invoice) => (
+                  <TableRow
+                    key={invoice.id}
+                    className={clsx(
+                      "cursor-pointer hover:bg-slate-50",
+                      selectedInvoices.has(invoice.id) && "bg-blue-50/30"
+                    )}
+                    onClick={() => {
+                      const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
+                      const invoicesSheetUrl = invoicesSheet?.sheetUrl
+
+                      navigate("/create-invoice", {
+                        state: {
+                          invoiceToEdit: invoice,
+                          selectedSpreadsheetUrl: invoicesSheetUrl,
+                          hideForm: true,
+                        },
+                      })
+                      localStorage.setItem("invoiceToEdit", JSON.stringify(invoice))
+                    }}
+                  >
+                    <TableCell onClick={(e) => e.stopPropagation()} className="w-[56px] px-4 py-2 align-middle text-center">
+                      <Checkbox
+                        checked={selectedInvoices.has(invoice.id)}
+                        onCheckedChange={() => handleSelectInvoice(invoice.id)}
+                        aria-label={`Select invoice ${invoice.id}`}
+                        className="mx-auto"
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">{invoice.id}</TableCell>
+                    <TableCell>
+                      <div className="font-medium">
+                        {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}
+                      </div>
+                      <div className="text-sm text-slate-500">
+                        {typeof invoice.customer === "object" ? invoice.customer.email : ""}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-medium">{invoice.date}</div>
+                      <div className="text-sm text-slate-500">Due: {invoice.dueDate}</div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={invoice.status === "Paid" ? "default" : "secondary"}
+                        className={
+                          invoice.status === "Paid"
+                            ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50 text-md px-4"
+                            : invoice.status === "Partially Paid"
+                            ? "bg-blue-50 text-blue-700 hover:bg-blue-50 text-md px-4"
+                            : "bg-amber-50 text-amber-700 hover:bg-amber-50 text-md px-4"
+                        }
+                      >
+                        {invoice.status}
+                        {invoice.status === "Partially Paid" && invoice.paidAmount && (
+                          <span className="ml-2 text-sm">
+                            ({formatCurrency(invoice.paidAmount)})
+                          </span>
+                        )}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right font-medium">{formatCurrency(invoice.amount)}</TableCell>
+                    <TableCell className="text-center">
+                      {invoice.status === "Pending" && new Date(invoice.dueDate) < new Date() ? (
+                        <span className="text-red-600 font-medium">
+                          {Math.ceil((new Date().getTime() - new Date(invoice.dueDate).getTime()) / (1000 * 60 * 60 * 24))} days
+                        </span>
+                      ) : (
+                        <span className="text-slate-400">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          onClick={async (e) => {
+                            e.stopPropagation()
+                            try {
+                              const {
+                                data: { session },
+                                error: sessionError,
+                              } = await supabase.auth.getSession()
+
+                              if (sessionError) {
+                                throw new Error(sessionError.message)
+                              }
+
+                              const response = await fetch(
+                                "https://sheetbills-server.vercel.app/api/sheets/mark-as-paid",
+                                {
+                                  method: "PUT",
+                                  headers: {
+                                    "Content-Type": "application/json",
+                                    Authorization: `Bearer ${session?.provider_token}`,
+                                    "X-Supabase-Token": session?.access_token || "",
+                                  },
+                                  body: JSON.stringify({
+                                    invoiceId: invoice.id,
+                                    sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
+                                      ?.sheetUrl,
+                                  }),
+                                },
+                              )
+
+                              if (!response.ok) {
+                                const errorData = await response.json()
+                                throw new Error(errorData.error || "Failed to mark invoice as paid")
+                              }
+
+                              // Update local state
+                              const updatedInvoices = invoices.map((inv) =>
+                                inv.id === invoice.id ? { ...inv, status: "Paid" as const } : inv,
+                              )
+                              setInvoices(updatedInvoices)
+                              if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
+
+                              toast({
+                                title: "Status Updated",
+                                description: "Invoice marked as paid successfully.",
+                              })
+                            } catch (error) {
+                              toast({
+                                title: "Error",
+                                description: error instanceof Error ? error.message : "Failed to update invoice status",
+                                variant: "destructive",
+                              })
+                            }
+                          }}
+                          className={`${invoice.status === "Paid" ? "bg-emerald-100 text-emerald-700" : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"}`}
+                          size="sm"
+                          disabled={invoice.status === "Paid"}
+                        >
+                         
+                          Mark as Paid
+                        </Button>
+                        <Button
+                          onClick={async (e) => {
+                            e.stopPropagation()
+                            try {
+                              const {
+                                data: { session },
+                                error: sessionError,
+                              } = await supabase.auth.getSession()
+
+                              if (sessionError) {
+                                throw new Error(sessionError.message)
+                              }
+
+                              const response = await fetch(
+                                "https://sheetbills-server.vercel.app/api/sheets/mark-as-pending",
+                                {
+                                  method: "PUT",
+                                  headers: {
+                                    "Content-Type": "application/json",
+                                    Authorization: `Bearer ${session?.provider_token}`,
+                                    "X-Supabase-Token": session?.access_token || "",
+                                  },
+                                  body: JSON.stringify({ 
+                                    invoiceId: invoice.id,
+                                    sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
+                                      ?.sheetUrl,
+                                  }),
+                                },
+                              )
+
+                              if (!response.ok) {
+                                const errorData = await response.json()
+                                throw new Error(errorData.error || "Failed to mark invoice as pending")
+                              }
+
+                              // Update local state
+                              const updatedInvoices = invoices.map((inv) =>
+                                inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv,
+                              )
+                              setInvoices(updatedInvoices)
+                              if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
+
+                              toast({
+                                title: "Status Updated",
+                                description: "Invoice marked as pending successfully.",
+                              })
+                            } catch (error) {
+                              toast({
+                                title: "Error",
+                                description: error instanceof Error ? error.message : "Failed to update invoice status",
+                                variant: "destructive",
+                              })
+                            }
+                          }}
+                          className={`${invoice.status === "Pending" ? "bg-amber-100  text-amber-700" : "bg-amber-50 text-amber-700 p-0 hover:bg-amber-100"}`}
+                          size="sm"
+                          disabled={invoice.status === "Pending"}
+                        >
+                       
+                          Mark as Pending
+                        </Button>
+                        <Button
+                          onClick={async (e) => {
+                            e.stopPropagation()
+                            setSelectedInvoice(invoice)
+                            setIsPartialPaymentModalOpen(true)
+                          }}
+                          className="bg-blue-50 text-blue-700 hover:bg-blue-100"
+                          size="sm"
+                          disabled={invoice.status === "Paid"}
+                        >
+                          Partial Payment
+                        </Button>
+                      </div>
+                    </TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
+                              const invoicesSheetUrl = invoicesSheet?.sheetUrl
+
+                              navigate("/create-invoice", {
+                                state: {
+                                  invoiceToEdit: invoice,
+                                  selectedSpreadsheetUrl: invoicesSheetUrl,
+                                },
+                              })
+                            }}
+                          >
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setInvoiceToDelete(invoice)
+                              setIsDeleteDialogOpen(true)
+                            }}
+                            className="text-red-600"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between px-4 py-3 border-t">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </Button>
+                  <div className="text-sm text-slate-500">
+                    Page {currentPage} of {totalPages}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </Button>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                >
-                  Next
-                </Button>
+                <div className="text-sm text-slate-500">
+                  Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredInvoices.length)} of {filteredInvoices.length} invoices
+                </div>
               </div>
-              <div className="text-sm text-slate-500">
-                Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredInvoices.length)} of {filteredInvoices.length} invoices
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </CardContent>
       </Card>
     )

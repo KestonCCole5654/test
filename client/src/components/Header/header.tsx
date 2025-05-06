@@ -41,14 +41,9 @@ const Header: React.FC = () => {
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut()
     if (!error) {
-      navigate("/login", { replace: true })
+      navigate("/login")
       setIsMobileMenuOpen(false)
     }
-  }
-
-  const handleNavigation = (path: string) => {
-    navigate(path, { replace: true })
-    setIsMobileMenuOpen(false)
   }
 
   useEffect(() => {
@@ -73,6 +68,11 @@ const Header: React.FC = () => {
     window.addEventListener("resize", handleResize)
     return () => window.removeEventListener("resize", handleResize)
   }, [])
+
+  // Close mobile menu when navigating
+  const handleNavigation = () => {
+    setIsMobileMenuOpen(false)
+  }
 
   if (!mounted || loading) return null
 
@@ -101,26 +101,26 @@ const Header: React.FC = () => {
             {user && (
               <>
                 <button
-                  onClick={() => handleNavigation("/dashboard")}
+                  onClick={() => navigate("/dashboard")}
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
                   Dashboard
                 </button>
                 <button
-                  onClick={() => handleNavigation("/reports")}
+                  onClick={() => navigate("/reports")}
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
                   Reports
                 </button>
                 
                 <button
-                  onClick={() => handleNavigation("/settings")}
+                  onClick={() => navigate("/settings")}
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
                   Account & Settings
                 </button>
                 <button
-                  onClick={() => handleNavigation("/contact")}
+                  onClick={() => navigate("/contact")}
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
                   Contact & Support
@@ -167,7 +167,7 @@ const Header: React.FC = () => {
                           {/* User profile section - desktop :       <User className="mr-2 h-4 w-4" />  <span>Profile</span> */}
                       
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleNavigation("/settings")}>
+                      <DropdownMenuItem onClick={() => navigate("/settings")}>
                         <Settings className="mr-2 h-4 w-4" />
                         <span>Settings</span>
                       </DropdownMenuItem>
@@ -212,31 +212,46 @@ const Header: React.FC = () => {
             {user && (
               <nav className="flex flex-col space-y-1">
                 <button
-                  onClick={() => handleNavigation("/dashboard")}
+                  onClick={() => {
+                    navigate("/dashboard");
+                    handleNavigation();
+                  }}
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
                   Dashboard
                 </button>
                 <button
-                  onClick={() => handleNavigation("/reports")}
+                  onClick={() => {
+                    navigate("/reports");
+                    handleNavigation();
+                  }}
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
                   Reports
                 </button>
                 <button
-                  onClick={() => handleNavigation("/template-generator")}
+                  onClick={() => {
+                    navigate("/template-generator");
+                    handleNavigation();
+                  }}
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
                   Invoices Template Generator
                 </button>
                 <button
-                  onClick={() => handleNavigation("/settings")}
+                  onClick={() => {
+                    navigate("/settings");
+                    handleNavigation();
+                  }}
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
                   Settings
                 </button>
                 <button
-                  onClick={() => handleNavigation("/contact")}
+                  onClick={() => {
+                    navigate("/contact");
+                    handleNavigation();
+                  }}
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
                   Contact & Support
@@ -272,7 +287,7 @@ const Header: React.FC = () => {
                   className="w-full bg-green-700 hover:bg-green-800"
                   onClick={() => {
                     navigate("/login")
-                    handleNavigation("/login")
+                    handleNavigation()
                   }}
                 >
                   Sign in

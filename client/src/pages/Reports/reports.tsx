@@ -8,6 +8,8 @@ import { Link } from "react-router-dom"
 import { Mail, CheckCircle, AlertCircle, Search, Calendar, Download, BarChart3, PieChart, Filter } from 'lucide-react'
 import { Badge } from "../../components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
+import supabase from "../../components/Auth/supabaseClient"
+import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar"
 
 // Placeholder components for charts and selectors
 const DateRangePicker = ({ value, onChange }: any) => (
@@ -112,6 +114,15 @@ export default function Reports() {
   const [searchTerm, setSearchTerm] = useState("")
   const [dateRange, setDateRange] = useState("")
   const [reportType, setReportType] = useState("invoices")
+  const [user, setUser] = useState<any>(null)
+
+  React.useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+    }
+    getUser()
+  }, [])
 
   const selectedReport = selectedClient ? clientReports[selectedClient] : null
   
@@ -120,10 +131,33 @@ export default function Reports() {
   )
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 bg-slate-50 min-h-screen">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-800 mb-2">Reports Dashboard</h1>
-        <p className="text-slate-500">View and analyze client data and financial reports</p>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8  min-h-screen">
+      {/* Premium Welcome Header */}
+      <div className="max-w-7xl mx-auto bg-gradient-to-r from-emerald-600 to-emerald-700 py-10 shadow-lg rounded-b-3xl mb-8">
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-4 sm:gap-6">
+            <div className="relative">
+              <Avatar className="h-14 w-14 sm:h-16 sm:w-16 ring-4 ring-white shadow-lg">
+                {user?.user_metadata?.avatar_url ? (
+                  <AvatarImage src={user.user_metadata.avatar_url} alt={user.email} />
+                ) : (
+                  <AvatarFallback>{user?.email?.[0]?.toUpperCase() || "U"}</AvatarFallback>
+                )}
+              </Avatar>
+              <span className="absolute bottom-0 right-0 bg-gradient-to-tr from-yellow-400 to-yellow-600 text-white text-xs px-2 py-0.5 rounded-full shadow-md font-semibold border-2 border-white">
+                PRO
+              </span>
+            </div>
+            <div>
+              <h1 className="text-3xl font-extrabold text-white drop-shadow-lg flex items-center gap-2">
+                Reports Dashboard
+              </h1>
+              <p className="text-slate-100 mt-2 text-lg font-medium">
+                View and analyze client data and financial reports
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">

@@ -1035,7 +1035,7 @@ export default function Dashboard() {
 
       {/* Partial Payment Modal */}
       <Dialog open={isPartialPaymentModalOpen} onOpenChange={setIsPartialPaymentModalOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-md w-full p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle>Record Partial Payment</DialogTitle>
             <DialogDescription>
@@ -1055,18 +1055,20 @@ export default function Dashboard() {
                 max={selectedInvoice?.amount}
                 step="0.01"
               />
-              <p className="text-sm text-slate-500">
+              <p className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded font-semibold w-fit">
                 Total invoice amount: {formatCurrency(selectedInvoice?.amount || 0)}
               </p>
             </div>
             <div className="grid gap-2">
               <Label>Payment Date</Label>
-              <Calendar
-                mode="single"
-                selected={paymentDate}
-                onSelect={(date) => date && setPaymentDate(date)}
-                className="rounded-md border"
-              />
+              <div className="flex justify-center">
+                <Calendar
+                  mode="single"
+                  selected={paymentDate}
+                  onSelect={(date) => date && setPaymentDate(date)}
+                  className="rounded-md border max-w-xs w-full p-2"
+                />
+              </div>
             </div>
           </div>
           <DialogFooter>

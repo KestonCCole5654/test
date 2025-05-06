@@ -2,7 +2,7 @@
 
 import React from "react"
 import { useEffect, useState, useRef } from "react"
-import { Trash2, Edit, MoreVertical, Plus, RefreshCw, ArrowUpDown, CheckCircle, Clock, DollarSign, X, GripVertical } from "lucide-react"
+import { Trash2, Edit, MoreVertical, Plus, RefreshCw, ArrowUpDown, X, GripVertical } from "lucide-react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
@@ -32,24 +32,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../../components/ui/alert-dialog"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../../components/ui/dialog"
 import { Label } from "../../components/ui/label"
 import { Calendar } from "../../components/ui/calendar"
-import { format } from "date-fns"
 import { Checkbox } from "../../components/ui/checkbox"
-import { Check } from "lucide-react"
-import clsx from "clsx"
-import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { Sheet, SheetContent, SheetHeader, SheetFooter, SheetTitle, SheetDescription, SheetClose } from "../../components/ui/sheet"
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
+import { Sheet, SheetContent, SheetHeader, SheetFooter, SheetTitle, SheetDescription } from "../../components/ui/sheet"
 
 interface Invoice {
   id: string
@@ -89,7 +78,7 @@ interface Spreadsheet {
 }
 
 function SortableTableRow({ id, children, ...props }: any) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
   return (
     <tr
       ref={setNodeRef}
@@ -101,22 +90,29 @@ function SortableTableRow({ id, children, ...props }: any) {
       {...props}
     >
       {/* Drag handle cell */}
-      <td className="w-8 px-2 align-middle text-center cursor-grab" style={{ verticalAlign: 'middle' }}>
-        <span {...attributes} {...listeners} className="inline-flex items-center justify-center cursor-grab text-gray-400 hover:text-gray-600 active:text-gray-800">
+      <td className="w-8 px-2 align-middle text-center cursor-grab" style={{ verticalAlign: "middle" }}>
+        <span
+          {...attributes}
+          {...listeners}
+          className="inline-flex items-center justify-center cursor-grab text-gray-400 hover:text-gray-600 active:text-gray-800"
+        >
           <GripVertical className="h-5 w-5" />
         </span>
       </td>
       {children}
     </tr>
-  );
+  )
 }
 
 // Add GmailIcon SVG component
 const GmailIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M22 6C22 4.9 21.1 4 20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6ZM20 6L12 11L4 6H20ZM20 18H4V8L12 13L20 8V18Z" fill="#EA4335"/>
+    <path
+      d="M22 6C22 4.9 21.1 4 20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6ZM20 6L12 11L4 6H20ZM20 18H4V8L12 13L20 8V18Z"
+      fill="#EA4335"
+    />
   </svg>
-);
+)
 
 export default function Dashboard() {
   const navigate = useNavigate()
@@ -124,8 +120,8 @@ export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null)
   const [invoices, setInvoices] = useState<Invoice[]>(() => {
     // Try to load cached data on initial render
-    const cachedData = localStorage.getItem('cachedInvoices');
-    return cachedData ? JSON.parse(cachedData) : [];
+    const cachedData = localStorage.getItem("cachedInvoices")
+    return cachedData ? JSON.parse(cachedData) : []
   })
   const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([])
   const [isStateLoading, setIsLoading] = useState(true)
@@ -143,12 +139,12 @@ export default function Dashboard() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [invoiceToDelete, setInvoiceToDelete] = useState<Invoice | null>(null)
   const [lastFetchTime, setLastFetchTime] = useState<number>(() => {
-    const cachedTime = localStorage.getItem('lastFetchTime');
-    return cachedTime ? parseInt(cachedTime) : 0;
-  });
+    const cachedTime = localStorage.getItem("lastFetchTime")
+    return cachedTime ? Number.parseInt(cachedTime) : 0
+  })
   // Add pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage] = useState(10)
   const [isPartialPaymentModalOpen, setIsPartialPaymentModalOpen] = useState(false)
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
   const [partialPaymentAmount, setPartialPaymentAmount] = useState("")
@@ -157,7 +153,7 @@ export default function Dashboard() {
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false)
   const headerCheckboxRef = useRef<HTMLInputElement>(null)
   const [bulkDeleteMessage, setBulkDeleteMessage] = useState<string | null>(null)
-  const [rowOrder, setRowOrder] = React.useState(invoices.map((inv) => inv.id));
+  const [rowOrder, setRowOrder] = React.useState(invoices.map((inv) => inv.id))
 
   // Calculate totals
   const totalInvoices = invoices.length
@@ -329,28 +325,28 @@ export default function Dashboard() {
   }, [invoices, searchQuery, statusFilter])
 
   // Calculate pagination values
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredInvoices.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage
+  const currentItems = filteredInvoices.slice(indexOfFirstItem, indexOfLastItem)
+  const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage)
 
   // Handle page change
   const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-  };
+    setCurrentPage(pageNumber)
+  }
 
   const fetchInvoices = async (sheetUrl: string) => {
     try {
       setIsLoading(true)
 
       // Check if we need to refresh the data (5 minutes cache)
-      const currentTime = Date.now();
-      const timeSinceLastFetch = currentTime - lastFetchTime;
-      const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+      const currentTime = Date.now()
+      const timeSinceLastFetch = currentTime - lastFetchTime
+      const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes in milliseconds
 
       if (timeSinceLastFetch < CACHE_DURATION && invoices.length > 0) {
-        setIsLoading(false);
-        return; // Use cached data
+        setIsLoading(false)
+        return // Use cached data
       }
 
       // Validate URL format first
@@ -466,9 +462,9 @@ export default function Dashboard() {
       }
 
       // Cache the data
-      localStorage.setItem('cachedInvoices', JSON.stringify(transformedData));
-      localStorage.setItem('lastFetchTime', currentTime.toString());
-      setLastFetchTime(currentTime);
+      localStorage.setItem("cachedInvoices", JSON.stringify(transformedData))
+      localStorage.setItem("lastFetchTime", currentTime.toString())
+      setLastFetchTime(currentTime)
 
       setInvoices(transformedData.filter((invoice): invoice is Invoice => invoice !== null))
       setError(null)
@@ -569,9 +565,9 @@ export default function Dashboard() {
   function handleRefresh(event?: React.MouseEvent<HTMLButtonElement>): void {
     if (selectedSpreadsheetUrl && user) {
       // Clear cache before fetching
-      localStorage.removeItem('cachedInvoices');
-      localStorage.removeItem('lastFetchTime');
-      setLastFetchTime(0);
+      localStorage.removeItem("cachedInvoices")
+      localStorage.removeItem("lastFetchTime")
+      setLastFetchTime(0)
       fetchInvoices(selectedSpreadsheetUrl)
       toast({
         title: "Data Refreshed",
@@ -590,7 +586,7 @@ export default function Dashboard() {
     if (!selectedInvoice) return
 
     try {
-      const amount = parseFloat(partialPaymentAmount)
+      const amount = Number.parseFloat(partialPaymentAmount)
       if (isNaN(amount) || amount <= 0 || amount >= selectedInvoice.amount) {
         toast({
           title: "Invalid Amount",
@@ -609,23 +605,20 @@ export default function Dashboard() {
         throw new Error(sessionError.message)
       }
 
-      const response = await fetch(
-        "https://sheetbills-server.vercel.app/api/sheets/partial-payment",
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session?.provider_token}`,
-            "X-Supabase-Token": session?.access_token || "",
-          },
-          body: JSON.stringify({
-            invoiceId: selectedInvoice.id,
-            amount: amount,
-            paymentDate: paymentDate.toISOString(),
-            sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
-          }),
+      const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/partial-payment", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.provider_token}`,
+          "X-Supabase-Token": session?.access_token || "",
         },
-      )
+        body: JSON.stringify({
+          invoiceId: selectedInvoice.id,
+          amount: amount,
+          paymentDate: paymentDate.toISOString(),
+          sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
+        }),
+      })
 
       if (!response.ok) {
         const errorData = await response.json()
@@ -635,12 +628,12 @@ export default function Dashboard() {
       // Update local state with proper typing
       const updatedInvoices = invoices.map((inv) =>
         inv.id === selectedInvoice.id
-          ? {
+          ? ({
               ...inv,
               status: amount === inv.amount ? "Paid" : "Partially Paid",
               paidAmount: amount,
               lastPaymentDate: paymentDate.toISOString(),
-            } as Invoice
+            } as Invoice)
           : inv,
       )
       setInvoices(updatedInvoices)
@@ -738,7 +731,9 @@ export default function Dashboard() {
       setInvoices(updatedInvoices)
       if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
 
-      setBulkDeleteMessage(`${selectedInvoices.size} invoice(s) have been deleted successfully and removed from your dashboard.`)
+      setBulkDeleteMessage(
+        `${selectedInvoices.size} invoice(s) have been deleted successfully and removed from your dashboard.`,
+      )
 
       setSelectedInvoices(new Set())
       setIsBulkDeleteDialogOpen(false)
@@ -763,9 +758,9 @@ export default function Dashboard() {
   }, [someVisibleSelected])
 
   React.useEffect(() => {
-    setRowOrder(currentItems.map((inv) => inv.id));
-  }, [currentItems]);
-  const sensors = useSensors(useSensor(PointerSensor));
+    setRowOrder(currentItems.map((inv) => inv.id))
+  }, [currentItems])
+  const sensors = useSensors(useSensor(PointerSensor))
 
   return (
     <div className="min-h-screen w-full ">
@@ -1024,10 +1019,7 @@ export default function Dashboard() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleBulkDelete}
-              className="bg-red-600 focus:ring-red-600"
-            >
+            <AlertDialogAction onClick={handleBulkDelete} className="bg-red-600 focus:ring-red-600">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -1036,16 +1028,17 @@ export default function Dashboard() {
 
       {/* Partial Payment Sidebar */}
       <Sheet open={isPartialPaymentModalOpen} onOpenChange={setIsPartialPaymentModalOpen}>
-        <SheetContent side="right" className="max-w-md w-full p-4 sm:p-6">
-          <SheetHeader>
-            <SheetTitle>Record Partial Payment</SheetTitle>
-            <SheetDescription>
-              Enter the payment amount and date for invoice #{selectedInvoice?.id}
-            </SheetDescription>
+        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+          <SheetHeader className="mb-4">
+            <SheetTitle className="text-xl">Record Partial Payment</SheetTitle>
+            <SheetDescription>Enter the payment amount and date for invoice #{selectedInvoice?.id}</SheetDescription>
           </SheetHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="amount">Payment Amount</Label>
+
+          <div className="grid gap-6 py-4">
+            <div className="grid gap-3">
+              <Label htmlFor="amount" className="text-sm font-medium">
+                Payment Amount
+              </Label>
               <Input
                 id="amount"
                 type="number"
@@ -1055,28 +1048,39 @@ export default function Dashboard() {
                 min="0"
                 max={selectedInvoice?.amount}
                 step="0.01"
+                className="w-full"
               />
-              <p className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded font-semibold w-fit">
+              <p className="text-sm bg-green-100 text-green-800 px-3 py-2 rounded-md font-medium">
                 Total invoice amount: {formatCurrency(selectedInvoice?.amount || 0)}
               </p>
             </div>
-            <div className="grid gap-2">
-              <Label>Payment Date</Label>
-              <div className="flex justify-center">
+
+            <div className="grid gap-3">
+              <Label className="text-sm font-medium">Payment Date</Label>
+              <div className="border rounded-md p-3 bg-white">
                 <Calendar
                   mode="single"
                   selected={paymentDate}
                   onSelect={(date) => date && setPaymentDate(date)}
-                  className="rounded-md border max-w-xs w-full p-2"
+                  className="mx-auto"
+                  classNames={{
+                    day_selected: "bg-green-600 text-white hover:bg-green-600 focus:bg-green-600",
+                    day_today: "bg-slate-100 text-slate-900",
+                    day_outside: "text-slate-300",
+                    day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
+                  }}
                 />
               </div>
             </div>
           </div>
-          <SheetFooter>
-            <Button variant="outline" onClick={() => setIsPartialPaymentModalOpen(false)}>
+
+          <SheetFooter className="flex flex-col sm:flex-row gap-3 mt-6">
+            <Button variant="outline" onClick={() => setIsPartialPaymentModalOpen(false)} className="w-full sm:w-auto">
               Cancel
             </Button>
-            <Button onClick={handlePartialPayment}>Record Payment</Button>
+            <Button onClick={handlePartialPayment} className="w-full sm:w-auto bg-green-600 hover:bg-green-700">
+              Record Payment
+            </Button>
           </SheetFooter>
         </SheetContent>
       </Sheet>
@@ -1160,9 +1164,7 @@ export default function Dashboard() {
                 >
                   {allVisibleSelected ? "Deselect All" : "Select All"}
                 </Button>
-                <span className="text-sm text-slate-500">
-                  {selectedInvoices.size} selected
-                </span>
+                <span className="text-sm text-slate-500">{selectedInvoices.size} selected</span>
               </div>
               <Button
                 variant="destructive"
@@ -1178,25 +1180,23 @@ export default function Dashboard() {
               sensors={sensors}
               collisionDetection={closestCenter}
               onDragEnd={(event: any) => {
-                const { active, over } = event;
+                const { active, over } = event
                 if (active.id !== over?.id) {
-                  const oldIndex = rowOrder.indexOf(active.id);
-                  const newIndex = rowOrder.indexOf(over.id);
-                  const newOrder = arrayMove(rowOrder, oldIndex, newIndex);
-                  setRowOrder(newOrder);
+                  const oldIndex = rowOrder.indexOf(active.id)
+                  const newIndex = rowOrder.indexOf(over.id)
+                  const newOrder = arrayMove(rowOrder, oldIndex, newIndex)
+                  setRowOrder(newOrder)
                   // Reorder currentItems and update invoices state accordingly
-                  const reordered = newOrder.map(id => currentItems.find(inv => inv.id === id)).filter((inv): inv is Invoice => Boolean(inv));
+                  const reordered = newOrder
+                    .map((id) => currentItems.find((inv) => inv.id === id))
+                    .filter((inv): inv is Invoice => Boolean(inv))
                   // Update invoices state (for persistence)
                   setInvoices((prev) => {
                     // Only reorder the current page, keep others as is
-                    const start = indexOfFirstItem;
-                    const end = indexOfLastItem;
-                    return [
-                      ...prev.slice(0, start),
-                      ...reordered,
-                      ...prev.slice(end)
-                    ];
-                  });
+                    const start = indexOfFirstItem
+                    const end = indexOfLastItem
+                    return [...prev.slice(0, start), ...reordered, ...prev.slice(end)]
+                  })
                 }
               }}
             >
@@ -1237,11 +1237,14 @@ export default function Dashboard() {
                   </TableHeader>
                   <TableBody>
                     {rowOrder.map((id) => {
-                      const invoice = currentItems.find(inv => inv.id === id);
-                      if (!invoice) return null;
+                      const invoice = currentItems.find((inv) => inv.id === id)
+                      if (!invoice) return null
                       return (
                         <SortableTableRow key={invoice.id} id={invoice.id}>
-                          <TableCell onClick={(e) => e.stopPropagation()} className="w-[56px] px-4 py-2 align-middle text-center">
+                          <TableCell
+                            onClick={(e) => e.stopPropagation()}
+                            className="w-[56px] px-4 py-2 align-middle text-center"
+                          >
                             <Checkbox
                               checked={selectedInvoices.has(invoice.id)}
                               onCheckedChange={() => handleSelectInvoice(invoice.id)}
@@ -1252,16 +1255,14 @@ export default function Dashboard() {
                           <TableCell className="font-medium">{invoice.id}</TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
-                            
                               <div className="flex flex-col">
                                 <span className="font-medium">
                                   {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}
                                 </span>
-                                
-                                 <span className="text-xs text-slate-500">
+
+                                <span className="text-xs text-slate-500">
                                   {typeof invoice.customer === "object" ? invoice.customer.email : ""}
                                 </span>
-                                
                               </div>
                             </div>
                           </TableCell>
@@ -1276,15 +1277,13 @@ export default function Dashboard() {
                                 invoice.status === "Paid"
                                   ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50 text-md px-4"
                                   : invoice.status === "Partially Paid"
-                                  ? "bg-blue-50 text-blue-700 hover:bg-blue-50 text-md px-4"
-                                  : "bg-amber-50 text-amber-700 hover:bg-amber-50 text-md px-4"
+                                    ? "bg-blue-50 text-blue-700 hover:bg-blue-50 text-md px-4"
+                                    : "bg-amber-50 text-amber-700 hover:bg-amber-50 text-md px-4"
                               }
                             >
                               {invoice.status}
                               {invoice.status === "Partially Paid" && invoice.paidAmount && (
-                                <span className="ml-2 text-sm">
-                                  ({formatCurrency(invoice.paidAmount)})
-                                </span>
+                                <span className="ml-2 text-sm">({formatCurrency(invoice.paidAmount)})</span>
                               )}
                             </Badge>
                           </TableCell>
@@ -1292,7 +1291,10 @@ export default function Dashboard() {
                           <TableCell className="text-center">
                             {invoice.status === "Pending" && new Date(invoice.dueDate) < new Date() ? (
                               <span className="text-red-600 font-medium">
-                                {Math.ceil((new Date().getTime() - new Date(invoice.dueDate).getTime()) / (1000 * 60 * 60 * 24))} days
+                                {Math.ceil(
+                                  (new Date().getTime() - new Date(invoice.dueDate).getTime()) / (1000 * 60 * 60 * 24),
+                                )}{" "}
+                                days
                               </span>
                             ) : (
                               <span className="text-slate-400">-</span>
@@ -1349,7 +1351,8 @@ export default function Dashboard() {
                                   } catch (error) {
                                     toast({
                                       title: "Error",
-                                      description: error instanceof Error ? error.message : "Failed to update invoice status",
+                                      description:
+                                        error instanceof Error ? error.message : "Failed to update invoice status",
                                       variant: "destructive",
                                     })
                                   }
@@ -1382,7 +1385,7 @@ export default function Dashboard() {
                                           Authorization: `Bearer ${session?.provider_token}`,
                                           "X-Supabase-Token": session?.access_token || "",
                                         },
-                                        body: JSON.stringify({ 
+                                        body: JSON.stringify({
                                           invoiceId: invoice.id,
                                           sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
                                             ?.sheetUrl,
@@ -1409,7 +1412,8 @@ export default function Dashboard() {
                                   } catch (error) {
                                     toast({
                                       title: "Error",
-                                      description: error instanceof Error ? error.message : "Failed to update invoice status",
+                                      description:
+                                        error instanceof Error ? error.message : "Failed to update invoice status",
                                       variant: "destructive",
                                     })
                                   }
@@ -1446,7 +1450,9 @@ export default function Dashboard() {
                                 <DropdownMenuItem
                                   onClick={(e) => {
                                     e.stopPropagation()
-                                    const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
+                                    const invoicesSheet = spreadsheets.find(
+                                      (sheet) => sheet.name === "SheetBills Invoices",
+                                    )
                                     const invoicesSheetUrl = invoicesSheet?.sheetUrl
 
                                     navigate("/create-invoice", {
@@ -1507,7 +1513,8 @@ export default function Dashboard() {
                   </Button>
                 </div>
                 <div className="text-sm text-slate-500">
-                  Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredInvoices.length)} of {filteredInvoices.length} invoices
+                  Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredInvoices.length)} of{" "}
+                  {filteredInvoices.length} invoices
                 </div>
               </div>
             )}

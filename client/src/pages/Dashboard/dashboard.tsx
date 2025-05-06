@@ -1249,7 +1249,7 @@ export default function Dashboard() {
                           <TableCell className="font-medium">{invoice.id}</TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
-                              <GmailIcon />
+                            
                               <div className="flex flex-col">
                                 <span className="font-medium">
                                   {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}

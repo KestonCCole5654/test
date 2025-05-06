@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Route, Routes, Navigate, useNavigate, Outlet, useLocation } from 'react-router-dom';
+import { Route, Routes, Navigate, Outlet } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import supabase from './components/Auth/supabaseClient';
 import Login from './components/Auth/Login';
@@ -22,9 +22,6 @@ import { LoadingSpinner } from "./components/ui/loadingSpinner";
 import AuthCallback from './pages/auth-callback'
 import Reports from './pages/Reports/reports';
 
-
-
-
 const AuthenticatedLayout = () => (
   <>
     <Header />
@@ -33,9 +30,7 @@ const AuthenticatedLayout = () => (
     </main>
   </>
 );
-{/*
-  
-  */}
+
 async function checkBusinessSheet(supabaseToken: string, googleToken: string) {
   try {
     const response = await fetch("https://sheetbills-server.vercel.app/api/check-business-sheet", {
@@ -60,19 +55,6 @@ async function checkBusinessSheet(supabaseToken: string, googleToken: string) {
 function App() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  // Try to get session from location.state, or from storage
-  let session = location.state?.session
-  if (!session) {
-    const sessionString = localStorage.getItem("sb-auth-token") || sessionStorage.getItem("sb-auth-token")
-    if (sessionString) {
-      try {
-        session = JSON.parse(sessionString)
-      } catch {}
-    }
-  }
 
   useEffect(() => {
     let isMounted = true;
@@ -91,26 +73,6 @@ function App() {
 
       setUser(session?.user ?? null);
       setLoading(false);
-
-      if (session) {
-        try {
-          const hasSheet = await checkBusinessSheet(
-            session.access_token,
-            session.provider_token || ''
-          );
-
-          const currentPath = window.location.pathname;
-          
-          if (!hasSheet && currentPath !== '/Onboarding') {
-            navigate('/Onboarding', { replace: true });
-          } else if (hasSheet && currentPath === '/Onboarding') {
-            navigate('/invoices', { replace: true });
-          }
-        } catch (error) {
-          console.error("Auth state change error:", error);
-          navigate('/login', { replace: true });
-        }
-      }
     };
 
     const initializeAuth = async () => {
@@ -133,7 +95,7 @@ function App() {
       isMounted = false;
       authSubscription?.unsubscribe();
     };
-  }, [navigate]);
+  }, []);
 
   if (loading) {
     return (
@@ -147,46 +109,44 @@ function App() {
   }
 
   return (
-    
-      <HelmetProvider>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/auth-callback" element={<AuthCallback />} />
-          
-          {/* Onboarding Route - Separate from other authenticated routes */}
-          <Route
-            path="/Onboarding"
-            element={
-              <AuthenticatedRoute authenticated={!!user} isLoading={loading}>
-                <OnboardingPage />
-              </AuthenticatedRoute>
-            }
-          />
+    <HelmetProvider>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/auth-callback" element={<AuthCallback />} />
+        
+        {/* Onboarding Route - Separate from other authenticated routes */}
+        <Route
+          path="/Onboarding"
+          element={
+            <AuthenticatedRoute authenticated={!!user} isLoading={loading}>
+              <OnboardingPage />
+            </AuthenticatedRoute>
+          }
+        />
 
-          {/* Protected Routes */}
-          <Route
-            element={
-              <AuthenticatedRoute authenticated={!!user} isLoading={loading}>
-                <AuthenticatedLayout />
-              </AuthenticatedRoute>
-            }
-          >
-            <Route path="/" element={<Navigate to="/invoices" replace />} />
-            <Route path="/invoices" element={<Dashboard />} />
-            <Route path="/create-invoice" element={<InvoiceForm />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/reports" element={<Reports />} />
-          </Route>
+        {/* Protected Routes */}
+        <Route
+          element={
+            <AuthenticatedRoute authenticated={!!user} isLoading={loading}>
+              <AuthenticatedLayout />
+            </AuthenticatedRoute>
+          }
+        >
+          <Route path="/" element={<Navigate to="/invoices" replace />} />
+          <Route path="/invoices" element={<Dashboard />} />
+          <Route path="/create-invoice" element={<InvoiceForm />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/reports" element={<Reports />} />
+        </Route>
 
-          {/* Catch all route */}
-          <Route path="*" element={
-            <Navigate to={user ? "/invoices" : "/login"} replace />
-          } />
-        </Routes>
-      </HelmetProvider>
-  
+        {/* Catch all route */}
+        <Route path="*" element={
+          <Navigate to={user ? "/invoices" : "/login"} replace />
+        } />
+      </Routes>
+    </HelmetProvider>
   );
 }
 

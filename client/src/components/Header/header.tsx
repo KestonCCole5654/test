@@ -100,31 +100,31 @@ const Header: React.FC = () => {
            <nav className="hidden md:flex items-center space-x-1">
             {user && (
               <>
-                <Link
-                  to="/dashboard"
+                <button
+                  onClick={() => navigate("/dashboard")}
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
                   Dashboard
-                </Link>
-                <Link
-                  to="/reports"
+                </button>
+                <button
+                  onClick={() => navigate("/reports")}
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
                   Reports
-                </Link>
+                </button>
                 
-                <Link
-                  to="/settings"
+                <button
+                  onClick={() => navigate("/settings")}
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
                   Account & Settings
-                </Link>
-                <Link
-                  to="/contact"
+                </button>
+                <button
+                  onClick={() => navigate("/contact")}
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
                   Contact & Support
-                </Link>
+                </button>
               </>
             )}
           </nav>
@@ -211,41 +211,51 @@ const Header: React.FC = () => {
           <div className="container max-w-7xl mx-auto px-4 sm:px-6 py-3">
             {user && (
               <nav className="flex flex-col space-y-1">
-                <Link
-                  to="/dashboard"
+                <button
+                  onClick={() => {
+                    navigate("/dashboard");
+                    handleNavigation();
+                  }}
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-                  onClick={handleNavigation}
                 >
                   Dashboard
-                </Link>
-                <Link
-                  to="/reports"
+                </button>
+                <button
+                  onClick={() => {
+                    navigate("/reports");
+                    handleNavigation();
+                  }}
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-                  onClick={handleNavigation}
                 >
                   Reports
-                </Link>
-                <Link
-                  to="/template-generator"
+                </button>
+                <button
+                  onClick={() => {
+                    navigate("/template-generator");
+                    handleNavigation();
+                  }}
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-                  onClick={handleNavigation}
                 >
                   Invoices Template Generator
-                </Link>
-                <Link
-                  to="/settings"
+                </button>
+                <button
+                  onClick={() => {
+                    navigate("/settings");
+                    handleNavigation();
+                  }}
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-                  onClick={handleNavigation}
                 >
                   Settings
-                </Link>
-                <Link
-                  to="/contact"
+                </button>
+                <button
+                  onClick={() => {
+                    navigate("/contact");
+                    handleNavigation();
+                  }}
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-                  onClick={handleNavigation}
                 >
                   Contact & Support
-                </Link>
+                </button>
               </nav>
             )}
 

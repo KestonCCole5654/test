@@ -1254,9 +1254,12 @@ export default function Dashboard() {
                                 <span className="font-medium">
                                   {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}
                                 </span>
-                                <span className="text-xs text-slate-500">
+                                {/*
+                                 <span className="text-xs text-slate-500">
                                   {typeof invoice.customer === "object" ? invoice.customer.email : ""}
                                 </span>
+                                */}
+                               
                               </div>
                             </div>
                           </TableCell>

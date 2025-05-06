@@ -106,6 +106,12 @@ const Header: React.FC = () => {
                 >
                   Dashboard
                 </Link>
+                <Link
+                  to="/reports"
+                  className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                >
+                  Reports
+                </Link>
                 
                 <Link
                   to="/settings"
@@ -211,6 +217,13 @@ const Header: React.FC = () => {
                   onClick={handleNavigation}
                 >
                   Dashboard
+                </Link>
+                <Link
+                  to="/reports"
+                  className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  onClick={handleNavigation}
+                >
+                  Reports
                 </Link>
                 <Link
                   to="/template-generator"

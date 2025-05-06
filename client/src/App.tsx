@@ -20,6 +20,7 @@ import OnboardingPage from './pages/Onboarding/page';
 import ContactPage from './pages/Contact/contact';
 import { LoadingSpinner } from "./components/ui/loadingSpinner";
 import AuthCallback from './pages/auth-callback'
+import Reports from './pages/Reports/reports';
 
 
 
@@ -176,6 +177,7 @@ function App() {
             <Route path="/create-invoice" element={<InvoiceForm />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/reports" element={<Reports />} />
           </Route>
 
           {/* Catch all route */}

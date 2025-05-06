@@ -814,7 +814,7 @@ export default function Dashboard() {
                 </div>
               )}
               <span className="text-xs">
-                <span className="bg-green-100 text-green-800 rounded px-2">{pendingInvoices} pending</span>
+                <span className="bg-green-100 text-green-800  pl-2 pr-2 pt-0 pb-0">{pendingInvoices} pending</span>
               </span>
             </CardContent>
           </Card>
@@ -822,7 +822,7 @@ export default function Dashboard() {
           {/* Paid Amount Card */}
           <Card className="py-2 px-3">
             <CardHeader className="pb-1 px-2">
-              <CardTitle className="text-xs font-medium text-slate-500">Paid Amount</CardTitle>
+              <CardTitle className="text-xs font-medium text-slate-500 ">Paid Amount</CardTitle>
             </CardHeader>
             <CardContent className="px-2 py-1">
               {isStateLoading ? (
@@ -833,7 +833,7 @@ export default function Dashboard() {
                 </div>
               )}
               <span className="text-xs">
-                <span className="bg-green-100 text-green-800 rounded px-2">{paidInvoices} paid</span>
+                <span className="bg-green-100 text-green-800  pl-2 pr-2 pt-0 pb-0">{paidInvoices} paid</span>
               </span>
             </CardContent>
           </Card>

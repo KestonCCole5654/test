@@ -5,6 +5,7 @@ import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { format } from "date-fns"
 import { Link } from "react-router-dom"
+import { Mail, CheckCircle, AlertCircle } from "lucide-react"
 
 // Placeholder components for charts and selectors
 const DateRangePicker = ({ value, onChange }: any) => (
@@ -28,6 +29,40 @@ const PieChart = ({ data }: any) => (
   <div className="h-40 flex items-center justify-center bg-slate-100 rounded">[Pie Chart]</div>
 )
 
+// Mock data for clients
+const clients = [
+  { id: 1, email: "miquel@ucademy.com", status: "Active" },
+  { id: 2, email: "jeff@ucademy.com", status: "Active" },
+  { id: 3, email: "pablo@ucademy.com", status: "Inactive" },
+  { id: 4, email: "pablo.pomareta@ucademy.com", status: "Active" },
+  { id: 5, email: "ramiro@ucademy.com", status: "Active" },
+  { id: 6, email: "patricia.garre@ucademy.com", status: "Active" },
+  { id: 7, email: "facturacion@ucademy.com", status: "Inactive" },
+  { id: 8, email: "tech@ucademy.com", status: "Active" },
+]
+
+// Mock report data per client
+const clientReports: Record<string, any> = {
+  "miquel@ucademy.com": {
+    history: [
+      { date: "2024-05-01", action: "Invoice Sent", amount: 1200, status: "Paid" },
+      { date: "2024-05-10", action: "Invoice Sent", amount: 800, status: "Overdue" },
+    ],
+    totalInvoices: 2,
+    totalPaid: 1200,
+    totalOverdue: 800,
+  },
+  "jeff@ucademy.com": {
+    history: [
+      { date: "2024-05-03", action: "Invoice Sent", amount: 500, status: "Paid" },
+    ],
+    totalInvoices: 1,
+    totalPaid: 500,
+    totalOverdue: 0,
+  },
+  // ...add more mock data as needed
+}
+
 function formatCurrency(amount: number) {
   return amount.toLocaleString("en-US", {
     style: "currency",
@@ -37,207 +72,129 @@ function formatCurrency(amount: number) {
   })
 }
 
-// Mock data
-const clientList = [
-  { id: 1, name: "Acme Corp" },
-  { id: 2, name: "Globex" },
-  { id: 3, name: "Wayne Enterprises" },
-]
-const summary = {
-  totalInvoices: 42,
-  totalRevenue: 12800,
-  avgPaymentTime: 12,
-  dueThisMonth: 5,
-  overdueCount: 2,
-}
-const monthlyTrendsData: any[] = []
-const statusBreakdownData: any[] = []
-const filteredInvoices = [
-  { clientName: "Acme Corp", invoiceNumber: "INV-001", amount: 1200, sentDate: "2024-05-01", dueDate: "2024-05-15", paidDate: "2024-05-10", status: "Paid" },
-  { clientName: "Globex", invoiceNumber: "INV-002", amount: 800, sentDate: "2024-05-03", dueDate: "2024-05-17", paidDate: null, status: "Unpaid" },
-]
-const clientHistory = [
-  { id: 1, name: "Acme Corp", invoiceCount: 10, totalPaid: 8000, totalOutstanding: 200, lastPaymentDate: "2024-05-10" },
-  { id: 2, name: "Globex", invoiceCount: 5, totalPaid: 2000, totalOutstanding: 800, lastPaymentDate: null },
-]
-const emailLogs = [
-  { id: 1, date: "2024-05-01", clientName: "Acme Corp", invoiceNumber: "INV-001", type: "Invoice Sent", status: "Sent" },
-  { id: 2, date: "2024-05-03", clientName: "Globex", invoiceNumber: "INV-002", type: "Reminder", status: "Sent" },
-]
-
 export default function Reports() {
-  const [dateRange, setDateRange] = useState("")
-  const [status, setStatus] = useState("All")
-  const [client, setClient] = useState("")
+  const [selectedClient, setSelectedClient] = useState<string | null>(null)
 
-  // Export handler (placeholder)
-  const handleExport = () => {
-    alert("Export functionality coming soon!")
-  }
+  const selectedReport = selectedClient ? clientReports[selectedClient] : null
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-      {/* Header & Filters */}
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
-        <h1 className="text-2xl font-bold">Reports</h1>
-        <div className="flex flex-wrap gap-3">
-          <DateRangePicker value={dateRange} onChange={setDateRange} />
-          <Select value={status} onChange={setStatus} options={["All", "Paid", "Unpaid", "Overdue"]} />
-          <ClientSelector value={client} onChange={setClient} clients={clientList} />
-          <Button onClick={handleExport} variant="outline">Export CSV/PDF</Button>
+      <h1 className="text-2xl font-bold mb-6">Reports</h1>
+      <div className="flex flex-col md:flex-row gap-8">
+        {/* Left: Client Table */}
+        <div className="w-full md:w-1/2">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-semibold text-slate-700">Clients</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell></TableCell>
+                    <TableCell>Email</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {clients.map((client) => (
+                    <TableRow key={client.email}>
+                      <TableCell className="w-8">
+                        <img src="/google-icon.svg" alt="Google" className="h-5 w-5" />
+                      </TableCell>
+                      <TableCell className="font-medium text-slate-800">{client.email}</TableCell>
+                      <TableCell>
+                        {client.status === "Active" ? (
+                          <span className="inline-flex items-center bg-green-100 text-green-800 rounded px-2 text-xs">
+                            <CheckCircle className="h-3 w-3 mr-1" /> Active
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center bg-yellow-100 text-yellow-800 rounded px-2 text-xs">
+                            <AlertCircle className="h-3 w-3 mr-1" /> Inactive
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setSelectedClient(client.email)}
+                        >
+                          Generate Report
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
+        {/* Right: Client Report */}
+        <div className="w-full md:w-1/2">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-semibold text-slate-700">
+                {selectedClient ? `Report for ${selectedClient}` : "Select a client to view report"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              {selectedReport ? (
+                <div className="space-y-4">
+                  <div className="flex gap-4 flex-wrap">
+                    <div className="bg-green-50 rounded p-3 flex-1 min-w-[120px]">
+                      <div className="text-xs text-slate-500">Total Invoices Sent</div>
+                      <div className="text-lg font-bold">{selectedReport.totalInvoices}</div>
+                    </div>
+                    <div className="bg-green-50 rounded p-3 flex-1 min-w-[120px]">
+                      <div className="text-xs text-slate-500">Total Paid</div>
+                      <div className="text-lg font-bold">{formatCurrency(selectedReport.totalPaid)}</div>
+                    </div>
+                    <div className="bg-yellow-50 rounded p-3 flex-1 min-w-[120px]">
+                      <div className="text-xs text-slate-500">Total Overdue</div>
+                      <div className="text-lg font-bold">{formatCurrency(selectedReport.totalOverdue)}</div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold mb-2">Client History</div>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Date</TableCell>
+                          <TableCell>Action</TableCell>
+                          <TableCell>Amount</TableCell>
+                          <TableCell>Status</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {selectedReport.history.map((h: any, idx: number) => (
+                          <TableRow key={idx}>
+                            <TableCell>{h.date}</TableCell>
+                            <TableCell>{h.action}</TableCell>
+                            <TableCell>{formatCurrency(h.amount)}</TableCell>
+                            <TableCell>
+                              {h.status === "Paid" ? (
+                                <span className="bg-green-100 text-green-800 rounded px-2 text-xs">Paid</span>
+                              ) : h.status === "Overdue" ? (
+                                <span className="bg-yellow-100 text-yellow-800 rounded px-2 text-xs">Overdue</span>
+                              ) : (
+                                <span className="bg-slate-100 text-slate-800 rounded px-2 text-xs">{h.status}</span>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-slate-500 text-sm">No report selected.</div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
-
-      {/* Key Summary Metrics */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-        <Card>
-          <CardHeader className="pb-1">
-            <CardTitle className="text-xs font-medium text-slate-500 flex items-center gap-2">Total Invoices Sent</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0 pb-2">
-            <div className="text-xl font-bold">{summary.totalInvoices}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-1">
-            <CardTitle className="text-xs font-medium text-slate-500 flex items-center gap-2">Total Revenue Received</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0 pb-2">
-            <div className="text-xl font-bold">{formatCurrency(summary.totalRevenue)}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-1">
-            <CardTitle className="text-xs font-medium text-slate-500 flex items-center gap-2">Avg. Payment Time</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0 pb-2">
-            <div className="text-xl font-bold">{summary.avgPaymentTime} days</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-1">
-            <CardTitle className="text-xs font-medium text-slate-500 flex items-center gap-2">Due This Month</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0 pb-2">
-            <div className="text-xl font-bold">{summary.dueThisMonth}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-1">
-            <CardTitle className="text-xs font-medium text-slate-500 flex items-center gap-2">Overdue Invoices</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0 pb-2">
-            <div className="text-xl font-bold">{summary.overdueCount}</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Invoice Activity Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <Card>
-          <CardHeader className="pb-1">Monthly Invoice Trends</CardHeader>
-          <CardContent className="pt-0"><BarOrLineChart data={monthlyTrendsData} /></CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-1">Status Breakdown</CardHeader>
-          <CardContent className="pt-0"><PieChart data={statusBreakdownData} /></CardContent>
-        </Card>
-      </div>
-
-      {/* Payment Timeline Table */}
-      <Card className="mb-8">
-        <CardHeader className="pb-1">Payment Timeline</CardHeader>
-        <CardContent className="pt-0">
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Client Name</TableCell>
-                <TableCell>Invoice #</TableCell>
-                <TableCell>Amount</TableCell>
-                <TableCell>Sent Date</TableCell>
-                <TableCell>Due Date</TableCell>
-                <TableCell>Paid Date</TableCell>
-                <TableCell>Status</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredInvoices.map(inv => (
-                <TableRow key={inv.invoiceNumber}>
-                  <TableCell>{inv.clientName}</TableCell>
-                  <TableCell>{inv.invoiceNumber}</TableCell>
-                  <TableCell>{formatCurrency(inv.amount)}</TableCell>
-                  <TableCell>{inv.sentDate}</TableCell>
-                  <TableCell>{inv.dueDate}</TableCell>
-                  <TableCell>{inv.paidDate || "-"}</TableCell>
-                  <TableCell>{inv.status}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      {/* Client History Section */}
-      <Card className="mb-8">
-        <CardHeader className="pb-1">Client History</CardHeader>
-        <CardContent className="pt-0">
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Client</TableCell>
-                <TableCell>Invoices</TableCell>
-                <TableCell>Total Paid</TableCell>
-                <TableCell>Total Outstanding</TableCell>
-                <TableCell>Last Payment</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {clientHistory.map(client => (
-                <TableRow key={client.id}>
-                  <TableCell>{client.name}</TableCell>
-                  <TableCell>{client.invoiceCount}</TableCell>
-                  <TableCell>{formatCurrency(client.totalPaid)}</TableCell>
-                  <TableCell>{formatCurrency(client.totalOutstanding)}</TableCell>
-                  <TableCell>{client.lastPaymentDate || "-"}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      {/* Communication Log */}
-      <Card>
-        <CardHeader className="pb-1">Communication Log</CardHeader>
-        <CardContent className="pt-0">
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Date</TableCell>
-                <TableCell>Client</TableCell>
-                <TableCell>Invoice #</TableCell>
-                <TableCell>Type</TableCell>
-                <TableCell>Status</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {emailLogs.map(log => (
-                <TableRow key={log.id}>
-                  <TableCell>{log.date}</TableCell>
-                  <TableCell>{log.clientName}</TableCell>
-                  <TableCell>{log.invoiceNumber}</TableCell>
-                  <TableCell>{log.type}</TableCell>
-                  <TableCell>
-                    <span className={log.status === 'Sent' ? 'text-green-700' : 'text-yellow-700'}>
-                      {log.status}
-                    </span>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
     </div>
   )
 } 

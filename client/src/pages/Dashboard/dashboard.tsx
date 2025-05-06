@@ -787,7 +787,7 @@ export default function Dashboard() {
           {/* Total Invoices Card */}
           <Card className="py-2 px-3">
             <CardHeader className="pb-1 px-2">
-              <CardTitle className="text-xs font-medium text-slate-500">Total Invoices</CardTitle>
+              <CardTitle className="text-md font-medium text-slate-500">Total Invoices</CardTitle>
             </CardHeader>
             <CardContent className="px-2 py-1">
               {isStateLoading ? (
@@ -803,7 +803,7 @@ export default function Dashboard() {
           {/* Pending Amount Card */}
           <Card className="py-2 px-3">
             <CardHeader className="pb-1 px-2">
-              <CardTitle className="text-xs font-medium text-slate-500">Pending Amount</CardTitle>
+              <CardTitle className="text-md font-medium text-slate-500">Pending Amount</CardTitle>
             </CardHeader>
             <CardContent className="px-2 py-1">
               {isStateLoading ? (
@@ -822,7 +822,7 @@ export default function Dashboard() {
           {/* Paid Amount Card */}
           <Card className="py-2 px-3">
             <CardHeader className="pb-1 px-2">
-              <CardTitle className="text-xs font-medium text-slate-500 ">Paid Amount</CardTitle>
+              <CardTitle className="text-md font-medium text-slate-500 ">Paid Amount</CardTitle>
             </CardHeader>
             <CardContent className="px-2 py-1">
               {isStateLoading ? (
@@ -841,7 +841,7 @@ export default function Dashboard() {
           {/* Total Revenue Card */}
           <Card className="py-2 px-3">
             <CardHeader className="pb-1 px-2">
-              <CardTitle className="text-xs font-medium text-slate-500">Total Revenue</CardTitle>
+              <CardTitle className="text-md font-medium text-slate-500">Total Revenue</CardTitle>
             </CardHeader>
             <CardContent className="px-2 py-1">
               {isStateLoading ? (

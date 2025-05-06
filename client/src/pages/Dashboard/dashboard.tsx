@@ -1114,16 +1114,7 @@ export default function Dashboard() {
                   className="font-medium"
                   disabled={currentItems.length === 0}
                 >
-                  {allVisibleSelected ? "Deselect All (Page)" : "Select All (Page)"}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleSelectAllGlobal}
-                  className="font-medium"
-                  disabled={filteredInvoices.length === 0}
-                >
-                  {selectedInvoices.size === filteredInvoices.length ? "Deselect All (All)" : "Select All (All)"}
+                  {allVisibleSelected ? "Deselect All" : "Select All"}
                 </Button>
                 <span className="text-sm text-slate-500">
                   {selectedInvoices.size} selected

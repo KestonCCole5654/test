@@ -130,9 +130,6 @@ export default function Reports() {
         <Card className="bg-white shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-center space-x-4">
-              <div className="bg-green-100 p-3 rounded-full">
-                <CheckCircle className="h-6 w-6 text-green-600" />
-              </div>
               <div>
                 <p className="text-sm font-medium text-slate-500">Active Clients</p>
                 <h3 className="text-2xl font-bold text-slate-800">{clients.filter(c => c.status === "Active").length}</h3>
@@ -144,9 +141,6 @@ export default function Reports() {
         <Card className="bg-white shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-center space-x-4">
-              <div className="bg-blue-100 p-3 rounded-full">
-                <Mail className="h-6 w-6 text-blue-600" />
-              </div>
               <div>
                 <p className="text-sm font-medium text-slate-500">Total Invoices</p>
                 <h3 className="text-2xl font-bold text-slate-800">
@@ -160,9 +154,7 @@ export default function Reports() {
         <Card className="bg-white shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-center space-x-4">
-              <div className="bg-yellow-100 p-3 rounded-full">
-                <AlertCircle className="h-6 w-6 text-yellow-600" />
-              </div>
+             
               <div>
                 <p className="text-sm font-medium text-slate-500">Total Overdue</p>
                 <h3 className="text-2xl font-bold text-slate-800">

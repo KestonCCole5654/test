@@ -785,71 +785,73 @@ export default function Dashboard() {
         {/* Stats Cards Section */}
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8">
           {/* Total Invoices Card */}
-          <Card>
-            <CardHeader className="pb-1 sm:pb-2 px-3 sm:px-6">
-              <CardTitle className="text-xs sm:text-sm font-medium text-slate-500">Total Invoices</CardTitle>
+          <Card className="py-2 px-3">
+            <CardHeader className="pb-1 px-2">
+              <CardTitle className="text-xs font-medium text-slate-500">Total Invoices</CardTitle>
             </CardHeader>
-            <CardContent className="px-3 sm:px-6 py-1 sm:py-2">
+            <CardContent className="px-2 py-1">
               {isStateLoading ? (
-                <Skeleton className="h-8 w-24" />
+                <Skeleton className="h-6 w-16" />
               ) : (
                 <div className="flex items-center">
-                  <div className="text-xl sm:text-3xl font-bold text-slate-900">{totalInvoices}</div>
+                  <div className="text-lg font-bold text-slate-900">{totalInvoices}</div>
                 </div>
               )}
             </CardContent>
           </Card>
 
           {/* Pending Amount Card */}
-          <Card>
-            <CardHeader className="pb-1 sm:pb-2 px-3 sm:px-6">
-              <CardTitle className="text-xs sm:text-sm font-medium text-slate-500">Pending Amount</CardTitle>
+          <Card className="py-2 px-3">
+            <CardHeader className="pb-1 px-2">
+              <CardTitle className="text-xs font-medium text-slate-500">Pending Amount</CardTitle>
             </CardHeader>
-            <CardContent className="px-3 sm:px-6 py-1 sm:py-2">
+            <CardContent className="px-2 py-1">
               {isStateLoading ? (
-                <Skeleton className="h-8 w-24" />
+                <Skeleton className="h-6 w-16" />
               ) : (
                 <div className="flex items-center">
-                  <div className="text-xl sm:text-3xl font-bold text-slate-900">{formatCurrency(pendingAmount)}</div>
+                  <div className="text-lg font-bold text-slate-900">{formatCurrency(pendingAmount)}</div>
                 </div>
               )}
-              <p className="text-xs text-slate-500 mt-1">{pendingInvoices} pending</p>
+              <span className="text-xs">
+                <span className="bg-green-100 text-green-800 rounded px-2">{pendingInvoices} pending</span>
+              </span>
             </CardContent>
           </Card>
 
           {/* Paid Amount Card */}
-          <Card>
-            <CardHeader className="pb-1 sm:pb-2 px-3 sm:px-6">
-              <CardTitle className="text-xs sm:text-sm font-medium text-slate-500">Paid Amount</CardTitle>
+          <Card className="py-2 px-3">
+            <CardHeader className="pb-1 px-2">
+              <CardTitle className="text-xs font-medium text-slate-500">Paid Amount</CardTitle>
             </CardHeader>
-            <CardContent className="px-3 sm:px-6 py-1 sm:py-2">
+            <CardContent className="px-2 py-1">
               {isStateLoading ? (
-                <Skeleton className="h-8 w-24" />
+                <Skeleton className="h-6 w-16" />
               ) : (
                 <div className="flex items-center">
-                  <div className="text-xl sm:text-3xl font-bold text-slate-900">{formatCurrency(paidAmount)}</div>
+                  <div className="text-lg font-bold text-slate-900">{formatCurrency(paidAmount)}</div>
                 </div>
               )}
-              <p className="text-xs text-slate-500 mt-1">{paidInvoices} paid</p>
+              <span className="text-xs">
+                <span className="bg-green-100 text-green-800 rounded px-2">{paidInvoices} paid</span>
+              </span>
             </CardContent>
           </Card>
 
           {/* Total Revenue Card */}
-          <Card>
-            <CardHeader className="pb-1 sm:pb-2 px-3 sm:px-6">
-              <CardTitle className="text-xs sm:text-sm font-medium text-slate-500">Total Revenue</CardTitle>
+          <Card className="py-2 px-3">
+            <CardHeader className="pb-1 px-2">
+              <CardTitle className="text-xs font-medium text-slate-500">Total Revenue</CardTitle>
             </CardHeader>
-            <CardContent className="px-3 sm:px-6 py-1 sm:py-2">
+            <CardContent className="px-2 py-1">
               {isStateLoading ? (
-                <Skeleton className="h-8 w-24" />
+                <Skeleton className="h-6 w-16" />
               ) : (
                 <div className="flex items-center">
-                  <div className="text-xl sm:text-3xl font-bold text-slate-900">
-                    {formatCurrency(paidAmount + pendingAmount)}
-                  </div>
+                  <div className="text-lg font-bold text-slate-900">{formatCurrency(paidAmount + pendingAmount)}</div>
                 </div>
               )}
-              <p className="text-xs text-slate-500 mt-1">All time</p>
+              <span className="text-xs text-slate-500">All time</span>
             </CardContent>
           </Card>
         </div>

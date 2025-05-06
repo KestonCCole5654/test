@@ -2,7 +2,7 @@
 
 import React from "react"
 import { useEffect, useState, useRef } from "react"
-import { Trash2, Edit, MoreVertical, Plus, RefreshCw, ArrowUpDown, CheckCircle, Clock, DollarSign, X } from "lucide-react"
+import { Trash2, Edit, MoreVertical, Plus, RefreshCw, ArrowUpDown, CheckCircle, Clock, DollarSign, X, GripVertical } from "lucide-react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
@@ -96,12 +96,15 @@ function SortableTableRow({ id, children, ...props }: any) {
         transform: CSS.Transform.toString(transform),
         transition,
         opacity: isDragging ? 0.5 : 1,
-        cursor: 'grab',
       }}
-      {...attributes}
-      {...listeners}
       {...props}
     >
+      {/* Drag handle cell */}
+      <td className="w-8 px-2 align-middle text-center cursor-grab" style={{ verticalAlign: 'middle' }}>
+        <span {...attributes} {...listeners} className="inline-flex items-center justify-center cursor-grab text-gray-400 hover:text-gray-600 active:text-gray-800">
+          <GripVertical className="h-5 w-5" />
+        </span>
+      </td>
       {children}
     </tr>
   );
@@ -1191,6 +1194,7 @@ export default function Dashboard() {
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-slate-50 hover:bg-slate-50">
+                      <TableHead className="w-8 px-2"></TableHead>
                       <TableHead className="w-[56px] px-4 py-2 align-middle text-center">
                         <input
                           type="checkbox"

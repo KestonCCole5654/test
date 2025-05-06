@@ -150,20 +150,6 @@ export default function Reports() {
             </div>
           </CardContent>
         </Card>
-        
-        <Card className="bg-white shadow-sm">
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-4">
-             
-              <div>
-                <p className="text-sm font-medium text-slate-500">Total Overdue</p>
-                <h3 className="text-2xl font-bold text-slate-800">
-                  {formatCurrency(Object.values(clientReports).reduce((sum, report) => sum + (report.totalOverdue || 0), 0))}
-                </h3>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
       
       <div className="flex flex-col lg:flex-row gap-8">
@@ -191,7 +177,6 @@ export default function Reports() {
                     <TableRow className="bg-slate-50 hover:bg-slate-50">
                       <TableHead className="w-12"></TableHead>
                       <TableHead>Email</TableHead>
-                      <TableHead>Status</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -203,17 +188,6 @@ export default function Reports() {
                             <GmailIcon />
                           </TableCell>
                           <TableCell className="font-medium text-slate-800">{client.email}</TableCell>
-                          <TableCell>
-                            {client.status === "Active" ? (
-                              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 hover:bg-green-50">
-                                <CheckCircle className="h-3 w-3 mr-1" /> Active
-                              </Badge>
-                            ) : (
-                              <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 hover:bg-yellow-50">
-                                <AlertCircle className="h-3 w-3 mr-1" /> Inactive
-                              </Badge>
-                            )}
-                          </TableCell>
                           <TableCell className="text-right">
                             <Button
                               size="sm"
@@ -228,7 +202,7 @@ export default function Reports() {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={4} className="text-center py-8 text-slate-500">
+                        <TableCell colSpan={3} className="text-center py-8 text-slate-500">
                           No clients found matching your search.
                         </TableCell>
                       </TableRow>

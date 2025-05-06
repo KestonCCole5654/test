@@ -59,14 +59,14 @@ const PieChartComponent = ({ data }: any) => (
 
 // Mock data for clients
 const clients = [
-  { id: 1, email: "miquel@ucademy.com", status: "Active" },
-  { id: 2, email: "jeff@ucademy.com", status: "Active" },
-  { id: 3, email: "pablo@ucademy.com", status: "Inactive" },
-  { id: 4, email: "pablo.pomareta@ucademy.com", status: "Active" },
-  { id: 5, email: "ramiro@ucademy.com", status: "Active" },
-  { id: 6, email: "patricia.garre@ucademy.com", status: "Active" },
-  { id: 7, email: "facturacion@ucademy.com", status: "Inactive" },
-  { id: 8, email: "tech@ucademy.com", status: "Active" },
+  { id: 1, email: "miquel@ucademy.com", status: "Sent" },
+  { id: 2, email: "jeff@ucademy.com", status: "Sent" },
+  { id: 3, email: "pablo@ucademy.com", status: "Not Sent" },
+  { id: 4, email: "pablo.pomareta@ucademy.com", status: "Sent" },
+  { id: 5, email: "ramiro@ucademy.com", status: "Sent" },
+  { id: 6, email: "patricia.garre@ucademy.com", status: "Sent" },
+  { id: 7, email: "facturacion@ucademy.com", status: "Not Sent" },
+  { id: 8, email: "tech@ucademy.com", status: "Sent" },
 ]
 
 // Mock report data per client

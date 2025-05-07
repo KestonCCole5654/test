@@ -16,6 +16,20 @@ export default function AuthCallback() {
         .single()
 
       if (error) throw error
+
+      // Check if business details sheet exists
+      const businessSheetUrl = localStorage.getItem('business_sheet_url')
+      if (businessSheetUrl) {
+        // If business sheet exists, mark onboarding as completed
+        if (!data?.onboarding_completed) {
+          await supabase
+            .from('user_settings')
+            .update({ onboarding_completed: true })
+            .eq('user_id', userId)
+        }
+        return false // Don't show onboarding if business sheet exists
+      }
+
       return !data?.onboarding_completed
     } catch (err) {
       console.error('Error checking onboarding status:', err)

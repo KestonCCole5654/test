@@ -311,8 +311,9 @@ export default function LoginPage() {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
-        const needsOnboarding = await checkUserOnboarding(session.user.id)
-        navigate(needsOnboarding ? "/Onboarding" : "/invoices")
+        // const needsOnboarding = await checkUserOnboarding(session.user.id)
+        // navigate(needsOnboarding ? "/Onboarding" : "/invoices")
+        navigate("/invoices") // Always go to invoices
       }
     }
     checkUser()

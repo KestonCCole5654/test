@@ -55,11 +55,9 @@ export default function AuthCallback() {
         if (error) throw error
 
         if (session) {
-          // Check if user needs onboarding
-          const needsOnboarding = await checkUserOnboarding(session.user.id)
-          
-          // Redirect based on onboarding status
-          navigate(needsOnboarding ? '/Onboarding' : '/invoices')
+          // const needsOnboarding = await checkUserOnboarding(session.user.id)
+          // navigate(needsOnboarding ? '/Onboarding' : '/invoices')
+          navigate('/invoices') // Always go to invoices
         } else {
           navigate('/login')
         }

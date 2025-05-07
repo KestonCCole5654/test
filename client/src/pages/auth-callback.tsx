@@ -17,17 +17,27 @@ export default function AuthCallback() {
 
       if (error) throw error
 
-      // Check if business details sheet exists
+      // Check if business details sheet exists in localStorage
       const businessSheetUrl = localStorage.getItem('business_sheet_url')
-      if (businessSheetUrl) {
-        // If business sheet exists, mark onboarding as completed
+      
+      // Also check if we have any spreadsheets
+      const { data: spreadsheets, error: sheetsError } = await supabase
+        .from('spreadsheets')
+        .select('*')
+        .eq('user_id', userId)
+
+      if (sheetsError) throw sheetsError
+
+      // If we have either a business sheet URL or any spreadsheets, mark onboarding as completed
+      if (businessSheetUrl || (spreadsheets && spreadsheets.length > 0)) {
+        // If onboarding isn't marked as completed, update it
         if (!data?.onboarding_completed) {
           await supabase
             .from('user_settings')
             .update({ onboarding_completed: true })
             .eq('user_id', userId)
         }
-        return false // Don't show onboarding if business sheet exists
+        return false // Don't show onboarding if we have any sheets
       }
 
       return !data?.onboarding_completed

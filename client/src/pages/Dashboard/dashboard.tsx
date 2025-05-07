@@ -1,7 +1,6 @@
 "use client"
 
-import React from "react"
-import { useEffect, useState, useRef } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import { Trash2, Edit, MoreVertical, Plus, RefreshCw, ArrowUpDown, X, GripVertical } from "lucide-react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
@@ -21,7 +20,6 @@ import supabase from "../../components/Auth/supabaseClient"
 import type { User } from "@supabase/supabase-js"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
-import { Avatar, AvatarFallback } from "../../components/ui/avatar"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,6 +38,9 @@ import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } 
 import { CSS } from "@dnd-kit/utilities"
 import { Sheet, SheetContent, SheetHeader, SheetFooter, SheetTitle, SheetDescription } from "../../components/ui/sheet"
 
+// =====================
+// Types & Interfaces
+// =====================
 interface Invoice {
   id: string
   date: string
@@ -77,44 +78,11 @@ interface Spreadsheet {
   isDefault: boolean
 }
 
-function SortableTableRow({ id, children, ...props }: any) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
-  return (
-    <tr
-      ref={setNodeRef}
-      style={{
-        transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.5 : 1,
-      }}
-      {...props}
-    >
-      {/* Drag handle cell */}
-      <td className="w-8 px-2 align-middle text-center cursor-grab" style={{ verticalAlign: "middle" }}>
-        <span
-          {...attributes}
-          {...listeners}
-          className="inline-flex items-center justify-center cursor-grab text-gray-400 hover:text-gray-600 active:text-gray-800"
-        >
-          <GripVertical className="h-5 w-5" />
-        </span>
-      </td>
-      {children}
-    </tr>
-  )
-}
-
-// Add GmailIcon SVG component
-const GmailIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path
-      d="M22 6C22 4.9 21.1 4 20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6ZM20 6L12 11L4 6H20ZM20 18H4V8L12 13L20 8V18Z"
-      fill="#EA4335"
-    />
-  </svg>
-)
-
+// =====================
+// Main Dashboard Component
+// =====================
 export default function Dashboard() {
+  // ----------- State & Constants -----------
   const navigate = useNavigate()
   const location = useLocation()
   const [user, setUser] = useState<User | null>(null)
@@ -142,20 +110,23 @@ export default function Dashboard() {
     const cachedTime = localStorage.getItem("lastFetchTime")
     return cachedTime ? Number.parseInt(cachedTime) : 0
   })
-  // Add pagination state
+  // Pagination
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(10)
+  // Partial Payment Modal
   const [isPartialPaymentModalOpen, setIsPartialPaymentModalOpen] = useState(false)
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
   const [partialPaymentAmount, setPartialPaymentAmount] = useState("")
   const [paymentDate, setPaymentDate] = useState<Date>(new Date())
+  // Bulk selection
   const [selectedInvoices, setSelectedInvoices] = useState<Set<string>>(new Set())
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false)
   const headerCheckboxRef = useRef<HTMLInputElement>(null)
   const [bulkDeleteMessage, setBulkDeleteMessage] = useState<string | null>(null)
+  // Row order for drag-and-drop
   const [rowOrder, setRowOrder] = React.useState(invoices.map((inv) => inv.id))
 
-  // Calculate totals
+  // ----------- Derived Values -----------
   const totalInvoices = invoices.length
   const pendingAmount = invoices
     .filter((invoice) => invoice.status === "Pending")
@@ -166,19 +137,32 @@ export default function Dashboard() {
   const pendingInvoices = invoices.filter((invoice) => invoice.status === "Pending").length
   const paidInvoices = invoices.filter((invoice) => invoice.status === "Paid").length
 
+  // =====================
+  // Table Pagination & Selection (must be above useEffect hooks)
+  // =====================
+  const indexOfLastItem = currentPage * itemsPerPage
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage
+  const currentItems = filteredInvoices.slice(indexOfFirstItem, indexOfLastItem)
+  const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage)
+  const allVisibleIds = currentItems.map((invoice) => invoice.id)
+  const allVisibleSelected = allVisibleIds.every((id) => selectedInvoices.has(id))
+  const someVisibleSelected = allVisibleIds.some((id) => selectedInvoices.has(id)) && !allVisibleSelected
+
+  // =====================
+  // Effects
+  // =====================
+
+  // Auth check on mount
   useEffect(() => {
     let isMounted = true
     const abortController = new AbortController()
-
     const checkAuth = async () => {
       try {
         const {
           data: { user },
           error,
         } = await supabase.auth.getUser()
-
         if (!isMounted) return
-
         if (error) {
           navigate("/login", {
             state: {
@@ -189,14 +173,11 @@ export default function Dashboard() {
           })
           return
         }
-
         if (!user) {
           navigate("/login", { state: { from: location.pathname }, replace: true })
           return
         }
-
         setUser(user)
-
         const {
           data: { session },
         } = await supabase.auth.getSession()
@@ -215,55 +196,43 @@ export default function Dashboard() {
         })
       }
     }
-
     checkAuth()
-
     return () => {
       isMounted = false
       abortController.abort()
     }
   }, [navigate, location.pathname])
 
+  // Fetch spreadsheets for user
   useEffect(() => {
     const abortController = new AbortController()
     let isMounted = true
-
     const fetchData = async () => {
       try {
         if (!user) return
-
         setIsLoading(true)
         const {
           data: { session },
           error,
         } = await supabase.auth.getSession()
-
         if (!isMounted) return
-
         if (error || !session) {
           throw new Error(error?.message || "Session validation failed")
         }
-
         const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/spreadsheets", {
           signal: abortController.signal,
           headers: { Authorization: `Bearer ${session.provider_token}` },
         })
-
         if (!response.ok) {
           const errorData = await response.json()
           throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
         }
-
         const data = await response.json()
-
         if (!isMounted) return
-
         const spreadsheets = data.spreadsheets || []
         setSpreadsheets(spreadsheets)
-
         const storedDefault = localStorage.getItem("defaultSheetUrl")
         const validDefault = spreadsheets.some((s: Spreadsheet) => s.sheetUrl === storedDefault)
-
         if (spreadsheets.length > 0) {
           const newDefault = spreadsheets.find((s: Spreadsheet) => s.isDefault) || spreadsheets[0]
           if (!validDefault) {
@@ -273,7 +242,6 @@ export default function Dashboard() {
         }
       } catch (err) {
         if (!isMounted) return
-
         if (err instanceof Error && err.message.includes("401")) {
           navigate("/login", { state: { from: location.pathname }, replace: true })
         }
@@ -281,16 +249,14 @@ export default function Dashboard() {
         if (isMounted) setIsLoading(false)
       }
     }
-
     fetchData()
-
     return () => {
       isMounted = false
       abortController.abort()
     }
   }, [user, navigate, location.pathname])
 
-  // Filter and sort invoices
+  // Filter and sort invoices when data or filters change
   useEffect(() => {
     const filtered = invoices.filter((invoice) => {
       const searchLower = searchQuery.toLowerCase()
@@ -298,11 +264,9 @@ export default function Dashboard() {
         invoice.id.toLowerCase().includes(searchLower) ||
         invoice.customer.name.toLowerCase().includes(searchLower) ||
         invoice.customer.email.toLowerCase().includes(searchLower)
-
       const today = new Date()
       today.setHours(0, 0, 0, 0)
       const dueDate = new Date(invoice.dueDate)
-
       let matchesStatus = true
       switch (statusFilter.toLowerCase()) {
         case "paid":
@@ -315,60 +279,92 @@ export default function Dashboard() {
           matchesStatus = invoice.status === "Pending" && dueDate < today
           break
       }
-
       return matchesSearch && matchesStatus
     })
-
     setFilteredInvoices(filtered)
-    // Reset to first page when filters change
-    setCurrentPage(1)
+    setCurrentPage(1) // Reset to first page when filters change
   }, [invoices, searchQuery, statusFilter])
 
-  // Calculate pagination values
-  const indexOfLastItem = currentPage * itemsPerPage
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage
-  const currentItems = filteredInvoices.slice(indexOfFirstItem, indexOfLastItem)
-  const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage)
+  // Update row order when current items change (for drag-and-drop)
+  useEffect(() => {
+    setRowOrder(currentItems.map((inv) => inv.id))
+  }, [currentItems])
 
-  // Handle page change
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber)
+  // Indeterminate state for header checkbox
+  useEffect(() => {
+    if (headerCheckboxRef.current) {
+      headerCheckboxRef.current.indeterminate = someVisibleSelected
+    }
+  }, [someVisibleSelected])
+
+  // =====================
+  // Utility Functions
+  // =====================
+
+  // Format currency for display
+  function formatCurrency(amount: number): string {
+    return amount.toLocaleString("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
   }
 
+  // Format date for display
+  function formatDate(dateString: string): string {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  }
+
+  // Validate Google Sheet URL
+  const isValidGoogleSheetUrl = (url: string): boolean => {
+    return /^https:\/\/docs\.google\.com\/spreadsheets\/d\/[a-zA-Z0-9-_]+/.test(url)
+  }
+
+  // Validate tax/discount fields
+  const validateFinancialField = (field: any) => {
+    return {
+      type: ["percentage", "fixed"].includes(field?.type) ? field.type : "fixed",
+      value: Math.max(0, Number(field?.value) || 0),
+    }
+  }
+
+  // =====================
+  // Invoice Data Fetching
+  // =====================
+  // Fetch invoices from API and cache
   const fetchInvoices = async (sheetUrl: string) => {
     try {
       setIsLoading(true)
-
       // Check if we need to refresh the data (5 minutes cache)
       const currentTime = Date.now()
       const timeSinceLastFetch = currentTime - lastFetchTime
       const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes in milliseconds
-
       if (timeSinceLastFetch < CACHE_DURATION && invoices.length > 0) {
         setIsLoading(false)
         return // Use cached data
       }
-
       // Validate URL format first
       if (!isValidGoogleSheetUrl(sheetUrl)) {
         throw new Error("Invalid Google Sheets URL format")
       }
-
       const {
         data: { session },
         error: sessionError,
       } = await supabase.auth.getSession()
-
       // Handle session errors
       if (sessionError) {
         throw new Error(`Session error: ${sessionError.message}`)
       }
-
       if (!session) {
         navigate("/login", { state: { sessionExpired: true } })
         return
       }
-
       // Validate Google token presence
       const googleToken = session.provider_token
       const supabaseToken = session.access_token
@@ -377,7 +373,6 @@ export default function Dashboard() {
         navigate("/login", { state: { needsReauth: true } })
         return
       }
-
       const response = await fetch(
         `https://sheetbills-server.vercel.app/api/sheets/data?sheetUrl=${encodeURIComponent(sheetUrl)}`,
         {
@@ -387,30 +382,24 @@ export default function Dashboard() {
           },
         },
       )
-
       // Handle specific error cases
       if (response.status === 401) {
         await supabase.auth.signOut()
         navigate("/login", { state: { sessionExpired: true } })
         return
       }
-
       if (response.status === 404) {
         throw new Error("Spreadsheet not found - Check URL and sharing permissions")
       }
-
       if (!response.ok) {
         const errorData = await response.json()
         throw new Error(errorData.error || `API Error: ${response.statusText}`)
       }
-
       const data = await response.json()
-
       // Validate response structure
       if (!Array.isArray(data)) {
         throw new Error("Invalid API response format - Expected array of invoices")
       }
-
       // Transform data with strict validation
       const transformedData = data
         .map((invoice: any) => {
@@ -432,11 +421,9 @@ export default function Dashboard() {
                 items = []
               }
             }
-
             if (!invoice.id || typeof invoice.amount !== "number") {
               throw new Error("Missing required invoice fields")
             }
-
             return {
               id: invoice.id,
               date: invoice.date || new Date().toISOString().split("T")[0],
@@ -456,28 +443,23 @@ export default function Dashboard() {
           }
         })
         .filter(Boolean)
-
       if (transformedData.length === 0) {
         throw new Error("No valid invoices found in spreadsheet")
       }
-
       // Cache the data
       localStorage.setItem("cachedInvoices", JSON.stringify(transformedData))
       localStorage.setItem("lastFetchTime", currentTime.toString())
       setLastFetchTime(currentTime)
-
       setInvoices(transformedData.filter((invoice): invoice is Invoice => invoice !== null))
       setError(null)
     } catch (err) {
       const error = err instanceof Error ? err : new Error("Unknown error occurred")
       setError(error.message)
-
       toast({
         title: "Data Loading Failed",
         description: error.message,
         variant: "destructive",
       })
-
       if (error.message.includes("Reauthenticate")) {
         navigate("/login", { state: { needsReauth: true } })
       }
@@ -486,46 +468,174 @@ export default function Dashboard() {
     }
   }
 
-  useEffect(() => {
-    let isMounted = true
-
-    const fetchData = async () => {
-      if (selectedSpreadsheetUrl && user) {
-        try {
-          await fetchInvoices(selectedSpreadsheetUrl)
-        } catch (error) {
-          if (isMounted) {
-            console.error("Fetch error:", error)
-          }
-        }
+  // =====================
+  // Table & Bulk Actions
+  // =====================
+  // Checkbox selection for invoices
+  const handleSelectInvoice = (invoiceId: string) => {
+    setSelectedInvoices((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(invoiceId)) {
+        newSet.delete(invoiceId)
+      } else {
+        newSet.add(invoiceId)
       }
+      return newSet
+    })
+  }
+  // Select all visible invoices
+  const handleSelectAllVisible = () => {
+    const allVisibleIds = currentItems.map((invoice) => invoice.id)
+    const allSelected = allVisibleIds.every((id) => selectedInvoices.has(id))
+    setSelectedInvoices((prev) => {
+      const newSet = new Set(prev)
+      if (allSelected) {
+        // Deselect all visible
+        allVisibleIds.forEach((id) => newSet.delete(id))
+      } else {
+        // Select all visible
+        allVisibleIds.forEach((id) => newSet.add(id))
+      }
+      return newSet
+    })
+  }
+  // Select all invoices across all pages
+  const handleSelectAllGlobal = () => {
+    if (selectedInvoices.size === filteredInvoices.length) {
+      setSelectedInvoices(new Set())
+    } else {
+      setSelectedInvoices(new Set(filteredInvoices.map((invoice) => invoice.id)))
     }
-
-    fetchData()
-
-    return () => {
-      isMounted = false
+  }
+  // Bulk delete selected invoices
+  const handleBulkDelete = async () => {
+    try {
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession()
+      if (sessionError) {
+        throw new Error(sessionError.message)
+      }
+      const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/bulk-delete", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.provider_token}`,
+          "X-Supabase-Token": session?.access_token || "",
+        },
+        body: JSON.stringify({
+          invoiceIds: Array.from(selectedInvoices),
+          sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
+        }),
+      })
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to delete invoices")
+      }
+      // Update local state by removing the deleted invoices
+      const updatedInvoices = invoices.filter((inv) => !selectedInvoices.has(inv.id))
+      setInvoices(updatedInvoices)
+      if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
+      setBulkDeleteMessage(
+        `${selectedInvoices.size} invoice(s) have been deleted successfully and removed from your dashboard.`,
+      )
+      setSelectedInvoices(new Set())
+      setIsBulkDeleteDialogOpen(false)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to delete invoices",
+        variant: "destructive",
+      })
     }
-  }, [selectedSpreadsheetUrl, user])
-
-  const isValidGoogleSheetUrl = (url: string): boolean => {
-    return /^https:\/\/docs\.google\.com\/spreadsheets\/d\/[a-zA-Z0-9-_]+/.test(url)
   }
 
-  const validateFinancialField = (field: any) => {
-    return {
-      type: ["percentage", "fixed"].includes(field?.type) ? field.type : "fixed",
-      value: Math.max(0, Number(field?.value) || 0),
+  // =====================
+  // Partial Payment Logic
+  // =====================
+  // Handle partial payment modal actions
+  const handlePartialPayment = async () => {
+    if (!selectedInvoice) return
+    try {
+      const amount = Number.parseFloat(partialPaymentAmount)
+      if (isNaN(amount) || amount <= 0 || amount >= selectedInvoice.amount) {
+        toast({
+          title: "Invalid Amount",
+          description: "Please enter a valid partial payment amount.",
+          variant: "destructive",
+        })
+        return
+      }
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession()
+      if (sessionError) {
+        throw new Error(sessionError.message)
+      }
+      const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/partial-payment", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.provider_token}`,
+          "X-Supabase-Token": session?.access_token || "",
+        },
+        body: JSON.stringify({
+          invoiceId: selectedInvoice.id,
+          amount: amount,
+          paymentDate: paymentDate.toISOString(),
+          sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
+        }),
+      })
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to process partial payment")
+      }
+      // Update local state with proper typing
+      const updatedInvoices = invoices.map((inv) =>
+        inv.id === selectedInvoice.id
+          ? ({
+              ...inv,
+              status: amount === inv.amount ? "Paid" : "Partially Paid",
+              paidAmount: amount,
+              lastPaymentDate: paymentDate.toISOString(),
+            } as Invoice)
+          : inv,
+      )
+      setInvoices(updatedInvoices)
+      if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
+      toast({
+        title: "Payment Recorded",
+        description: "Partial payment has been recorded successfully.",
+      })
+      setIsPartialPaymentModalOpen(false)
+      setSelectedInvoice(null)
+      setPartialPaymentAmount("")
+      setPaymentDate(new Date())
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to process payment",
+        variant: "destructive",
+      })
     }
   }
 
+  // =====================
+  // Table Rendering & UI
+  // =====================
+  // Handle page change
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber)
+  }
+
+  // Sorting handler
   const handleSort = (key: keyof Invoice) => {
     const direction = sortConfig.key === key && sortConfig.direction === "ascending" ? "descending" : "ascending"
-
     const sortedInvoices = [...filteredInvoices].sort((a, b) => {
       let valueA: any = a[key]
       let valueB: any = b[key]
-
       if (key === "date" || key === "dueDate") {
         valueA = typeof valueA === "string" || typeof valueA === "number" ? new Date(valueA).getTime() : 0
         valueB = typeof valueB === "string" || typeof valueB === "number" ? new Date(valueB).getTime() : 0
@@ -539,27 +649,14 @@ export default function Dashboard() {
         valueA = a.status
         valueB = b.status
       }
-
-      // Ensure values are defined before comparison
       if (valueA === undefined) valueA = ""
       if (valueB === undefined) valueB = ""
-
       if (valueA < valueB) return direction === "ascending" ? -1 : 1
       if (valueA > valueB) return direction === "ascending" ? 1 : -1
       return 0
     })
-
     setSortConfig({ key, direction })
     setFilteredInvoices(sortedInvoices)
-  }
-
-  function formatCurrency(amount: number): string {
-    return amount.toLocaleString("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })
   }
 
   function handleRefresh(event?: React.MouseEvent<HTMLButtonElement>): void {
@@ -582,184 +679,6 @@ export default function Dashboard() {
     }
   }
 
-  const handlePartialPayment = async () => {
-    if (!selectedInvoice) return
-
-    try {
-      const amount = Number.parseFloat(partialPaymentAmount)
-      if (isNaN(amount) || amount <= 0 || amount >= selectedInvoice.amount) {
-        toast({
-          title: "Invalid Amount",
-          description: "Please enter a valid partial payment amount.",
-          variant: "destructive",
-        })
-        return
-      }
-
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession()
-
-      if (sessionError) {
-        throw new Error(sessionError.message)
-      }
-
-      const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/partial-payment", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.provider_token}`,
-          "X-Supabase-Token": session?.access_token || "",
-        },
-        body: JSON.stringify({
-          invoiceId: selectedInvoice.id,
-          amount: amount,
-          paymentDate: paymentDate.toISOString(),
-          sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
-        }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || "Failed to process partial payment")
-      }
-
-      // Update local state with proper typing
-      const updatedInvoices = invoices.map((inv) =>
-        inv.id === selectedInvoice.id
-          ? ({
-              ...inv,
-              status: amount === inv.amount ? "Paid" : "Partially Paid",
-              paidAmount: amount,
-              lastPaymentDate: paymentDate.toISOString(),
-            } as Invoice)
-          : inv,
-      )
-      setInvoices(updatedInvoices)
-      if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
-
-      toast({
-        title: "Payment Recorded",
-        description: "Partial payment has been recorded successfully.",
-      })
-
-      setIsPartialPaymentModalOpen(false)
-      setSelectedInvoice(null)
-      setPartialPaymentAmount("")
-      setPaymentDate(new Date())
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to process payment",
-        variant: "destructive",
-      })
-    }
-  }
-
-  // Add function to handle checkbox selection
-  const handleSelectInvoice = (invoiceId: string) => {
-    setSelectedInvoices((prev) => {
-      const newSet = new Set(prev)
-      if (newSet.has(invoiceId)) {
-        newSet.delete(invoiceId)
-      } else {
-        newSet.add(invoiceId)
-      }
-      return newSet
-    })
-  }
-
-  // Add function to handle select all visible
-  const handleSelectAllVisible = () => {
-    const allVisibleIds = currentItems.map((invoice) => invoice.id)
-    const allSelected = allVisibleIds.every((id) => selectedInvoices.has(id))
-    setSelectedInvoices((prev) => {
-      const newSet = new Set(prev)
-      if (allSelected) {
-        // Deselect all visible
-        allVisibleIds.forEach((id) => newSet.delete(id))
-      } else {
-        // Select all visible
-        allVisibleIds.forEach((id) => newSet.add(id))
-      }
-      return newSet
-    })
-  }
-
-  // Add function to handle select all across all pages
-  const handleSelectAllGlobal = () => {
-    if (selectedInvoices.size === filteredInvoices.length) {
-      setSelectedInvoices(new Set())
-    } else {
-      setSelectedInvoices(new Set(filteredInvoices.map((invoice) => invoice.id)))
-    }
-  }
-
-  // Add function to handle bulk delete
-  const handleBulkDelete = async () => {
-    try {
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession()
-
-      if (sessionError) {
-        throw new Error(sessionError.message)
-      }
-
-      const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/bulk-delete", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.provider_token}`,
-          "X-Supabase-Token": session?.access_token || "",
-        },
-        body: JSON.stringify({
-          invoiceIds: Array.from(selectedInvoices),
-          sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
-        }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || "Failed to delete invoices")
-      }
-
-      // Update local state by removing the deleted invoices
-      const updatedInvoices = invoices.filter((inv) => !selectedInvoices.has(inv.id))
-      setInvoices(updatedInvoices)
-      if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
-
-      setBulkDeleteMessage(
-        `${selectedInvoices.size} invoice(s) have been deleted successfully and removed from your dashboard.`,
-      )
-
-      setSelectedInvoices(new Set())
-      setIsBulkDeleteDialogOpen(false)
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to delete invoices",
-        variant: "destructive",
-      })
-    }
-  }
-
-  // For indeterminate state
-  const allVisibleIds = currentItems.map((invoice) => invoice.id)
-  const allVisibleSelected = allVisibleIds.every((id) => selectedInvoices.has(id))
-  const someVisibleSelected = allVisibleIds.some((id) => selectedInvoices.has(id)) && !allVisibleSelected
-
-  useEffect(() => {
-    if (headerCheckboxRef.current) {
-      headerCheckboxRef.current.indeterminate = someVisibleSelected
-    }
-  }, [someVisibleSelected])
-
-  React.useEffect(() => {
-    setRowOrder(currentItems.map((inv) => inv.id))
-  }, [currentItems])
   const sensors = useSensors(useSensor(PointerSensor))
 
   return (
@@ -1486,4 +1405,34 @@ export default function Dashboard() {
       </Card>
     )
   }
+}
+
+// =====================
+// Sortable Table Row Component
+// =====================
+function SortableTableRow({ id, children, ...props }: any) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
+  return (
+    <tr
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+      }}
+      {...props}
+    >
+      {/* Drag handle cell */}
+      <td className="w-8 px-2 align-middle text-center cursor-grab" style={{ verticalAlign: "middle" }}>
+        <span
+          {...attributes}
+          {...listeners}
+          className="inline-flex items-center justify-center cursor-grab text-gray-400 hover:text-gray-600 active:text-gray-800"
+        >
+          <GripVertical className="h-5 w-5" />
+        </span>
+      </td>
+      {children}
+    </tr>
+  )
 }

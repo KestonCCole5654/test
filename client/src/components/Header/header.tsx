@@ -1,7 +1,4 @@
-"use client"
-
-import type React from "react"
-import { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Menu, X, ChevronDown, LogOut, Settings, User, Bell, HelpCircle } from "lucide-react"
 import supabase from "../../components/Auth/supabaseClient"
@@ -16,12 +13,13 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "../ui/avatar"
+import { User as SupabaseUser } from '@supabase/supabase-js'
 
-const Header: React.FC = () => {
+const Header = () => {
   const navigate = useNavigate()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<SupabaseUser | null>(null)
   const [loading, setLoading] = useState(true)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
 
@@ -78,7 +76,7 @@ const Header: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-50 bg-white shadow-xs">
-      <div className="container max-w-8xl mx-auto  sm:px-6">
+      <div className="container max-w-8xl mx-auto sm:px-6">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
@@ -90,53 +88,38 @@ const Header: React.FC = () => {
             </Link>
           </div>
 
-          {/* Desktop Navigation
-          <Link
-                  to="/template-generator"
-                  className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-                >
-                  Invoices Template Generator
-          </Link> */}
-           <nav className="hidden md:flex items-center space-x-1">
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-1">
             {user && (
               <>
-                <button
-                  onClick={() => {
-                    navigate("/invoices");
-                  }}
+                {/* Changed from buttons to Links */}
+                <Link
+                  to="/invoices"
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
                   Dashboard
-                </button>
-                <button
-                  onClick={() => {
-                    navigate("/reports");
-                  }}
+                </Link>
+                <Link
+                  to="/reports"
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
                   Reports
-                </button>
-                
-                <button
-                  onClick={() => {
-                    navigate("/settings");
-                  }}
+                </Link>
+                <Link
+                  to="/settings"
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
                   Account & Settings
-                </button>
-                <button
-                  onClick={() => {
-                    navigate("/contact");
-                  }}
+                </Link>
+                <Link
+                  to="/contact"
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
                   Contact & Support
-                </button>
+                </Link>
               </>
             )}
           </nav>
-        
 
           {/* User profile section - desktop */}
           <div className="hidden md:flex items-center space-x-2">
@@ -171,9 +154,7 @@ const Header: React.FC = () => {
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
                       <DropdownMenuItem>
-                  
-                          {/* User profile section - desktop :       <User className="mr-2 h-4 w-4" />  <span>Profile</span> */}
-                      
+                        {/* User profile section - desktop */}
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => navigate("/settings")}>
                         <Settings className="mr-2 h-4 w-4" />
@@ -219,51 +200,42 @@ const Header: React.FC = () => {
           <div className="container max-w-7xl mx-auto px-4 sm:px-6 py-3">
             {user && (
               <nav className="flex flex-col space-y-1">
-                <button
-                  onClick={() => {
-                    navigate("/invoices");
-                    handleNavigation();
-                  }}
+                {/* Changed from buttons to Links in mobile menu too */}
+                <Link
+                  to="/invoices"
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  onClick={handleNavigation}
                 >
                   Dashboard
-                </button>
-                <button
-                  onClick={() => {
-                    navigate("/reports");
-                    handleNavigation();
-                  }}
+                </Link>
+                <Link
+                  to="/reports" 
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  onClick={handleNavigation}
                 >
                   Reports
-                </button>
-                <button
-                  onClick={() => {
-                    navigate("/template-generator");
-                    handleNavigation();
-                  }}
+                </Link>
+                <Link
+                  to="/template-generator"
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  onClick={handleNavigation}
                 >
                   Invoices Template Generator
-                </button>
-                <button
-                  onClick={() => {
-                    navigate("/settings");
-                    handleNavigation();
-                  }}
+                </Link>
+                <Link
+                  to="/settings"
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  onClick={handleNavigation}
                 >
                   Settings
-                </button>
-                <button
-                  onClick={() => {
-                    navigate("/contact");
-                    handleNavigation();
-                  }}
+                </Link>
+                <Link
+                  to="/contact"
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  onClick={handleNavigation}
                 >
                   Contact & Support
-                </button>
+                </Link>
               </nav>
             )}
 

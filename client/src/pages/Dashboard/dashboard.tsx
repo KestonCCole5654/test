@@ -881,7 +881,7 @@ export default function Dashboard() {
                         state: { selectedSpreadsheetUrl: invoicesSheetUrl },
                       })
                     }}
-                    className="bg-green-600 text-slate-900 hover:bg-green-600 font-bold shadow-lg w-full sm:w-auto"
+                    className="bg-green-600 text-white hover:bg-green-600 font-bold shadow-lg w-full sm:w-auto"
                     disabled={isStateLoading}
                   >
                     <Plus className="mr-2 h-4 w-4" />

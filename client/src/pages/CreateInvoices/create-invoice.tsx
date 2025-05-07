@@ -60,8 +60,53 @@ export interface BusinessData {
 
 export default function InvoiceForm() {
   const location = useLocation()
+  const navigate = useNavigate()
   const invoiceToEdit = location.state?.invoiceToEdit
   const selectedSpreadsheetUrl = location.state?.selectedSpreadsheetUrl
+  const key = location.state?.key
+  
+  console.log('InvoiceForm mounted with state:', { invoiceToEdit, selectedSpreadsheetUrl, key })
+  
+  // Add useEffect to handle state changes
+  useEffect(() => {
+    console.log('InvoiceForm mounted with key:', key)
+    // Reset form state when key changes
+    if (key) {
+      setIsFormExpanded(true)
+      setInvoiceData({
+        invoiceNumber: `INV-${new Date().getFullYear()}-${String(Math.floor(1000 + Math.random() * 9000))}`,
+        date: new Date().toISOString().split("T")[0],
+        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+        customer: {
+          name: "",
+          email: "",
+          address: "",
+        },
+        items: [{
+          name: "",
+          description: "",
+          quantity: 1,
+          price: "",
+          discount: {
+            type: "percentage",
+            value: ""
+          },
+          tax: {
+            type: "percentage",
+            value: ""
+          }
+        }],
+        amount: 0,
+        notes: "",
+        template: "classic",
+        status: "Pending"
+      })
+    }
+    return () => {
+      console.log('InvoiceForm unmounted')
+    }
+  }, [key])
+
   const [isFormExpanded, setIsFormExpanded] = useState(!location.state?.hideForm)
   const [invoiceData, setInvoiceData] = useState<InvoiceData>({
     invoiceNumber:
@@ -94,7 +139,6 @@ export default function InvoiceForm() {
     status: invoiceToEdit?.status || "Pending"
   })
   const previewRef = useRef<HTMLDivElement>(null)
-  const navigate = useNavigate()
 
   // Used to update invoice Data
   const updateInvoiceData = (field: string, value: any) => {

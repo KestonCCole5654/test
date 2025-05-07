@@ -803,8 +803,12 @@ export default function Dashboard() {
                     onClick={() => {
                       const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
                       const invoicesSheetUrl = invoicesSheet?.sheetUrl
+                      console.log('Navigating to create invoice with URL:', invoicesSheetUrl)
                       navigate("/create-invoice", {
-                        state: { selectedSpreadsheetUrl: invoicesSheetUrl },
+                        state: { 
+                          selectedSpreadsheetUrl: invoicesSheetUrl,
+                          key: Date.now() // Add a unique key to force remount
+                        }
                       })
                     }}
                     className="bg-green-600 text-white hover:bg-green-600 font-bold shadow-lg w-full sm:w-auto"
@@ -1012,8 +1016,12 @@ export default function Dashboard() {
                 onClick={() => {
                   const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
                   const invoicesSheetUrl = invoicesSheet?.sheetUrl
+                  console.log('Navigating to create invoice with URL:', invoicesSheetUrl)
                   navigate("/create-invoice", {
-                    state: { selectedSpreadsheetUrl: invoicesSheetUrl },
+                    state: { 
+                      selectedSpreadsheetUrl: invoicesSheetUrl,
+                      key: Date.now() // Add a unique key to force remount
+                    }
                   })
                 }}
                 className="bg-green-600 text-white hover:bg-green-700"

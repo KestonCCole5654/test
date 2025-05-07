@@ -784,14 +784,14 @@ export default function Dashboard() {
 
               {selectedSpreadsheetUrl && (
                 <div className="flex gap-2">
-                  <Button
-                    onClick={handleRefresh}
-                    className="bg-green-600 text-white hover:bg-green-700"
-                    disabled={isStateLoading}
-                  >
-                    <RefreshCw className={`mr-2 h-4 w-4 ${isStateLoading ? "animate-spin" : ""}`} />
-                    Refresh
-                  </Button>
+                <Button
+                  onClick={handleRefresh}
+                  className="bg-green-600 text-white hover:bg-green-700"
+                  disabled={isStateLoading}
+                >
+                  <RefreshCw className={`mr-2 h-4 w-4 ${isStateLoading ? "animate-spin" : ""}`} />
+                  Refresh
+                </Button>
                   <Button
                     onClick={() => {
                       const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
@@ -1149,9 +1149,9 @@ export default function Dashboard() {
                             </div>
                           </TableCell>
                           <TableCell className="px-6 py-4 whitespace-nowrap min-w-[180px]">
-                            <div className="font-medium">{formatDate(invoice.date)}</div>
+                            <div className="font-medium">{invoice.date}</div>
                             <div className="text-sm">
-                              Due: <span className="bg-green-200 text-green-900 px-2 py-0.5 rounded">{formatDate(invoice.dueDate)}</span>
+                              Due: <span className="bg-green-200 text-green-900 px-2 py-0.5 rounded">{invoice.dueDate}</span>
                             </div>
                           </TableCell>
                           <TableCell className="px-6 py-4">
@@ -1335,8 +1335,8 @@ export default function Dashboard() {
                                     })
                                   }}
                                 >
-                                  
-                                  Edit Invoice
+                                  <Edit className="mr-2 h-4 w-4" />
+                                  Edit
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
@@ -1347,8 +1347,8 @@ export default function Dashboard() {
                                   }}
                                   className="text-red-600"
                                 >
-                                  
-                                  Delete Invoice
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  Delete
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onClick={(e) => {
@@ -1356,7 +1356,7 @@ export default function Dashboard() {
                                     setSelectedInvoice(invoice)
                                     setIsPartialPaymentModalOpen(true)
                                   }}
-                                  className="text-green-600"
+                                  className="text-blue-700"
                                 >
                                   Partial Payment
                                 </DropdownMenuItem>

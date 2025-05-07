@@ -1423,18 +1423,6 @@ export default function Dashboard() {
                               >
                                 Mark as Pending
                               </Button>
-                              <Button
-                                onClick={async (e) => {
-                                  e.stopPropagation()
-                                  setSelectedInvoice(invoice)
-                                  setIsPartialPaymentModalOpen(true)
-                                }}
-                                className="bg-blue-50 text-blue-700 hover:bg-blue-100 px-3"
-                                size="sm"
-                                disabled={invoice.status === "Paid"}
-                              >
-                                Partial Payment
-                              </Button>
                             </div>
                           </TableCell>
                           <TableCell onClick={(e) => e.stopPropagation()} className="px-6 py-4">
@@ -1476,6 +1464,16 @@ export default function Dashboard() {
                                 >
                                   <Trash2 className="mr-2 h-4 w-4" />
                                   Delete
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    setSelectedInvoice(invoice)
+                                    setIsPartialPaymentModalOpen(true)
+                                  }}
+                                  className="text-blue-700"
+                                >
+                                  Partial Payment
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>

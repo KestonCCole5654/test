@@ -1231,7 +1231,9 @@ export default function Dashboard() {
                           </TableCell>
                           <TableCell className="px-6 py-4 whitespace-nowrap min-w-[180px]">
                             <div className="font-medium">{invoice.date}</div>
-                            <div className="text-sm text-slate-500">Due: {invoice.dueDate}</div>
+                            <div className="text-sm">
+                              Due: <span className="bg-green-200 text-green-900 px-2 py-0.5 rounded">{invoice.dueDate}</span>
+                            </div>
                           </TableCell>
                           <TableCell className="px-6 py-4">
                             <Badge
@@ -1320,7 +1322,7 @@ export default function Dashboard() {
                                     })
                                   }
                                 }}
-                                className={`${invoice.status === "Paid" ? "bg-emerald-100 text-emerald-700" : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"} px-3`}
+                                className={`bg-green-100 text-green-800 hover:bg-green-200 px-3`}
                                 size="sm"
                                 disabled={invoice.status === "Paid"}
                               >
@@ -1381,7 +1383,7 @@ export default function Dashboard() {
                                     })
                                   }
                                 }}
-                                className={`${invoice.status === "Pending" ? "bg-amber-100  text-amber-700" : "bg-amber-50 text-amber-700 p-0 hover:bg-amber-100"} px-3`}
+                                className={`bg-green-50 text-green-700 hover:bg-green-100 px-3`}
                                 size="sm"
                                 disabled={invoice.status === "Pending"}
                               >

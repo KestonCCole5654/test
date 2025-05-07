@@ -764,58 +764,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen w-full ">
-      {/* Premium Welcome Header */}
-      <div className="max-w-7xl mx-auto bg-gradient-to-r from-emerald-600 to-emerald-700 py-10 shadow-lg rounded-b-3xl">
-        <div className="container max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between">
-          <div className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-4 sm:gap-6">
-            <div className="relative">
-              <Avatar className="h-14 w-14 sm:h-16 sm:w-16 ring-4 ring-white shadow-lg">
-                {user?.user_metadata?.avatar_url ? (
-                  <img
-                    src={user.user_metadata.avatar_url || "/placeholder.svg"}
-                    alt="User Avatar"
-                    className="h-full w-full rounded-full object-cover"
-                  />
-                ) : (
-                  <AvatarFallback>{user?.email?.[0]?.toUpperCase() || "U"}</AvatarFallback>
-                )}
-              </Avatar>
-              <span className="absolute bottom-0 right-0 bg-gradient-to-tr from-yellow-400 to-yellow-600 text-white text-xs px-2 py-0.5 rounded-full shadow-md font-semibold border-2 border-white">
-                PRO
-              </span>
-            </div>
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white drop-shadow-lg flex flex-wrap justify-center sm:justify-start items-center gap-2">
-                Welcome back,
-                <span className="bg-white/20 px-3 py-1 rounded-xl text-yellow-200 font-bold shadow">
-                  {user?.email?.split("@")[0]}
-                </span>
-                <span className="ml-2 animate-bounce text-yellow-300 text-2xl">👋</span>
-              </h2>
-              <p className="text-slate-100 mt-2 text-base sm:text-lg font-medium">
-                Manage and track your invoices with ease.
-              </p>
-            </div>
-          </div>
-          <div className="mt-6 md:mt-0 flex gap-4">
-            <Button
-              onClick={() => {
-                const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
-                const invoicesSheetUrl = invoicesSheet?.sheetUrl
-                navigate("/create-invoice", {
-                  state: { selectedSpreadsheetUrl: invoicesSheetUrl },
-                })
-              }}
-              className="bg-white text-slate-900 hover:bg-green-600 font-bold shadow-lg w-full sm:w-auto"
-              disabled={isStateLoading}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Create Invoice
-            </Button>
-          </div>
-        </div>
-      </div>
-
       <div className="container max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {/* Stats Cards Section */}
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8">
@@ -916,14 +864,30 @@ export default function Dashboard() {
               />
 
               {selectedSpreadsheetUrl && (
-                <Button
-                  onClick={handleRefresh}
-                  className="bg-green-600 text-white hover:bg-green-700"
-                  disabled={isStateLoading}
-                >
-                  <RefreshCw className={`mr-2 h-4 w-4 ${isStateLoading ? "animate-spin" : ""}`} />
-                  Refresh
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleRefresh}
+                    className="bg-green-600 text-white hover:bg-green-700"
+                    disabled={isStateLoading}
+                  >
+                    <RefreshCw className={`mr-2 h-4 w-4 ${isStateLoading ? "animate-spin" : ""}`} />
+                    Refresh
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
+                      const invoicesSheetUrl = invoicesSheet?.sheetUrl
+                      navigate("/create-invoice", {
+                        state: { selectedSpreadsheetUrl: invoicesSheetUrl },
+                      })
+                    }}
+                    className="bg-white text-slate-900 hover:bg-green-600 font-bold shadow-lg w-full sm:w-auto"
+                    disabled={isStateLoading}
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create Invoice
+                  </Button>
+                </div>
               )}
             </div>
           </div>

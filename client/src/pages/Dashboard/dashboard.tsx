@@ -1215,13 +1215,13 @@ export default function Dashboard() {
                           className="mx-auto accent-blue-600 h-4 w-4 rounded border-gray-300"
                         />
                       </TableHead>
-                      <TableHead onClick={() => handleSort("id")} className="cursor-pointer font-medium px-6 py-4">
+                      <TableHead onClick={() => handleSort("id")} className="cursor-pointer font-medium px-6 py-4 whitespace-nowrap min-w-[160px]">
                         Invoice ID <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
                       <TableHead onClick={() => handleSort("customer")} className="cursor-pointer font-medium px-6 py-4">
                         Customer <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
-                      <TableHead onClick={() => handleSort("date")} className="cursor-pointer font-medium px-6 py-4">
+                      <TableHead onClick={() => handleSort("date")} className="cursor-pointer font-medium px-6 py-4 whitespace-nowrap min-w-[180px]">
                         Date <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
                       <TableHead onClick={() => handleSort("status")} className="cursor-pointer font-medium px-6 py-4">
@@ -1252,7 +1252,7 @@ export default function Dashboard() {
                               className="mx-auto"
                             />
                           </TableCell>
-                          <TableCell className="font-medium px-6 py-4">{invoice.id}</TableCell>
+                          <TableCell className="font-medium px-6 py-4 whitespace-nowrap min-w-[160px]">{invoice.id}</TableCell>
                           <TableCell className="px-6 py-4">
                             <div className="flex items-center gap-3">
                               <div className="flex flex-col">
@@ -1265,7 +1265,7 @@ export default function Dashboard() {
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell className="px-6 py-4">
+                          <TableCell className="px-6 py-4 whitespace-nowrap min-w-[180px]">
                             <div className="font-medium">{invoice.date}</div>
                             <div className="text-sm text-slate-500">Due: {invoice.dueDate}</div>
                           </TableCell>

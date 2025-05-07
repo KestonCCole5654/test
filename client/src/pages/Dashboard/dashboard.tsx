@@ -1204,8 +1204,8 @@ export default function Dashboard() {
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-slate-50 hover:bg-slate-50">
-                      <TableHead className="w-8 px-2"></TableHead>
-                      <TableHead className="w-[56px] px-4 py-2 align-middle text-center">
+                      <TableHead className="w-8 px-4"></TableHead>
+                      <TableHead className="w-[56px] px-6 py-4 align-middle text-center">
                         <input
                           type="checkbox"
                           ref={headerCheckboxRef}
@@ -1215,24 +1215,24 @@ export default function Dashboard() {
                           className="mx-auto accent-blue-600 h-4 w-4 rounded border-gray-300"
                         />
                       </TableHead>
-                      <TableHead onClick={() => handleSort("id")} className="cursor-pointer font-medium">
+                      <TableHead onClick={() => handleSort("id")} className="cursor-pointer font-medium px-6 py-4">
                         Invoice ID <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
-                      <TableHead onClick={() => handleSort("customer")} className="cursor-pointer font-medium">
+                      <TableHead onClick={() => handleSort("customer")} className="cursor-pointer font-medium px-6 py-4">
                         Customer <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
-                      <TableHead onClick={() => handleSort("date")} className="cursor-pointer font-medium">
+                      <TableHead onClick={() => handleSort("date")} className="cursor-pointer font-medium px-6 py-4">
                         Date <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
-                      <TableHead onClick={() => handleSort("status")} className="cursor-pointer font-medium">
+                      <TableHead onClick={() => handleSort("status")} className="cursor-pointer font-medium px-6 py-4">
                         Status <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
-                      <TableHead onClick={() => handleSort("amount")} className="cursor-pointer font-medium text-right">
+                      <TableHead onClick={() => handleSort("amount")} className="cursor-pointer font-medium text-right px-6 py-4">
                         Amount <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
-                      <TableHead className="font-medium text-center">Overdue</TableHead>
-                      <TableHead className="font-medium text-center">Payment Actions</TableHead>
-                      <TableHead className="w-[80px] font-medium">Other Actions</TableHead>
+                      <TableHead className="font-medium text-center px-6 py-4">Overdue</TableHead>
+                      <TableHead className="font-medium text-center px-6 py-4">Payment Actions</TableHead>
+                      <TableHead className="w-[80px] font-medium px-6 py-4">Other Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -1243,7 +1243,7 @@ export default function Dashboard() {
                         <SortableTableRow key={invoice.id} id={invoice.id}>
                           <TableCell
                             onClick={(e) => e.stopPropagation()}
-                            className="w-[56px] px-4 py-2 align-middle text-center"
+                            className="w-[56px] px-6 py-4 align-middle text-center"
                           >
                             <Checkbox
                               checked={selectedInvoices.has(invoice.id)}
@@ -1252,33 +1252,32 @@ export default function Dashboard() {
                               className="mx-auto"
                             />
                           </TableCell>
-                          <TableCell className="font-medium">{invoice.id}</TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
+                          <TableCell className="font-medium px-6 py-4">{invoice.id}</TableCell>
+                          <TableCell className="px-6 py-4">
+                            <div className="flex items-center gap-3">
                               <div className="flex flex-col">
                                 <span className="font-medium">
                                   {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}
                                 </span>
-
-                                <span className="text-xs text-slate-500">
+                                <span className="text-sm text-slate-500">
                                   {typeof invoice.customer === "object" ? invoice.customer.email : ""}
                                 </span>
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="px-6 py-4">
                             <div className="font-medium">{invoice.date}</div>
                             <div className="text-sm text-slate-500">Due: {invoice.dueDate}</div>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="px-6 py-4">
                             <Badge
                               variant={invoice.status === "Paid" ? "default" : "secondary"}
                               className={
                                 invoice.status === "Paid"
-                                  ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50 text-md px-4"
+                                  ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50 text-md px-4 py-1"
                                   : invoice.status === "Partially Paid"
-                                    ? "bg-blue-50 text-blue-700 hover:bg-blue-50 text-md px-4"
-                                    : "bg-amber-50 text-amber-700 hover:bg-amber-50 text-md px-4"
+                                    ? "bg-blue-50 text-blue-700 hover:bg-blue-50 text-md px-4 py-1"
+                                    : "bg-amber-50 text-amber-700 hover:bg-amber-50 text-md px-4 py-1"
                               }
                             >
                               {invoice.status}
@@ -1287,8 +1286,8 @@ export default function Dashboard() {
                               )}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-right font-medium">{formatCurrency(invoice.amount)}</TableCell>
-                          <TableCell className="text-center">
+                          <TableCell className="text-right font-medium px-6 py-4">{formatCurrency(invoice.amount)}</TableCell>
+                          <TableCell className="text-center px-6 py-4">
                             {invoice.status === "Pending" && new Date(invoice.dueDate) < new Date() ? (
                               <span className="text-red-600 font-medium">
                                 {Math.ceil(
@@ -1300,8 +1299,8 @@ export default function Dashboard() {
                               <span className="text-slate-400">-</span>
                             )}
                           </TableCell>
-                          <TableCell onClick={(e) => e.stopPropagation()}>
-                            <div className="flex justify-end gap-1">
+                          <TableCell onClick={(e) => e.stopPropagation()} className="px-6 py-4">
+                            <div className="flex justify-end gap-2">
                               <Button
                                 onClick={async (e) => {
                                   e.stopPropagation()
@@ -1357,7 +1356,7 @@ export default function Dashboard() {
                                     })
                                   }
                                 }}
-                                className={`${invoice.status === "Paid" ? "bg-emerald-100 text-emerald-700" : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"}`}
+                                className={`${invoice.status === "Paid" ? "bg-emerald-100 text-emerald-700" : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"} px-3`}
                                 size="sm"
                                 disabled={invoice.status === "Paid"}
                               >
@@ -1418,7 +1417,7 @@ export default function Dashboard() {
                                     })
                                   }
                                 }}
-                                className={`${invoice.status === "Pending" ? "bg-amber-100  text-amber-700" : "bg-amber-50 text-amber-700 p-0 hover:bg-amber-100"}`}
+                                className={`${invoice.status === "Pending" ? "bg-amber-100  text-amber-700" : "bg-amber-50 text-amber-700 p-0 hover:bg-amber-100"} px-3`}
                                 size="sm"
                                 disabled={invoice.status === "Pending"}
                               >
@@ -1430,7 +1429,7 @@ export default function Dashboard() {
                                   setSelectedInvoice(invoice)
                                   setIsPartialPaymentModalOpen(true)
                                 }}
-                                className="bg-blue-50 text-blue-700 hover:bg-blue-100"
+                                className="bg-blue-50 text-blue-700 hover:bg-blue-100 px-3"
                                 size="sm"
                                 disabled={invoice.status === "Paid"}
                               >
@@ -1438,7 +1437,7 @@ export default function Dashboard() {
                               </Button>
                             </div>
                           </TableCell>
-                          <TableCell onClick={(e) => e.stopPropagation()}>
+                          <TableCell onClick={(e) => e.stopPropagation()} className="px-6 py-4">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" className="h-8 w-8 p-0">

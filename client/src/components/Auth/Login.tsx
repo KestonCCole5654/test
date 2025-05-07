@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { Button } from "../../components/ui/button"
 import { Card, CardContent } from "../../components/ui/card"
 import { Loader2, Shield, CheckCircle2 } from "lucide-react"
@@ -244,6 +244,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState<boolean>(false)
   const [mounted, setMounted] = useState<boolean>(false)
   const navigate = useNavigate()
+  const location = useLocation()
   const { toast } = useToast()
 
   const checkUserOnboarding = async (userId: string) => {
@@ -311,9 +312,8 @@ export default function LoginPage() {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
-        // const needsOnboarding = await checkUserOnboarding(session.user.id)
-        // navigate(needsOnboarding ? "/Onboarding" : "/invoices")
-        navigate("/invoices") // Always go to invoices
+        const from = (location.state as { from?: string })?.from || "/invoices"
+        navigate(from)
       }
     }
     checkUser()

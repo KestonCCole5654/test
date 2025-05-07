@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 import supabase from '../components/Auth/supabaseClient'
 
 export default function AuthCallback() {
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
+  const location = useLocation()
 
   const checkUserOnboarding = async (userId: string) => {
     try {
@@ -57,7 +58,9 @@ export default function AuthCallback() {
         if (session) {
           // const needsOnboarding = await checkUserOnboarding(session.user.id)
           // navigate(needsOnboarding ? '/Onboarding' : '/invoices')
-          navigate('/invoices') // Always go to invoices
+          // Get the previous location from state or default to invoices
+          const from = location.state?.from || '/invoices'
+          navigate(from)
         } else {
           navigate('/login')
         }

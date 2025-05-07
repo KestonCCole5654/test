@@ -840,68 +840,46 @@ export default function Dashboard() {
         </div>
 
         {/* Tabs and Content */}
-        <Tabs defaultValue="all" className="mb-8">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
-            <TabsList className="mb-4 sm:mb-0">
-              <TabsTrigger value="all" onClick={() => setStatusFilter("all")}>
-                All Invoices
-              </TabsTrigger>
-              <TabsTrigger value="pending" onClick={() => setStatusFilter("pending")}>
-                Pending
-              </TabsTrigger>
-              <TabsTrigger value="paid" onClick={() => setStatusFilter("paid")}>
-                Paid
-              </TabsTrigger>
-            </TabsList>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <Input
+              placeholder="Search invoices..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="max-w-md"
+              disabled={isStateLoading}
+            />
 
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              <Input
-                placeholder="Search invoices..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="max-w-md"
-                disabled={isStateLoading}
-              />
-
-              {selectedSpreadsheetUrl && (
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleRefresh}
-                    className="bg-green-600 text-white hover:bg-green-700"
-                    disabled={isStateLoading}
-                  >
-                    <RefreshCw className={`mr-2 h-4 w-4 ${isStateLoading ? "animate-spin" : ""}`} />
-                    Refresh
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
-                      const invoicesSheetUrl = invoicesSheet?.sheetUrl
-                      navigate("/create-invoice", {
-                        state: { selectedSpreadsheetUrl: invoicesSheetUrl },
-                      })
-                    }}
-                    className="bg-green-600 text-white hover:bg-green-600 font-bold shadow-lg w-full sm:w-auto"
-                    disabled={isStateLoading}
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create Invoice
-                  </Button>
-                </div>
-              )}
-            </div>
+            {selectedSpreadsheetUrl && (
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleRefresh}
+                  className="bg-green-600 text-white hover:bg-green-700"
+                  disabled={isStateLoading}
+                >
+                  <RefreshCw className={`mr-2 h-4 w-4 ${isStateLoading ? "animate-spin" : ""}`} />
+                  Refresh
+                </Button>
+                <Button
+                  onClick={() => {
+                    const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
+                    const invoicesSheetUrl = invoicesSheet?.sheetUrl
+                    navigate("/create-invoice", {
+                      state: { selectedSpreadsheetUrl: invoicesSheetUrl },
+                    })
+                  }}
+                  className="bg-green-600 text-white hover:bg-green-600 font-bold shadow-lg w-full sm:w-auto"
+                  disabled={isStateLoading}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Invoice
+                </Button>
+              </div>
+            )}
           </div>
+        </div>
 
-          <TabsContent value="all" className="mt-0">
-            {renderInvoiceTable()}
-          </TabsContent>
-          <TabsContent value="pending" className="mt-0">
-            {renderInvoiceTable()}
-          </TabsContent>
-          <TabsContent value="paid" className="mt-0">
-            {renderInvoiceTable()}
-          </TabsContent>
-        </Tabs>
+        {renderInvoiceTable()}
       </div>
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
@@ -1129,6 +1107,16 @@ export default function Dashboard() {
                   {allVisibleSelected ? "Deselect All" : "Select All"}
                 </Button>
                 <span className="text-sm text-slate-500">{selectedInvoices.size} selected</span>
+                <select
+                  value={statusFilter}
+                  onChange={e => setStatusFilter(e.target.value)}
+                  className="ml-2 border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  style={{ minWidth: 120 }}
+                >
+                  <option value="all">All</option>
+                  <option value="pending">Pending</option>
+                  <option value="paid">Paid</option>
+                </select>
               </div>
               <Button
                 variant="destructive"
@@ -1204,7 +1192,12 @@ export default function Dashboard() {
                       const invoice = currentItems.find((inv) => inv.id === id)
                       if (!invoice) return null
                       return (
-                        <SortableTableRow key={invoice.id} id={invoice.id}>
+                        <SortableTableRow
+                          key={invoice.id}
+                          id={invoice.id}
+                          onClick={() => navigate(`/invoice/${invoice.id}`)}
+                          style={{ cursor: 'pointer' }}
+                        >
                           <TableCell
                             onClick={(e) => e.stopPropagation()}
                             className="w-[56px] px-6 py-4 align-middle text-center"

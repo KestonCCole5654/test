@@ -768,11 +768,11 @@ export default function Dashboard() {
         {/* Stats Cards Section */}
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8">
           {/* Total Invoices Card */}
-          <Card className="py-2 px-3">
-            <CardHeader className="pb-1 px-2">
+          <Card className="py-1 px-1">
+            <CardHeader className="pb-0 px-1">
               <CardTitle className="text-md font-medium text-slate-500">Total Invoices</CardTitle>
             </CardHeader>
-            <CardContent className="px-2 py-1">
+            <CardContent className="px-1 py-0">
               {isStateLoading ? (
                 <Skeleton className="h-6 w-16" />
               ) : (
@@ -784,11 +784,11 @@ export default function Dashboard() {
           </Card>
 
           {/* Pending Amount Card */}
-          <Card className="py-2 px-3">
-            <CardHeader className="pb-1 px-2">
+          <Card className="py-1 px-1">
+            <CardHeader className="pb-0 px-1">
               <CardTitle className="text-md font-medium text-slate-500">Pending Amount</CardTitle>
             </CardHeader>
-            <CardContent className="px-2 py-1">
+            <CardContent className="px-1 py-0">
               {isStateLoading ? (
                 <Skeleton className="h-6 w-16" />
               ) : (
@@ -803,11 +803,11 @@ export default function Dashboard() {
           </Card>
 
           {/* Paid Amount Card */}
-          <Card className="py-2 px-3">
-            <CardHeader className="pb-1 px-2">
+          <Card className="py-1 px-1">
+            <CardHeader className="pb-0 px-1">
               <CardTitle className="text-md font-medium text-slate-500 ">Paid Amount</CardTitle>
             </CardHeader>
-            <CardContent className="px-2 py-1">
+            <CardContent className="px-1 py-0">
               {isStateLoading ? (
                 <Skeleton className="h-6 w-16" />
               ) : (
@@ -822,11 +822,11 @@ export default function Dashboard() {
           </Card>
 
           {/* Total Revenue Card */}
-          <Card className="py-2 px-3">
-            <CardHeader className="pb-1 px-2">
+          <Card className="py-1 px-1">
+            <CardHeader className="pb-0 px-1">
               <CardTitle className="text-md font-medium text-slate-500">Total Revenue</CardTitle>
             </CardHeader>
-            <CardContent className="px-2 py-1">
+            <CardContent className="px-1 py-0">
               {isStateLoading ? (
                 <Skeleton className="h-6 w-16" />
               ) : (

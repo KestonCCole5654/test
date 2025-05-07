@@ -1356,7 +1356,7 @@ export default function Dashboard() {
                                     setSelectedInvoice(invoice)
                                     setIsPartialPaymentModalOpen(true)
                                   }}
-                                  className="text-green-600"
+
                                 >
                                   Partial Payment
                                 </DropdownMenuItem>

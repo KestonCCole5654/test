@@ -334,6 +334,15 @@ export default function Dashboard() {
     }
   }
 
+  // Utility function to calculate overdue days accurately
+  function getOverdueDays(dueDateString: string): number {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dueDate = new Date(dueDateString);
+    dueDate.setHours(0, 0, 0, 0);
+    return Math.ceil((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+  }
+
   // =====================
   // Invoice Data Fetching
   // =====================
@@ -1175,10 +1184,7 @@ export default function Dashboard() {
                           <TableCell className="text-center px-6 py-4">
                             {invoice.status === "Pending" && new Date(invoice.dueDate) < new Date() ? (
                               <span className="text-red-600 font-medium">
-                                {Math.ceil(
-                                  (new Date().getTime() - new Date(invoice.dueDate).getTime()) / (1000 * 60 * 60 * 24),
-                                )}{" "}
-                                days
+                                {getOverdueDays(invoice.dueDate)} days
                               </span>
                             ) : (
                               <span className="text-slate-400">-</span>

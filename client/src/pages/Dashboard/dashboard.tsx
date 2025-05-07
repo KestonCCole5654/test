@@ -168,8 +168,7 @@ export default function Dashboard() {
             state: {
               error: "Session verification failed",
               from: location.pathname,
-            },
-            replace: true,
+            }
           })
           return
         }
@@ -183,7 +182,7 @@ export default function Dashboard() {
         } = await supabase.auth.getSession()
         if (!session || (session.expires_at ?? 0) * 1000 < Date.now()) {
           await supabase.auth.signOut()
-          navigate("/login", { state: { sessionExpired: true }, replace: true })
+          navigate("/login", { state: { sessionExpired: true } })
         }
       } catch (err) {
         if (!isMounted) return
@@ -191,8 +190,7 @@ export default function Dashboard() {
           state: {
             error: "Connection error. Please try again.",
             from: location.pathname,
-          },
-          replace: true,
+          }
         })
       }
     }

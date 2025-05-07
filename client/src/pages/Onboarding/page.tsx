@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
+import { useNavigate } from "react-router-dom"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { useToast } from "../../components/ui/use-toast"
@@ -809,7 +810,8 @@ export default function InitializePage() {
       setShowSuccess(true)
 
       // Redirect to dashboard after successful setup
-      setTimeout(() => (window.location.href = "/invoices"), 3000)
+      const navigate = useNavigate()
+      setTimeout(() => navigate("/invoices"), 3000)
     } catch (err) {
       console.error("Setup error:", err)
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred"

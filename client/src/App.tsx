@@ -128,7 +128,7 @@ function App() {
             </AuthenticatedRoute>
           }
         >
-          <Route path="/" element={<Navigate to="/invoices" replace />} />
+          <Route path="/" element={<Navigate to="/invoices" />} />
           <Route path="/invoices" element={<Dashboard />} />
           <Route path="/create-invoice" element={<InvoiceForm />} />
           <Route path="/settings" element={<SettingsPage />} />
@@ -138,7 +138,7 @@ function App() {
 
         {/* Catch all route */}
         <Route path="*" element={
-          <Navigate to={user ? "/invoices" : "/login"} replace />
+          <Navigate to={user ? "/invoices" : "/login"} />
         } />
       </Routes>
     </HelmetProvider>

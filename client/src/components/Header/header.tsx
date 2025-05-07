@@ -102,7 +102,7 @@ const Header: React.FC = () => {
               <>
                 <button
                   onClick={() => {
-                    navigate("/invoices", { replace: true });
+                    navigate("/invoices");
                   }}
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
@@ -110,7 +110,7 @@ const Header: React.FC = () => {
                 </button>
                 <button
                   onClick={() => {
-                    navigate("/reports", { replace: true });
+                    navigate("/reports");
                   }}
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
@@ -119,7 +119,7 @@ const Header: React.FC = () => {
                 
                 <button
                   onClick={() => {
-                    navigate("/settings", { replace: true });
+                    navigate("/settings");
                   }}
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
@@ -127,7 +127,7 @@ const Header: React.FC = () => {
                 </button>
                 <button
                   onClick={() => {
-                    navigate("/contact", { replace: true });
+                    navigate("/contact");
                   }}
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 >
@@ -221,7 +221,7 @@ const Header: React.FC = () => {
               <nav className="flex flex-col space-y-1">
                 <button
                   onClick={() => {
-                    navigate("/invoices", { replace: true });
+                    navigate("/invoices");
                     handleNavigation();
                   }}
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
@@ -230,7 +230,7 @@ const Header: React.FC = () => {
                 </button>
                 <button
                   onClick={() => {
-                    navigate("/reports", { replace: true });
+                    navigate("/reports");
                     handleNavigation();
                   }}
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
@@ -239,7 +239,7 @@ const Header: React.FC = () => {
                 </button>
                 <button
                   onClick={() => {
-                    navigate("/template-generator", { replace: true });
+                    navigate("/template-generator");
                     handleNavigation();
                   }}
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
@@ -248,7 +248,7 @@ const Header: React.FC = () => {
                 </button>
                 <button
                   onClick={() => {
-                    navigate("/settings", { replace: true });
+                    navigate("/settings");
                     handleNavigation();
                   }}
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
@@ -257,7 +257,7 @@ const Header: React.FC = () => {
                 </button>
                 <button
                   onClick={() => {
-                    navigate("/contact", { replace: true });
+                    navigate("/contact");
                     handleNavigation();
                   }}
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"

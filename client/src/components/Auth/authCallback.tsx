@@ -35,19 +35,19 @@ export default function AuthCallback() {
           window.history.replaceState({}, document.title, window.location.pathname);
           
           // Navigate to dashboard
-          navigate('/dashboard', { replace: true });
+          navigate('/dashboard');
         } else if (event === 'TOKEN_REFRESHED') {
           console.log('Token refreshed successfully');
         } else if (event === 'SIGNED_OUT') {
           // Clear all storage on sign out
           sessionStorage.clear();
           localStorage.clear();
-          navigate('/login', { replace: true });
+          navigate('/login');
         }
       } catch (error) {
         console.error('Auth validation failed:', error);
         setError(error instanceof Error ? error.message : 'Authentication failed');
-        navigate('/login', { replace: true, state: { error: 'Authentication failed' } });
+        navigate('/login', { state: { error: 'Authentication failed' } });
       }
     };
 
@@ -65,7 +65,7 @@ export default function AuthCallback() {
       } catch (error) {
         console.error('Session check failed:', error);
         setError('Failed to check session');
-        navigate('/login', { replace: true });
+        navigate('/login');
       }
     };
 

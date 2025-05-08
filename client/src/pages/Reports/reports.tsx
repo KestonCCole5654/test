@@ -4,7 +4,6 @@ import { Table, TableHead, TableRow, TableCell, TableBody, TableHeader } from ".
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { format } from "date-fns"
-import { Link } from "react-router-dom"
 import { Mail, CheckCircle, AlertCircle, Search, Calendar, Download, BarChart3, PieChart, Filter } from 'lucide-react'
 import { Badge } from "../../components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
@@ -115,6 +114,7 @@ export default function Reports() {
   const [dateRange, setDateRange] = useState("")
   const [reportType, setReportType] = useState("invoices")
   const [user, setUser] = useState<any>(null)
+  const [key] = useState(() => Math.random())
 
   React.useEffect(() => {
     const getUser = async () => {
@@ -122,7 +122,7 @@ export default function Reports() {
       setUser(user)
     }
     getUser()
-  }, [])
+  }, [key])
 
   const selectedReport = selectedClient ? clientReports[selectedClient] : null
   

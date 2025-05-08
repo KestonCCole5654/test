@@ -18,21 +18,22 @@ import { User as SupabaseUser } from '@supabase/supabase-js'
 const Header = () => {
   const navigate = useNavigate()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [mounted, setMounted] = useState(false)
   const [user, setUser] = useState<SupabaseUser | null>(null)
-  const [loading, setLoading] = useState(true)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    setMounted(true)
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
-      setLoading(false)
+    })
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
     })
 
     return () => {
-      authListener.subscription.unsubscribe()
+      subscription.unsubscribe()
     }
   }, [])
 
@@ -72,8 +73,6 @@ const Header = () => {
     setIsMobileMenuOpen(false)
   }
 
-  if (!mounted || loading) return null
-
   return (
     <header className="sticky top-0 z-50 border-b border-gray-50 bg-white shadow-xs">
       <div className="container max-w-8xl mx-auto sm:px-6">
@@ -92,28 +91,31 @@ const Header = () => {
           <nav className="hidden md:flex items-center space-x-1">
             {user && (
               <>
-                {/* Changed from buttons to Links */}
                 <Link
                   to="/invoices"
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-green-100 hover:text-slate-900 transition-colors"
+                  onClick={handleNavigation}
                 >
                   Dashboard
                 </Link>
                 <Link
                   to="/reports"
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-green-100 hover:text-slate-900 transition-colors"
+                  onClick={handleNavigation}
                 >
                   Reports
                 </Link>
                 <Link
                   to="/settings"
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-green-100 hover:text-slate-900 transition-colors"
+                  onClick={handleNavigation}
                 >
                   Account & Settings
                 </Link>
                 <Link
                   to="/contact"
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-green-100 hover:text-slate-900 transition-colors"
+                  onClick={handleNavigation}
                 >
                   Contact & Support
                 </Link>
@@ -200,79 +202,35 @@ const Header = () => {
           <div className="container max-w-7xl mx-auto px-4 sm:px-6 py-3">
             {user && (
               <nav className="flex flex-col space-y-1">
-                {/* Changed from buttons to Links in mobile menu too */}
                 <Link
                   to="/invoices"
-                  className="px-3 py-2.5 rounded-md text-slate-700 ho hover:text-slate-900 transition-colors"
+                  className="px-3 py-2.5 rounded-md text-slate-700 hover:text-slate-900 transition-colors"
                   onClick={handleNavigation}
                 >
                   Dashboard
                 </Link>
                 <Link
                   to="/reports" 
-                  className="px-3 py-2.5 rounded-md text-slate-700 ho hover:text-slate-900 transition-colors"
+                  className="px-3 py-2.5 rounded-md text-slate-700 hover:text-slate-900 transition-colors"
                   onClick={handleNavigation}
                 >
                   Reports
                 </Link>
                 <Link
-                  to="/template-generator"
-                  className="px-3 py-2.5 rounded-md text-slate-700 ho hover:text-slate-900 transition-colors"
-                  onClick={handleNavigation}
-                >
-                  Invoices Template Generator
-                </Link>
-                <Link
                   to="/settings"
-                  className="px-3 py-2.5 rounded-md text-slate-700 ho hover:text-slate-900 transition-colors"
+                  className="px-3 py-2.5 rounded-md text-slate-700 hover:text-slate-900 transition-colors"
                   onClick={handleNavigation}
                 >
                   Settings
                 </Link>
                 <Link
                   to="/contact"
-                  className="px-3 py-2.5 rounded-md text-slate-700 ho hover:text-slate-900 transition-colors"
+                  className="px-3 py-2.5 rounded-md text-slate-700 hover:text-slate-900 transition-colors"
                   onClick={handleNavigation}
                 >
                   Contact & Support
                 </Link>
               </nav>
-            )}
-
-            {user ? (
-              <div className="mt-4 pt-4 border-t border-green-200">
-                <div className="flex items-center px-3 py-2">
-                  <Avatar className="h-10 w-10 mr-3">
-                    <AvatarFallback className="bg-green-100 text-green-800">
-                      {user.email?.charAt(0).toUpperCase() || "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-medium text-green-900 truncate">{user.email}</p>
-                    <p className="text-sm text-green-700 truncate">Account</p>
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 mt-2"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Log out
-                </Button>
-              </div>
-            ) : (
-              <div className="mt-4 pt-4 border-t border-green-200">
-                <Button
-                  className="w-full bg-green-700 hover:bg-green-800"
-                  onClick={() => {
-                    navigate("/login")
-                    handleNavigation()
-                  }}
-                >
-                  Sign in
-                </Button>
-              </div>
             )}
           </div>
         </div>

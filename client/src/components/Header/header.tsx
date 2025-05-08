@@ -99,7 +99,7 @@ const Header = () => {
                   Dashboard
                 </Link>
                 <Link
-                  to="/reports"
+                  to="/invoices"
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-green-100 hover:text-slate-900 transition-colors"
                   onClick={handleNavigation}
                 >

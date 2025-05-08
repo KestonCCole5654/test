@@ -541,6 +541,7 @@ const SuccessIllustration = () => (
 )
 
 export default function InitializePage() {
+  const navigate = useNavigate()
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")
@@ -810,7 +811,6 @@ export default function InitializePage() {
       setShowSuccess(true)
 
       // Redirect to dashboard after successful setup
-      const navigate = useNavigate()
       setTimeout(() => navigate("/invoices"), 3000)
     } catch (err) {
       console.error("Setup error:", err)

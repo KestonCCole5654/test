@@ -95,25 +95,25 @@ const Header = () => {
                 {/* Changed from buttons to Links */}
                 <Link
                   to="/invoices"
-                  className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  className="px-3 py-2 rounded-md text-slate-600 hover:bg-green-50 hover:text-slate-900 transition-colors"
                 >
                   Dashboard
                 </Link>
                 <Link
                   to="/reports"
-                  className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  className="px-3 py-2 rounded-md text-slate-600 hover:bg-green-50 hover:text-slate-900 transition-colors"
                 >
                   Reports
                 </Link>
                 <Link
                   to="/settings"
-                  className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  className="px-3 py-2 rounded-md text-slate-600 hover:bg-green-50 hover:text-slate-900 transition-colors"
                 >
                   Account & Settings
                 </Link>
                 <Link
                   to="/contact"
-                  className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  className="px-3 py-2 rounded-md text-slate-600 hover:bg-green-50 hover:text-slate-900 transition-colors"
                 >
                   Contact & Support
                 </Link>
@@ -203,35 +203,35 @@ const Header = () => {
                 {/* Changed from buttons to Links in mobile menu too */}
                 <Link
                   to="/invoices"
-                  className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  className="px-3 py-2.5 rounded-md text-slate-700 ho hover:text-slate-900 transition-colors"
                   onClick={handleNavigation}
                 >
                   Dashboard
                 </Link>
                 <Link
                   to="/reports" 
-                  className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  className="px-3 py-2.5 rounded-md text-slate-700 ho hover:text-slate-900 transition-colors"
                   onClick={handleNavigation}
                 >
                   Reports
                 </Link>
                 <Link
                   to="/template-generator"
-                  className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  className="px-3 py-2.5 rounded-md text-slate-700 ho hover:text-slate-900 transition-colors"
                   onClick={handleNavigation}
                 >
                   Invoices Template Generator
                 </Link>
                 <Link
                   to="/settings"
-                  className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  className="px-3 py-2.5 rounded-md text-slate-700 ho hover:text-slate-900 transition-colors"
                   onClick={handleNavigation}
                 >
                   Settings
                 </Link>
                 <Link
                   to="/contact"
-                  className="px-3 py-2.5 rounded-md text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  className="px-3 py-2.5 rounded-md text-slate-700 ho hover:text-slate-900 transition-colors"
                   onClick={handleNavigation}
                 >
                   Contact & Support

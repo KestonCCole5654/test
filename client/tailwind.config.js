@@ -19,9 +19,10 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        sans: ['Poppins', 'system-ui', 'sans-serif'],
+        sans: ['Afacad Flux', 'system-ui', 'sans-serif'],
         inter: ["var(--font-inter)", "system-ui", "sans-serif"],
         'dm-sans': ['DM Sans', 'sans-serif'],
+        'poppins': ['Poppins', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

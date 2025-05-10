@@ -998,43 +998,6 @@ export default function Dashboard() {
       )
     }
 
-    // Empty State
-    if (filteredInvoices.length === 0) {
-      return (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <h3 className="text-lg font-medium text-slate-900 mb-2">No invoices found</h3>
-            <p className="text-slate-500 text-center max-w-md mb-6">
-              {searchQuery || statusFilter !== "all" ? (
-                <>No invoices match your current filters. Try adjusting your search or filter criteria.</>
-              ) : (
-                <>Get started by creating your first invoice.</>
-              )}
-            </p>
-            {!searchQuery && statusFilter === "all" && (
-              <Button
-                onClick={() => {
-                  const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
-                  const invoicesSheetUrl = invoicesSheet?.sheetUrl
-                  console.log('Navigating to create invoice with URL:', invoicesSheetUrl)
-                  navigate("/create-invoice", {
-                    state: { 
-                      selectedSpreadsheetUrl: invoicesSheetUrl,
-                      key: Date.now() // Add a unique key to force remount
-                    }
-                  })
-                }}
-                className="bg-green-600 text-white hover:bg-green-700"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Create Invoice
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      )
-    }
-
     return (
       <Card>
         <CardContent className="p-0">
@@ -1138,7 +1101,23 @@ export default function Dashboard() {
                       const invoice = currentItems.find((inv) => inv.id === id)
                       if (!invoice) return null
                       return (
-                        <SortableTableRow key={invoice.id} id={invoice.id}>
+                        <SortableTableRow 
+                          key={invoice.id} 
+                          id={invoice.id} 
+                          onClick={() => {
+                            const invoicesSheet = spreadsheets.find(
+                              (sheet) => sheet.name === "SheetBills Invoices",
+                            )
+                            const invoicesSheetUrl = invoicesSheet?.sheetUrl
+
+                            navigate("/create-invoice", {
+                              state: {
+                                invoiceToEdit: invoice,
+                                selectedSpreadsheetUrl: invoicesSheetUrl,
+                              },
+                            })
+                          }}
+                        >
                           <TableCell
                             onClick={(e) => e.stopPropagation()}
                             className="w-[56px] px-6 py-4 align-middle text-center"
@@ -1347,7 +1326,6 @@ export default function Dashboard() {
                                     })
                                   }}
                                 >
-                                  
                                   Edit Invoice
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
@@ -1359,7 +1337,6 @@ export default function Dashboard() {
                                   }}
                                   className="text-red-600"
                                 >
-                                  
                                   Delete Invoice
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
@@ -1368,7 +1345,6 @@ export default function Dashboard() {
                                     setSelectedInvoice(invoice)
                                     setIsPartialPaymentModalOpen(true)
                                   }}
-
                                 >
                                   Partial Payment
                                 </DropdownMenuItem>
@@ -1422,8 +1398,9 @@ export default function Dashboard() {
 // =====================
 // Sortable Table Row Component
 // =====================
-function SortableTableRow({ id, children, ...props }: any) {
+function SortableTableRow({ id, children, onClick, ...props }: any) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
+  
   return (
     <tr
       ref={setNodeRef}
@@ -1431,7 +1408,9 @@ function SortableTableRow({ id, children, ...props }: any) {
         transform: CSS.Transform.toString(transform),
         transition,
         opacity: isDragging ? 0.5 : 1,
+        cursor: 'pointer'
       }}
+      onClick={onClick}
       {...props}
     >
       {/* Drag handle cell */}

@@ -20,6 +20,7 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['Afacad Flux', 'system-ui', 'sans-serif'],
+        'AfacadFlux': ['Afacad Flux', 'system-ui', 'sans-serif'],
         inter: ["var(--font-inter)", "system-ui", "sans-serif"],
         'dm-sans': ['DM Sans', 'sans-serif'],
         'poppins': ['Poppins', 'sans-serif'],

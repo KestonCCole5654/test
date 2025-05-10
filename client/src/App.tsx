@@ -22,19 +22,14 @@ import { LoadingSpinner } from "./components/ui/loadingSpinner";
 import AuthCallback from './pages/auth-callback'
 import Reports from './pages/Reports/reports';
 
-const AuthenticatedLayout = () => {
-  // Use location to force re-rendering when route changes
-  const location = useLocation();
-  
-  return (
-    <>
-      <Header />
-      <main className="container mx-auto p-4" key={location.pathname}>
-        <Outlet />
-      </main>
-    </>
-  );
-};
+const AuthenticatedLayout = () => (
+  <>
+    <Header />
+    <main className="container mx-auto p-4">
+      <Outlet />
+    </main>
+  </>
+);
 
 async function checkBusinessSheet(supabaseToken: string, googleToken: string) {
   try {
@@ -76,22 +71,11 @@ function App() {
         sessionStorage.setItem('sb-auth-token', JSON.stringify(session));
         localStorage.setItem('sb-auth-token', JSON.stringify(session));
         setUser(session.user);
-        
-        // If we're on the auth callback page, redirect to the appropriate page
-        if (location.pathname === '/auth-callback') {
-          const from = location.state?.from || '/invoices';
-          navigate(from, { replace: true });
-        }
       } else {
         console.log('Clearing user session');
         sessionStorage.removeItem('sb-auth-token');
         localStorage.removeItem('sb-auth-token');
         setUser(null);
-        
-        // If we're not on the login page, redirect there
-        if (location.pathname !== '/login') {
-          navigate('/login', { replace: true });
-        }
       }
       setLoading(false);
     };
@@ -115,7 +99,7 @@ function App() {
       isMounted = false;
       authSubscription?.unsubscribe();
     };
-  }, [navigate, location]);
+  }, []);
 
   // Add location change logging
   useEffect(() => {
@@ -162,7 +146,7 @@ function App() {
             </AuthenticatedRoute>
           }
         >
-          <Route path="/" element={<Navigate to="/invoices" replace />} />
+          <Route path="/" element={<Navigate to="/invoices" />} />
           <Route path="/invoices" element={<Dashboard />} />
           <Route path="/create-invoice" element={<InvoiceForm />} />
           <Route path="/settings" element={<SettingsPage />} />
@@ -172,7 +156,7 @@ function App() {
 
         {/* Catch all route */}
         <Route path="*" element={
-          <Navigate to={user ? "/invoices" : "/login"} replace />
+          <Navigate to={user ? "/invoices" : "/login"} />
         } />
       </Routes>
     </HelmetProvider>

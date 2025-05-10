@@ -56,25 +56,31 @@ export default function AuthCallback() {
         if (error) throw error
 
         if (session) {
-          // const needsOnboarding = await checkUserOnboarding(session.user.id)
-          // navigate(needsOnboarding ? '/Onboarding' : '/invoices')
+          // Store the session
+          sessionStorage.setItem('supabase_token', session.access_token)
+          if (session.provider_token) {
+            sessionStorage.setItem('google_access_token', session.provider_token)
+          }
+
           // Get the previous location from state or default to invoices
           const from = location.state?.from || '/invoices'
-          // Use replace to prevent back button issues
-          navigate(from, { replace: true })
+          
+          // Force a page reload to ensure proper state reset
+          window.location.href = from
         } else {
-          navigate('/login', { replace: true })
+          window.location.href = '/login'
         }
       } catch (err: any) {
         console.error('Auth callback error:', err)
         setError(err.message)
-        // Use replace to prevent back button issues
-        setTimeout(() => navigate('/login', { replace: true }), 3000)
+        setTimeout(() => {
+          window.location.href = '/login'
+        }, 3000)
       }
     }
 
     handleAuthCallback()
-  }, [navigate, location.state])
+  }, [location.state])
 
   if (error) {
     return (

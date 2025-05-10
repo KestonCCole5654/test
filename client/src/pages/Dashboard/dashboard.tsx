@@ -1101,7 +1101,11 @@ export default function Dashboard() {
                       const invoice = currentItems.find((inv) => inv.id === id)
                       if (!invoice) return null
                       return (
-                        <SortableTableRow key={invoice.id} id={invoice.id}>
+                        <SortableTableRow 
+                          key={invoice.id} 
+                          id={invoice.id}
+                          invoice={invoice}
+                          spreadsheets={spreadsheets}>
                           <TableCell
                             onClick={(e) => e.stopPropagation()}
                             className="w-[56px] px-6 py-4 align-middle text-center"
@@ -1382,8 +1386,36 @@ export default function Dashboard() {
 // =====================
 // Sortable Table Row Component
 // =====================
-function SortableTableRow({ id, children, ...props }: any) {
+interface SortableTableRowProps {
+  id: string;
+  children: React.ReactNode;
+  invoice: Invoice;
+  spreadsheets: Spreadsheet[];
+  [key: string]: any;
+}
+
+function SortableTableRow({ id, children, invoice, spreadsheets, ...props }: SortableTableRowProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
+  const navigate = useNavigate()
+  
+  const handleRowClick = () => {
+    if (invoice) {
+      const invoicesSheet = spreadsheets.find(
+        (sheet: Spreadsheet) => sheet.name === "SheetBills Invoices"
+      )
+      const invoicesSheetUrl = invoicesSheet?.sheetUrl
+      
+      // Navigate to create-invoice page with invoice data and hideForm=true
+      navigate("/create-invoice", {
+        state: {
+          invoiceToEdit: invoice,
+          selectedSpreadsheetUrl: invoicesSheetUrl,
+          hideForm: true // This will collapse the form and show only the preview
+        },
+      })
+    }
+  }
+  
   return (
     <tr
       ref={setNodeRef}
@@ -1391,7 +1423,10 @@ function SortableTableRow({ id, children, ...props }: any) {
         transform: CSS.Transform.toString(transform),
         transition,
         opacity: isDragging ? 0.5 : 1,
+        cursor: "pointer"
       }}
+      onClick={handleRowClick}
+      className="hover:bg-slate-50"
       {...props}
     >
       {/* Drag handle cell */}
@@ -1400,6 +1435,7 @@ function SortableTableRow({ id, children, ...props }: any) {
           {...attributes}
           {...listeners}
           className="inline-flex items-center justify-center cursor-grab text-gray-400 hover:text-gray-600 active:text-gray-800"
+          onClick={(e) => e.stopPropagation()} // Prevent row click when dragging
         >
           <GripVertical className="h-5 w-5" />
         </span>

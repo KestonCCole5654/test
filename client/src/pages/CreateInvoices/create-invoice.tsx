@@ -64,8 +64,9 @@ export default function InvoiceForm() {
   const invoiceToEdit = location.state?.invoiceToEdit
   const selectedSpreadsheetUrl = location.state?.selectedSpreadsheetUrl
   const key = location.state?.key
+  const hideForm = location.state?.hideForm
   
-  console.log('InvoiceForm mounted with state:', { invoiceToEdit, selectedSpreadsheetUrl, key })
+  console.log('InvoiceForm mounted with state:', { invoiceToEdit, selectedSpreadsheetUrl, key, hideForm })
   
   // Add useEffect to handle state changes
   useEffect(() => {

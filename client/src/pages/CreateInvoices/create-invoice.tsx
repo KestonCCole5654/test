@@ -360,54 +360,8 @@ export default function InvoiceForm() {
   }
 
   const handleDownloadPDF = async () => {
-    if (!previewRef.current) return
-
-    try {
-      // Create a temporary div to render the invoice without buttons
-      const tempDiv = document.createElement("div")
-      tempDiv.innerHTML = previewRef.current.innerHTML
-      document.body.appendChild(tempDiv)
-
-      // Apply print styles
-      tempDiv.style.width = "210mm" // A4 width
-      tempDiv.style.padding = "10mm"
-      tempDiv.style.backgroundColor = "white"
-
-      // Hide any no-print elements
-      const noPrintElements = tempDiv.querySelectorAll(".no-print")
-      noPrintElements.forEach((el) => {
-        ;(el as HTMLElement).style.display = "none"
-      })
-
-      // Capture the canvas
-      const canvas = await html2canvas(tempDiv, {
-        scale: 2, // Higher scale for better quality
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#ffffff",
-      })
-
-      // Remove the temporary div
-      document.body.removeChild(tempDiv)
-
-      // Create PDF
-      const imgData = canvas.toDataURL("image/png")
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
-      })
-
-      const imgWidth = 210 // A4 width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width
-
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight)
-
-      // Save the PDF
-      pdf.save(`Invoice-${invoiceData.invoiceNumber}.pdf`)
-    } catch (error) {
-      console.error("Error generating PDF:", error)
-    }
+    // Use the helper function with forEmail=false
+    await generateAndSavePDF(false)
   }
 
   // Function to handle sending email to client using Gmail
@@ -421,8 +375,64 @@ export default function InvoiceForm() {
       return
     }
 
+    // First, show a loading toast
+    toast({
+      title: "Preparing Email",
+      description: "Generating invoice PDF and preparing email...",
+    })
+
     try {
-      // First generate the PDF
+      // Generate the PDF first
+      await generateAndSavePDF(true)
+      
+      // Create a subject line for the email
+      const subject = `Invoice ${invoiceData.invoiceNumber} from ${businessData.companyName}`
+      
+      // Create email body with invoice details
+      const body = `Dear ${invoiceData.customer.name},
+
+Please find attached invoice ${invoiceData.invoiceNumber} for the amount of ${formatCurrency(invoiceData.amount)}.
+
+Invoice Date: ${formatDate(invoiceData.date)}
+Due Date: ${formatDate(invoiceData.dueDate)}
+
+If you have any questions, please don't hesitate to contact us.
+
+Thank you for your business.
+
+Regards,
+${businessData.companyName}
+${businessData.email}
+${businessData.phone}`
+      
+      // Open Gmail compose in a new window with prefilled fields
+      const mailtoLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(invoiceData.customer.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+      
+      // Open Gmail in a new window
+      window.open(mailtoLink, '_blank')
+      
+      // Show success toast with clear instructions
+      toast({
+        title: "Email Ready",
+        description: "Gmail has been opened. Please attach the downloaded invoice PDF to complete your email.",
+        variant: "default",
+      })
+    } catch (error) {
+      console.error("Error preparing email:", error)
+      toast({
+        title: "Error",
+        description: "Failed to prepare email. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  // Helper function to generate and save PDF
+  const generateAndSavePDF = async (forEmail = false) => {
+    if (!previewRef.current) return
+    
+    try {
+      // Create a temporary div to render the invoice without buttons
       const tempDiv = document.createElement("div")
       tempDiv.innerHTML = previewRef.current.innerHTML
       document.body.appendChild(tempDiv)
@@ -462,50 +472,29 @@ export default function InvoiceForm() {
 
       pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight)
       
-      // Get the PDF as a blob
-      const pdfBlob = pdf.output('blob')
+      // Save the PDF with a clear filename that indicates it's for email attachment
+      const filename = forEmail 
+        ? `Invoice-${invoiceData.invoiceNumber}-for-${invoiceData.customer.name.replace(/\s+/g, "-")}.pdf`
+        : `Invoice-${invoiceData.invoiceNumber}.pdf`
       
-      // Create a subject line for the email
-      const subject = `Invoice ${invoiceData.invoiceNumber} from ${businessData.companyName}`
+      pdf.save(filename)
       
-      // Create email body with invoice details
-      const body = `Dear ${invoiceData.customer.name},
-
-Please find attached invoice ${invoiceData.invoiceNumber} for the amount of ${formatCurrency(invoiceData.amount)}.
-
-Invoice Date: ${formatDate(invoiceData.date)}
-Due Date: ${formatDate(invoiceData.dueDate)}
-
-If you have any questions, please don't hesitate to contact us.
-
-Thank you for your business.
-
-Regards,
-${businessData.companyName}
-${businessData.email}
-${businessData.phone}`
+      if (forEmail) {
+        toast({
+          title: "PDF Generated",
+          description: `Invoice PDF saved as "${filename}". Please attach this file to your email.`,
+        })
+      }
       
-      // Open Gmail compose in a new window with prefilled fields
-      // Note: We can't directly attach files through mailto links, but we can prefill the subject and body
-      const mailtoLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(invoiceData.customer.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-      
-      window.open(mailtoLink, '_blank')
-      
-      toast({
-        title: "Email Client Opened",
-        description: "Gmail compose window has been opened. Please attach the invoice PDF manually.",
-        variant: "default",
-      })
-      
-      // Also download the PDF for easy attachment
-      pdf.save(`Invoice-${invoiceData.invoiceNumber}.pdf`)
+      return pdf
     } catch (error) {
-      console.error("Error preparing email:", error)
+      console.error("Error generating PDF:", error)
       toast({
         title: "Error",
-        description: "Failed to prepare email. Please try again.",
+        description: "Failed to generate PDF. Please try again.",
         variant: "destructive",
       })
+      return null
     }
   }
 

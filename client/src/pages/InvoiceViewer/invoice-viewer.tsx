@@ -81,7 +81,7 @@ export default function InvoiceViewer() {
       }
 
       // Fetch the invoice data from the server
-      const response = await fetch(`https://sheetbills-server.vercel.app/api/invoices/shared/${invoiceId}?token=${token}`)
+      const response = await fetch(`/api/invoices/shared/${invoiceId}?token=${token}`)
       
       if (!response.ok) {
         throw new Error("Failed to fetch invoice")

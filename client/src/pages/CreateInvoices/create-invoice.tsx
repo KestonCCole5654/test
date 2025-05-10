@@ -397,7 +397,7 @@ export default function InvoiceForm() {
       }
       
       // Create a shareable link for the invoice
-      const response = await fetch("https://sheetbills-server.vercel.app/api/invoices/shared/create-link", {
+      const response = await fetch("/api/invoices/shared/create-link", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -34,20 +34,20 @@ export default function AuthCallback() {
           // Clean URL only after successful validation
           window.history.replaceState({}, document.title, window.location.pathname);
           
-          // Navigate to dashboard
-          navigate('/dashboard');
+          // Navigate to invoices instead of dashboard
+          navigate('/invoices', { replace: true });
         } else if (event === 'TOKEN_REFRESHED') {
           console.log('Token refreshed successfully');
         } else if (event === 'SIGNED_OUT') {
           // Clear all storage on sign out
           sessionStorage.clear();
           localStorage.clear();
-          navigate('/login');
+          navigate('/login', { replace: true });
         }
       } catch (error) {
         console.error('Auth validation failed:', error);
         setError(error instanceof Error ? error.message : 'Authentication failed');
-        navigate('/login', { state: { error: 'Authentication failed' } });
+        navigate('/login', { state: { error: 'Authentication failed' }, replace: true });
       }
     };
 
@@ -65,7 +65,7 @@ export default function AuthCallback() {
       } catch (error) {
         console.error('Session check failed:', error);
         setError('Failed to check session');
-        navigate('/login');
+        navigate('/login', { replace: true });
       }
     };
 

@@ -60,19 +60,21 @@ export default function AuthCallback() {
           // navigate(needsOnboarding ? '/Onboarding' : '/invoices')
           // Get the previous location from state or default to invoices
           const from = location.state?.from || '/invoices'
-          navigate(from)
+          // Use replace to prevent back button issues
+          navigate(from, { replace: true })
         } else {
-          navigate('/login')
+          navigate('/login', { replace: true })
         }
       } catch (err: any) {
         console.error('Auth callback error:', err)
         setError(err.message)
-        setTimeout(() => navigate('/login'), 3000)
+        // Use replace to prevent back button issues
+        setTimeout(() => navigate('/login', { replace: true }), 3000)
       }
     }
 
     handleAuthCallback()
-  }, [navigate])
+  }, [navigate, location.state])
 
   if (error) {
     return (

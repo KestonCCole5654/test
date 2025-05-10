@@ -4,7 +4,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import supabase from './components/Auth/supabaseClient';
 import Login from './components/Auth/Login';
 import Dashboard from './pages/Dashboard/dashboard';
-import Header from './components/Header/header';
+import SidebarLayout from './components/Layout/SidebarLayout';
 import AuthenticatedRoute from './components/Auth/authenticatedRoute';
 import InvoiceForm from './pages/CreateInvoices/create-invoice';
 import type { 
@@ -23,14 +23,7 @@ import AuthCallback from './pages/auth-callback'
 import Reports from './pages/Reports/reports';
 import InvoiceViewer from './pages/InvoiceViewer/invoice-viewer';
 
-const AuthenticatedLayout = () => (
-  <>
-    <Header />
-    <main className="container mx-auto p-4">
-      <Outlet />
-    </main>
-  </>
-);
+// SidebarLayout already includes the Outlet component
 
 async function checkBusinessSheet(supabaseToken: string, googleToken: string) {
   try {
@@ -144,7 +137,7 @@ function App() {
         <Route
           element={
             <AuthenticatedRoute authenticated={!!user} isLoading={loading}>
-              <AuthenticatedLayout />
+              <SidebarLayout />
             </AuthenticatedRoute>
           }
         >

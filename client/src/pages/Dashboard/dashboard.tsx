@@ -689,9 +689,8 @@ export default function Dashboard() {
   const sensors = useSensors(useSensor(PointerSensor))
 
   return (
-    <div className="min-h-screen w-full font-AfacadFlux ">
-      <div className="container max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        {/* Stats Cards Section */}
+    <div className="min-h-screen w-full font-AfacadFlux p-6">
+      {/* Stats Cards Section */}
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8">
           {/* Total Invoices Card */}
           <Card className="py-1 px-1">

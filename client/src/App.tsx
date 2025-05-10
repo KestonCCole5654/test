@@ -63,13 +63,16 @@ function App() {
     let authSubscription: Subscription;
 
     const handleAuthStateChange = async (event: AuthChangeEvent, session: Session | null) => {
+      console.log('Auth state changed:', { event, session: !!session });
       if (!isMounted) return;
 
       if (session) {
+        console.log('Setting user session');
         sessionStorage.setItem('sb-auth-token', JSON.stringify(session));
         localStorage.setItem('sb-auth-token', JSON.stringify(session));
         setUser(session.user);
       } else {
+        console.log('Clearing user session');
         sessionStorage.removeItem('sb-auth-token');
         localStorage.removeItem('sb-auth-token');
         setUser(null);
@@ -78,7 +81,9 @@ function App() {
     };
 
     // Get initial session
+    console.log('Getting initial session');
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session:', { hasSession: !!session });
       if (session) {
         setUser(session.user);
       }
@@ -90,12 +95,25 @@ function App() {
     authSubscription = subscription;
 
     return () => {
+      console.log('Cleaning up auth subscription');
       isMounted = false;
       authSubscription?.unsubscribe();
     };
   }, []);
 
+  // Add location change logging
+  useEffect(() => {
+    console.log('Location changed:', {
+      pathname: location.pathname,
+      search: location.search,
+      hash: location.hash,
+      user: !!user,
+      loading
+    });
+  }, [location, user, loading]);
+
   if (loading) {
+    console.log('App is in loading state');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner />

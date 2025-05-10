@@ -379,6 +379,7 @@ export default function InvoiceForm() {
     toast({
       title: "Preparing Email",
       description: "Generating shareable invoice link...",
+      variant: "default"
     })
 
     try {
@@ -571,6 +572,7 @@ ${businessData.phone}`
         toast({
           title: "PDF Generated",
           description: `Invoice PDF saved as "${filename}". Please attach this file to your email.`,
+          variant: "default"
         })
       }
       

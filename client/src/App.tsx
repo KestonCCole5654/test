@@ -22,14 +22,19 @@ import { LoadingSpinner } from "./components/ui/loadingSpinner";
 import AuthCallback from './pages/auth-callback'
 import Reports from './pages/Reports/reports';
 
-const AuthenticatedLayout = () => (
-  <>
-    <Header />
-    <main className="container mx-auto p-4">
-      <Outlet />
-    </main>
-  </>
-);
+const AuthenticatedLayout = () => {
+  // Use location to force re-rendering when route changes
+  const location = useLocation();
+  
+  return (
+    <>
+      <Header />
+      <main className="container mx-auto p-4" key={location.pathname}>
+        <Outlet />
+      </main>
+    </>
+  );
+};
 
 async function checkBusinessSheet(supabaseToken: string, googleToken: string) {
   try {
@@ -158,11 +163,11 @@ function App() {
           }
         >
           <Route path="/" element={<Navigate to="/invoices" replace />} />
-          <Route path="/invoices" element={<Dashboard />} />
-          <Route path="/create-invoice" element={<InvoiceForm />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/reports" element={<Reports />} />
+          <Route path="/invoices" element={<Dashboard key="dashboard-route" />} />
+          <Route path="/create-invoice" element={<InvoiceForm key="invoice-form-route" />} />
+          <Route path="/settings" element={<SettingsPage key="settings-route" />} />
+          <Route path="/contact" element={<ContactPage key="contact-route" />} />
+          <Route path="/reports" element={<Reports key="reports-route" />} />
         </Route>
 
         {/* Catch all route */}

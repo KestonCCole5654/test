@@ -1101,23 +1101,7 @@ export default function Dashboard() {
                       const invoice = currentItems.find((inv) => inv.id === id)
                       if (!invoice) return null
                       return (
-                        <SortableTableRow 
-                          key={invoice.id} 
-                          id={invoice.id} 
-                          onClick={() => {
-                            const invoicesSheet = spreadsheets.find(
-                              (sheet) => sheet.name === "SheetBills Invoices",
-                            )
-                            const invoicesSheetUrl = invoicesSheet?.sheetUrl
-
-                            navigate("/create-invoice", {
-                              state: {
-                                invoiceToEdit: invoice,
-                                selectedSpreadsheetUrl: invoicesSheetUrl,
-                              },
-                            })
-                          }}
-                        >
+                        <SortableTableRow key={invoice.id} id={invoice.id}>
                           <TableCell
                             onClick={(e) => e.stopPropagation()}
                             className="w-[56px] px-6 py-4 align-middle text-center"
@@ -1398,9 +1382,8 @@ export default function Dashboard() {
 // =====================
 // Sortable Table Row Component
 // =====================
-function SortableTableRow({ id, children, onClick, ...props }: any) {
+function SortableTableRow({ id, children, ...props }: any) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
-  
   return (
     <tr
       ref={setNodeRef}
@@ -1408,9 +1391,7 @@ function SortableTableRow({ id, children, onClick, ...props }: any) {
         transform: CSS.Transform.toString(transform),
         transition,
         opacity: isDragging ? 0.5 : 1,
-        cursor: 'pointer'
       }}
-      onClick={onClick}
       {...props}
     >
       {/* Drag handle cell */}

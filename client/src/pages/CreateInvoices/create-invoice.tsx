@@ -378,23 +378,66 @@ export default function InvoiceForm() {
     // First, show a loading toast
     toast({
       title: "Preparing Email",
-      description: "Generating invoice PDF and preparing email...",
+      description: "Generating shareable invoice link...",
     })
 
     try {
-      // Generate the PDF first
-      await generateAndSavePDF(true)
+      // Get the current session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      
+      if (sessionError) {
+        throw new Error(sessionError.message)
+      }
+      
+      if (!session) {
+        throw new Error("No active session")
+      }
+      
+      // Create a shareable link for the invoice
+      const response = await fetch("https://sheetbills-server.vercel.app/api/invoices/shared/create-link", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Supabase-Token": session.access_token || "",
+        },
+        body: JSON.stringify({
+          invoiceId: invoiceData.invoiceNumber,
+        }),
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to create shareable link")
+      }
+      
+      const { shareUrl, expiresAt } = await response.json()
+      
+      // Format expiration date
+      const expirationDate = new Date(expiresAt)
+      const formattedExpirationDate = expirationDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
       
       // Create a subject line for the email
       const subject = `Invoice ${invoiceData.invoiceNumber} from ${businessData.companyName}`
       
-      // Create email body with invoice details
+      // Create email body with invoice details and shareable link
       const body = `Dear ${invoiceData.customer.name},
 
-Please find attached invoice ${invoiceData.invoiceNumber} for the amount of ${formatCurrency(invoiceData.amount)}.
+Please find your invoice ${invoiceData.invoiceNumber} for the amount of ${formatCurrency(invoiceData.amount)}.
 
-Invoice Date: ${formatDate(invoiceData.date)}
-Due Date: ${formatDate(invoiceData.dueDate)}
+You can view and download your invoice by clicking the link below:
+${shareUrl}
+
+Invoice Details:
+- Invoice Number: ${invoiceData.invoiceNumber}
+- Invoice Date: ${formatDate(invoiceData.date)}
+- Due Date: ${formatDate(invoiceData.dueDate)}
+- Amount: ${formatCurrency(invoiceData.amount)}
+
+This link will expire on ${formattedExpirationDate}.
 
 If you have any questions, please don't hesitate to contact us.
 
@@ -411,19 +454,64 @@ ${businessData.phone}`
       // Open Gmail in a new window
       window.open(mailtoLink, '_blank')
       
-      // Show success toast with clear instructions
+      // Show success toast
       toast({
         title: "Email Ready",
-        description: "Gmail has been opened. Please attach the downloaded invoice PDF to complete your email.",
+        description: "Gmail has been opened with a shareable invoice link included in the email.",
         variant: "default",
       })
     } catch (error) {
       console.error("Error preparing email:", error)
       toast({
         title: "Error",
-        description: "Failed to prepare email. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to prepare email. Please try again.",
         variant: "destructive",
       })
+      
+      // Fallback to the PDF attachment method if creating a shareable link fails
+      try {
+        await generateAndSavePDF(true)
+        
+        // Create a subject line for the email
+        const subject = `Invoice ${invoiceData.invoiceNumber} from ${businessData.companyName}`
+        
+        // Create email body with invoice details
+        const body = `Dear ${invoiceData.customer.name},
+
+Please find attached invoice ${invoiceData.invoiceNumber} for the amount of ${formatCurrency(invoiceData.amount)}.
+
+Invoice Date: ${formatDate(invoiceData.date)}
+Due Date: ${formatDate(invoiceData.dueDate)}
+
+If you have any questions, please don't hesitate to contact us.
+
+Thank you for your business.
+
+Regards,
+${businessData.companyName}
+${businessData.email}
+${businessData.phone}`
+        
+        // Open Gmail compose in a new window with prefilled fields
+        const mailtoLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(invoiceData.customer.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+        
+        // Open Gmail in a new window
+        window.open(mailtoLink, '_blank')
+        
+        // Show fallback toast
+        toast({
+          title: "Email Ready (Fallback Mode)",
+          description: "Gmail has been opened. Please attach the downloaded invoice PDF to complete your email.",
+          variant: "default",
+        })
+      } catch (fallbackError) {
+        console.error("Error in fallback email method:", fallbackError)
+        toast({
+          title: "Error",
+          description: "All email methods failed. Please try again later.",
+          variant: "destructive",
+        })
+      }
     }
   }
 

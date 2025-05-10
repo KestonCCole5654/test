@@ -163,11 +163,11 @@ function App() {
           }
         >
           <Route path="/" element={<Navigate to="/invoices" replace />} />
-          <Route path="/invoices" element={<Dashboard key="dashboard-route" />} />
-          <Route path="/create-invoice" element={<InvoiceForm key="invoice-form-route" />} />
-          <Route path="/settings" element={<SettingsPage key="settings-route" />} />
-          <Route path="/contact" element={<ContactPage key="contact-route" />} />
-          <Route path="/reports" element={<Reports key="reports-route" />} />
+          <Route path="/invoices" element={<Dashboard />} />
+          <Route path="/create-invoice" element={<InvoiceForm />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/reports" element={<Reports />} />
         </Route>
 
         {/* Catch all route */}

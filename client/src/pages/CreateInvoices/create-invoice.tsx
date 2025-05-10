@@ -6,7 +6,7 @@ import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Textarea } from "../../components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
-import { Trash2, Plus, Download, ChevronDown, ArrowLeft, CheckCircle, Clock } from "lucide-react"
+import { Trash2, Plus, Download, ChevronDown, ArrowLeft, CheckCircle, Clock, Mail } from "lucide-react"
 import html2canvas from "html2canvas"
 import jsPDF from "jspdf"
 import { Collapsible, CollapsibleContent } from "../../components/ui/collapsible"
@@ -362,52 +362,149 @@ export default function InvoiceForm() {
     if (!previewRef.current) return
 
     try {
-      // Create a clone of the preview element
-      const element = previewRef.current.cloneNode(true) as HTMLElement
+      // Create a temporary div to render the invoice without buttons
+      const tempDiv = document.createElement("div")
+      tempDiv.innerHTML = previewRef.current.innerHTML
+      document.body.appendChild(tempDiv)
 
-      // Style the clone for PDF rendering without affecting the UI
-      element.style.position = "fixed"
-      element.style.left = "-9999px"
-      element.style.top = "0"
-      element.style.width = `${previewRef.current.offsetWidth}px`
-      element.style.height = `${previewRef.current.offsetHeight}px`
+      // Apply print styles
+      tempDiv.style.width = "210mm" // A4 width
+      tempDiv.style.padding = "10mm"
+      tempDiv.style.backgroundColor = "white"
 
-      // Modify the totals table positioning for PDF
-      const totalsTable = element.querySelector(".float-right")
-      if (totalsTable) {
-        totalsTable.classList.add("absolute", "right-0")
-      }
-
-      // Add the hidden clone to the DOM
-      document.body.appendChild(element)
-
-      // Capture the clone instead of the original element
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        logging: false,
-        useCORS: true,
-        allowTaint: true,
+      // Hide any no-print elements
+      const noPrintElements = tempDiv.querySelectorAll(".no-print")
+      noPrintElements.forEach((el) => {
+        ;(el as HTMLElement).style.display = "none"
       })
 
-      // Generate PDF
+      // Capture the canvas
+      const canvas = await html2canvas(tempDiv, {
+        scale: 2, // Higher scale for better quality
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+      })
+
+      // Remove the temporary div
+      document.body.removeChild(tempDiv)
+
+      // Create PDF
       const imgData = canvas.toDataURL("image/png")
-      const pdf = new jsPDF("p", "mm", "a4")
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      })
+
       const imgWidth = 210 // A4 width in mm
       const imgHeight = (canvas.height * imgWidth) / canvas.width
 
       pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight)
-      pdf.save(`invoice-${invoiceData.invoiceNumber}.pdf`)
+
+      // Save the PDF
+      pdf.save(`Invoice-${invoiceData.invoiceNumber}.pdf`)
     } catch (error) {
-      console.error("PDF generation failed:", error)
+      console.error("Error generating PDF:", error)
+    }
+  }
+
+  // Function to handle sending email to client using Gmail
+  const handleEmailInvoice = async () => {
+    if (!previewRef.current || !invoiceData.customer.email) {
       toast({
-        title: "Download Failed",
-        description: "Could not generate PDF document",
+        title: "Error",
+        description: "Customer email is required to send the invoice.",
         variant: "destructive",
       })
-    } finally {
-      // Clean up cloned elements
-      const clones = document.querySelectorAll('[style*="-9999px"]')
-      clones.forEach((clone) => clone.remove())
+      return
+    }
+
+    try {
+      // First generate the PDF
+      const tempDiv = document.createElement("div")
+      tempDiv.innerHTML = previewRef.current.innerHTML
+      document.body.appendChild(tempDiv)
+
+      // Apply print styles
+      tempDiv.style.width = "210mm" // A4 width
+      tempDiv.style.padding = "10mm"
+      tempDiv.style.backgroundColor = "white"
+
+      // Hide any no-print elements
+      const noPrintElements = tempDiv.querySelectorAll(".no-print")
+      noPrintElements.forEach((el) => {
+        ;(el as HTMLElement).style.display = "none"
+      })
+
+      // Capture the canvas
+      const canvas = await html2canvas(tempDiv, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+      })
+
+      // Remove the temporary div
+      document.body.removeChild(tempDiv)
+
+      // Create PDF
+      const imgData = canvas.toDataURL("image/png")
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      })
+
+      const imgWidth = 210 // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width
+
+      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight)
+      
+      // Get the PDF as a blob
+      const pdfBlob = pdf.output('blob')
+      
+      // Create a subject line for the email
+      const subject = `Invoice ${invoiceData.invoiceNumber} from ${businessData.companyName}`
+      
+      // Create email body with invoice details
+      const body = `Dear ${invoiceData.customer.name},
+
+Please find attached invoice ${invoiceData.invoiceNumber} for the amount of ${formatCurrency(invoiceData.amount)}.
+
+Invoice Date: ${formatDate(invoiceData.date)}
+Due Date: ${formatDate(invoiceData.dueDate)}
+
+If you have any questions, please don't hesitate to contact us.
+
+Thank you for your business.
+
+Regards,
+${businessData.companyName}
+${businessData.email}
+${businessData.phone}`
+      
+      // Open Gmail compose in a new window with prefilled fields
+      // Note: We can't directly attach files through mailto links, but we can prefill the subject and body
+      const mailtoLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(invoiceData.customer.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+      
+      window.open(mailtoLink, '_blank')
+      
+      toast({
+        title: "Email Client Opened",
+        description: "Gmail compose window has been opened. Please attach the invoice PDF manually.",
+        variant: "default",
+      })
+      
+      // Also download the PDF for easy attachment
+      pdf.save(`Invoice-${invoiceData.invoiceNumber}.pdf`)
+    } catch (error) {
+      console.error("Error preparing email:", error)
+      toast({
+        title: "Error",
+        description: "Failed to prepare email. Please try again.",
+        variant: "destructive",
+      })
     }
   }
 
@@ -748,6 +845,15 @@ export default function InvoiceForm() {
   }, [])
 
   const [showSuccessModal, setShowSuccessModal] = useState(false)
+  // Format date to show month name, day and year for email body
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  }
 
   return (
     <>
@@ -1067,7 +1173,7 @@ export default function InvoiceForm() {
               </Card>
 
               {/* Save and Download Invoice Button */}
-              <div className="flex gap-3 justify-end no-print">
+              <div className="flex gap-3 justify-end no-print flex-wrap">
                 {invoiceToEdit ? (
                   <Button
                     variant="outline"
@@ -1087,6 +1193,15 @@ export default function InvoiceForm() {
                 )}
                 <Button variant="outline" onClick={() => window.print()} className="w-full sm:w-auto text-white">
                   Print Invoice
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={handleEmailInvoice} 
+                  className="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700"
+                  disabled={!invoiceData.customer.email}
+                >
+                  <Mail className="mr-2 h-4 w-4" />
+                  Email Invoice to Client
                 </Button>
               </div>
             </CollapsibleContent>

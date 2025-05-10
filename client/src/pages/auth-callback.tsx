@@ -65,22 +65,22 @@ export default function AuthCallback() {
           // Get the previous location from state or default to invoices
           const from = location.state?.from || '/invoices'
           
-          // Force a page reload to ensure proper state reset
-          window.location.href = from
+          // Let the App component handle the navigation
+          navigate(from, { replace: true })
         } else {
-          window.location.href = '/login'
+          navigate('/login', { replace: true })
         }
       } catch (err: any) {
         console.error('Auth callback error:', err)
         setError(err.message)
         setTimeout(() => {
-          window.location.href = '/login'
+          navigate('/login', { replace: true })
         }, 3000)
       }
     }
 
     handleAuthCallback()
-  }, [location.state])
+  }, [navigate, location.state])
 
   if (error) {
     return (

@@ -1,5 +1,5 @@
 // src/components/AuthenticatedRoute.tsx
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation, Outlet } from "react-router-dom";
 import { LoadingSpinner } from "../ui/loadingSpinner";
 
 interface Props {
@@ -30,5 +30,13 @@ export default function AuthenticatedRoute({
     return <Navigate to="/login" state={{ from: location.pathname }} />;
   }
 
-  return <>{children}</>;
+  // For route-based authentication, we should use Outlet
+  // This ensures proper routing behavior
+  if (children) {
+    // If children are provided directly, render them
+    return <>{children}</>;
+  }
+  
+  // Otherwise use Outlet for nested routes
+  return <Outlet />;
 }

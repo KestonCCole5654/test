@@ -14,6 +14,7 @@ import axios from "axios"
 import { useLocation, useNavigate } from "react-router-dom"
 import supabase from "../../components/Auth/supabaseClient"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
+import { useToast } from "../../components/ui/use-toast"
 
 
 export interface InvoiceData {
@@ -61,6 +62,7 @@ export interface BusinessData {
 export default function InvoiceForm() {
   const location = useLocation()
   const navigate = useNavigate()
+  const { toast } = useToast()
   const invoiceToEdit = location.state?.invoiceToEdit
   const selectedSpreadsheetUrl = location.state?.selectedSpreadsheetUrl
   const key = location.state?.key
@@ -1318,7 +1320,5 @@ ${businessData.phone}`
   )
 }
 
-function toast(arg0: { title: string; description: string; variant: string }) {
-  throw new Error("Function not implemented.")
-}
+
 

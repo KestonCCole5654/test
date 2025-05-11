@@ -1134,12 +1134,12 @@ export default function Dashboard() {
             </button>
           ))}
         </div>
-        <div className="flex w-full md:w-auto">
+        <div className="flex gap-8 w-full md:w-auto">
           <Input
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="max-w-xs border-gray-200"
+            className="max-w-xs  border-gray-200"
             disabled={isStateLoading}
           />
           <Button

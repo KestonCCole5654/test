@@ -705,7 +705,7 @@ export default function Dashboard() {
 
     return (
       <Card>
-        <CardContent className="p-0 font-sans">
+        <CardContent className="p-0 font-cal-cfont-cal-sans">
           <div className="flex flex-col gap-2">
             {bulkDeleteMessage && (
               <div className="flex items-center justify-between bg-green-50 border border-green-200 text-green-800 rounded px-4 py-2 mb-2">
@@ -1107,7 +1107,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen w-full font-sans px-6 pb-6  text-gray-700">
+    <div className="min-h-screen w-full font-cal-sans px-6 pb-6  text-gray-700">
       <h1 className="text-2xl font-semibold text-gray-800 mb-6 mt-10">Invoices</h1>
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">

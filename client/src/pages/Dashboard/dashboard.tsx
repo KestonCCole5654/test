@@ -1095,10 +1095,12 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen w-full font-cal-sans px-6 pb-6 bg-white text-gray-700">
+    <div className="min-h-screen w-full text-gray-700 font-cal-sans px-6 pb-6 bg-white">
+      {/* Heading */}
+      <h1 className="text-2xl font-bold text-gray-800 mb-4">Invoices</h1>
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
-        <div className="flex gap-0 border border-gray-200 rounded-md bg-white">
+        <div className="flex gap-0 rounded-md bg-white">
           {[
             { label: 'All', value: 'all' },
             { label: 'Pending', value: 'pending' },
@@ -1107,14 +1109,13 @@ export default function Dashboard() {
           ].map(tab => (
             <button
               key={tab.value}
-              className={`px-6 py-2 text-sm font-medium transition-colors border-0 border-r last:border-r-0 rounded-none focus:outline-none ${
+              className={`px-6 py-2 text-sm transition-colors border-0 border-l-4 focus:outline-none ${
                 statusFilter === tab.value
-                  ? 'text-green-700 border-green-500 bg-white' // active
-                  : 'text-gray-700 border-gray-200 bg-white hover:text-green-700 hover:border-green-500'
+                  ? 'text-green-700 border-green-500 font-bold bg-white' // active
+                  : 'text-gray-700 border-transparent font-normal bg-white hover:text-green-700 hover:font-bold'
               } ${tab.value === 'all' ? 'rounded-l-md' : ''} ${tab.value === 'trash' ? 'rounded-r-md' : ''}`}
               style={{
-                borderRightWidth: tab.value !== 'trash' ? 1 : 0,
-                borderColor: statusFilter === tab.value ? '#22c55e' : '#e5e7eb', // green-500 or gray-200
+                borderLeftWidth: 4,
               }}
               onClick={() => setStatusFilter(tab.value)}
             >

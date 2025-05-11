@@ -80,7 +80,7 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
       <div className="flex items-center h-16 border-b border-gray-100 px-4">
         <Link to="/" className="flex items-center space-x-2">
           <div className="h-8 w-8 rounded bg-green-800 flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-bold text-lg">$</span>
+            <span className="text-white text-md">$</span>
           </div>
           {!collapsed && (
             <span className="text-xl  text-green-800">SHEETBILLS <sup className="text-xs text-green-800">TM</sup></span>

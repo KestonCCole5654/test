@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState, useRef } from "react"
-import { Trash2, Edit, MoreVertical, Plus, RefreshCw, ArrowUpDown, X, GripVertical } from "lucide-react"
+import { Trash2, MoreVertical, RefreshCw, ArrowUpDown, X, GripVertical } from "lucide-react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
@@ -13,13 +13,11 @@ import {
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu"
 import { useNavigate, useLocation } from "react-router-dom"
-import { Badge } from "../../components/ui/badge"
 import { Skeleton } from "../../components/ui/skeleton"
 import { toast } from "../../components/ui/use-toast"
 import supabase from "../../components/Auth/supabaseClient"
 import type { User } from "@supabase/supabase-js"
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
+import { Card, CardContent } from "../../components/ui/card"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -168,7 +166,7 @@ export default function Dashboard() {
             state: {
               error: "Session verification failed",
               from: location.pathname,
-            }
+            },
           })
           return
         }
@@ -190,7 +188,7 @@ export default function Dashboard() {
           state: {
             error: "Connection error. Please try again.",
             from: location.pathname,
-          }
+          },
         })
       }
     }
@@ -312,10 +310,10 @@ export default function Dashboard() {
   // Format date for display
   function formatDate(dateString: string): string {
     const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     })
   }
 
@@ -334,11 +332,11 @@ export default function Dashboard() {
 
   // Utility function to calculate overdue days accurately
   function getOverdueDays(dueDateString: string): number {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const dueDate = new Date(dueDateString);
-    dueDate.setHours(0, 0, 0, 0);
-    return Math.ceil((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const dueDate = new Date(dueDateString)
+    dueDate.setHours(0, 0, 0, 0)
+    return Math.ceil((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24))
   }
 
   // =====================
@@ -707,7 +705,7 @@ export default function Dashboard() {
 
     return (
       <Card>
-        <CardContent className="p-0 font-cal-sans">
+        <CardContent className="p-0 font-sans">
           <div className="flex flex-col gap-2">
             {bulkDeleteMessage && (
               <div className="flex items-center justify-between bg-green-50 border border-green-200 text-green-800 rounded px-4 py-2 mb-2">
@@ -771,9 +769,9 @@ export default function Dashboard() {
               <SortableContext items={rowOrder} strategy={verticalListSortingStrategy}>
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-white border-b border-gray-100">
+                    <TableRow className="bg-gray-50 border-b border-gray-200">
                       <TableHead className="w-8 px-4"></TableHead>
-                      <TableHead className="w-[56px] px-6 py-4 align-middle text-center">
+                      <TableHead className="w-[56px] px-6 py-4 align-middle text-center font-medium text-gray-600">
                         <input
                           type="checkbox"
                           ref={headerCheckboxRef}
@@ -783,24 +781,45 @@ export default function Dashboard() {
                           className="mx-auto accent-gray-600 h-4 w-4 rounded border-gray-300"
                         />
                       </TableHead>
-                      <TableHead onClick={() => handleSort("id")} className="cursor-pointer font-medium px-6 py-4 whitespace-nowrap min-w-[160px]">
+                      <TableHead
+                        onClick={() => handleSort("id")}
+                        className="cursor-pointer font-medium px-6 py-4 whitespace-nowrap min-w-[160px] font-medium text-gray-600"
+                      >
                         Invoice ID <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
-                      <TableHead onClick={() => handleSort("customer")} className="cursor-pointer font-medium px-6 py-4">
+                      <TableHead
+                        onClick={() => handleSort("customer")}
+                        className="cursor-pointer font-medium px-6 py-4 font-medium text-gray-600"
+                      >
                         Client <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
-                      <TableHead onClick={() => handleSort("dueDate")} className="cursor-pointer font-medium px-6 py-4 whitespace-nowrap min-w-[180px]">
+                      <TableHead
+                        onClick={() => handleSort("dueDate")}
+                        className="cursor-pointer font-medium px-6 py-4 whitespace-nowrap min-w-[180px] font-medium text-gray-600"
+                      >
                         Due Date <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
-                      <TableHead onClick={() => handleSort("status")} className="cursor-pointer font-medium px-6 py-4">
+                      <TableHead
+                        onClick={() => handleSort("status")}
+                        className="cursor-pointer font-medium px-6 py-4 font-medium text-gray-600"
+                      >
                         Status <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
-                      <TableHead onClick={() => handleSort("amount")} className="cursor-pointer font-medium text-right px-6 py-4">
+                      <TableHead
+                        onClick={() => handleSort("amount")}
+                        className="cursor-pointer font-medium text-right px-6 py-4 font-medium text-gray-600"
+                      >
                         Amount <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
-                      <TableHead className="font-medium text-center px-6 py-4">Overdue</TableHead>
-                      <TableHead className="font-medium text-center px-6 py-4">Payment Actions</TableHead>
-                      <TableHead className="w-[80px] font-medium px-6 py-4">Other Actions</TableHead>
+                      <TableHead className="font-medium text-center px-6 py-4 font-medium text-gray-600">
+                        Overdue
+                      </TableHead>
+                      <TableHead className="font-medium text-center px-6 py-4 font-medium text-gray-600">
+                        Payment Actions
+                      </TableHead>
+                      <TableHead className="w-[80px] font-medium px-6 py-4 font-medium text-gray-600">
+                        Other Actions
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -808,11 +827,12 @@ export default function Dashboard() {
                       const invoice = currentItems.find((inv) => inv.id === id)
                       if (!invoice) return null
                       return (
-                        <SortableTableRow 
-                          key={invoice.id} 
+                        <SortableTableRow
+                          key={invoice.id}
                           id={invoice.id}
                           invoice={invoice}
-                          spreadsheets={spreadsheets}>
+                          spreadsheets={spreadsheets}
+                        >
                           <TableCell
                             onClick={(e) => e.stopPropagation()}
                             className="w-[56px] px-6 py-4 align-middle text-center"
@@ -824,14 +844,16 @@ export default function Dashboard() {
                               className="mx-auto"
                             />
                           </TableCell>
-                          <TableCell className="font-medium px-6 py-4 whitespace-nowrap min-w-[160px]">{invoice.id}</TableCell>
+                          <TableCell className="font-medium px-6 py-4 whitespace-nowrap min-w-[160px]">
+                            {invoice.id}
+                          </TableCell>
                           <TableCell className="px-6 py-4">
                             <div className="flex items-center gap-3">
                               <div className="flex flex-col">
                                 <span className="font-medium">
                                   {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}
                                 </span>
-                                <span className="text-sm text-slate-500">
+                                <span className="text-xs font-medium text-slate-500">
                                   {typeof invoice.customer === "object" ? invoice.customer.email : ""}
                                 </span>
                               </div>
@@ -841,12 +863,12 @@ export default function Dashboard() {
                             <div className="font-medium">{formatDate(invoice.dueDate)}</div>
                           </TableCell>
                           <TableCell className="px-6 py-4">
-                            {invoice.status === 'Paid' ? (
-                              <span className="inline-block px-3 py-1 rounded-md border border-green-200 bg-green-50 text-green-700 text-xs font-medium">
+                            {invoice.status === "Paid" ? (
+                              <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium">
                                 Paid
                               </span>
-                            ) : invoice.status === 'Pending' ? (
-                              <span className="inline-block px-3 py-1 rounded-md border border-yellow-200 bg-yellow-50 text-yellow-800 text-xs font-medium">
+                            ) : invoice.status === "Pending" ? (
+                              <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-100 text-gray-700 text-xs font-medium">
                                 Pending
                               </span>
                             ) : (
@@ -855,12 +877,12 @@ export default function Dashboard() {
                               </span>
                             )}
                           </TableCell>
-                          <TableCell className="text-right font-medium px-6 py-4">{formatCurrency(invoice.amount)}</TableCell>
+                          <TableCell className="text-right font-medium px-6 py-4">
+                            {formatCurrency(invoice.amount)}
+                          </TableCell>
                           <TableCell className="text-center px-6 py-4">
                             {invoice.status === "Pending" && new Date(invoice.dueDate) < new Date() ? (
-                              <span className="text-red-600 font-medium">
-                                {getOverdueDays(invoice.dueDate)} days
-                              </span>
+                              <span className="text-red-600 font-medium">{getOverdueDays(invoice.dueDate)} days</span>
                             ) : (
                               <span className="text-slate-400">-</span>
                             )}
@@ -922,7 +944,7 @@ export default function Dashboard() {
                                     })
                                   }
                                 }}
-                                className={`bg-green-100 text-green-800 hover:bg-green-200 px-3`}
+                                className={`bg-gray-100 text-gray-800 hover:bg-gray-200 px-3`}
                                 size="sm"
                                 disabled={invoice.status === "Paid"}
                               >
@@ -983,7 +1005,7 @@ export default function Dashboard() {
                                     })
                                   }
                                 }}
-                                className={`bg-green-50 text-green-700 hover:bg-green-100 px-3`}
+                                className={`bg-gray-50 text-gray-700 hover:bg-gray-100 px-3`}
                                 size="sm"
                                 disabled={invoice.status === "Pending"}
                               >
@@ -1085,24 +1107,24 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen w-full font-cal-sans px-6 pb-6  text-gray-700">
-      <h1 className="text-2xl font-bold text-gray-800 mb-4 mt-10">Invoices</h1>
+    <div className="min-h-screen w-full font-sans px-6 pb-6  text-gray-700">
+      <h1 className="text-2xl font-semibold text-gray-800 mb-6 mt-10">Invoices</h1>
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
         <div className="flex gap-0 rounded-md bg-white">
           {[
-            { label: 'All', value: 'all' },
-            { label: 'Pending', value: 'pending' },
-            { label: 'Paid', value: 'paid' },
-            { label: 'Trash', value: 'trash' },
-          ].map(tab => (
+            { label: "All", value: "all" },
+            { label: "Pending", value: "pending" },
+            { label: "Paid", value: "paid" },
+            { label: "Trash", value: "trash" },
+          ].map((tab) => (
             <button
               key={tab.value}
-              className={`px-6 py-2 text-sm transition-colors border border-gray-600 focus:outline-none ${
+              className={`px-6 py-2 text-sm font-medium transition-colors border border-gray-600 focus:outline-none ${
                 statusFilter === tab.value
-                  ? 'text-gray-700 border-gray-500 font-bold bg-white' // active
-                  : 'text-gray-700 border-transparent font-normal bg-white hover:text-green-700 hover:font-bold'
-              } ${tab.value === 'all' ? 'rounded-l-md' : ''} ${tab.value === 'trash' ? 'rounded-r-md' : ''}`}
+                  ? "text-gray-700 border-gray-500 font-semibold bg-white" // active
+                  : "text-gray-700 border-transparent font-normal bg-white hover:text-green-700 hover:font-bold"
+              } ${tab.value === "all" ? "rounded-l-md" : ""} ${tab.value === "trash" ? "rounded-r-md" : ""}`}
               style={{
                 borderLeftWidth: 4,
               }}
@@ -1125,21 +1147,21 @@ export default function Dashboard() {
             className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 shadow-none"
             disabled={isStateLoading}
           >
-            <RefreshCw className={`mr-2 h-4 w-4 ${isStateLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`mr-2 h-4 w-4 ${isStateLoading ? "animate-spin" : ""}`} />
             Refresh
           </Button>
           <Button
             onClick={() => {
-              const invoicesSheet = spreadsheets.find((sheet) => sheet.name === 'SheetBills Invoices')
+              const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
               const invoicesSheetUrl = invoicesSheet?.sheetUrl
-              navigate('/create-invoice', {
+              navigate("/create-invoice", {
                 state: {
                   selectedSpreadsheetUrl: invoicesSheetUrl,
                   key: Date.now(),
                 },
               })
             }}
-            className="border border-gray-300 text-white bg-green-700 hover:bg-green-800 shadow-none"
+            className="border border-gray-300 text-white bg-gray-800 hover:bg-gray-900 shadow-none"
             disabled={isStateLoading}
           >
             + New Invoice
@@ -1147,8 +1169,8 @@ export default function Dashboard() {
         </div>
       </div>
       {/* Table Card */}
-      <div className="bg-white border border-gray-100 rounded-lg shadow-sm">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+      <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
@@ -1157,7 +1179,7 @@ export default function Dashboard() {
               className="font-medium border-gray-200"
               disabled={currentItems.length === 0}
             >
-              {allVisibleSelected ? 'Deselect All' : 'Select All'}
+              {allVisibleSelected ? "Deselect All" : "Select All"}
             </Button>
             <span className="text-sm text-gray-500">{selectedInvoices.size} selected</span>
           </div>
@@ -1176,7 +1198,7 @@ export default function Dashboard() {
         <div className="overflow-x-auto">
           <Table className="min-w-full text-sm">
             <TableHeader>
-              <TableRow className="bg-white border-b border-gray-100">
+              <TableRow className="bg-gray-50 border-b border-gray-200">
                 <TableHead className="w-8 px-4"></TableHead>
                 <TableHead className="w-[56px] px-6 py-4 align-middle text-center">
                   <input
@@ -1202,12 +1224,7 @@ export default function Dashboard() {
                 const invoice = currentItems.find((inv) => inv.id === id)
                 if (!invoice) return null
                 return (
-                  <SortableTableRow
-                    key={invoice.id}
-                    id={invoice.id}
-                    invoice={invoice}
-                    spreadsheets={spreadsheets}
-                  >
+                  <SortableTableRow key={invoice.id} id={invoice.id} invoice={invoice} spreadsheets={spreadsheets}>
                     <TableCell
                       onClick={(e) => e.stopPropagation()}
                       className="w-[56px] px-6 py-4 align-middle text-center"
@@ -1222,18 +1239,22 @@ export default function Dashboard() {
                     <TableCell className="font-medium px-6 py-4 whitespace-nowrap">{invoice.id}</TableCell>
                     <TableCell className="px-6 py-4">
                       <div className="flex flex-col">
-                        <span className="font-medium">{typeof invoice.customer === 'object' ? invoice.customer.name : invoice.customer}</span>
-                        <span className="text-xs text-gray-400">{typeof invoice.customer === 'object' ? invoice.customer.email : ''}</span>
+                        <span className="font-medium">
+                          {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}
+                        </span>
+                        <span className="text-xs font-medium text-gray-400">
+                          {typeof invoice.customer === "object" ? invoice.customer.email : ""}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell className="px-6 py-4 whitespace-nowrap">{formatDate(invoice.dueDate)}</TableCell>
                     <TableCell className="px-6 py-4">
-                      {invoice.status === 'Paid' ? (
-                        <span className="inline-block px-3 py-1 rounded-md border border-green-200 bg-green-50 text-green-700 text-xs font-medium">
+                      {invoice.status === "Paid" ? (
+                        <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium">
                           Paid
                         </span>
-                      ) : invoice.status === 'Pending' ? (
-                        <span className="inline-block px-3 py-1 rounded-md border border-yellow-200 bg-yellow-50 text-yellow-800 text-xs font-medium">
+                      ) : invoice.status === "Pending" ? (
+                        <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-100 text-gray-700 text-xs font-medium">
                           Pending
                         </span>
                       ) : (
@@ -1244,7 +1265,7 @@ export default function Dashboard() {
                     </TableCell>
                     <TableCell className="text-right font-medium px-6 py-4">{formatCurrency(invoice.amount)}</TableCell>
                     <TableCell className="text-center px-8 py-6">
-                      {invoice.status === 'Pending' && new Date(invoice.dueDate) < new Date() ? (
+                      {invoice.status === "Pending" && new Date(invoice.dueDate) < new Date() ? (
                         <span className="text-red-600 px-4 py-1.5  text-sm">
                           {getOverdueDays(invoice.dueDate)} days
                         </span>
@@ -1276,7 +1297,8 @@ export default function Dashboard() {
                                   },
                                   body: JSON.stringify({
                                     invoiceId: invoice.id,
-                                    sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
+                                    sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
+                                      ?.sheetUrl,
                                   }),
                                 },
                               )
@@ -1303,7 +1325,7 @@ export default function Dashboard() {
                           }}
                           className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
                           size="sm"
-                          disabled={invoice.status === 'Paid'}
+                          disabled={invoice.status === "Paid"}
                         >
                           Mark as Paid
                         </Button>
@@ -1329,7 +1351,8 @@ export default function Dashboard() {
                                   },
                                   body: JSON.stringify({
                                     invoiceId: invoice.id,
-                                    sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
+                                    sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
+                                      ?.sheetUrl,
                                   }),
                                 },
                               )
@@ -1356,11 +1379,27 @@ export default function Dashboard() {
                           }}
                           className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
                           size="sm"
-                          disabled={invoice.status === 'Pending'}
+                          disabled={invoice.status === "Pending"}
                         >
                           Mark as Pending
                         </Button>
-                        <Button size="sm" className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none" onClick={(e) => { e.stopPropagation(); navigate('/create-invoice', { state: { invoiceToEdit: invoice, selectedSpreadsheetUrl: spreadsheets.find((sheet) => sheet.name === 'SheetBills Invoices')?.sheetUrl } }) }}>Edit</Button>
+                        <Button
+                          size="sm"
+                          className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            navigate("/create-invoice", {
+                              state: {
+                                invoiceToEdit: invoice,
+                                selectedSpreadsheetUrl: spreadsheets.find(
+                                  (sheet) => sheet.name === "SheetBills Invoices",
+                                )?.sheetUrl,
+                              },
+                            })
+                          }}
+                        >
+                          Edit
+                        </Button>
                       </div>
                     </TableCell>
                   </SortableTableRow>
@@ -1371,7 +1410,7 @@ export default function Dashboard() {
         </div>
         {/* Pagination Controls */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 bg-white">
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-white">
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
@@ -1396,7 +1435,8 @@ export default function Dashboard() {
               </Button>
             </div>
             <div className="text-sm text-gray-500">
-              Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredInvoices.length)} of {filteredInvoices.length} invoices
+              Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredInvoices.length)} of{" "}
+              {filteredInvoices.length} invoices
             </div>
           </div>
         )}
@@ -1456,7 +1496,7 @@ export default function Dashboard() {
                   setIsDeleteDialogOpen(false)
                 }
               }}
-              className="bg-red-600 focus:ring-red-600"
+              className="bg-gray-800 focus:ring-gray-800"
             >
               Delete
             </AlertDialogAction>
@@ -1475,7 +1515,7 @@ export default function Dashboard() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleBulkDelete} className="bg-red-600 focus:ring-red-600">
+            <AlertDialogAction onClick={handleBulkDelete} className="bg-gray-800 focus:ring-gray-800">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -1505,7 +1545,7 @@ export default function Dashboard() {
                 step="0.01"
                 className="w-full"
               />
-              <p className="text-sm bg-green-100 text-green-800 px-3 py-2 rounded-md font-medium">
+              <p className="text-sm font-medium bg-green-100 text-green-800 px-3 py-2 rounded-md">
                 Total invoice amount: {formatCurrency(selectedInvoice?.amount || 0)}
               </p>
             </div>
@@ -1531,7 +1571,7 @@ export default function Dashboard() {
             <Button variant="outline" onClick={() => setIsPartialPaymentModalOpen(false)} className="w-full sm:w-auto">
               Cancel
             </Button>
-            <Button onClick={handlePartialPayment} className="w-full sm:w-auto bg-green-600 hover:bg-green-700">
+            <Button onClick={handlePartialPayment} className="w-full sm:w-auto bg-gray-800 hover:bg-gray-900">
               Record Payment
             </Button>
           </SheetFooter>
@@ -1545,35 +1585,33 @@ export default function Dashboard() {
 // Sortable Table Row Component
 // =====================
 interface SortableTableRowProps {
-  id: string;
-  children: React.ReactNode;
-  invoice: Invoice;
-  spreadsheets: Spreadsheet[];
-  [key: string]: any;
+  id: string
+  children: React.ReactNode
+  invoice: Invoice
+  spreadsheets: Spreadsheet[]
+  [key: string]: any
 }
 
 function SortableTableRow({ id, children, invoice, spreadsheets, ...props }: SortableTableRowProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
   const navigate = useNavigate()
-  
+
   const handleRowClick = () => {
     if (invoice) {
-      const invoicesSheet = spreadsheets.find(
-        (sheet: Spreadsheet) => sheet.name === "SheetBills Invoices"
-      )
+      const invoicesSheet = spreadsheets.find((sheet: Spreadsheet) => sheet.name === "SheetBills Invoices")
       const invoicesSheetUrl = invoicesSheet?.sheetUrl
-      
+
       // Navigate to create-invoice page with invoice data and hideForm=true
       navigate("/create-invoice", {
         state: {
           invoiceToEdit: invoice,
           selectedSpreadsheetUrl: invoicesSheetUrl,
-          hideForm: true // This will collapse the form and show only the preview
+          hideForm: true, // This will collapse the form and show only the preview
         },
       })
     }
   }
-  
+
   return (
     <tr
       ref={setNodeRef}
@@ -1581,7 +1619,7 @@ function SortableTableRow({ id, children, invoice, spreadsheets, ...props }: Sor
         transform: CSS.Transform.toString(transform),
         transition,
         opacity: isDragging ? 0.5 : 1,
-        cursor: "pointer"
+        cursor: "pointer",
       }}
       onClick={handleRowClick}
       className="hover:bg-slate-50"

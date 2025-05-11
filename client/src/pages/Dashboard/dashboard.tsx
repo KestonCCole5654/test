@@ -1120,10 +1120,10 @@ export default function Dashboard() {
           ].map((tab) => (
             <button
               key={tab.value}
-              className={`px-6 py-2 text-sm transition-colors border border-gray-100 focus:outline-none ${
+              className={`px-6 py-2 text-sm transition-colors border border-gray-50 focus:outline-none ${
                 statusFilter === tab.value
-                  ? "text-gray-700 border-gray-100  bg-white" // active
-                  : "text-gray-700 border-gray-100  bg-white "
+                  ? "text-gray-700 border-gray-50  bg-white" // active
+                  : "text-gray-700 border-gray-50  bg-white "
               } `}
               
               onClick={() => setStatusFilter(tab.value)}
@@ -1132,7 +1132,7 @@ export default function Dashboard() {
             </button>
           ))}
         </div>
-        <div className="flex gap-8 w-full md:w-auto">
+        <div className="flex gap-7 w-full md:w-auto">
           <Input
             placeholder="Search..."
             value={searchQuery}

@@ -1233,7 +1233,7 @@ export default function Dashboard() {
                       <span className={`px-4 py-1 rounded-full text-xs font-semibold ${invoice.status === 'Paid' ? 'bg-green-50 text-green-700 border border-green-200' : invoice.status === 'Pending' ? 'bg-yellow-50 text-yellow-700 border border-yellow-200' : 'bg-green-50 text-green-700 border border-green-200'}`}>{invoice.status}</span>
                     </TableCell>
                     <TableCell className="text-right font-medium px-6 py-4">{formatCurrency(invoice.amount)}</TableCell>
-                    <TableCell className="text-center px-6 py-4">
+                    <TableCell className="text-center px-8 py-6">
                       {invoice.status === 'Pending' && new Date(invoice.dueDate) < new Date() ? (
                         <span className="text-red-600 font-medium">
                           {getOverdueDays(invoice.dueDate)} days

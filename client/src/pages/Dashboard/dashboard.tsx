@@ -1087,28 +1087,32 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen w-full font-AfacadFlux px-6 pb-6 bg-white">
+    <div className="min-h-screen w-full font-cal-sans px-6 pb-6 bg-white">
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
-        <div className="flex gap-2">
-          <button
-            className={`px-5 py-2 rounded-full border text-sm font-medium transition-colors ${statusFilter === 'all' ? 'bg-blue-50 border-blue-300 text-blue-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
-            onClick={() => setStatusFilter('all')}
-          >
-            All
-          </button>
-          <button
-            className={`px-5 py-2 rounded-full border text-sm font-medium transition-colors ${statusFilter === 'pending' ? 'bg-yellow-50 border-yellow-300 text-yellow-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
-            onClick={() => setStatusFilter('pending')}
-          >
-            Pending
-          </button>
-          <button
-            className={`px-5 py-2 rounded-full border text-sm font-medium transition-colors ${statusFilter === 'paid' ? 'bg-green-50 border-green-300 text-green-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
-            onClick={() => setStatusFilter('paid')}
-          >
-            Paid
-          </button>
+        <div className="flex gap-0 border border-gray-200 rounded-md bg-white">
+          {[
+            { label: 'All', value: 'all' },
+            { label: 'Pending', value: 'pending' },
+            { label: 'Paid', value: 'paid' },
+            { label: 'Trash', value: 'trash' },
+          ].map(tab => (
+            <button
+              key={tab.value}
+              className={`px-6 py-2 text-sm font-medium transition-colors border-0 border-r last:border-r-0 rounded-none focus:outline-none ${
+                statusFilter === tab.value
+                  ? 'text-blue-700 border-blue-500 bg-white' // active
+                  : 'text-gray-700 border-gray-200 bg-white hover:bg-gray-50'
+              } ${tab.value === 'all' ? 'rounded-l-md' : ''} ${tab.value === 'trash' ? 'rounded-r-md' : ''}`}
+              style={{
+                borderRightWidth: tab.value !== 'trash' ? 1 : 0,
+                borderColor: statusFilter === tab.value ? '#2563eb' : '#e5e7eb',
+              }}
+              onClick={() => setStatusFilter(tab.value)}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
         <div className="flex gap-2 w-full md:w-auto">
           <Input
@@ -1120,7 +1124,7 @@ export default function Dashboard() {
           />
           <Button
             onClick={handleRefresh}
-            className="bg-blue-600 text-white hover:bg-blue-700 shadow-none"
+            className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 shadow-none"
             disabled={isStateLoading}
           >
             <RefreshCw className={`mr-2 h-4 w-4 ${isStateLoading ? 'animate-spin' : ''}`} />
@@ -1137,7 +1141,7 @@ export default function Dashboard() {
                 },
               })
             }}
-            className="bg-blue-600 text-white hover:bg-blue-700 font-bold shadow-none"
+            className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 font-bold shadow-none"
             disabled={isStateLoading}
           >
             + New Invoice

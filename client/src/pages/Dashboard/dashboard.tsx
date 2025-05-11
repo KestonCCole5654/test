@@ -1122,8 +1122,8 @@ export default function Dashboard() {
               key={tab.value}
               className={`px-6 py-2 text-sm transition-colors border border-gray-600 focus:outline-none ${
                 statusFilter === tab.value
-                  ? "text-gray-700 border-gray-500 font-semibold bg-white" // active
-                  : "text-gray-700 border-transparent font-normal bg-white hover:text-green-700 hover:font-bold"
+                  ? "text-gray-700 border-gray-500  bg-white" // active
+                  : "text-gray-700 border-gray-700  bg-white "
               } `}
               
               onClick={() => setStatusFilter(tab.value)}

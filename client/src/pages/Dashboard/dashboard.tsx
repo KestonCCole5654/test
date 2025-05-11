@@ -1141,7 +1141,7 @@ export default function Dashboard() {
                 },
               })
             }}
-            className="border border-gray-300 text-white bg-green-700 hover:bg-green-800 font-semibold shadow-none"
+            className="border border-gray-300 text-white bg-green-700 hover:bg-green-800 shadow-none"
             disabled={isStateLoading}
           >
             + New Invoice

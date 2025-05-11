@@ -1122,7 +1122,7 @@ export default function Dashboard() {
               key={tab.value}
               className={`px-6 py-2 text-sm transition-colors border border-gray-50 focus:outline-none ${
                 statusFilter === tab.value
-                  ? "text-gray-700 border-gray-50  bg-white" // active
+                  ? "text-gray-700 border-gray-50  bg-gray-100" // active
                   : "text-gray-700 border-gray-50  bg-white "
               } `}
               

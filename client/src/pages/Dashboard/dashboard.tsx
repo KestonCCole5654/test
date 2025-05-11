@@ -1132,7 +1132,7 @@ export default function Dashboard() {
             </button>
           ))}
         </div>
-        <div className="flex gap-5 w-full md:w-auto">
+        <div className="flex gap-3 w-full md:w-auto">
           <Input
             placeholder="Search..."
             value={searchQuery}

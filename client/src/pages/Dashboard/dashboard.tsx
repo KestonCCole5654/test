@@ -1091,95 +1091,14 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen w-full font-AfacadFlux p-6">
-      {/* Stats Cards Section */}
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8">
-        {/* Total Invoices Card */}
-        <Card className="py-1 px-1">
-          <CardHeader className="pb-0 px-1">
-            <CardTitle className="text-md font-medium text-slate-500">Total Invoices</CardTitle>
-          </CardHeader>
-          <CardContent className="px-1 py-0">
-            {isStateLoading ? (
-              <Skeleton className="h-6 w-16" />
-            ) : (
-              <div className="flex items-center">
-                <div className="text-lg font-bold text-slate-900">{totalInvoices}</div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Pending Amount Card */}
-        <Card className="py-1 px-1">
-          <CardHeader className="pb-0 px-1">
-            <CardTitle className="text-md font-medium text-slate-500">Pending Amount</CardTitle>
-          </CardHeader>
-          <CardContent className="px-1 py-0">
-            {isStateLoading ? (
-              <Skeleton className="h-6 w-16" />
-            ) : (
-              <div className="flex items-center">
-                <div className="text-lg font-bold text-slate-900">{formatCurrency(pendingAmount)}</div>
-              </div>
-            )}
-            <span className="text-xs">
-              <span className="bg-green-100 text-green-800  pl-2 pr-2 pt-0 pb-0">{pendingInvoices} pending</span>
-            </span>
-          </CardContent>
-        </Card>
-
-        {/* Paid Amount Card */}
-        <Card className="py-1 px-1">
-          <CardHeader className="pb-0 px-1">
-            <CardTitle className="text-md font-medium text-slate-500 ">Paid Amount</CardTitle>
-          </CardHeader>
-          <CardContent className="px-1 py-0">
-            {isStateLoading ? (
-              <Skeleton className="h-6 w-16" />
-            ) : (
-              <div className="flex items-center">
-                <div className="text-lg font-bold text-slate-900">{formatCurrency(paidAmount)}</div>
-              </div>
-            )}
-            <span className="text-xs">
-              <span className="bg-green-100 text-green-800  pl-2 pr-2 pt-0 pb-0">{paidInvoices} paid</span>
-            </span>
-          </CardContent>
-        </Card>
-
-        {/* Total Revenue Card */}
-        <Card className="py-1 px-1">
-          <CardHeader className="pb-0 px-1">
-            <CardTitle className="text-md font-medium text-slate-500">Total Revenue</CardTitle>
-          </CardHeader>
-          <CardContent className="px-1 py-0">
-            {isStateLoading ? (
-              <Skeleton className="h-6 w-16" />
-            ) : (
-              <div className="flex items-center">
-                <div className="text-lg font-bold text-slate-900">{formatCurrency(paidAmount + pendingAmount)}</div>
-              </div>
-            )}
-            <span className="text-xs text-slate-500">All time</span>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Tabs and Content */}
       <Tabs defaultValue="all" className="mb-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
           <TabsList className="mb-4 sm:mb-0">
-            <TabsTrigger value="all" onClick={() => setStatusFilter("all")}>
-              All Invoices
-            </TabsTrigger>
-            <TabsTrigger value="pending" onClick={() => setStatusFilter("pending")}>
-              Pending
-            </TabsTrigger>
-            <TabsTrigger value="paid" onClick={() => setStatusFilter("paid")}>
-              Paid
-            </TabsTrigger>
+            <TabsTrigger value="all" onClick={() => setStatusFilter("all")}>All Invoices</TabsTrigger>
+            <TabsTrigger value="pending" onClick={() => setStatusFilter("pending")}>Pending</TabsTrigger>
+            <TabsTrigger value="paid" onClick={() => setStatusFilter("paid")}>Paid</TabsTrigger>
           </TabsList>
-
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
             <Input
               placeholder="Search invoices..."
@@ -1188,7 +1107,6 @@ export default function Dashboard() {
               className="max-w-md"
               disabled={isStateLoading}
             />
-
             {selectedSpreadsheetUrl && (
               <div className="flex gap-2">
                 <Button
@@ -1203,7 +1121,6 @@ export default function Dashboard() {
                   onClick={() => {
                     const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
                     const invoicesSheetUrl = invoicesSheet?.sheetUrl
-                    console.log('Navigating to create invoice with URL:', invoicesSheetUrl)
                     navigate("/create-invoice", {
                       state: { 
                         selectedSpreadsheetUrl: invoicesSheetUrl,
@@ -1221,16 +1138,9 @@ export default function Dashboard() {
             )}
           </div>
         </div>
-
-        <TabsContent value="all" className="mt-0">
-          {renderInvoiceTable()}
-        </TabsContent>
-        <TabsContent value="pending" className="mt-0">
-          {renderInvoiceTable()}
-        </TabsContent>
-        <TabsContent value="paid" className="mt-0">
-          {renderInvoiceTable()}
-        </TabsContent>
+        <TabsContent value="all" className="mt-0">{renderInvoiceTable()}</TabsContent>
+        <TabsContent value="pending" className="mt-0">{renderInvoiceTable()}</TabsContent>
+        <TabsContent value="paid" className="mt-0">{renderInvoiceTable()}</TabsContent>
       </Tabs>
 
       {/* Delete Confirmation Dialog */}

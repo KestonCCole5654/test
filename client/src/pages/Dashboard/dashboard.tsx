@@ -1248,7 +1248,7 @@ export default function Dashboard() {
                           Paid
                         </span>
                       ) : invoice.status === 'Pending' ? (
-                        <span className="px-4 py-1.5 rounded-full border font-medium text-sm" style={{
+                        <span className="px-4 py-1.5 rounded-full border text-sm" style={{
                           background: '#FFFBCC',
                           color: '#A67C00',
                           borderColor: '#FFD600',
@@ -1257,7 +1257,7 @@ export default function Dashboard() {
                           Pending
                         </span>
                       ) : (
-                        <span className="px-4 py-1.5 rounded-full border font-medium text-sm bg-gray-100 text-gray-700 border-gray-300" style={{letterSpacing: '0.01em'}}>
+                        <span className="px-4 py-1.5 rounded-full border text-sm bg-gray-100 text-gray-700 border-gray-300" style={{letterSpacing: '0.01em'}}>
                           {invoice.status}
                         </span>
                       )}
@@ -1265,11 +1265,11 @@ export default function Dashboard() {
                     <TableCell className="text-right font-medium px-6 py-4">{formatCurrency(invoice.amount)}</TableCell>
                     <TableCell className="text-center px-8 py-6">
                       {invoice.status === 'Pending' && new Date(invoice.dueDate) < new Date() ? (
-                        <span className="text-red-600 font-medium">
+                        <span className="text-red-600 px-4 py-1.5  text-sm">
                           {getOverdueDays(invoice.dueDate)} days
                         </span>
                       ) : (
-                        <span className="text-gray-400">-</span>
+                        <span className="text-gray-400 px-4 py-1.5 text-sm">-</span>
                       )}
                     </TableCell>
                     <TableCell className="text-center px-6 py-4">

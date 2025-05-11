@@ -845,7 +845,7 @@ export default function Dashboard() {
                           </TableCell>
                           <TableCell className="px-6 py-4">
                             <Badge
-                              variant={invoice.status === "Paid" ? "default" : "secondary"}
+                              variant={invoice.status === "Paid" ? "default" : invoice.status === "Partially Paid" ? "secondary" : "destructive"}
                               className={
                                 invoice.status === "Paid"
                                   ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50 text-md px-4 py-1"
@@ -1143,7 +1143,15 @@ export default function Dashboard() {
               filteredInvoices.map((invoice) => (
                 <tr key={invoice.id} className="border-b last:border-b-0 hover:bg-gray-50">
                   <td className="px-4 py-3">
-                    <span className={`px-4 py-1 rounded-full text-xs font-medium border ${invoice.status === 'Paid' ? 'bg-green-50 border-green-200 text-green-700' : invoice.status === 'Sent' ? 'bg-blue-50 border-blue-200 text-blue-700' : invoice.status === 'Draft' ? 'bg-gray-50 border-gray-200 text-gray-500' : 'bg-yellow-50 border-yellow-200 text-yellow-700'}`}>{invoice.status}</span>
+                    <span className={`px-4 py-1 rounded-full text-xs font-medium border ${
+                      invoice.status === 'Paid'
+                        ? 'bg-green-50 border-green-200 text-green-700'
+                        : invoice.status === 'Partially Paid'
+                        ? 'bg-blue-50 border-blue-200 text-blue-700'
+                        : invoice.status === 'Pending'
+                        ? 'bg-yellow-50 border-yellow-200 text-yellow-700'
+                        : 'bg-gray-50 border-gray-200 text-gray-500'
+                    }`}>{invoice.status}</span>
                   </td>
                   <td className="px-4 py-3">USD {invoice.amount.toFixed(2)}</td>
                   <td className="px-4 py-3">{typeof invoice.customer === 'object' ? invoice.customer.name : invoice.customer}</td>

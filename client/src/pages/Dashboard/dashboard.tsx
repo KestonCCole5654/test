@@ -1108,7 +1108,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen w-full font-cal-sans px-6 pb-6  text-gray-700">
-      <h1 className="text-2xl font-semibold text-gray-800 mb-6 mt-10">Invoices</h1>
+      <h1 className="text-3xl  text-gray-800 mb-6 mt-10">Invoices</h1>
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
         <div className="flex gap-0 rounded-md bg-white">
@@ -1161,10 +1161,10 @@ export default function Dashboard() {
                 },
               })
             }}
-            className="border border-gray-300 text-white bg-gray-800 hover:bg-gray-900 shadow-none"
+            className="border border-gray-300 text-white bg-green-800 hover:bg-green-900 shadow-none"
             disabled={isStateLoading}
           >
-            + New Invoice
+            New Invoice
           </Button>
         </div>
       </div>

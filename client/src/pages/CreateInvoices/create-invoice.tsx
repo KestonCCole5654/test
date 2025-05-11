@@ -15,16 +15,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import supabase from "../../components/Auth/supabaseClient"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 import { useToast } from "../../components/ui/use-toast"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "../../components/ui/alert-dialog"
+
 
 export interface InvoiceData {
   invoiceNumber: string
@@ -69,79 +60,6 @@ export interface BusinessData {
 }
 
 export default function InvoiceForm() {
-  // Add a new component for the simplified invoice preview card
-  // Add this after the InvoiceClassic component but before the useState declarations
-
-  // Simplified Invoice Preview Card
-  const InvoicePreviewCard = ({
-    data,
-    onAction,
-  }: {
-    data: InvoiceData
-    onAction: (action: "view" | "reminder" | "copy" | "delete") => void
-  }) => {
-    const getStatusColor = (status?: string) => {
-      switch (status) {
-        case "Paid":
-          return "text-green-600"
-        case "Pending":
-          return "text-amber-600"
-        default:
-          return "text-purple-600"
-      }
-    }
-
-    return (
-      <div className="w-full max-w-sm mx-auto bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-        {/* Status Header */}
-        <div className={`w-full py-2 px-4 text-center font-medium ${getStatusColor(data.status)}`}>
-          {data.status || "OPENED"}
-        </div>
-
-        {/* Amount and Customer */}
-        <div className="p-4 text-center border-b border-gray-100">
-          <div className="text-2xl font-bold text-gray-900 mb-1">USD {formatCurrency(calculateTotal())}</div>
-          <div className="text-gray-500">{data.customer.name || "Customer Name"}</div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="p-3 space-y-2">
-          <Button
-            variant="outline"
-            className="w-full justify-center text-blue-600 border-blue-200 hover:bg-blue-50"
-            onClick={() => onAction("view")}
-          >
-            View
-          </Button>
-
-          <Button
-            variant="outline"
-            className="w-full justify-center text-indigo-600 border-indigo-200 hover:bg-indigo-50"
-            onClick={() => onAction("reminder")}
-          >
-            Send Reminder
-          </Button>
-
-          <Button
-            variant="outline"
-            className="w-full justify-center text-gray-600 border-gray-200 hover:bg-gray-50"
-            onClick={() => onAction("copy")}
-          >
-            Copy Link
-          </Button>
-
-          <Button
-            variant="outline"
-            className="w-full justify-center text-red-600 border-red-200 hover:bg-red-50"
-            onClick={() => onAction("delete")}
-          >
-            Delete
-          </Button>
-        </div>
-      </div>
-    )
-  }
-
   const location = useLocation()
   const navigate = useNavigate()
   const { toast } = useToast()
@@ -149,12 +67,12 @@ export default function InvoiceForm() {
   const selectedSpreadsheetUrl = location.state?.selectedSpreadsheetUrl
   const key = location.state?.key
   const hideForm = location.state?.hideForm
-
-  console.log("InvoiceForm mounted with state:", { invoiceToEdit, selectedSpreadsheetUrl, key, hideForm })
-
+  
+  console.log('InvoiceForm mounted with state:', { invoiceToEdit, selectedSpreadsheetUrl, key, hideForm })
+  
   // Add useEffect to handle state changes
   useEffect(() => {
-    console.log("InvoiceForm mounted with key:", key)
+    console.log('InvoiceForm mounted with key:', key)
     // Reset form state when key changes
     if (key) {
       setIsFormExpanded(true)
@@ -167,30 +85,28 @@ export default function InvoiceForm() {
           email: "",
           address: "",
         },
-        items: [
-          {
-            name: "",
-            description: "",
-            quantity: 1,
-            price: "",
-            discount: {
-              type: "percentage",
-              value: "",
-            },
-            tax: {
-              type: "percentage",
-              value: "",
-            },
+        items: [{
+          name: "",
+          description: "",
+          quantity: 1,
+          price: "",
+          discount: {
+            type: "percentage",
+            value: ""
           },
-        ],
+          tax: {
+            type: "percentage",
+            value: ""
+          }
+        }],
         amount: 0,
         notes: "",
         template: "classic",
-        status: "Pending",
+        status: "Pending"
       })
     }
     return () => {
-      console.log("InvoiceForm unmounted")
+      console.log('InvoiceForm unmounted')
     }
   }, [key])
 
@@ -206,26 +122,24 @@ export default function InvoiceForm() {
       email: "",
       address: "",
     },
-    items: invoiceToEdit?.items || [
-      {
-        name: "",
-        description: "",
-        quantity: 1,
-        price: "",
-        discount: {
-          type: "percentage",
-          value: "",
-        },
-        tax: {
-          type: "percentage",
-          value: "",
-        },
+    items: invoiceToEdit?.items || [{
+      name: "",
+      description: "",
+      quantity: 1,
+      price: "",
+      discount: {
+        type: "percentage",
+        value: ""
       },
-    ],
+      tax: {
+        type: "percentage",
+        value: ""
+      }
+    }],
     amount: invoiceToEdit?.amount || 0,
     notes: invoiceToEdit?.notes || "",
     template: invoiceToEdit?.template || "classic",
-    status: invoiceToEdit?.status || "Pending",
+    status: invoiceToEdit?.status || "Pending"
   })
   const previewRef = useRef<HTMLDivElement>(null)
 
@@ -257,23 +171,20 @@ export default function InvoiceForm() {
   }
   // Used to Add Items
   const addItem = () => {
-    updateInvoiceData("items", [
-      ...invoiceData.items,
-      {
-        name: "",
-        description: "",
-        quantity: 1,
-        price: "",
-        discount: {
-          type: "percentage",
-          value: "",
-        },
-        tax: {
-          type: "percentage",
-          value: "",
-        },
+    updateInvoiceData("items", [...invoiceData.items, {
+      name: "",
+      description: "",
+      quantity: 1,
+      price: "",
+      discount: {
+        type: "percentage",
+        value: ""
       },
-    ])
+      tax: {
+        type: "percentage",
+        value: ""
+      }
+    }])
   }
   // Used to Remove Items
   const removeItem = (index: number) => {
@@ -340,9 +251,7 @@ export default function InvoiceForm() {
         },
       })
 
-      const invoicesSheet = response.data.spreadsheets.find(
-        (sheet: { name: string; sheetUrl: string }) => sheet.name === "SheetBills Invoices",
-      )
+      const invoicesSheet = response.data.spreadsheets.find((sheet: { name: string; sheetUrl: string }) => sheet.name === "SheetBills Invoices")
       if (!invoicesSheet) {
         throw new Error("SheetBills Invoices sheet not found")
       }
@@ -364,23 +273,23 @@ export default function InvoiceForm() {
             id: originalInvoiceId, // Ensure we're using the original ID
             invoiceNumber: originalInvoiceId, // Use the same ID for invoiceNumber
             amount: total,
-            status: invoiceToEdit.status,
+            status: invoiceToEdit.status
           },
           invoiceId: originalInvoiceId, // Use the same ID here
-          sheetUrl: invoicesSheet.sheetUrl,
+          sheetUrl: invoicesSheet.sheetUrl
         },
         {
           headers: {
             Authorization: `Bearer ${session.access_token}`,
           },
-        },
+        }
       )
 
       if (updateResponse.data.success) {
         setShowSuccessModal(true)
         // Navigate back to dashboard after successful update
         setTimeout(() => {
-          navigate("/dashboard")
+          navigate('/dashboard')
         }, 2000)
       } else {
         alert("Failed to update invoice")
@@ -409,9 +318,7 @@ export default function InvoiceForm() {
         },
       })
 
-      const invoicesSheet = response.data.spreadsheets.find(
-        (sheet: { name: string; sheetUrl: string }) => sheet.name === "SheetBills Invoices",
-      )
+      const invoicesSheet = response.data.spreadsheets.find((sheet: { name: string; sheetUrl: string }) => sheet.name === "SheetBills Invoices")
       if (!invoicesSheet) {
         throw new Error("SheetBills Invoices sheet not found")
       }
@@ -428,22 +335,22 @@ export default function InvoiceForm() {
           invoiceData: {
             ...invoiceData,
             amount: total,
-            status: "Pending",
+            status: 'Pending'
           },
-          sheetUrl: invoicesSheet.sheetUrl,
+          sheetUrl: invoicesSheet.sheetUrl
         },
         {
           headers: {
             Authorization: `Bearer ${session.access_token}`,
           },
-        },
+        }
       )
 
       if (saveResponse.data.success) {
         setShowSuccessModal(true)
         // Navigate back to dashboard after successful save
         setTimeout(() => {
-          navigate("/dashboard")
+          navigate('/dashboard')
         }, 2000)
       } else {
         alert("Failed to save invoice")
@@ -474,24 +381,21 @@ export default function InvoiceForm() {
     toast({
       title: "Preparing Email",
       description: "Generating shareable invoice link...",
-      variant: "default",
+      variant: "default"
     })
 
     try {
       // Get the current session
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession()
-
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      
       if (sessionError) {
         throw new Error(sessionError.message)
       }
-
+      
       if (!session) {
         throw new Error("No active session")
       }
-
+      
       // Create a shareable link for the invoice
       const response = await fetch("https://sheetbills-server.vercel.app/api/invoices/shared/create-link", {
         method: "POST",
@@ -503,25 +407,25 @@ export default function InvoiceForm() {
           invoiceId: invoiceData.invoiceNumber,
         }),
       })
-
+      
       if (!response.ok) {
         const errorData = await response.json()
         throw new Error(errorData.error || "Failed to create shareable link")
       }
-
+      
       const { shareUrl, expiresAt } = await response.json()
-
+      
       // Format expiration date
       const expirationDate = new Date(expiresAt)
-      const formattedExpirationDate = expirationDate.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+      const formattedExpirationDate = expirationDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
       })
-
+      
       // Create a subject line for the email
       const subject = `Invoice ${invoiceData.invoiceNumber} from ${businessData.companyName}`
-
+      
       // Create email body with invoice details and shareable link
       const body = `Dear ${invoiceData.customer.name},
 
@@ -546,13 +450,13 @@ Regards,
 ${businessData.companyName}
 ${businessData.email}
 ${businessData.phone}`
-
+      
       // Open Gmail compose in a new window with prefilled fields
       const mailtoLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(invoiceData.customer.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-
+      
       // Open Gmail in a new window
-      window.open(mailtoLink, "_blank")
-
+      window.open(mailtoLink, '_blank')
+      
       // Show success toast
       toast({
         title: "Email Ready",
@@ -566,14 +470,14 @@ ${businessData.phone}`
         description: error instanceof Error ? error.message : "Failed to prepare email. Please try again.",
         variant: "destructive",
       })
-
+      
       // Fallback to the PDF attachment method if creating a shareable link fails
       try {
         await generateAndSavePDF(true)
-
+        
         // Create a subject line for the email
         const subject = `Invoice ${invoiceData.invoiceNumber} from ${businessData.companyName}`
-
+        
         // Create email body with invoice details
         const body = `Dear ${invoiceData.customer.name},
 
@@ -590,13 +494,13 @@ Regards,
 ${businessData.companyName}
 ${businessData.email}
 ${businessData.phone}`
-
+        
         // Open Gmail compose in a new window with prefilled fields
         const mailtoLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(invoiceData.customer.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-
+        
         // Open Gmail in a new window
-        window.open(mailtoLink, "_blank")
-
+        window.open(mailtoLink, '_blank')
+        
         // Show fallback toast
         toast({
           title: "Email Ready (Fallback Mode)",
@@ -617,7 +521,7 @@ ${businessData.phone}`
   // Helper function to generate and save PDF
   const generateAndSavePDF = async (forEmail = false) => {
     if (!previewRef.current) return
-
+    
     try {
       // Create a temporary div to render the invoice without buttons
       const tempDiv = document.createElement("div")
@@ -658,22 +562,22 @@ ${businessData.phone}`
       const imgHeight = (canvas.height * imgWidth) / canvas.width
 
       pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight)
-
+      
       // Save the PDF with a clear filename that indicates it's for email attachment
-      const filename = forEmail
+      const filename = forEmail 
         ? `Invoice-${invoiceData.invoiceNumber}-for-${invoiceData.customer.name.replace(/\s+/g, "-")}.pdf`
         : `Invoice-${invoiceData.invoiceNumber}.pdf`
-
+      
       pdf.save(filename)
-
+      
       if (forEmail) {
         toast({
           title: "PDF Generated",
           description: `Invoice PDF saved as "${filename}". Please attach this file to your email.`,
-          variant: "default",
+          variant: "default"
         })
       }
-
+      
       return pdf
     } catch (error) {
       console.error("Error generating PDF:", error)
@@ -741,8 +645,7 @@ ${businessData.phone}`
 
       // Process invoice data with guaranteed fields
       const processedInvoiceData: InvoiceData = {
-        invoiceNumber:
-          invoiceToEdit.invoiceNumber || `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+        invoiceNumber: invoiceToEdit.invoiceNumber || `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
         date: invoiceToEdit.date || new Date().toISOString().split("T")[0],
         dueDate: invoiceToEdit.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
         customer: invoiceToEdit.customer || {
@@ -752,25 +655,16 @@ ${businessData.phone}`
         },
         items: Array.isArray(invoiceToEdit.items)
           ? invoiceToEdit.items.map((item: InvoiceItem) => ({
-              ...item,
-              price: item.price === 0 ? "" : item.price,
-              discount: parseFinancialField(item.discount, "discount", { type: "percentage", value: "" }),
-              tax: parseFinancialField(item.tax, "tax", { type: "percentage", value: "" }),
-            }))
-          : [
-              {
-                name: "",
-                description: "",
-                quantity: 1,
-                price: "",
-                discount: { type: "percentage", value: "" },
-                tax: { type: "percentage", value: "" },
-              },
-            ],
+            ...item,
+            price: item.price === 0 ? "" : item.price,
+            discount: parseFinancialField(item.discount, "discount", { type: "percentage", value: "" }),
+            tax: parseFinancialField(item.tax, "tax", { type: "percentage", value: "" })
+          }))
+          : [{ name: "", description: "", quantity: 1, price: "", discount: { type: "percentage", value: "" }, tax: { type: "percentage", value: "" } }],
         amount: invoiceToEdit.amount || 0,
         notes: typeof invoiceToEdit.notes === "string" ? invoiceToEdit.notes : "",
         template: "classic" as const,
-        status: invoiceToEdit.status === "Paid" ? "Paid" : "Pending",
+        status: invoiceToEdit.status === "Paid" ? "Paid" : "Pending"
       }
 
       setInvoiceData(processedInvoiceData)
@@ -785,28 +679,28 @@ ${businessData.phone}`
   const InvoiceClassic = ({ data, businessData }: { data: InvoiceData; businessData: BusinessData }) => {
     // Calculate all amounts
     const calculateItemTotal = (item: InvoiceItem) => {
-      const price = item.price === "" ? 0 : Number(item.price)
-      const quantity = item.quantity
-      const subtotal = price * quantity
+      const price = item.price === "" ? 0 : Number(item.price);
+      const quantity = item.quantity;
+      const subtotal = price * quantity;
 
       // Calculate discount
-      let discount = 0
+      let discount = 0;
       if (item.discount.value && item.discount.value !== "") {
         if (item.discount.type === "percentage") {
-          discount = (subtotal * Number(item.discount.value)) / 100
+          discount = (subtotal * Number(item.discount.value)) / 100;
         } else {
-          discount = Number(item.discount.value)
+          discount = Number(item.discount.value);
         }
       }
 
       // Calculate tax
-      let tax = 0
+      let tax = 0;
       if (item.tax.value && item.tax.value !== "") {
-        const afterDiscount = subtotal - discount
+        const afterDiscount = subtotal - discount;
         if (item.tax.type === "percentage") {
-          tax = (afterDiscount * Number(item.tax.value)) / 100
+          tax = (afterDiscount * Number(item.tax.value)) / 100;
         } else {
-          tax = Number(item.tax.value)
+          tax = Number(item.tax.value);
         }
       }
 
@@ -814,15 +708,15 @@ ${businessData.phone}`
         subtotal,
         discount,
         tax,
-        total: subtotal - discount + tax,
-      }
-    }
+        total: subtotal - discount + tax
+      };
+    };
 
-    const itemTotals = data.items.map(calculateItemTotal)
-    const subtotal = itemTotals.reduce((sum, item) => sum + item.subtotal, 0)
-    const totalDiscount = itemTotals.reduce((sum, item) => sum + item.discount, 0)
-    const totalTax = itemTotals.reduce((sum, item) => sum + item.tax, 0)
-    const total = subtotal - totalDiscount + totalTax
+    const itemTotals = data.items.map(calculateItemTotal);
+    const subtotal = itemTotals.reduce((sum, item) => sum + item.subtotal, 0);
+    const totalDiscount = itemTotals.reduce((sum, item) => sum + item.discount, 0);
+    const totalTax = itemTotals.reduce((sum, item) => sum + item.tax, 0);
+    const total = subtotal - totalDiscount + totalTax;
 
     // Format date to show month name, day and year
     const formatDate = (dateString: string) => {
@@ -850,6 +744,8 @@ ${businessData.phone}`
           justifyContent: "flex-start",
         }}
       >
+
+
         {/* Header with logo */}
         <div className="flex justify-between mt-8 items-center mb-8">
           <div>
@@ -977,7 +873,10 @@ ${businessData.phone}`
   const [isEditing, setIsEditing] = useState(false)
 
   const hasBusinessDetails =
-    businessData.companyName || businessData.email || businessData.phone || businessData.address
+    businessData.companyName ||
+    businessData.email ||
+    businessData.phone ||
+    businessData.address
 
   // Used to fetch business Details from the server/backend
   const fetchBusinessDetails = async () => {
@@ -1031,52 +930,12 @@ ${businessData.phone}`
   // Format date to show month name, day and year for email body
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     })
   }
-
-  // Add a handler function for the preview card actions
-  // Add this before the return statement in the main component
-
-  const handlePreviewAction = (action: "view" | "reminder" | "copy" | "delete") => {
-    switch (action) {
-      case "view":
-        window.print()
-        break
-      case "reminder":
-        handleEmailInvoice()
-        break
-      case "copy":
-        // Create a shareable link and copy to clipboard
-        navigator.clipboard
-          .writeText(`${window.location.origin}/invoice/${invoiceData.invoiceNumber}`)
-          .then(() => {
-            toast({
-              title: "Link Copied",
-              description: "Invoice link copied to clipboard",
-            })
-          })
-          .catch(() => {
-            toast({
-              title: "Failed to Copy",
-              description: "Could not copy link to clipboard",
-              variant: "destructive",
-            })
-          })
-        break
-      case "delete":
-        setInvoiceToDelete(invoiceData)
-        setIsDeleteDialogOpen(true)
-        break
-    }
-  }
-
-  // Add state for delete confirmation
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [invoiceToDelete, setInvoiceToDelete] = useState<InvoiceData | null>(null)
 
   return (
     <>
@@ -1096,11 +955,17 @@ ${businessData.phone}`
       
       */}
 
+
       {/* Main Content */}
       <div className=" mt-0 font-AfacadFlux w-full py-4 sm:py-8 px-4 mx-auto  rounded-b-3xl mb-10">
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gradient-to-r from-emerald-600 to-emerald-700 shadow-lg rounded-2xl px-6 py-8">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="h-8 w-8 text-white">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(-1)}
+              className="h-8 w-8 text-white"
+            >
               <ArrowLeft className="h-4 w-4" />
               <span className="sr-only">Back</span>
             </Button>
@@ -1110,13 +975,10 @@ ${businessData.phone}`
                   {invoiceToEdit ? "Invoice Details" : "Create Invoice"}
                 </h1>
                 {invoiceToEdit && (
-                  <div
-                    className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                      invoiceToEdit.status === "Paid"
-                        ? "bg-green-100 border border-green-200 text-green-800"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}
-                  >
+                  <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${invoiceToEdit.status === "Paid"
+                    ? "bg-green-100 border border-green-200 text-green-800"
+                    : "bg-yellow-100 text-yellow-800"
+                    }`}>
                     {invoiceToEdit.status === "Paid" ? (
                       <CheckCircle className="h-3 w-3" />
                     ) : (
@@ -1140,12 +1002,12 @@ ${businessData.phone}`
               className="flex items-center gap-2 bg-white text-emerald-700 border-emerald-200 hover:bg-emerald-50 font-bold shadow"
             >
               {isFormExpanded ? "Hide Form" : invoiceToEdit ? "Edit Invoice" : "Show Form"}
-              <ChevronDown
-                className={`h-4 w-4 transition-transform duration-300 ${isFormExpanded ? "rotate-180" : ""}`}
-              />
+              <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${isFormExpanded ? "rotate-180" : ""}`} />
             </Button>
           </div>
         </div>
+
+
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 relative">
           {/* Add a vertical separator between form and preview */}
@@ -1249,7 +1111,9 @@ ${businessData.phone}`
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <span className="font-medium">Item {index + 1}</span>
-                            <span className="text-sm text-slate-500">{item.name || "Unnamed Item"}</span>
+                            <span className="text-sm text-slate-500">
+                              {item.name || "Unnamed Item"}
+                            </span>
                           </div>
                           <Button
                             type="button"
@@ -1289,7 +1153,7 @@ ${businessData.phone}`
                               id={`item-quantity-${index}`}
                               type="number"
                               value={item.quantity}
-                              onChange={(e) => updateItem(index, "quantity", Number.parseInt(e.target.value) || 0)}
+                              onChange={(e) => updateItem(index, "quantity", parseInt(e.target.value) || 0)}
                               min="0"
                             />
                           </div>
@@ -1299,7 +1163,7 @@ ${businessData.phone}`
                               id={`item-price-${index}`}
                               type="number"
                               value={item.price}
-                              onChange={(e) => updateItem(index, "price", Number.parseFloat(e.target.value) || 0)}
+                              onChange={(e) => updateItem(index, "price", parseFloat(e.target.value) || 0)}
                               min="0"
                               step="0.01"
                             />
@@ -1312,7 +1176,7 @@ ${businessData.phone}`
                               <Select
                                 value={item.discount.type}
                                 onValueChange={(value) => {
-                                  updateItem(index, "discount", { ...item.discount, type: value })
+                                  updateItem(index, "discount", { ...item.discount, type: value });
                                 }}
                               >
                                 <SelectTrigger className="w-24">
@@ -1327,12 +1191,7 @@ ${businessData.phone}`
                                 id={`item-discount-${index}`}
                                 type="number"
                                 value={item.discount.value}
-                                onChange={(e) =>
-                                  updateItem(index, "discount", {
-                                    ...item.discount,
-                                    value: Number.parseFloat(e.target.value) || 0,
-                                  })
-                                }
+                                onChange={(e) => updateItem(index, "discount", { ...item.discount, value: parseFloat(e.target.value) || 0 })}
                                 min="0"
                                 step="0.01"
                                 className="flex-1"
@@ -1345,7 +1204,7 @@ ${businessData.phone}`
                               <Select
                                 value={item.tax.type}
                                 onValueChange={(value) => {
-                                  updateItem(index, "tax", { ...item.tax, type: value })
+                                  updateItem(index, "tax", { ...item.tax, type: value });
                                 }}
                               >
                                 <SelectTrigger className="w-24">
@@ -1360,12 +1219,7 @@ ${businessData.phone}`
                                 id={`item-tax-${index}`}
                                 type="number"
                                 value={item.tax.value}
-                                onChange={(e) =>
-                                  updateItem(index, "tax", {
-                                    ...item.tax,
-                                    value: Number.parseFloat(e.target.value) || 0,
-                                  })
-                                }
+                                onChange={(e) => updateItem(index, "tax", { ...item.tax, value: parseFloat(e.target.value) || 0 })}
                                 min="0"
                                 step="0.01"
                                 className="flex-1"
@@ -1422,9 +1276,9 @@ ${businessData.phone}`
                 <Button variant="outline" onClick={() => window.print()} className="w-full sm:w-auto text-white">
                   Print Invoice
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleEmailInvoice}
+                <Button 
+                  variant="outline" 
+                  onClick={handleEmailInvoice} 
                   className="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700"
                   disabled={!invoiceData.customer.email}
                 >
@@ -1440,28 +1294,8 @@ ${businessData.phone}`
             className={`transition-all duration-500 ease-in-out ${isFormExpanded ? "lg:col-span-1" : "col-span-full w-full"}`}
           >
             <div className={`${isFormExpanded ? "lg:sticky lg:top-6" : ""}`}>
-              {/* Toggle between detailed preview and card preview */}
-              <div className="flex justify-end mb-4">
-                <Button variant="outline" onClick={handleDownloadPDF} className="mr-2">
-                  <Download className="h-4 w-4 mr-2" />
-                  Download PDF
-                </Button>
-              </div>
-
-              <div className="flex flex-col items-center gap-6">
-                {/* Card Preview - Visible when form is collapsed */}
-                {!isFormExpanded && <InvoicePreviewCard data={invoiceData} onAction={handlePreviewAction} />}
-
-                {/* Full Preview - Always visible but hidden on small screens when collapsed */}
-                <div
-                  id="invoice-print-area"
-                  ref={previewRef}
-                  className={`flex justify-center ${!isFormExpanded ? "hidden md:flex" : ""}`}
-                >
-                  {invoiceData.template === "classic" && (
-                    <InvoiceClassic data={invoiceData} businessData={businessData} />
-                  )}
-                </div>
+              <div id="invoice-print-area" ref={previewRef} className="flex justify-center">
+                {invoiceData.template === "classic" && <InvoiceClassic data={invoiceData} businessData={businessData} />}
               </div>
             </div>
           </div>
@@ -1471,105 +1305,20 @@ ${businessData.phone}`
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
             <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col items-center">
               {/* Checkmark animation */}
-              <svg
-                className="w-16 h-16 text-green-600 mb-4 animate-bounce"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
+              <svg className="w-16 h-16 text-green-600 mb-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" />
-                <path
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M8 12l3 3 5-5"
-                />
+                <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M8 12l3 3 5-5" />
               </svg>
               <h2 className="text-2xl font-bold mb-2 text-green-700">Invoice Saved!</h2>
               <p className="mb-4 text-gray-600">Your invoice has been saved successfully.</p>
+
             </div>
           </div>
         )}
       </div>
-
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure you want to delete this invoice?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete invoice
-              {invoiceToDelete ? ` #${invoiceToDelete.invoiceNumber}` : ""}.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={async () => {
-                try {
-                  const {
-                    data: { session },
-                    error: sessionError,
-                  } = await supabase.auth.getSession()
-                  if (sessionError) {
-                    throw new Error(sessionError.message)
-                  }
-
-                  // Get the SheetBills Invoices sheet URL
-                  const response = await axios.get("https://sheetbills-server.vercel.app/api/sheets/spreadsheets", {
-                    headers: {
-                      Authorization: `Bearer ${session?.provider_token}`,
-                      "X-Supabase-Token": session?.access_token,
-                    },
-                  })
-
-                  const invoicesSheet = response.data.spreadsheets.find(
-                    (sheet: { name: string }) => sheet.name === "SheetBills Invoices",
-                  )
-
-                  if (!invoicesSheet) {
-                    throw new Error("SheetBills Invoices sheet not found")
-                  }
-
-                  // Delete the invoice
-                  await axios.delete("https://sheetbills-server.vercel.app/api/sheets/delete-invoice", {
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${session?.provider_token}`,
-                      "X-Supabase-Token": session?.access_token || "",
-                    },
-                    data: {
-                      invoiceId: invoiceToDelete?.invoiceNumber,
-                      sheetUrl: invoicesSheet.sheetUrl,
-                    },
-                  })
-
-                  toast({
-                    title: "Invoice Deleted",
-                    description: "Invoice has been deleted successfully.",
-                  })
-
-                  // Navigate back to dashboard
-                  navigate("/dashboard")
-                } catch (error) {
-                  toast({
-                    title: "Error",
-                    description: error instanceof Error ? error.message : "Failed to delete invoice",
-                    variant: "destructive",
-                  })
-                } finally {
-                  setInvoiceToDelete(null)
-                  setIsDeleteDialogOpen(false)
-                }
-              }}
-              className="bg-red-600 focus:ring-red-600"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   )
 }
+
+
+

@@ -1090,7 +1090,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen w-full font-AfacadFlux p-6">
+    <div className="min-h-screen w-full font-AfacadFlux px-6 pb-6">
       {/* Tabs and Content */}
       <Tabs defaultValue="all" className="mb-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">

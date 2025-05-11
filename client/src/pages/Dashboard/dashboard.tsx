@@ -707,7 +707,7 @@ export default function Dashboard() {
 
     return (
       <Card>
-        <CardContent className="p-0">
+        <CardContent className="p-0 f">
           <div className="flex flex-col gap-2">
             {bulkDeleteMessage && (
               <div className="flex items-center justify-between bg-green-50 border border-green-200 text-green-800 rounded px-4 py-2 mb-2">
@@ -780,17 +780,17 @@ export default function Dashboard() {
                           checked={allVisibleSelected && currentItems.length > 0}
                           onChange={handleSelectAllVisible}
                           aria-label="Select all invoices on this page"
-                          className="mx-auto accent-blue-600 h-4 w-4 rounded border-gray-300"
+                          className="mx-auto accent-gray-600 h-4 w-4 rounded border-gray-300"
                         />
                       </TableHead>
                       <TableHead onClick={() => handleSort("id")} className="cursor-pointer font-medium px-6 py-4 whitespace-nowrap min-w-[160px]">
                         Invoice ID <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
                       <TableHead onClick={() => handleSort("customer")} className="cursor-pointer font-medium px-6 py-4">
-                        Customer <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
+                        Client <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
-                      <TableHead onClick={() => handleSort("date")} className="cursor-pointer font-medium px-6 py-4 whitespace-nowrap min-w-[180px]">
-                        Date <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
+                      <TableHead onClick={() => handleSort("dueDate")} className="cursor-pointer font-medium px-6 py-4 whitespace-nowrap min-w-[180px]">
+                        Due Date <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
                       <TableHead onClick={() => handleSort("status")} className="cursor-pointer font-medium px-6 py-4">
                         Status <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
@@ -838,10 +838,7 @@ export default function Dashboard() {
                             </div>
                           </TableCell>
                           <TableCell className="px-6 py-4 whitespace-nowrap min-w-[180px]">
-                            <div className="font-medium">{formatDate(invoice.date)}</div>
-                            <div className="text-sm">
-                              Due: <span className="bg-green-200 text-green-900 px-2 py-0.5 rounded">{formatDate(invoice.dueDate)}</span>
-                            </div>
+                            <div className="font-medium">{formatDate(invoice.dueDate)}</div>
                           </TableCell>
                           <TableCell className="px-6 py-4">
                             <Badge
@@ -1186,12 +1183,12 @@ export default function Dashboard() {
                     checked={allVisibleSelected && currentItems.length > 0}
                     onChange={handleSelectAllVisible}
                     aria-label="Select all invoices on this page"
-                    className="mx-auto accent-blue-600 h-4 w-4 rounded border-gray-300"
+                    className="mx-auto accent-gray-600 h-4 w-4 rounded border-gray-300"
                   />
                 </TableHead>
                 <TableHead className="px-6 py-4">Number</TableHead>
                 <TableHead className="px-6 py-4">Client</TableHead>
-                <TableHead className="px-6 py-4">Date</TableHead>
+                <TableHead className="px-6 py-4">Due Date</TableHead>
                 <TableHead className="px-6 py-4">Status</TableHead>
                 <TableHead className="px-6 py-4 text-right">Total</TableHead>
                 <TableHead className="px-6 py-4 text-center">Overdue</TableHead>
@@ -1227,7 +1224,7 @@ export default function Dashboard() {
                         <span className="text-xs text-gray-400">{typeof invoice.customer === 'object' ? invoice.customer.email : ''}</span>
                       </div>
                     </TableCell>
-                    <TableCell className="px-6 py-4 whitespace-nowrap">{formatDate(invoice.date)}</TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap">{formatDate(invoice.dueDate)}</TableCell>
                     <TableCell className="px-6 py-4">
                       <span className={`px-4 py-1 rounded-full text-xs font-semibold ${invoice.status === 'Paid' ? 'bg-green-50 text-green-700 border border-green-200' : invoice.status === 'Pending' ? 'bg-yellow-50 text-yellow-700 border border-yellow-200' : 'bg-blue-50 text-blue-700 border border-blue-200'}`}>{invoice.status}</span>
                     </TableCell>
@@ -1290,7 +1287,7 @@ export default function Dashboard() {
                               })
                             }
                           }}
-                          className="bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 px-3"
+                          className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
                           size="sm"
                           disabled={invoice.status === 'Paid'}
                         >
@@ -1343,13 +1340,13 @@ export default function Dashboard() {
                               })
                             }
                           }}
-                          className="bg-yellow-50 text-yellow-700 border border-yellow-200 hover:bg-yellow-100 px-3"
+                          className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
                           size="sm"
                           disabled={invoice.status === 'Pending'}
                         >
                           Mark as Pending
                         </Button>
-                        <Button size="sm" className="bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100" onClick={(e) => { e.stopPropagation(); navigate('/create-invoice', { state: { invoiceToEdit: invoice, selectedSpreadsheetUrl: spreadsheets.find((sheet) => sheet.name === 'SheetBills Invoices')?.sheetUrl } }) }}>Edit</Button>
+                        <Button size="sm" className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none" onClick={(e) => { e.stopPropagation(); navigate('/create-invoice', { state: { invoiceToEdit: invoice, selectedSpreadsheetUrl: spreadsheets.find((sheet) => sheet.name === 'SheetBills Invoices')?.sheetUrl } }) }}>Edit</Button>
                       </div>
                     </TableCell>
                   </SortableTableRow>

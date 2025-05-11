@@ -24,6 +24,7 @@ module.exports = {
         inter: ["var(--font-inter)", "system-ui", "sans-serif"],
         'dm-sans': ['DM Sans', 'sans-serif'],
         'poppins': ['Poppins', 'sans-serif'],
+        'cal-sans': ['Cal Sans', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

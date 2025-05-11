@@ -847,7 +847,7 @@ export default function Dashboard() {
                                 invoice.status === "Paid"
                                   ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50 text-md px-4 py-1"
                                   : invoice.status === "Partially Paid"
-                                    ? "bg-blue-50 text-blue-700 hover:bg-blue-50 text-md px-4 py-1"
+                                    ? "bg-green-50 text-green-700 hover:bg-green-50 text-md px-4 py-1"
                                     : "bg-amber-50 text-amber-700 hover:bg-amber-50 text-md px-4 py-1"
                               }
                             >
@@ -1101,7 +1101,7 @@ export default function Dashboard() {
               key={tab.value}
               className={`px-6 py-2 text-sm font-medium transition-colors border-0 border-r last:border-r-0 rounded-none focus:outline-none ${
                 statusFilter === tab.value
-                  ? 'text-blue-700 border-blue-500 bg-white' // active
+                  ? 'text-green-700 border-green-500 bg-white' // active
                   : 'text-gray-700 border-gray-200 bg-white hover:bg-gray-50'
               } ${tab.value === 'all' ? 'rounded-l-md' : ''} ${tab.value === 'trash' ? 'rounded-r-md' : ''}`}
               style={{
@@ -1119,7 +1119,7 @@ export default function Dashboard() {
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="max-w-xs border-gray-200 focus:border-blue-400 focus:ring-0"
+            className="max-w-xs border-gray-200 focus:border-green-400 focus:ring-0"
             disabled={isStateLoading}
           />
           <Button
@@ -1141,7 +1141,7 @@ export default function Dashboard() {
                 },
               })
             }}
-            className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 font-bold shadow-none"
+            className="border border-gray-300 text-white bg-green-700 hover:bg-green-800 font-semibold shadow-none"
             disabled={isStateLoading}
           >
             + New Invoice
@@ -1230,7 +1230,7 @@ export default function Dashboard() {
                     </TableCell>
                     <TableCell className="px-6 py-4 whitespace-nowrap">{formatDate(invoice.dueDate)}</TableCell>
                     <TableCell className="px-6 py-4">
-                      <span className={`px-4 py-1 rounded-full text-xs font-semibold ${invoice.status === 'Paid' ? 'bg-green-50 text-green-700 border border-green-200' : invoice.status === 'Pending' ? 'bg-yellow-50 text-yellow-700 border border-yellow-200' : 'bg-blue-50 text-blue-700 border border-blue-200'}`}>{invoice.status}</span>
+                      <span className={`px-4 py-1 rounded-full text-xs font-semibold ${invoice.status === 'Paid' ? 'bg-green-50 text-green-700 border border-green-200' : invoice.status === 'Pending' ? 'bg-yellow-50 text-yellow-700 border border-yellow-200' : 'bg-green-50 text-green-700 border border-green-200'}`}>{invoice.status}</span>
                     </TableCell>
                     <TableCell className="text-right font-medium px-6 py-4">{formatCurrency(invoice.amount)}</TableCell>
                     <TableCell className="text-center px-6 py-4">

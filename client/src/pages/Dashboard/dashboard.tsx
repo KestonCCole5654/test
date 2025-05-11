@@ -845,7 +845,7 @@ export default function Dashboard() {
                           </TableCell>
                           <TableCell className="px-6 py-4">
                             <Badge
-                              variant={invoice.status === "Paid" ? "default" : invoice.status === "Partially Paid" ? "secondary" : "destructive"}
+                              variant={invoice.status === "Paid" ? "default" : "secondary"}
                               className={
                                 invoice.status === "Paid"
                                   ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50 text-md px-4 py-1"
@@ -1091,86 +1091,191 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen w-full font-AfacadFlux px-6 pb-6 bg-white">
-      {/* Tabs and Actions Row */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-gray-200 pb-4 mb-4">
-        <div className="flex flex-wrap gap-1">
-          {['All', 'Draft', 'Sent', 'Paid', 'Refunded', 'Deleted'].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setStatusFilter(tab.toLowerCase())}
-              className={`px-4 py-2 rounded-md border text-sm font-medium transition-colors
-                ${statusFilter === tab.toLowerCase() ? 'bg-blue-50 border-blue-300 text-blue-700' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'}`}
-            >
-              {tab}
-            </button>
-          ))}
+      {/* Filter Tabs, Search, and Create Invoice Row */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
+        <div className="flex gap-2">
+          <button
+            className={`px-5 py-2 rounded-full border text-sm font-medium transition-colors ${statusFilter === 'all' ? 'bg-blue-50 border-blue-300 text-blue-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+            onClick={() => setStatusFilter('all')}
+          >
+            All
+          </button>
+          <button
+            className={`px-5 py-2 rounded-full border text-sm font-medium transition-colors ${statusFilter === 'pending' ? 'bg-yellow-50 border-yellow-300 text-yellow-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+            onClick={() => setStatusFilter('pending')}
+          >
+            Pending
+          </button>
+          <button
+            className={`px-5 py-2 rounded-full border text-sm font-medium transition-colors ${statusFilter === 'paid' ? 'bg-green-50 border-green-300 text-green-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+            onClick={() => setStatusFilter('paid')}
+          >
+            Paid
+          </button>
         </div>
         <div className="flex gap-2 w-full md:w-auto">
-          <input
-            type="text"
+          <Input
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="border border-gray-200 rounded-md px-3 py-2 text-sm w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-100"
+            className="max-w-xs border-gray-200 focus:border-blue-400 focus:ring-0"
+            disabled={isStateLoading}
           />
           <Button
-            onClick={() => navigate('/create-invoice')}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md px-5 py-2 shadow-none"
+            onClick={handleRefresh}
+            className="bg-blue-600 text-white hover:bg-blue-700 shadow-none"
+            disabled={isStateLoading}
           >
-            New Invoice
+            <RefreshCw className={`mr-2 h-4 w-4 ${isStateLoading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+          <Button
+            onClick={() => {
+              const invoicesSheet = spreadsheets.find((sheet) => sheet.name === 'SheetBills Invoices')
+              const invoicesSheetUrl = invoicesSheet?.sheetUrl
+              navigate('/create-invoice', {
+                state: {
+                  selectedSpreadsheetUrl: invoicesSheetUrl,
+                  key: Date.now(),
+                },
+              })
+            }}
+            className="bg-blue-600 text-white hover:bg-blue-700 font-bold shadow-none"
+            disabled={isStateLoading}
+          >
+            + New Invoice
           </Button>
         </div>
       </div>
-      {/* Table */}
-      <div className="bg-white border border-gray-200 rounded-md overflow-x-auto">
-        <table className="min-w-full text-sm">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th className="px-4 py-3 text-left font-semibold text-gray-500">STATUS</th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-500">TOTAL</th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-500">CLIENT</th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-500">DATE</th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-500">NUMBER</th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-500">ACTIONS</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredInvoices.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="text-center py-8 text-gray-400">No invoices found.</td>
-              </tr>
-            ) : (
-              filteredInvoices.map((invoice) => (
-                <tr key={invoice.id} className="border-b last:border-b-0 hover:bg-gray-50">
-                  <td className="px-4 py-3">
-                    <span className={`px-4 py-1 rounded-full text-xs font-medium border ${
-                      invoice.status === 'Paid'
-                        ? 'bg-green-50 border-green-200 text-green-700'
-                        : invoice.status === 'Partially Paid'
-                        ? 'bg-blue-50 border-blue-200 text-blue-700'
-                        : invoice.status === 'Pending'
-                        ? 'bg-yellow-50 border-yellow-200 text-yellow-700'
-                        : 'bg-gray-50 border-gray-200 text-gray-500'
-                    }`}>{invoice.status}</span>
-                  </td>
-                  <td className="px-4 py-3">USD {invoice.amount.toFixed(2)}</td>
-                  <td className="px-4 py-3">{typeof invoice.customer === 'object' ? invoice.customer.name : invoice.customer}</td>
-                  <td className="px-4 py-3">{formatDate(invoice.date)}</td>
-                  <td className="px-4 py-3">{invoice.id}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" className="border-gray-200 text-gray-700 px-3 py-1 h-auto">Send</Button>
-                      <Button variant="outline" size="sm" className="border-gray-200 text-gray-700 px-3 py-1 h-auto" onClick={() => navigate('/create-invoice', { state: { invoiceToEdit: invoice } })}>Edit</Button>
-                      <Button variant="outline" size="sm" className="border-gray-200 text-gray-700 px-3 py-1 h-auto" onClick={() => navigate('/invoice/' + invoice.id)}>View</Button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+      {/* Table Card */}
+      <div className="bg-white border border-gray-100 rounded-lg shadow-sm">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSelectAllVisible}
+              className="font-medium border-gray-200"
+              disabled={currentItems.length === 0}
+            >
+              {allVisibleSelected ? 'Deselect All' : 'Select All'}
+            </Button>
+            <span className="text-sm text-gray-500">{selectedInvoices.size} selected</span>
+          </div>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => setIsBulkDeleteDialogOpen(true)}
+            disabled={selectedInvoices.size === 0}
+            className="bg-red-100 text-red-700 border-red-200 hover:bg-red-200"
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete Selected
+          </Button>
+        </div>
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <Table className="min-w-full text-sm">
+            <TableHeader>
+              <TableRow className="bg-white border-b border-gray-100">
+                <TableHead className="w-8 px-4"></TableHead>
+                <TableHead className="w-[56px] px-6 py-4 align-middle text-center">
+                  <input
+                    type="checkbox"
+                    ref={headerCheckboxRef}
+                    checked={allVisibleSelected && currentItems.length > 0}
+                    onChange={handleSelectAllVisible}
+                    aria-label="Select all invoices on this page"
+                    className="mx-auto accent-blue-600 h-4 w-4 rounded border-gray-300"
+                  />
+                </TableHead>
+                <TableHead className="px-6 py-4">Number</TableHead>
+                <TableHead className="px-6 py-4">Client</TableHead>
+                <TableHead className="px-6 py-4">Date</TableHead>
+                <TableHead className="px-6 py-4">Status</TableHead>
+                <TableHead className="px-6 py-4 text-right">Total</TableHead>
+                <TableHead className="px-6 py-4 text-center">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rowOrder.map((id) => {
+                const invoice = currentItems.find((inv) => inv.id === id)
+                if (!invoice) return null
+                return (
+                  <SortableTableRow
+                    key={invoice.id}
+                    id={invoice.id}
+                    invoice={invoice}
+                    spreadsheets={spreadsheets}
+                  >
+                    <TableCell
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-[56px] px-6 py-4 align-middle text-center"
+                    >
+                      <Checkbox
+                        checked={selectedInvoices.has(invoice.id)}
+                        onCheckedChange={() => handleSelectInvoice(invoice.id)}
+                        aria-label={`Select invoice ${invoice.id}`}
+                        className="mx-auto"
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium px-6 py-4 whitespace-nowrap">{invoice.id}</TableCell>
+                    <TableCell className="px-6 py-4">
+                      <div className="flex flex-col">
+                        <span className="font-medium">{typeof invoice.customer === 'object' ? invoice.customer.name : invoice.customer}</span>
+                        <span className="text-xs text-gray-400">{typeof invoice.customer === 'object' ? invoice.customer.email : ''}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap">{formatDate(invoice.date)}</TableCell>
+                    <TableCell className="px-6 py-4">
+                      <span className={`px-4 py-1 rounded-full text-xs font-semibold ${invoice.status === 'Paid' ? 'bg-green-50 text-green-700 border border-green-200' : invoice.status === 'Pending' ? 'bg-yellow-50 text-yellow-700 border border-yellow-200' : 'bg-blue-50 text-blue-700 border border-blue-200'}`}>{invoice.status}</span>
+                    </TableCell>
+                    <TableCell className="text-right font-medium px-6 py-4">{formatCurrency(invoice.amount)}</TableCell>
+                    <TableCell className="text-center px-6 py-4">
+                      <div className="flex justify-center gap-2">
+                        <Button size="sm" className="bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100">Send</Button>
+                        <Button size="sm" className="bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100" onClick={(e) => { e.stopPropagation(); navigate('/create-invoice', { state: { invoiceToEdit: invoice, selectedSpreadsheetUrl: spreadsheets.find((sheet) => sheet.name === 'SheetBills Invoices')?.sheetUrl } }) }}>Edit</Button>
+                        <Button size="sm" className="bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100" onClick={(e) => { e.stopPropagation(); setInvoiceToDelete(invoice); setIsDeleteDialogOpen(true); }}>Delete</Button>
+                      </div>
+                    </TableCell>
+                  </SortableTableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </div>
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 bg-white">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="border-gray-200"
+              >
+                Previous
+              </Button>
+              <div className="text-sm text-gray-500">
+                Page {currentPage} of {totalPages}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="border-gray-200"
+              >
+                Next
+              </Button>
+            </div>
+            <div className="text-sm text-gray-500">
+              Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredInvoices.length)} of {filteredInvoices.length} invoices
+            </div>
+          </div>
+        )}
       </div>
-
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
@@ -1178,7 +1283,7 @@ export default function Dashboard() {
             <AlertDialogTitle>Are you sure you want to delete this invoice?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete the invoice
-              {invoiceToDelete && <span className="font-medium"> #{invoiceToDelete.id}</span>}.
+              {invoiceToDelete ? <span className="font-medium"> #{invoiceToDelete.id}</span> : null}.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

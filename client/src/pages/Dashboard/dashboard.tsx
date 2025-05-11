@@ -725,7 +725,7 @@ export default function Dashboard() {
                   variant="outline"
                   size="sm"
                   onClick={handleSelectAllVisible}
-                 
+                  className="text-white"
                   disabled={currentItems.length === 0}
                 >
                   {allVisibleSelected ? "Deselect All" : "Select All"}
@@ -1108,10 +1108,10 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen w-full font-cal-sans px-6 pb-6  text-gray-700">
-      <h1 className="text-3xl  text-gray-800 mb-6 mt-10">Invoices</h1>
+      <h1 className="text-3xl  text-green-800 mb-6 mt-10">Invoices</h1>
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
-        <div className="flex gap-0  bg-white">
+        <div className="flex  bg-white">
           {[
             { label: "All", value: "all" },
             { label: "Pending", value: "pending" },
@@ -1132,7 +1132,7 @@ export default function Dashboard() {
             </button>
           ))}
         </div>
-        <div className="flex gap-7 w-full md:w-auto">
+        <div className="flex gap-5 w-full md:w-auto">
           <Input
             placeholder="Search..."
             value={searchQuery}

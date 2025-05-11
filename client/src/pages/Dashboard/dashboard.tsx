@@ -1108,7 +1108,7 @@ export default function Dashboard() {
           ].map(tab => (
             <button
               key={tab.value}
-              className={`px-6 py-2 text-sm transition-colors border-0 border-gray-400 focus:outline-none ${
+              className={`px-6 py-2 text-sm transition-colors border border-gray-600 focus:outline-none ${
                 statusFilter === tab.value
                   ? 'text-gray-700 border-gray-500 font-bold bg-white' // active
                   : 'text-gray-700 border-transparent font-normal bg-white hover:text-green-700 hover:font-bold'
@@ -1122,12 +1122,12 @@ export default function Dashboard() {
             </button>
           ))}
         </div>
-        <div className="flex gap-2 w-full md:w-auto">
+        <div className="flex w-full md:w-auto">
           <Input
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="max-w-xs border-gray-200 focus:border-green-400 focus:ring-0"
+            className="max-w-xs border-gray-200"
             disabled={isStateLoading}
           />
           <Button

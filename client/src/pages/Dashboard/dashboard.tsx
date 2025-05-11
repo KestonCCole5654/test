@@ -1095,7 +1095,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen w-full text-gray-500 font-cal-sans px-6 pb-6 bg-white">
+    <div className="min-h-screen w-full text-gray-800 font-cal-sans px-6 pb-6 bg-white">
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
         <div className="flex gap-0 rounded-md bg-white">
@@ -1109,7 +1109,7 @@ export default function Dashboard() {
               key={tab.value}
               className={`px-6 py-2 text-sm font-medium transition-colors border-0 border-r last:border-r-0 rounded-none focus:outline-none ${
                 statusFilter === tab.value
-                  ? 'text-gray-800 border-gray-500 bg-white' // active
+                  ? 'text-gray-700 border-green-500 bg-white' // active
                   : 'text-gray-700 border-gray-200 bg-white hover:bg-gray-50'
               } ${tab.value === 'all' ? 'rounded-l-md' : ''} ${tab.value === 'trash' ? 'rounded-r-md' : ''}`}
               style={{

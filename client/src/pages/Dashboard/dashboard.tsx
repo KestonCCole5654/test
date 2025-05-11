@@ -771,7 +771,7 @@ export default function Dashboard() {
                   <TableHeader>
                     <TableRow className="bg-gray-50 border-b border-gray-200">
                       <TableHead className="w-8 px-4"></TableHead>
-                      <TableHead className="w-[56px] px-6 py-4 align-middle text-center font-medium text-gray-600">
+                      <TableHead className="w-[56px] px-6 py-4 align-middle text-center text-gray-600">
                         <input
                           type="checkbox"
                           ref={headerCheckboxRef}
@@ -783,41 +783,41 @@ export default function Dashboard() {
                       </TableHead>
                       <TableHead
                         onClick={() => handleSort("id")}
-                        className="cursor-pointer font-medium px-6 py-4 whitespace-nowrap min-w-[160px] font-medium text-gray-600"
+                        className="cursor-pointer px-6 py-4 whitespace-nowrap min-w-[160px] text-gray-600"
                       >
                         Invoice ID <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
                       <TableHead
                         onClick={() => handleSort("customer")}
-                        className="cursor-pointer font-medium px-6 py-4 font-medium text-gray-600"
+                        className="cursor-pointer px-6 py-4 text-gray-600"
                       >
                         Client <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
                       <TableHead
                         onClick={() => handleSort("dueDate")}
-                        className="cursor-pointer font-medium px-6 py-4 whitespace-nowrap min-w-[180px] font-medium text-gray-600"
+                        className="cursor-pointer px-6 py-4 whitespace-nowrap min-w-[180px] text-gray-600"
                       >
                         Due Date <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
                       <TableHead
                         onClick={() => handleSort("status")}
-                        className="cursor-pointer font-medium px-6 py-4 font-medium text-gray-600"
+                        className="cursor-pointer px-6 py-4 text-gray-600"
                       >
                         Status <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
                       <TableHead
                         onClick={() => handleSort("amount")}
-                        className="cursor-pointer font-medium text-right px-6 py-4 font-medium text-gray-600"
+                        className="cursor-pointer text-right px-6 py-4 text-gray-600"
                       >
                         Amount <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
-                      <TableHead className="font-medium text-center px-6 py-4 font-medium text-gray-600">
+                      <TableHead className="text-center px-6 py-4 text-gray-600">
                         Overdue
                       </TableHead>
-                      <TableHead className="font-medium text-center px-6 py-4 font-medium text-gray-600">
+                      <TableHead className="text-center px-6 py-4 text-gray-600">
                         Payment Actions
                       </TableHead>
-                      <TableHead className="w-[80px] font-medium px-6 py-4 font-medium text-gray-600">
+                      <TableHead className="w-[80px] px-6 py-4 text-gray-600">
                         Other Actions
                       </TableHead>
                     </TableRow>
@@ -844,7 +844,7 @@ export default function Dashboard() {
                               className="mx-auto"
                             />
                           </TableCell>
-                          <TableCell className="font-medium px-6 py-4 whitespace-nowrap min-w-[160px]">
+                          <TableCell className="px-6 py-4 whitespace-nowrap min-w-[160px]">
                             {invoice.id}
                           </TableCell>
                           <TableCell className="px-6 py-4">
@@ -853,7 +853,7 @@ export default function Dashboard() {
                                 <span className="font-medium">
                                   {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}
                                 </span>
-                                <span className="text-xs font-medium text-slate-500">
+                                <span className="text-xs text-slate-500">
                                   {typeof invoice.customer === "object" ? invoice.customer.email : ""}
                                 </span>
                               </div>
@@ -877,7 +877,7 @@ export default function Dashboard() {
                               </span>
                             )}
                           </TableCell>
-                          <TableCell className="text-right font-medium px-6 py-4">
+                          <TableCell className="text-right px-6 py-4">
                             {formatCurrency(invoice.amount)}
                           </TableCell>
                           <TableCell className="text-center px-6 py-4">
@@ -1174,7 +1174,7 @@ export default function Dashboard() {
               variant="outline"
               size="sm"
               onClick={handleSelectAllVisible}
-              className="font-medium border-gray-200"
+              className=" border-gray-200"
               disabled={currentItems.length === 0}
             >
               {allVisibleSelected ? "Deselect All" : "Select All"}
@@ -1234,13 +1234,13 @@ export default function Dashboard() {
                         className="mx-auto"
                       />
                     </TableCell>
-                    <TableCell className="font-medium px-6 py-4 whitespace-nowrap">{invoice.id}</TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap">{invoice.id}</TableCell>
                     <TableCell className="px-6 py-4">
                       <div className="flex flex-col">
                         <span className="font-medium">
                           {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}
                         </span>
-                        <span className="text-xs font-medium text-gray-400">
+                        <span className="text-xs text-gray-400">
                           {typeof invoice.customer === "object" ? invoice.customer.email : ""}
                         </span>
                       </div>
@@ -1261,7 +1261,7 @@ export default function Dashboard() {
                         </span>
                       )}
                     </TableCell>
-                    <TableCell className="text-right font-medium px-6 py-4">{formatCurrency(invoice.amount)}</TableCell>
+                    <TableCell className="text-right px-6 py-4">{formatCurrency(invoice.amount)}</TableCell>
                     <TableCell className="text-center px-8 py-6">
                       {invoice.status === "Pending" && new Date(invoice.dueDate) < new Date() ? (
                         <span className="text-red-600 px-4 py-1.5  text-sm">
@@ -1543,7 +1543,7 @@ export default function Dashboard() {
                 step="0.01"
                 className="w-full"
               />
-              <p className="text-sm font-medium bg-green-100 text-green-800 px-3 py-2 rounded-md">
+              <p className="text-sm bg-green-100 text-green-800 px-3 py-2 rounded-md">
                 Total invoice amount: {formatCurrency(selectedInvoice?.amount || 0)}
               </p>
             </div>

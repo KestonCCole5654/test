@@ -688,298 +688,6 @@ export default function Dashboard() {
 
   const sensors = useSensors(useSensor(PointerSensor))
 
-  return (
-    <div className="min-h-screen w-full font-AfacadFlux p-6">
-      {/* Stats Cards Section */}
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8">
-          {/* Total Invoices Card */}
-          <Card className="py-1 px-1">
-            <CardHeader className="pb-0 px-1">
-              <CardTitle className="text-md font-medium text-slate-500">Total Invoices</CardTitle>
-            </CardHeader>
-            <CardContent className="px-1 py-0">
-              {isStateLoading ? (
-                <Skeleton className="h-6 w-16" />
-              ) : (
-                <div className="flex items-center">
-                  <div className="text-lg font-bold text-slate-900">{totalInvoices}</div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Pending Amount Card */}
-          <Card className="py-1 px-1">
-            <CardHeader className="pb-0 px-1">
-              <CardTitle className="text-md font-medium text-slate-500">Pending Amount</CardTitle>
-            </CardHeader>
-            <CardContent className="px-1 py-0">
-              {isStateLoading ? (
-                <Skeleton className="h-6 w-16" />
-              ) : (
-                <div className="flex items-center">
-                  <div className="text-lg font-bold text-slate-900">{formatCurrency(pendingAmount)}</div>
-                </div>
-              )}
-              <span className="text-xs">
-                <span className="bg-green-100 text-green-800  pl-2 pr-2 pt-0 pb-0">{pendingInvoices} pending</span>
-              </span>
-            </CardContent>
-          </Card>
-
-          {/* Paid Amount Card */}
-          <Card className="py-1 px-1">
-            <CardHeader className="pb-0 px-1">
-              <CardTitle className="text-md font-medium text-slate-500 ">Paid Amount</CardTitle>
-            </CardHeader>
-            <CardContent className="px-1 py-0">
-              {isStateLoading ? (
-                <Skeleton className="h-6 w-16" />
-              ) : (
-                <div className="flex items-center">
-                  <div className="text-lg font-bold text-slate-900">{formatCurrency(paidAmount)}</div>
-                </div>
-              )}
-              <span className="text-xs">
-                <span className="bg-green-100 text-green-800  pl-2 pr-2 pt-0 pb-0">{paidInvoices} paid</span>
-              </span>
-            </CardContent>
-          </Card>
-
-          {/* Total Revenue Card */}
-          <Card className="py-1 px-1">
-            <CardHeader className="pb-0 px-1">
-              <CardTitle className="text-md font-medium text-slate-500">Total Revenue</CardTitle>
-            </CardHeader>
-            <CardContent className="px-1 py-0">
-              {isStateLoading ? (
-                <Skeleton className="h-6 w-16" />
-              ) : (
-                <div className="flex items-center">
-                  <div className="text-lg font-bold text-slate-900">{formatCurrency(paidAmount + pendingAmount)}</div>
-                </div>
-              )}
-              <span className="text-xs text-slate-500">All time</span>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Tabs and Content */}
-        <Tabs defaultValue="all" className="mb-8">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
-            <TabsList className="mb-4 sm:mb-0">
-              <TabsTrigger value="all" onClick={() => setStatusFilter("all")}>
-                All Invoices
-              </TabsTrigger>
-              <TabsTrigger value="pending" onClick={() => setStatusFilter("pending")}>
-                Pending
-              </TabsTrigger>
-              <TabsTrigger value="paid" onClick={() => setStatusFilter("paid")}>
-                Paid
-              </TabsTrigger>
-            </TabsList>
-
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              <Input
-                placeholder="Search invoices..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="max-w-md"
-                disabled={isStateLoading}
-              />
-
-              {selectedSpreadsheetUrl && (
-                <div className="flex gap-2">
-                <Button
-                  onClick={handleRefresh}
-                  className="bg-green-600 text-white hover:bg-green-700"
-                  disabled={isStateLoading}
-                >
-                  <RefreshCw className={`mr-2 h-4 w-4 ${isStateLoading ? "animate-spin" : ""}`} />
-                  Refresh
-                </Button>
-                  <Button
-                    onClick={() => {
-                      const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
-                      const invoicesSheetUrl = invoicesSheet?.sheetUrl
-                      console.log('Navigating to create invoice with URL:', invoicesSheetUrl)
-                      navigate("/create-invoice", {
-                        state: { 
-                          selectedSpreadsheetUrl: invoicesSheetUrl,
-                          key: Date.now() // Add a unique key to force remount
-                        }
-                      })
-                    }}
-                    className="bg-green-600 text-white hover:bg-green-600 font-bold shadow-lg w-full sm:w-auto"
-                    disabled={isStateLoading}
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create Invoice
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <TabsContent value="all" className="mt-0">
-            {renderInvoiceTable()}
-          </TabsContent>
-          <TabsContent value="pending" className="mt-0">
-            {renderInvoiceTable()}
-          </TabsContent>
-          <TabsContent value="paid" className="mt-0">
-            {renderInvoiceTable()}
-          </TabsContent>
-        </Tabs>
-      </div>
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure you want to delete this invoice?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the invoice
-              {invoiceToDelete && <span className="font-medium"> #{invoiceToDelete.id}</span>}.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={async () => {
-                if (!invoiceToDelete) return
-
-                try {
-                  const {
-                    data: { session },
-                    error: sessionError,
-                  } = await supabase.auth.getSession()
-
-                  if (sessionError) {
-                    throw new Error(sessionError.message)
-                  }
-
-                  const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/delete-invoice", {
-                    method: "DELETE",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${session?.provider_token}`,
-                      "X-Supabase-Token": session?.access_token || "",
-                    },
-                    body: JSON.stringify({ invoiceId: invoiceToDelete.id }),
-                  })
-
-                  if (!response.ok) {
-                    const errorData = await response.json()
-                    throw new Error(errorData.error || "Failed to delete invoice")
-                  }
-
-                  // Update local state by removing the deleted invoice
-                  const updatedInvoices = invoices.filter((inv) => inv.id !== invoiceToDelete.id)
-                  setInvoices(updatedInvoices)
-                  if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
-
-                  toast({
-                    title: "Invoice Deleted",
-                    description: "Invoice has been deleted successfully.",
-                  })
-                } catch (error) {
-                  toast({
-                    title: "Error",
-                    description: error instanceof Error ? error.message : "Failed to delete invoice",
-                    variant: "destructive",
-                  })
-                } finally {
-                  setInvoiceToDelete(null)
-                  setIsDeleteDialogOpen(false)
-                }
-              }}
-              className="bg-red-600 focus:ring-red-600"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Bulk Delete Confirmation Dialog */}
-      <AlertDialog open={isBulkDeleteDialogOpen} onOpenChange={setIsBulkDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure you want to delete these invoices?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete {selectedInvoices.size} selected invoice(s).
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleBulkDelete} className="bg-red-600 focus:ring-red-600">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Partial Payment Sidebar */}
-      <Sheet open={isPartialPaymentModalOpen} onOpenChange={setIsPartialPaymentModalOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
-          <SheetHeader className="mb-4">
-            <SheetTitle className="text-xl">Record Partial Payment</SheetTitle>
-            <SheetDescription>Enter the payment amount and date for invoice #{selectedInvoice?.id}</SheetDescription>
-          </SheetHeader>
-
-          <div className="grid gap-6 py-4">
-            <div className="grid gap-3">
-              <Label htmlFor="amount" className="text-sm font-medium">
-                Payment Amount
-              </Label>
-              <Input
-                id="amount"
-                type="number"
-                value={partialPaymentAmount}
-                onChange={(e) => setPartialPaymentAmount(e.target.value)}
-                placeholder="Enter amount"
-                min="0"
-                max={selectedInvoice?.amount}
-                step="0.01"
-                className="w-full"
-              />
-              <p className="text-sm bg-green-100 text-green-800 px-3 py-2 rounded-md font-medium">
-                Total invoice amount: {formatCurrency(selectedInvoice?.amount || 0)}
-              </p>
-            </div>
-
-            <div className="grid gap-3">
-              <Label className="text-sm font-medium">Payment Date</Label>
-              <div className="border rounded-md p-3 bg-white">
-                <Calendar
-                  mode="single"
-                  selected={paymentDate}
-                  onSelect={(date) => date && setPaymentDate(date)}
-                  className="mx-auto"
-                  classNames={{
-                    day_selected: "bg-green-600 text-white hover:bg-green-600 focus:bg-green-600",
-                    day_today: "bg-slate-100 text-slate-900",
-                    day_outside: "text-slate-300",
-                    day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-
-          <SheetFooter className="flex flex-col sm:flex-row gap-3 mt-6">
-            <Button variant="outline" onClick={() => setIsPartialPaymentModalOpen(false)} className="w-full sm:w-auto">
-              Cancel
-            </Button>
-            <Button onClick={handlePartialPayment} className="w-full sm:w-auto bg-green-600 hover:bg-green-700">
-              Record Payment
-            </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
-    </div>
-  )
-
   function renderInvoiceTable() {
     // Show only skeletons while loading
     if (isStateLoading) {
@@ -1380,6 +1088,289 @@ export default function Dashboard() {
       </Card>
     )
   }
+
+  return (
+    <div className="min-h-screen w-full font-AfacadFlux p-6">
+      {/* Stats Cards Section */}
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8">
+        {/* Total Invoices Card */}
+        <Card className="py-1 px-1">
+          <CardHeader className="pb-0 px-1">
+            <CardTitle className="text-md font-medium text-slate-500">Total Invoices</CardTitle>
+          </CardHeader>
+          <CardContent className="px-1 py-0">
+            {isStateLoading ? (
+              <Skeleton className="h-6 w-16" />
+            ) : (
+              <div className="flex items-center">
+                <div className="text-lg font-bold text-slate-900">{totalInvoices}</div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Pending Amount Card */}
+        <Card className="py-1 px-1">
+          <CardHeader className="pb-0 px-1">
+            <CardTitle className="text-md font-medium text-slate-500">Pending Amount</CardTitle>
+          </CardHeader>
+          <CardContent className="px-1 py-0">
+            {isStateLoading ? (
+              <Skeleton className="h-6 w-16" />
+            ) : (
+              <div className="flex items-center">
+                <div className="text-lg font-bold text-slate-900">{formatCurrency(pendingAmount)}</div>
+              </div>
+            )}
+            <span className="text-xs">
+              <span className="bg-green-100 text-green-800  pl-2 pr-2 pt-0 pb-0">{pendingInvoices} pending</span>
+            </span>
+          </CardContent>
+        </Card>
+
+        {/* Paid Amount Card */}
+        <Card className="py-1 px-1">
+          <CardHeader className="pb-0 px-1">
+            <CardTitle className="text-md font-medium text-slate-500 ">Paid Amount</CardTitle>
+          </CardHeader>
+          <CardContent className="px-1 py-0">
+            {isStateLoading ? (
+              <Skeleton className="h-6 w-16" />
+            ) : (
+              <div className="flex items-center">
+                <div className="text-lg font-bold text-slate-900">{formatCurrency(paidAmount)}</div>
+              </div>
+            )}
+            <span className="text-xs">
+              <span className="bg-green-100 text-green-800  pl-2 pr-2 pt-0 pb-0">{paidInvoices} paid</span>
+            </span>
+          </CardContent>
+        </Card>
+
+        {/* Total Revenue Card */}
+        <Card className="py-1 px-1">
+          <CardHeader className="pb-0 px-1">
+            <CardTitle className="text-md font-medium text-slate-500">Total Revenue</CardTitle>
+          </CardHeader>
+          <CardContent className="px-1 py-0">
+            {isStateLoading ? (
+              <Skeleton className="h-6 w-16" />
+            ) : (
+              <div className="flex items-center">
+                <div className="text-lg font-bold text-slate-900">{formatCurrency(paidAmount + pendingAmount)}</div>
+              </div>
+            )}
+            <span className="text-xs text-slate-500">All time</span>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Tabs and Content */}
+      <Tabs defaultValue="all" className="mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
+          <TabsList className="mb-4 sm:mb-0">
+            <TabsTrigger value="all" onClick={() => setStatusFilter("all")}>
+              All Invoices
+            </TabsTrigger>
+            <TabsTrigger value="pending" onClick={() => setStatusFilter("pending")}>
+              Pending
+            </TabsTrigger>
+            <TabsTrigger value="paid" onClick={() => setStatusFilter("paid")}>
+              Paid
+            </TabsTrigger>
+          </TabsList>
+
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <Input
+              placeholder="Search invoices..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="max-w-md"
+              disabled={isStateLoading}
+            />
+
+            {selectedSpreadsheetUrl && (
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleRefresh}
+                  className="bg-green-600 text-white hover:bg-green-700"
+                  disabled={isStateLoading}
+                >
+                  <RefreshCw className={`mr-2 h-4 w-4 ${isStateLoading ? "animate-spin" : ""}`} />
+                  Refresh
+                </Button>
+                <Button
+                  onClick={() => {
+                    const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
+                    const invoicesSheetUrl = invoicesSheet?.sheetUrl
+                    console.log('Navigating to create invoice with URL:', invoicesSheetUrl)
+                    navigate("/create-invoice", {
+                      state: { 
+                        selectedSpreadsheetUrl: invoicesSheetUrl,
+                        key: Date.now() // Add a unique key to force remount
+                      }
+                    })
+                  }}
+                  className="bg-green-600 text-white hover:bg-green-600 font-bold shadow-lg w-full sm:w-auto"
+                  disabled={isStateLoading}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Invoice
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <TabsContent value="all" className="mt-0">
+          {renderInvoiceTable()}
+        </TabsContent>
+        <TabsContent value="pending" className="mt-0">
+          {renderInvoiceTable()}
+        </TabsContent>
+        <TabsContent value="paid" className="mt-0">
+          {renderInvoiceTable()}
+        </TabsContent>
+      </Tabs>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete this invoice?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the invoice
+              {invoiceToDelete ? <span className="font-medium"> #{invoiceToDelete.id}</span> : null}.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                if (!invoiceToDelete) return
+                try {
+                  const {
+                    data: { session },
+                    error: sessionError,
+                  } = await supabase.auth.getSession()
+                  if (sessionError) {
+                    throw new Error(sessionError.message)
+                  }
+                  const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/delete-invoice", {
+                    method: "DELETE",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${session?.provider_token}`,
+                      "X-Supabase-Token": session?.access_token || "",
+                    },
+                    body: JSON.stringify({ invoiceId: invoiceToDelete.id }),
+                  })
+                  if (!response.ok) {
+                    const errorData = await response.json()
+                    throw new Error(errorData.error || "Failed to delete invoice")
+                  }
+                  // Update local state by removing the deleted invoice
+                  const updatedInvoices = invoices.filter((inv) => inv.id !== invoiceToDelete.id)
+                  setInvoices(updatedInvoices)
+                  if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
+                  toast({
+                    title: "Invoice Deleted",
+                    description: "Invoice has been deleted successfully.",
+                  })
+                } catch (error) {
+                  toast({
+                    title: "Error",
+                    description: error instanceof Error ? error.message : "Failed to delete invoice",
+                    variant: "destructive",
+                  })
+                } finally {
+                  setInvoiceToDelete(null)
+                  setIsDeleteDialogOpen(false)
+                }
+              }}
+              className="bg-red-600 focus:ring-red-600"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Delete Confirmation Dialog */}
+      <AlertDialog open={isBulkDeleteDialogOpen} onOpenChange={setIsBulkDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete these invoices?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete {selectedInvoices.size} selected invoice(s).
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkDelete} className="bg-red-600 focus:ring-red-600">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Partial Payment Sidebar */}
+      <Sheet open={isPartialPaymentModalOpen} onOpenChange={setIsPartialPaymentModalOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+          <SheetHeader className="mb-4">
+            <SheetTitle className="text-xl">Record Partial Payment</SheetTitle>
+            <SheetDescription>Enter the payment amount and date for invoice #{selectedInvoice?.id}</SheetDescription>
+          </SheetHeader>
+          <div className="grid gap-6 py-4">
+            <div className="grid gap-3">
+              <Label htmlFor="amount" className="text-sm font-medium">
+                Payment Amount
+              </Label>
+              <Input
+                id="amount"
+                type="number"
+                value={partialPaymentAmount}
+                onChange={(e) => setPartialPaymentAmount(e.target.value)}
+                placeholder="Enter amount"
+                min="0"
+                max={selectedInvoice?.amount}
+                step="0.01"
+                className="w-full"
+              />
+              <p className="text-sm bg-green-100 text-green-800 px-3 py-2 rounded-md font-medium">
+                Total invoice amount: {formatCurrency(selectedInvoice?.amount || 0)}
+              </p>
+            </div>
+            <div className="grid gap-3">
+              <Label className="text-sm font-medium">Payment Date</Label>
+              <div className="border rounded-md p-3 bg-white">
+                <Calendar
+                  mode="single"
+                  selected={paymentDate}
+                  onSelect={(date) => date && setPaymentDate(date)}
+                  className="mx-auto"
+                  classNames={{
+                    day_selected: "bg-green-600 text-white hover:bg-green-600 focus:bg-green-600",
+                    day_today: "bg-slate-100 text-slate-900",
+                    day_outside: "text-slate-300",
+                    day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+          <SheetFooter className="flex flex-col sm:flex-row gap-3 mt-6">
+            <Button variant="outline" onClick={() => setIsPartialPaymentModalOpen(false)} className="w-full sm:w-auto">
+              Cancel
+            </Button>
+            <Button onClick={handlePartialPayment} className="w-full sm:w-auto bg-green-600 hover:bg-green-700">
+              Record Payment
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+    </div>
+  )
 }
 
 // =====================

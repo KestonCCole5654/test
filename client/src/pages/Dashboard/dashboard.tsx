@@ -1095,7 +1095,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen w-full font-cal-sans px-6 pb-6 bg-white">
+    <div className="min-h-screen w-full text-gray-500 font-cal-sans px-6 pb-6 bg-white">
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
         <div className="flex gap-0 border border-gray-200 rounded-md bg-white">

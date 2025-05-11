@@ -84,7 +84,7 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
             <span className="text-white text-md">$</span>
           </div>
           {!collapsed && (
-            <span className="text-lg  text-green-800">SheetBills<sup className="text-xs text-green-800">TM</sup></span>
+            <span className="text-xl  text-green-800">Sheetbills<sup className="text-xs text-green-800">TM</sup></span>
           )}
         </Link>
         <Button 

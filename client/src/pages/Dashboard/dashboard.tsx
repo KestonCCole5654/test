@@ -841,21 +841,29 @@ export default function Dashboard() {
                             <div className="font-medium">{formatDate(invoice.dueDate)}</div>
                           </TableCell>
                           <TableCell className="px-6 py-4">
-                            <Badge
-                              variant={invoice.status === "Paid" ? "default" : "secondary"}
-                              className={
-                                invoice.status === "Paid"
-                                  ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50 text-md px-4 py-1"
-                                  : invoice.status === "Partially Paid"
-                                    ? "bg-green-50 text-green-700 hover:bg-green-50 text-md px-4 py-1"
-                                    : "bg-amber-50 text-amber-700 hover:bg-amber-50 text-md px-4 py-1"
-                              }
-                            >
-                              {invoice.status}
-                              {invoice.status === "Partially Paid" && invoice.paidAmount && (
-                                <span className="ml-2 text-sm">({formatCurrency(invoice.paidAmount)})</span>
-                              )}
-                            </Badge>
+                            {invoice.status === 'Paid' ? (
+                              <span className="px-6 py-2 rounded-full border-2 font-bold text-base" style={{
+                                background: '#E6F2FF',
+                                color: '#1565C0',
+                                borderColor: '#90CAF9',
+                                letterSpacing: '0.01em',
+                              }}>
+                                Paid
+                              </span>
+                            ) : invoice.status === 'Pending' ? (
+                              <span className="px-6 py-2 rounded-full border-2 font-bold text-base" style={{
+                                background: '#FFFBCC',
+                                color: '#A67C00',
+                                borderColor: '#FFD600',
+                                letterSpacing: '0.01em',
+                              }}>
+                                Pending
+                              </span>
+                            ) : (
+                              <span className="px-6 py-2 rounded-full border-2 font-bold text-base bg-gray-100 text-gray-700 border-gray-300" style={{letterSpacing: '0.01em'}}>
+                                {invoice.status}
+                              </span>
+                            )}
                           </TableCell>
                           <TableCell className="text-right font-medium px-6 py-4">{formatCurrency(invoice.amount)}</TableCell>
                           <TableCell className="text-center px-6 py-4">
@@ -1230,7 +1238,29 @@ export default function Dashboard() {
                     </TableCell>
                     <TableCell className="px-6 py-4 whitespace-nowrap">{formatDate(invoice.dueDate)}</TableCell>
                     <TableCell className="px-6 py-4">
-                      <span className={`px-4 py-1 rounded-full text-xs font-semibold ${invoice.status === 'Paid' ? 'bg-green-50 text-green-700 border border-green-200' : invoice.status === 'Pending' ? 'bg-yellow-50 text-yellow-700 border border-yellow-200' : 'bg-green-50 text-green-700 border border-green-200'}`}>{invoice.status}</span>
+                      {invoice.status === 'Paid' ? (
+                        <span className="px-6 py-2 rounded-full border-2 font-bold text-base" style={{
+                          background: '#E6F2FF',
+                          color: '#1565C0',
+                          borderColor: '#90CAF9',
+                          letterSpacing: '0.01em',
+                        }}>
+                          Paid
+                        </span>
+                      ) : invoice.status === 'Pending' ? (
+                        <span className="px-6 py-2 rounded-full border-2 font-bold text-base" style={{
+                          background: '#FFFBCC',
+                          color: '#A67C00',
+                          borderColor: '#FFD600',
+                          letterSpacing: '0.01em',
+                        }}>
+                          Pending
+                        </span>
+                      ) : (
+                        <span className="px-6 py-2 rounded-full border-2 font-bold text-base bg-gray-100 text-gray-700 border-gray-300" style={{letterSpacing: '0.01em'}}>
+                          {invoice.status}
+                        </span>
+                      )}
                     </TableCell>
                     <TableCell className="text-right font-medium px-6 py-4">{formatCurrency(invoice.amount)}</TableCell>
                     <TableCell className="text-center px-8 py-6">

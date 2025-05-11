@@ -842,25 +842,15 @@ export default function Dashboard() {
                           </TableCell>
                           <TableCell className="px-6 py-4">
                             {invoice.status === 'Paid' ? (
-                              <span className="px-4 py-1.5 rounded-full border font-medium text-sm" style={{
-                                background: '#E6F2FF',
-                                color: '#1565C0',
-                                borderColor: '#90CAF9',
-                                letterSpacing: '0.01em',
-                              }}>
+                              <span className="inline-block px-3 py-1 rounded-md border border-green-200 bg-green-50 text-green-700 text-xs font-medium">
                                 Paid
                               </span>
                             ) : invoice.status === 'Pending' ? (
-                              <span className="px-4 py-1.5 rounded-full border font-medium text-sm" style={{
-                                background: '#FFFBCC',
-                                color: '#A67C00',
-                                borderColor: '#FFD600',
-                                letterSpacing: '0.01em',
-                              }}>
+                              <span className="inline-block px-3 py-1 rounded-md border border-yellow-200 bg-yellow-50 text-yellow-800 text-xs font-medium">
                                 Pending
                               </span>
                             ) : (
-                              <span className="px-4 py-1.5 rounded-full border font-medium text-sm bg-gray-100 text-gray-700 border-gray-300" style={{letterSpacing: '0.01em'}}>
+                              <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium">
                                 {invoice.status}
                               </span>
                             )}
@@ -1095,7 +1085,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen w-full font-cal-sans px-6 pb-6 bg-white text-gray-700">
+    <div className="min-h-screen w-full font-cal-sans px-6 pb-6  text-gray-700">
       <h1 className="text-2xl font-bold text-gray-800 mb-4 mt-10">Invoices</h1>
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
@@ -1239,25 +1229,15 @@ export default function Dashboard() {
                     <TableCell className="px-6 py-4 whitespace-nowrap">{formatDate(invoice.dueDate)}</TableCell>
                     <TableCell className="px-6 py-4">
                       {invoice.status === 'Paid' ? (
-                        <span className="px-4 py-1.5 rounded-full border font-medium text-sm" style={{
-                          background: '#E6F2FF',
-                          color: '#1565C0',
-                          borderColor: '#90CAF9',
-                          letterSpacing: '0.01em',
-                        }}>
+                        <span className="inline-block px-3 py-1 rounded-md border border-green-200 bg-green-50 text-green-700 text-xs font-medium">
                           Paid
                         </span>
                       ) : invoice.status === 'Pending' ? (
-                        <span className="px-4 py-1.5 rounded-full border text-sm" style={{
-                          background: '#FFFBCC',
-                          color: '#A67C00',
-                          borderColor: '#FFD600',
-                          letterSpacing: '0.01em',
-                        }}>
+                        <span className="inline-block px-3 py-1 rounded-md border border-yellow-200 bg-yellow-50 text-yellow-800 text-xs font-medium">
                           Pending
                         </span>
                       ) : (
-                        <span className="px-4 py-1.5 rounded-full border text-sm bg-gray-100 text-gray-700 border-gray-300" style={{letterSpacing: '0.01em'}}>
+                        <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium">
                           {invoice.status}
                         </span>
                       )}

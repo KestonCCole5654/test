@@ -72,7 +72,7 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
   return (
     <div 
       className={cn(
-        "flex flex-col h-screen bg-white border-r border-gray-200 transition-all duration-300",
+      "flex flex-col h-screen border-r border-gray-200 transition-all duration-300 bg-gray-50",
         collapsed ? "w-[70px]" : "w-[250px]"
       )}
     >

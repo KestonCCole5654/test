@@ -1120,14 +1120,12 @@ export default function Dashboard() {
           ].map((tab) => (
             <button
               key={tab.value}
-              className={`px-6 py-2 text-sm font-medium transition-colors border border-gray-600 focus:outline-none ${
+              className={`px-6 py-2 text-sm transition-colors border border-gray-600 focus:outline-none ${
                 statusFilter === tab.value
                   ? "text-gray-700 border-gray-500 font-semibold bg-white" // active
                   : "text-gray-700 border-transparent font-normal bg-white hover:text-green-700 hover:font-bold"
-              } ${tab.value === "all" ? "rounded-l-md" : ""} ${tab.value === "trash" ? "rounded-r-md" : ""}`}
-              style={{
-                borderLeftWidth: 4,
-              }}
+              } `}
+              
               onClick={() => setStatusFilter(tab.value)}
             >
               {tab.label}

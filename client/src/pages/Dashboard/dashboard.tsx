@@ -1111,7 +1111,7 @@ export default function Dashboard() {
       <h1 className="text-3xl  text-gray-800 mb-6 mt-10">Invoices</h1>
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
-        <div className="flex gap-0 rounded-md bg-white">
+        <div className="flex gap-0  bg-white">
           {[
             { label: "All", value: "all" },
             { label: "Pending", value: "pending" },
@@ -1120,10 +1120,10 @@ export default function Dashboard() {
           ].map((tab) => (
             <button
               key={tab.value}
-              className={`px-6 py-2 text-sm transition-colors border border-gray-600 focus:outline-none ${
+              className={`px-6 py-2 text-sm transition-colors border border-gray-100 focus:outline-none ${
                 statusFilter === tab.value
-                  ? "text-gray-700 border-gray-500  bg-white" // active
-                  : "text-gray-700 border-gray-500  bg-white "
+                  ? "text-gray-700 border-gray-100  bg-white" // active
+                  : "text-gray-700 border-gray-100  bg-white "
               } `}
               
               onClick={() => setStatusFilter(tab.value)}

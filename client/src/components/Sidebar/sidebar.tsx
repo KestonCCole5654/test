@@ -11,7 +11,8 @@ import {
   FileText, 
   HelpCircle, 
   ChevronRight, 
-  ChevronLeft 
+  ChevronLeft, 
+  Archive
 } from "lucide-react"
 import supabase from "../Auth/supabaseClient"
 import { Button } from "../ui/button"
@@ -110,8 +111,8 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
                 collapsed && "justify-center"
               )}
             >
-              <LayoutDashboard size={20} className="flex-shrink-0" />
-              {!collapsed && <span className="ml-3">Dashboard</span>}
+              <Archive size={20} className="flex-shrink-0" />
+              {!collapsed && <span className="ml-3">Invoices</span>}
             </Link>
           </li>
         

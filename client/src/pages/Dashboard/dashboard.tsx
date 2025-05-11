@@ -725,7 +725,7 @@ export default function Dashboard() {
                   variant="outline"
                   size="sm"
                   onClick={handleSelectAllVisible}
-                  className="font-medium"
+                 
                   disabled={currentItems.length === 0}
                 >
                   {allVisibleSelected ? "Deselect All" : "Select All"}

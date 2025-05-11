@@ -11,7 +11,7 @@ const SidebarLayout = () => {
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <div className={cn(
         "flex-1 overflow-auto transition-all duration-300",
-        collapsed ? "ml-[70px]" : "ml-[250px]"
+        collapsed ? "ml-2" : "ml-4"
       )}>
         <main className="h-full">
           <Outlet />

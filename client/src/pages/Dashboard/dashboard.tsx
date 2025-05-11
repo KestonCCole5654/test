@@ -1239,7 +1239,7 @@ export default function Dashboard() {
                     <TableCell className="px-6 py-4 whitespace-nowrap">{formatDate(invoice.dueDate)}</TableCell>
                     <TableCell className="px-6 py-4">
                       {invoice.status === 'Paid' ? (
-                        <span className="px-6 py-2 rounded-full border-2 font-bold text-base" style={{
+                        <span className="px-4 py-1.5 rounded-full border-2 font-bold text-base" style={{
                           background: '#E6F2FF',
                           color: '#1565C0',
                           borderColor: '#90CAF9',
@@ -1248,7 +1248,7 @@ export default function Dashboard() {
                           Paid
                         </span>
                       ) : invoice.status === 'Pending' ? (
-                        <span className="px-6 py-2 rounded-full border-2 font-bold text-base" style={{
+                        <span className="px-4 py-1.5 rounded-full border-2 font-bold text-base" style={{
                           background: '#FFFBCC',
                           color: '#A67C00',
                           borderColor: '#FFD600',
@@ -1257,7 +1257,7 @@ export default function Dashboard() {
                           Pending
                         </span>
                       ) : (
-                        <span className="px-6 py-2 rounded-full border-2 font-bold text-base bg-gray-100 text-gray-700 border-gray-300" style={{letterSpacing: '0.01em'}}>
+                        <span className="px-4 py-1.5 rounded-full border-2 font-bold text-base bg-gray-100 text-gray-700 border-gray-300" style={{letterSpacing: '0.01em'}}>
                           {invoice.status}
                         </span>
                       )}

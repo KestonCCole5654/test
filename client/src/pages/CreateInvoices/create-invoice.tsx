@@ -952,20 +952,18 @@ ${businessData.phone}`
               <div className="text-sm text-gray-500 mt-2">Amount Due:</div>
               <div className="font-bold text-xl text-green-700">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
             </div>
-            <Button
-              variant="outline"
-              className="ml-auto mt-4 sm:mt-0"
-              onClick={() => setIsFormExpanded(true)}
-            >
-              Edit Invoice
-            </Button>
-          </div>
-
-          {/* Action Buttons Row */}
-          <div className="flex flex-wrap justify-center gap-4 mb-6">
-            <Button variant="outline" onClick={handleEmailInvoice}>Email Invoice</Button>
-            <Button variant="outline" onClick={() => window.print()}>Print</Button>
-            <Button variant="outline" onClick={() => {/* TODO: implement get link */}}>Get Link</Button>
+            <div className="flex flex-col gap-4 sm:gap-2 sm:flex-row sm:items-center ml-auto mt-4 sm:mt-0">
+              <Button
+                variant="default"
+                className="font-bold"
+                onClick={() => setIsFormExpanded(true)}
+              >
+                Edit Invoice
+              </Button>
+              <Button variant="default" className="font-bold" onClick={handleEmailInvoice}>Email Invoice</Button>
+              <Button variant="default" className="font-bold" onClick={() => window.print()}>Print</Button>
+              <Button variant="default" className="font-bold" onClick={() => {/* TODO: implement get link */}}>Get Link</Button>
+            </div>
           </div>
 
           {/* Invoice Preview */}

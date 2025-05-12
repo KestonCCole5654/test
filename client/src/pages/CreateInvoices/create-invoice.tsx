@@ -980,7 +980,7 @@ ${businessData.phone}`
               <span className="text-gray-400">&gt;</span>
               <span className="text-gray-500 font-medium px-2">Invoices</span>
               <span className="text-gray-400">&gt;</span>
-              <span className="text-black font-bold px-2 bg-gray-100 rounded">
+              <span className="text-black font-medium px-2 bg-gray-100 rounded">
                 {invoiceToEdit ? "Edit Invoice" : "New Invoice"}
               </span>
             </nav>

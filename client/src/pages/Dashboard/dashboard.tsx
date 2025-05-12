@@ -705,7 +705,7 @@ export default function Dashboard() {
 
     return (
       <Card>
-        <CardContent className="p-0 font-cal-cfont-cal-sans">
+        <CardContent className="p-0 font-inter">
           <div className="flex flex-col gap-2">
             {bulkDeleteMessage && (
               <div className="flex items-center justify-between bg-green-50 border border-green-200 text-green-800 rounded px-4 py-2 mb-2">
@@ -850,29 +850,29 @@ export default function Dashboard() {
                           <TableCell className="px-6 py-4">
                             <div className="flex items-center gap-3">
                               <div className="flex flex-col">
-                                <span className="font-medium">
+                                <span className="font-medium font-inter">
                                   {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}
                                 </span>
-                                <span className="text-xs text-slate-500">
+                                <span className="text-xs text-slate-500 font-inter">
                                   {typeof invoice.customer === "object" ? invoice.customer.email : ""}
                                 </span>
                               </div>
                             </div>
                           </TableCell>
                           <TableCell className="px-6 py-4 whitespace-nowrap min-w-[180px]">
-                            <div className="font-medium">{formatDate(invoice.dueDate)}</div>
+                            <div className="font-medium font-inter">{formatDate(invoice.dueDate)}</div>
                           </TableCell>
                           <TableCell className="px-6 py-4">
                             {invoice.status === "Paid" ? (
-                              <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium">
+                              <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium font-inter">
                                 Paid
                               </span>
                             ) : invoice.status === "Pending" ? (
-                              <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-100 text-gray-700 text-xs font-medium">
+                              <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-100 text-gray-700 text-xs font-medium font-inter">
                                 Pending
                               </span>
                             ) : (
-                              <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium">
+                              <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium font-inter">
                                 {invoice.status}
                               </span>
                             )}
@@ -882,7 +882,7 @@ export default function Dashboard() {
                           </TableCell>
                           <TableCell className="text-center px-6 py-4">
                             {invoice.status === "Pending" && new Date(invoice.dueDate) < new Date() ? (
-                              <span className="text-red-600 font-medium">{getOverdueDays(invoice.dueDate)} days</span>
+                              <span className="text-red-600 font-medium font-inter">{getOverdueDays(invoice.dueDate)} days</span>
                             ) : (
                               <span className="text-slate-400">-</span>
                             )}
@@ -1107,7 +1107,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen w-full font-cal-sans px-6 pb-6  text-gray-700">
+    <div className="min-h-screen w-full font-inter px-6 pb-6  text-gray-700">
       <h1 className="text-3xl  text-green-800 mb-6 mt-10">Invoices</h1>
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
@@ -1237,7 +1237,7 @@ export default function Dashboard() {
                     <TableCell className="px-6 py-4 whitespace-nowrap">{invoice.id}</TableCell>
                     <TableCell className="px-6 py-4">
                       <div className="flex flex-col">
-                        <span className="font-medium">
+                        <span className="font-medium font-inter">
                           {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}
                         </span>
                         <span className="text-xs text-gray-400">
@@ -1248,15 +1248,15 @@ export default function Dashboard() {
                     <TableCell className="px-6 py-4 whitespace-nowrap">{formatDate(invoice.dueDate)}</TableCell>
                     <TableCell className="px-6 py-4">
                       {invoice.status === "Paid" ? (
-                        <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium">
+                        <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium font-inter">
                           Paid
                         </span>
                       ) : invoice.status === "Pending" ? (
-                        <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-100 text-gray-700 text-xs font-medium">
+                        <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-100 text-gray-700 text-xs font-medium font-inter">
                           Pending
                         </span>
                       ) : (
-                        <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium">
+                        <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium font-inter">
                           {invoice.status}
                         </span>
                       )}
@@ -1446,7 +1446,7 @@ export default function Dashboard() {
             <AlertDialogTitle>Are you sure you want to delete this invoice?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete the invoice
-              {invoiceToDelete ? <span className="font-medium"> #{invoiceToDelete.id}</span> : null}.
+              {invoiceToDelete ? <span className="font-medium font-inter"> #{invoiceToDelete.id}</span> : null}.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -1529,7 +1529,7 @@ export default function Dashboard() {
           </SheetHeader>
           <div className="grid gap-6 py-4">
             <div className="grid gap-3">
-              <Label htmlFor="amount" className="text-sm font-medium">
+              <Label htmlFor="amount" className="text-sm font-medium font-inter">
                 Payment Amount
               </Label>
               <Input
@@ -1548,7 +1548,7 @@ export default function Dashboard() {
               </p>
             </div>
             <div className="grid gap-3">
-              <Label className="text-sm font-medium">Payment Date</Label>
+              <Label className="text-sm font-medium font-inter">Payment Date</Label>
               <div className="border rounded-md p-3 bg-white">
                 <Calendar
                   mode="single"
@@ -1559,7 +1559,7 @@ export default function Dashboard() {
                     day_selected: "bg-green-600 text-white hover:bg-green-600 focus:bg-green-600",
                     day_today: "bg-slate-100 text-slate-900",
                     day_outside: "text-slate-300",
-                    day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
+                    day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 font-inter",
                   }}
                 />
               </div>

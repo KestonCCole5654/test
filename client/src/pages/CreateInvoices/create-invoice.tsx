@@ -942,8 +942,8 @@ ${businessData.phone}`
       {/* Preview Mode */}
       {!isFormExpanded && (
         <div className="w-full max-w-3xl mx-auto mt-8">
-          {/* Summary Card */}
-          <div className="bg-gray-50 border rounded-lg shadow p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+          <div className="grid grid-cols-2 gap-4 mb-6 bg-gray-50 border rounded-lg shadow p-6">
+            {/* Row 1: Summary (left), Edit Invoice (right) */}
             <div className="space-y-1">
               <div className="text-sm text-gray-500 font-inter font-medium ">Invoice #:</div>
               <div className="text-lg text-gray-800 font-inter font-medium">{invoiceData.invoiceNumber}</div>
@@ -952,21 +952,23 @@ ${businessData.phone}`
               <div className="text-sm text-gray-500 mt-2 font-inter font-medium">Amount Due:</div>
               <div className="text-xl text-green-700 font-inter font-medium">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
             </div>
-            <div className="flex flex-col gap-4 sm:gap-2 sm:flex-row sm:items-center ml-auto mt-4 sm:mt-0">
+            <div className="flex flex-col items-end gap-4">
               <Button
                 variant="default"
-                className="font-inter font-medium"
+                className="font-inter font-medium mb-2"
                 onClick={() => setIsFormExpanded(true)}
               >
                 Edit Invoice
               </Button>
             </div>
-          </div>
-            <div className="flex flex-row gap-4 sm:gap-2 sm:flex-row sm:items-center ml-auto mt-4 sm:mt-0">
+            {/* Row 2: (empty left), action buttons right */}
+            <div></div>
+            <div className="flex flex-row gap-4 sm:gap-2 sm:items-center">
               <Button variant="default" className="font-inter font-medium" onClick={handleEmailInvoice}>Email Invoice</Button>
-                <Button variant="default" className="font-inter font-medium" onClick={() => window.print()}>Print</Button>
-                <Button variant="default" className="font-inter font-medium" onClick={() => {/* TODO: implement get link */}}>Get Link</Button>
+              <Button variant="default" className="font-inter font-medium" onClick={() => window.print()}>Print</Button>
+              <Button variant="default" className="font-inter font-medium" onClick={() => {/* TODO: implement get link */}}>Get Link</Button>
             </div>
+          </div>
 
           {/* Invoice Preview */}
           <div className="bg-white rounded-lg shadow-lg p-8 min-h-[600px] flex items-center justify-center">

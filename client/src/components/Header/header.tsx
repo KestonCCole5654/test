@@ -74,16 +74,16 @@ const Header = () => {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gray-50 bg-white shadow-xs">
+    <header className="sticky top-0 font-inter z-50 border-b border-gray-50 bg-white shadow-xs">
       <div className="container max-w-8xl mx-auto sm:px-6">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded bg-green-600 flex items-center justify-center">
+              <div className="h-8 w-8 rounded bg-green-800 flex items-center justify-center">
                 <span className="text-white font-bold text-lg">$</span>
               </div>
-              <span className="text-xl font-bold text-green-600">SHEETBILLS <sup className="text-xs text-green-700">TM</sup></span>
+              <span className="text-lg font-bold text-green-800">SHEETBILLS <sup className="text-xs text-green-800">TM</sup></span>
             </Link>
           </div>
 
@@ -127,11 +127,7 @@ const Header = () => {
           <div className="hidden md:flex items-center space-x-2">
             {user ? (
               <>
-                
-                <Button variant="ghost" size="icon" className="text-green-700 hover:text-green-800">
-                  <span className="sr-only">Help</span>
-                </Button>
-
+               
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button

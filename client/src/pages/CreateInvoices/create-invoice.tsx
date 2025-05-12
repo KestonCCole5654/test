@@ -945,14 +945,14 @@ ${businessData.phone}`
           {/* Summary Card */}
           <div className="bg-gray-50 border rounded-lg shadow p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
             <div className="space-y-1">
-              <div className="text-sm text-gray-500 font-medium">Invoice #:</div>
-              <div className="text-xl font-bold text-gray-900">{invoiceData.invoiceNumber}</div>
-              <div className="text-sm text-gray-500 font-medium mt-2">Billed To:</div>
-              <div className="text-base font-semibold text-gray-800">{invoiceData.customer.name || 'Customer Name'}</div>
-              <div className="text-sm text-gray-500 font-medium mt-2">Amount Due:</div>
-              <div className="text-2xl font-extrabold text-green-700">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
+              <div className="text-sm text-gray-500">Invoice #:</div>
+              <div className="font-bold text-lg text-gray-800">{invoiceData.invoiceNumber}</div>
+              <div className="text-sm text-gray-500 mt-2">Billed To:</div>
+              <div className="font-medium text-gray-700">{invoiceData.customer.name || 'Customer Name'}</div>
+              <div className="text-sm text-gray-500 mt-2">Amount Due:</div>
+              <div className="font-bold text-xl text-green-700">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
             </div>
-            <div className="flex flex-row gap-4 sm:gap-2 sm:flex-row sm:items-center ml-auto mt-4 sm:mt-0">
+            <div className="flex flex-col gap-4 sm:gap-2 sm:flex-row sm:items-center ml-auto mt-4 sm:mt-0">
               <Button
                 variant="default"
                 className="font-bold"
@@ -960,8 +960,6 @@ ${businessData.phone}`
               >
                 Edit Invoice
               </Button>
-            </div>
-            <div className="flex flex-row gap-4 sm:gap-2 sm:flex-row sm:items-center ml-auto mt-4 sm:mt-0">
               <Button variant="default" className="font-bold" onClick={handleEmailInvoice}>Email Invoice</Button>
               <Button variant="default" className="font-bold" onClick={() => window.print()}>Print</Button>
               <Button variant="default" className="font-bold" onClick={() => {/* TODO: implement get link */}}>Get Link</Button>

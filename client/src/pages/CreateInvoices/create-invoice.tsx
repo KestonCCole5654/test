@@ -964,8 +964,8 @@ ${businessData.phone}`
             {/* Row 2: (empty left), action buttons right */}
             <div></div>
             <div className="flex flex-row gap-4 sm:gap-2 sm:items-center">
-              <Button variant="default" className="font-inter font-medium" onClick={handleEmailInvoice}>Email Invoice</Button>
-              <Button variant="default" className="font-inter font-medium" onClick={() => window.print()}>Print</Button>
+              <Button variant="default" className="font-inter font-medium" onClick={handleEmailInvoice}>Send Invoice Via Email</Button>
+              <Button variant="default" className="font-inter font-medium" onClick={() => window.print()}>Print Invoice</Button>
               <Button variant="default" className="font-inter font-medium" onClick={() => {/* TODO: implement get link */}}>Get Link</Button>
             </div>
           </div>

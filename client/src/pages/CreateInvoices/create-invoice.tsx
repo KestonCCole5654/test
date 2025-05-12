@@ -958,7 +958,7 @@ ${businessData.phone}`
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-                  {invoiceToEdit ? "Invoice Details" : "Create Invoice"}
+                  {invoiceToEdit ? "Invoice Detail" : "Create Invoice"}
                 </h1>
                 {invoiceToEdit && (
                   <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${invoiceToEdit.status === "Paid"
@@ -977,7 +977,7 @@ ${businessData.phone}`
               <p className="mt-2 text-sm sm:text-base text-emerald-50">
                 {invoiceToEdit
                   ? `Invoice #${invoiceData.invoiceNumber} - ${new Date(invoiceData.date).toLocaleDateString()}`
-                  : "Generate and download professional invoices, and Click (Hide form) to view the invoice only"}
+                  : "Generate and download professional invoices. "}
               </p>
             </div>
           </div>

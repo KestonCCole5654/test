@@ -970,12 +970,12 @@ ${businessData.phone}`
         <div className=" mt-0 font-inter w-full py-4 sm:py-8 px-4 mx-auto rounded-b-3xl mb-10">
           <div className="mb-8">
             {/* Breadcrumb Navigation */}
-            <nav className="flex items-center space-x-2 text-sm mb-6">
+            <nav className="flex items-center space-x-2 text-sm mb-3">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate('/dashboard')}
-                className="text-gray-500 hover:text-gray-700 font-light"
+                className="text-gray-500 hover:text-gray-700 font-light px-0"
               >
                 Dashboard
               </Button>
@@ -985,37 +985,28 @@ ${businessData.phone}`
               </span>
             </nav>
 
-            {/* Header Content */}
-            <div className="flex items-center justify-between">
+            {/* Header Content - Tidy, aligned, simple badge */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div>
-                <h1 className="text-2xl font-medium text-gray-900">
+                <h1 className="text-2xl font-semibold text-gray-900 mb-1">
                   {invoiceToEdit ? "Edit Invoice" : "Create New Invoice"}
                 </h1>
-                <p className="mt-1 text-sm text-gray-500 font-light">
+                <p className="text-sm text-gray-500 font-light">
                   {invoiceToEdit
                     ? `Invoice #${invoiceData.invoiceNumber} - ${new Date(invoiceData.date).toLocaleDateString()}`
                     : "Create a professional invoice for your client"}
                 </p>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 mt-2 sm:mt-0">
                 {invoiceToEdit && (
-                  <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                    invoiceToEdit.status === "Paid"
-                      ? "bg-green-50 text-green-700"
-                      : "bg-yellow-50 text-yellow-700"
-                  }`}>
-                    {invoiceToEdit.status === "Paid" ? (
-                      <CheckCircle className="h-3 w-3" />
-                    ) : (
-                      <Clock className="h-3 w-3" />
-                    )}
+                  <span className="bg-green-50 text-green-700 text-xs rounded px-3 py-1 font-medium">
                     {invoiceToEdit.status}
-                  </div>
+                  </span>
                 )}
                 <Button
-                  variant="outline"
+                  variant="default"
                   onClick={() => setIsFormExpanded(!isFormExpanded)}
-                  className="font-light"
+                  className="font-medium px-6 py-2"
                 >
                   {isFormExpanded ? "Hide Form" : "Show Form"}
                 </Button>

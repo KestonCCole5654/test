@@ -999,12 +999,16 @@ ${businessData.phone}`
               </div>
               <div className="flex items-center gap-3 mt-2 sm:mt-0">
                 {invoiceToEdit && (
-                  <span className="bg-green-50 text-green-700 text-xs rounded px-3 py-1 font-medium">
+                  <Button
+                    type="button"
+                    disabled
+                    className="bg-green-700 text-white px-6 py-2 rounded font-medium cursor-default border-none shadow-none hover:bg-green-700 focus:ring-0 focus:outline-none"
+                  >
                     {invoiceToEdit.status}
-                  </span>
+                  </Button>
                 )}
                 <Button
-                  variant="default"
+                  variant="outline"
                   onClick={() => setIsFormExpanded(!isFormExpanded)}
                   className="font-medium px-6 py-2"
                 >

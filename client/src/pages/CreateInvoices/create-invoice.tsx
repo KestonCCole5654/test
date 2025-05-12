@@ -952,7 +952,7 @@ ${businessData.phone}`
               <div className="text-sm text-gray-500 mt-2 font-inter font-medium">Amount Due:</div>
               <div className="text-xl text-green-700 font-inter font-medium">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
             </div>
-            <div className="flex flex-col items-center justify-center gap-4">
+            <div className="flex flex-col items-center  gap-4">
               <Button
                 variant="default"
                 className="font-inter font-medium mb-2"

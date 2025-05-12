@@ -732,7 +732,7 @@ ${businessData.phone}`
 
     return (
       <div
-        className="bg-white w-full font-inter max-w-full box-border flex flex-col justify-start shadow-md p-2"
+        className="bg-white w-full font-inter max-w-full box-border flex flex-col justify-start shadow-sm"
         style={{ minHeight: '287mm', margin: 0 }}
       >
         {/* Header with logo */}
@@ -796,7 +796,7 @@ ${businessData.phone}`
                   <td className="py-3 px-4 text-right">
                     ${formatCurrency(item.price === "" ? 0 : Number(item.price))}
                   </td>
-                  <td className="py-3 px-4 text-right font-medium">
+                  <td className="py-3 px-4 text-right font-inter font-medium">
                     ${formatCurrency(calculateItemTotal(item).total)}
                   </td>
                 </tr>
@@ -1331,8 +1331,8 @@ ${businessData.phone}`
           </div>
         </div>
       )}
-      <footer className="w-full text-center text-xs text-gray-400 mt-10 mb-2">
-        Powered by <span className="font-bold text-green-800">SheetBills™</span>
+      <footer className="w-full font-inter  text-center text-md text-gray-400 mt-10 mb-2">
+        Powered by <span className=" font-inter font-medium text-green-800">SheetBills™</span>
       </footer>
     </>
   )

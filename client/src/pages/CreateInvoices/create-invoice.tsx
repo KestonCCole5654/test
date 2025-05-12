@@ -954,7 +954,7 @@ ${businessData.phone}`
             </div>
             <div className="flex flex-col items-end justify-center  gap-4">
               <Button
-                variant="default"
+                variant="outline"
                 className="font-inter font-medium mb-2"
                 onClick={() => setIsFormExpanded(true)}
               >
@@ -963,9 +963,9 @@ ${businessData.phone}`
             </div>
             {/* Row 2: Buttons centered across both columns */}
             <div className="col-span-2 flex justify-center mt-4">
-              <Button variant="default" className="font-inter font-medium mx-2" onClick={handleEmailInvoice}>Email Invoice</Button>
-              <Button variant="default" className="font-inter font-medium mx-2" onClick={() => window.print()}>Print Invoice</Button>
-              <Button variant="default" className="font-inter font-medium mx-2" onClick={() => {/* TODO: implement get link */}}>Get Invoice Link</Button>
+              <Button variant="outline" className="font-inter font-medium mx-2" onClick={handleEmailInvoice}>Email Invoice</Button>
+              <Button variant="outline" className="font-inter font-medium mx-2" onClick={() => window.print()}>Print Invoice</Button>
+              <Button variant="outline" className="font-inter font-medium mx-2" onClick={() => {/* TODO: implement get link */}}>Get Invoice Link</Button>
             </div>
           </div>
 

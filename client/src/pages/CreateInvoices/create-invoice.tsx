@@ -930,7 +930,7 @@ ${businessData.phone}`
     <>
       {/* Preview Mode */}
       {!isFormExpanded && (
-        <div className="w-full max-w-3xl mx-auto mt-8">
+        <div className="max-w-7xl  bg-white mx-auto mt-8">
           <div className="grid grid-cols-2 gap-4 mb-6 bg-white border rounded-lg shadow p-6">
             {/* Row 1: Summary (left), Edit Invoice (right) */}
             <div className="space-y-1">
@@ -1044,7 +1044,7 @@ ${businessData.phone}`
                           type="date"
                           value={invoiceData.date}
                           onChange={(e) => updateInvoiceData("date", e.target.value)}
-                          className="mt-1.5"
+                          className="mt-1.5 font-inter font-light"
                         />
                       </div>
                       <div>
@@ -1054,7 +1054,7 @@ ${businessData.phone}`
                           type="date"
                           value={invoiceData.dueDate}
                           onChange={(e) => updateInvoiceData("dueDate", e.target.value)}
-                          className="mt-1.5"
+                          className="mt-1.5  font-inter font-light"
                         />
                       </div>
                     </div>
@@ -1069,7 +1069,7 @@ ${businessData.phone}`
                             value={invoiceData.customer.name}
                             onChange={(e) => updateInvoiceData("customer.name", e.target.value)}
                             placeholder="Customer name"
-                            className="mt-1.5"
+                            className="mt-1.5  font-inter font-light"
                           />
                         </div>
                         <div>
@@ -1080,7 +1080,7 @@ ${businessData.phone}`
                             value={invoiceData.customer.email}
                             onChange={(e) => updateInvoiceData("customer.email", e.target.value)}
                             placeholder="customer@example.com"
-                            className="mt-1.5"
+                            className="mt-1.5  font-inter font-light"
                           />
                         </div>
                       </div>
@@ -1092,7 +1092,7 @@ ${businessData.phone}`
                           onChange={(e) => updateInvoiceData("customer.address", e.target.value)}
                           placeholder="Customer address"
                           rows={2}
-                          className="mt-1.5"
+                          className="mt-1.5  font-inter font-light"
                         />
                       </div>
                     </div>
@@ -1140,7 +1140,7 @@ ${businessData.phone}`
                                 value={item.name}
                                 onChange={(e) => updateItem(index, "name", e.target.value)}
                                 placeholder="Item name"
-                                className="mt-1.5"
+                                className="mt-1.5  font-inter font-light"
                               />
                             </div>
                             <div>
@@ -1150,7 +1150,7 @@ ${businessData.phone}`
                                 value={item.description}
                                 onChange={(e) => updateItem(index, "description", e.target.value)}
                                 placeholder="Item description"
-                                className="mt-1.5"
+                                className="mt-1.5  font-inter font-light"
                               />
                             </div>
                           </div>
@@ -1163,7 +1163,7 @@ ${businessData.phone}`
                                 value={item.quantity}
                                 onChange={(e) => updateItem(index, "quantity", parseInt(e.target.value) || 0)}
                                 min="0"
-                                className="mt-1.5"
+                                className="mt-1.5 font-inter font-light"
                               />
                             </div>
                             <div>
@@ -1175,7 +1175,7 @@ ${businessData.phone}`
                                 onChange={(e) => updateItem(index, "price", parseFloat(e.target.value) || 0)}
                                 min="0"
                                 step="0.01"
-                                className="mt-1.5"
+                                className="mt-1.5  font-inter font-light"
                               />
                             </div>
                           </div>
@@ -1204,7 +1204,7 @@ ${businessData.phone}`
                                   onChange={(e) => updateItem(index, "discount", { ...item.discount, value: parseFloat(e.target.value) || 0 })}
                                   min="0"
                                   step="0.01"
-                                  className="flex-1"
+                                  className="flex-1 font-inter font-light"
                                 />
                               </div>
                             </div>
@@ -1232,7 +1232,7 @@ ${businessData.phone}`
                                   onChange={(e) => updateItem(index, "tax", { ...item.tax, value: parseFloat(e.target.value) || 0 })}
                                   min="0"
                                   step="0.01"
-                                  className="flex-1"
+                                  className="flex-1  font-inter font-light"
                                 />
                               </div>
                             </div>
@@ -1264,15 +1264,17 @@ ${businessData.phone}`
                 <div className="flex gap-3 justify-end no-print">
                   {invoiceToEdit ? (
                     <Button
+                     variant="outline"
                       onClick={handleUpdate}
-                      className="font-medium"
+                      className="font-inter font-light"
                     >
                       Update Invoice
                     </Button>
                   ) : (
                     <Button
+                     variant="outline"
                       onClick={handleSave}
-                      className="font-medium"
+                      className="font-inter font-light"
                     >
                       Save Invoice
                     </Button>

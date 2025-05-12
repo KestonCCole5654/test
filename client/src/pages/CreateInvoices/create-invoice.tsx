@@ -942,7 +942,7 @@ ${businessData.phone}`
       {/* Preview Mode */}
       {!isFormExpanded && (
         <div className="w-full max-w-3xl mx-auto mt-8">
-          <div className="grid grid-cols-2 gap-4 mb-6 bg-gray-50 border rounded-lg shadow p-6">
+          <div className="grid grid-cols-2 gap-4 mb-6 bg-white border rounded-lg shadow p-6">
             {/* Row 1: Summary (left), Edit Invoice (right) */}
             <div className="space-y-1">
               <div className="text-sm text-gray-500 font-inter font-medium ">Invoice #:</div>
@@ -952,7 +952,7 @@ ${businessData.phone}`
               <div className="text-sm text-gray-500 mt-2 font-inter font-medium">Amount Due:</div>
               <div className="text-xl text-green-700 font-inter font-medium">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
             </div>
-            <div className="flex flex-col items-end gap-4">
+            <div className="flex flex-col items-center justify-center gap-4">
               <Button
                 variant="default"
                 className="font-inter font-medium mb-2"
@@ -963,9 +963,9 @@ ${businessData.phone}`
             </div>
             {/* Row 2: Buttons centered across both columns */}
             <div className="col-span-2 flex justify-center mt-4">
-              <Button variant="default" className="font-inter font-medium mx-2" onClick={handleEmailInvoice}>Send Invoice Via Email</Button>
+              <Button variant="default" className="font-inter font-medium mx-2" onClick={handleEmailInvoice}>Email Invoice</Button>
               <Button variant="default" className="font-inter font-medium mx-2" onClick={() => window.print()}>Print Invoice</Button>
-              <Button variant="default" className="font-inter font-medium mx-2" onClick={() => {/* TODO: implement get link */}}>Get Link</Button>
+              <Button variant="default" className="font-inter font-medium mx-2" onClick={() => {/* TODO: implement get link */}}>Get Invoice Link</Button>
             </div>
           </div>
 

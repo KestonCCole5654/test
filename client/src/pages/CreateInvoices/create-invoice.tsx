@@ -969,18 +969,18 @@ ${businessData.phone}`
       {isFormExpanded && (
         <div className=" mt-0 font-inter w-full py-4 sm:py-8 px-4 mx-auto rounded-b-3xl mb-10">
           <div className="mb-8">
-            {/* Breadcrumb Navigation */}
-            <nav className="flex items-center space-x-2 text-sm mb-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate('/dashboard')}
-                className="text-gray-500 hover:text-gray-700 font-light px-0"
+            {/* Breadcrumb Navigation - styled like the reference image */}
+            <nav className="flex items-center space-x-2 text-sm mb-3 select-none" aria-label="Breadcrumb">
+              <a
+                href="/dashboard"
+                className="text-blue-700 font-medium underline underline-offset-2 px-2 py-1 rounded transition hover:bg-blue-50 focus:bg-blue-100 focus:outline-none"
               >
                 Dashboard
-              </Button>
-              <span className="text-gray-400">/</span>
-              <span className="text-gray-900 font-medium">
+              </a>
+              <span className="text-gray-400">&gt;</span>
+              <span className="text-gray-500 font-medium px-2">Invoices</span>
+              <span className="text-gray-400">&gt;</span>
+              <span className="text-black font-bold px-2 bg-gray-100 rounded">
                 {invoiceToEdit ? "Edit Invoice" : "New Invoice"}
               </span>
             </nav>

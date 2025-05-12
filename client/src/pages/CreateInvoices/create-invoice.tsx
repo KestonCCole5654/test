@@ -779,12 +779,12 @@ ${businessData.phone}`
         <div className="overflow-x-auto font-inter w-full">
           <table className="w-full font-inter max-w-full text-sm">
             <thead className="bg-green-800 text-white p-8">
-              <tr className="text-left text-md border-b font-medium">
-                <th className="py-3 px-6 first:pl-8 last:pr-8 font-inter font-medium">Item</th>
-                <th className="py-3 px-6 first:pl-8 last:pr-8 font-inter font-medium">Description</th>
-                <th className="py-3 px-6 first:pl-8 last:pr-8 font-inter font-medium text-right">Qty</th>
-                <th className="py-3 px-6 first:pl-8 last:pr-8 font-inter font-medium text-right">Price</th>
-                <th className="py-3 px-6 first:pl-8 last:pr-8 font-inter font-medium text-right">Amount</th>
+              <tr className="text-left text-lg border-b font-bold">
+                <th className="py-3 px-6 first:pl-8 last:pr-8 font-inter font-bold text-base text-green-100">Item</th>
+                <th className="py-3 px-6 first:pl-8 last:pr-8 font-inter font-bold text-base text-green-100">Description</th>
+                <th className="py-3 px-6 first:pl-8 last:pr-8 font-inter font-bold text-base text-green-100 text-right">Qty</th>
+                <th className="py-3 px-6 first:pl-8 last:pr-8 font-inter font-bold text-base text-green-100 text-right">Price</th>
+                <th className="py-3 px-6 first:pl-8 last:pr-8 font-inter font-bold text-base text-green-100 text-right">Amount</th>
               </tr>
             </thead>
             <tbody className="divide-y font-inter divide-gray-200">

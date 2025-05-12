@@ -83,7 +83,7 @@ const Header = () => {
               <div className="h-8 w-8 rounded bg-green-800 flex items-center justify-center">
                 <span className="text-white font-medium text-md">$</span>
               </div>
-              <span className="text-lg font-medium text-green-800">SheetBills<sup className="text-xs text-green-800">TM</sup></span>
+              <span className="text-lg font-medium text-green-800">SheetBills™</span>
             </Link>
           </div>
 

@@ -770,8 +770,8 @@ export default function Dashboard() {
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-gray-50 border-b border-gray-200">
-                      <TableHead className="w-8 px-4"></TableHead>
-                      <TableHead className="w-[56px] px-6 py-4 align-middle text-center text-gray-600">
+                      <TableHead className="w-8 px-4 font-semibold font-inter"></TableHead>
+                      <TableHead className="w-[56px] px-6 py-4 align-middle text-center text-gray-600 font-semibold font-inter">
                         <input
                           type="checkbox"
                           ref={headerCheckboxRef}
@@ -783,41 +783,41 @@ export default function Dashboard() {
                       </TableHead>
                       <TableHead
                         onClick={() => handleSort("id")}
-                        className="cursor-pointer px-6 py-4 whitespace-nowrap min-w-[160px] text-gray-600"
+                        className="cursor-pointer px-6 py-4 whitespace-nowrap min-w-[160px] text-gray-600 font-semibold font-inter"
                       >
                         Invoice ID <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
                       <TableHead
                         onClick={() => handleSort("customer")}
-                        className="cursor-pointer px-6 py-4 text-gray-600"
+                        className="cursor-pointer px-6 py-4 text-gray-600 font-semibold font-inter"
                       >
                         Client <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
                       <TableHead
                         onClick={() => handleSort("dueDate")}
-                        className="cursor-pointer px-6 py-4 whitespace-nowrap min-w-[180px] text-gray-600"
+                        className="cursor-pointer px-6 py-4 whitespace-nowrap min-w-[180px] text-gray-600 font-semibold font-inter"
                       >
                         Due Date <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
                       <TableHead
                         onClick={() => handleSort("status")}
-                        className="cursor-pointer px-6 py-4 text-gray-600"
+                        className="cursor-pointer px-6 py-4 text-gray-600 font-semibold font-inter"
                       >
                         Status <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
                       <TableHead
                         onClick={() => handleSort("amount")}
-                        className="cursor-pointer text-right px-6 py-4 text-gray-600"
+                        className="cursor-pointer text-right px-6 py-4 text-gray-600 font-bold font-inter"
                       >
                         Amount <ArrowUpDown className="inline h-4 w-4 ml-1 opacity-50" />
                       </TableHead>
-                      <TableHead className="text-center px-6 py-4 text-gray-600">
+                      <TableHead className="text-center px-6 py-4 text-gray-600 font-semibold font-inter">
                         Overdue
                       </TableHead>
-                      <TableHead className="text-center px-6 py-4 text-gray-600">
+                      <TableHead className="text-center px-6 py-4 text-gray-600 font-semibold font-inter">
                         Payment Actions
                       </TableHead>
-                      <TableHead className="w-[80px] px-6 py-4 text-gray-600">
+                      <TableHead className="w-[80px] px-6 py-4 text-gray-600 font-semibold font-inter">
                         Other Actions
                       </TableHead>
                     </TableRow>
@@ -877,7 +877,7 @@ export default function Dashboard() {
                               </span>
                             )}
                           </TableCell>
-                          <TableCell className="text-right px-6 py-4">
+                          <TableCell className="text-right px-6 py-4 font-bold font-inter">
                             {formatCurrency(invoice.amount)}
                           </TableCell>
                           <TableCell className="text-center px-6 py-4">
@@ -944,7 +944,7 @@ export default function Dashboard() {
                                     })
                                   }
                                 }}
-                                className={`bg-gray-100 text-gray-800 hover:bg-gray-200 px-3`}
+                                className={`bg-gray-100 text-gray-800 hover:bg-gray-200 px-3 font-bold font-inter`}
                                 size="sm"
                                 disabled={invoice.status === "Paid"}
                               >
@@ -1005,7 +1005,7 @@ export default function Dashboard() {
                                     })
                                   }
                                 }}
-                                className={`bg-gray-50 text-gray-700 hover:bg-gray-100 px-3`}
+                                className={`bg-gray-50 text-gray-700 hover:bg-gray-100 px-3 font-bold font-inter`}
                                 size="sm"
                                 disabled={invoice.status === "Pending"}
                               >
@@ -1107,8 +1107,8 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen w-full font-inter px-6 pb-6  text-gray-700">
-      <h1 className="text-3xl  text-green-800 mb-6 mt-10">Invoices</h1>
+    <div className="min-h-screen w-full font-inter px-6 pb-6 text-gray-700">
+      <h1 className="text-3xl font-extrabold text-green-800 mb-6 mt-10 font-inter">Invoices</h1>
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
         <div className="flex  bg-white">
@@ -1197,8 +1197,8 @@ export default function Dashboard() {
           <Table className="min-w-full text-sm">
             <TableHeader>
               <TableRow className="bg-gray-50 border-b border-gray-200">
-                <TableHead className="w-8 px-4"></TableHead>
-                <TableHead className="w-[56px] px-6 py-4 align-middle text-center">
+                <TableHead className="w-8 px-4 font-semibold font-inter"></TableHead>
+                <TableHead className="w-[56px] px-6 py-4 align-middle text-center text-gray-600 font-semibold font-inter">
                   <input
                     type="checkbox"
                     ref={headerCheckboxRef}
@@ -1208,13 +1208,13 @@ export default function Dashboard() {
                     className="mx-auto accent-gray-600 h-4 w-4 rounded border-gray-300"
                   />
                 </TableHead>
-                <TableHead className="px-6 py-4">Number</TableHead>
-                <TableHead className="px-6 py-4">Client</TableHead>
-                <TableHead className="px-6 py-4">Due Date</TableHead>
-                <TableHead className="px-6 py-4">Status</TableHead>
-                <TableHead className="px-6 py-4 text-right">Total</TableHead>
-                <TableHead className="px-6 py-4 text-center">Overdue</TableHead>
-                <TableHead className="px-6 py-4 text-center">Actions</TableHead>
+                <TableHead className="px-6 py-4 font-semibold font-inter">Number</TableHead>
+                <TableHead className="px-6 py-4 font-semibold font-inter">Client</TableHead>
+                <TableHead className="px-6 py-4 font-semibold font-inter">Due Date</TableHead>
+                <TableHead className="px-6 py-4 font-semibold font-inter">Status</TableHead>
+                <TableHead className="px-6 py-4 font-semibold font-inter text-right">Total</TableHead>
+                <TableHead className="px-6 py-4 font-semibold font-inter text-center">Overdue</TableHead>
+                <TableHead className="px-6 py-4 font-semibold font-inter text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -1234,18 +1234,22 @@ export default function Dashboard() {
                         className="mx-auto"
                       />
                     </TableCell>
-                    <TableCell className="px-6 py-4 whitespace-nowrap">{invoice.id}</TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap min-w-[160px]">
+                      {invoice.id}
+                    </TableCell>
                     <TableCell className="px-6 py-4">
                       <div className="flex flex-col">
                         <span className="font-medium font-inter">
                           {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}
                         </span>
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-gray-400 font-inter">
                           {typeof invoice.customer === "object" ? invoice.customer.email : ""}
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="px-6 py-4 whitespace-nowrap">{formatDate(invoice.dueDate)}</TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap min-w-[180px]">
+                      <div className="font-medium font-inter">{formatDate(invoice.dueDate)}</div>
+                    </TableCell>
                     <TableCell className="px-6 py-4">
                       {invoice.status === "Paid" ? (
                         <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium font-inter">
@@ -1261,18 +1265,20 @@ export default function Dashboard() {
                         </span>
                       )}
                     </TableCell>
-                    <TableCell className="text-right px-6 py-4">{formatCurrency(invoice.amount)}</TableCell>
+                    <TableCell className="text-right px-6 py-4 font-bold font-inter">
+                      {formatCurrency(invoice.amount)}
+                    </TableCell>
                     <TableCell className="text-center px-8 py-6">
                       {invoice.status === "Pending" && new Date(invoice.dueDate) < new Date() ? (
-                        <span className="text-red-600 px-4 py-1.5  text-sm">
+                        <span className="text-red-600 px-4 py-1.5  text-sm font-bold font-inter">
                           {getOverdueDays(invoice.dueDate)} days
                         </span>
                       ) : (
-                        <span className="text-gray-400 px-4 py-1.5 text-sm">-</span>
+                        <span className="text-gray-400 px-4 py-1.5 text-sm font-bold font-inter">-</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-center px-6 py-4">
-                      <div className="flex justify-center gap-2">
+                    <TableCell onClick={(e) => e.stopPropagation()} className="px-6 py-4">
+                      <div className="flex justify-end gap-2">
                         <Button
                           onClick={async (e) => {
                             e.stopPropagation()
@@ -1321,7 +1327,7 @@ export default function Dashboard() {
                               })
                             }
                           }}
-                          className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
+                          className={`bg-gray-100 text-gray-800 hover:bg-gray-200 px-3 font-bold font-inter`}
                           size="sm"
                           disabled={invoice.status === "Paid"}
                         >
@@ -1375,28 +1381,11 @@ export default function Dashboard() {
                               })
                             }
                           }}
-                          className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
+                          className={`bg-gray-50 text-gray-700 hover:bg-gray-100 px-3 font-bold font-inter`}
                           size="sm"
                           disabled={invoice.status === "Pending"}
                         >
                           Mark as Pending
-                        </Button>
-                        <Button
-                          size="sm"
-                          className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            navigate("/create-invoice", {
-                              state: {
-                                invoiceToEdit: invoice,
-                                selectedSpreadsheetUrl: spreadsheets.find(
-                                  (sheet) => sheet.name === "SheetBills Invoices",
-                                )?.sheetUrl,
-                              },
-                            })
-                          }}
-                        >
-                          Edit
                         </Button>
                       </div>
                     </TableCell>
@@ -1443,7 +1432,7 @@ export default function Dashboard() {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure you want to delete this invoice?</AlertDialogTitle>
+            <AlertDialogTitle className="font-bold font-inter">Are you sure you want to delete this invoice?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete the invoice
               {invoiceToDelete ? <span className="font-medium font-inter"> #{invoiceToDelete.id}</span> : null}.
@@ -1506,7 +1495,7 @@ export default function Dashboard() {
       <AlertDialog open={isBulkDeleteDialogOpen} onOpenChange={setIsBulkDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure you want to delete these invoices?</AlertDialogTitle>
+            <AlertDialogTitle className="font-bold font-inter">Are you sure you want to delete these invoices?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete {selectedInvoices.size} selected invoice(s).
             </AlertDialogDescription>
@@ -1524,7 +1513,7 @@ export default function Dashboard() {
       <Sheet open={isPartialPaymentModalOpen} onOpenChange={setIsPartialPaymentModalOpen}>
         <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
           <SheetHeader className="mb-4">
-            <SheetTitle className="text-xl">Record Partial Payment</SheetTitle>
+            <SheetTitle className="text-xl font-bold font-inter">Record Partial Payment</SheetTitle>
             <SheetDescription>Enter the payment amount and date for invoice #{selectedInvoice?.id}</SheetDescription>
           </SheetHeader>
           <div className="grid gap-6 py-4">

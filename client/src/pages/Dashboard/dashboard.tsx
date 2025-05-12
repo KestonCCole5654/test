@@ -1108,7 +1108,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen w-full font-inter px-6 pb-6 bg-white text-gray-700">
-      <h1 className="text-3xl  text-green-800 mb-6 mt-6">Invoices</h1>
+    
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
         <div className="flex  bg-white">

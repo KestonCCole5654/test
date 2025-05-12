@@ -960,10 +960,14 @@ ${businessData.phone}`
               >
                 Edit Invoice
               </Button>
-              <Button variant="default" className="font-inter font-medium" onClick={handleEmailInvoice}>Email Invoice</Button>
+             
+            </div>
+            <div className="flex flex-col gap-4 sm:gap-2 sm:flex-row sm:items-center ml-auto mt-4 sm:mt-0">
+            <Button variant="default" className="font-inter font-medium" onClick={handleEmailInvoice}>Email Invoice</Button>
               <Button variant="default" className="font-inter font-medium" onClick={() => window.print()}>Print</Button>
               <Button variant="default" className="font-inter font-medium" onClick={() => {/* TODO: implement get link */}}>Get Link</Button>
             </div>
+
           </div>
 
           {/* Invoice Preview */}

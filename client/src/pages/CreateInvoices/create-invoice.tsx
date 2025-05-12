@@ -778,7 +778,7 @@ ${businessData.phone}`
         {/* Items Table */}
         <div className="overflow-x-auto font-inter w-full">
           <table className="w-full font-inter max-w-full text-sm">
-            <thead className="bg-green-800 text-white pl-6 pr-6">
+            <thead className="bg-green-800 text-white p-8">
               <tr className="text-left text-md border-b font-medium">
                 <th className="py-3 font-inter font-medium px-1">Item</th>
                 <th className="py-3 font-inter font-medium">Description</th>

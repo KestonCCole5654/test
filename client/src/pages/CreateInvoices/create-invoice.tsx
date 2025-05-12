@@ -952,7 +952,7 @@ ${businessData.phone}`
               <div className="text-sm text-gray-500 mt-2">Amount Due:</div>
               <div className="font-bold text-xl text-green-700">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
             </div>
-            <div className="flex flex-col gap-4 sm:gap-2 sm:flex-row sm:items-center ml-auto mt-4 sm:mt-0">
+            <div className="flex flex-row gap-4 sm:gap-2 sm:flex-row sm:items-center ml-auto mt-4 sm:mt-0">
               <Button
                 variant="default"
                 className="font-bold"
@@ -960,10 +960,14 @@ ${businessData.phone}`
               >
                 Edit Invoice
               </Button>
+              <div className="flex flex-row gap-4 sm:gap-2 sm:flex-row sm:items-center ml-auto mt-4 sm:mt-0">
               <Button variant="default" className="font-bold" onClick={handleEmailInvoice}>Email Invoice</Button>
               <Button variant="default" className="font-bold" onClick={() => window.print()}>Print</Button>
               <Button variant="default" className="font-bold" onClick={() => {/* TODO: implement get link */}}>Get Link</Button>
             </div>
+             
+            </div>
+           
           </div>
 
           {/* Invoice Preview */}

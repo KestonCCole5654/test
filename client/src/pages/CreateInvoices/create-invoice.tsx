@@ -780,11 +780,11 @@ ${businessData.phone}`
           <table className="w-full font-inter max-w-full text-sm">
             <thead className="bg-green-800 text-white">
               <tr className="border-b font-semibold">
-                <th className="py-3 px-6 first:pl-8 last:pr-8 text-left font-inter font-bold text-base text-green-100">Item</th>
-                <th className="py-3 px-6 first:pl-8 last:pr-8 text-left font-inter font-bold text-base text-green-100">Description</th>
-                <th className="py-3 px-6 first:pl-8 last:pr-8 text-right font-inter font-bold text-base text-green-100">Qty</th>
-                <th className="py-3 px-6 first:pl-8 last:pr-8 text-right font-inter font-bold text-base text-green-100">Price</th>
-                <th className="py-3 px-6 first:pl-8 last:pr-8 text-right font-inter font-bold text-base text-green-100">Amount</th>
+                <th className="py-3 px-6 first:pl-8 last:pr-8 text-left font-inter font-medium text-base text-green-100">Item</th>
+                <th className="py-3 px-6 first:pl-8 last:pr-8 text-left font-inter font-medium text-base text-green-100">Description</th>
+                <th className="py-3 px-6 first:pl-8 last:pr-8 text-right font-inter font-medium text-base text-green-100">Qty</th>
+                <th className="py-3 px-6 first:pl-8 last:pr-8 text-right font-inter font-medium text-base text-green-100">Price</th>
+                <th className="py-3 px-6 first:pl-8 last:pr-8 text-right font-inter font-medium text-base text-green-100">Amount</th>
               </tr>
             </thead>
             <tbody className="divide-y font-inter divide-gray-200">
@@ -928,38 +928,36 @@ ${businessData.phone}`
 
   return (
     <>
-      {/* Preview Mode */}
+      {/* Preview Mode - Cleaned up */}
       {!isFormExpanded && (
-        <div className="max-w-7xl  bg-white mx-auto mt-8">
-          <div className="grid grid-cols-2 gap-4 mb-6 bg-white border rounded-lg shadow p-6">
-            {/* Row 1: Summary (left), Edit Invoice (right) */}
+        <div className="max-w-7xl mx-auto mt-8">
+          <div className="grid grid-cols-2 gap-4 mb-6 bg-white border rounded-lg p-6">
             <div className="space-y-1">
-              <div className="text-sm text-gray-500 font-inter font-medium ">Invoice #:</div>
-              <div className="text-lg text-gray-800 font-inter font-medium">{invoiceData.invoiceNumber}</div>
-              <div className="text-sm text-gray-500 mt-2 font-inter font-medium">Billed To:</div>
-              <div className=" text-gray-700 font-inter font-medium">{invoiceData.customer.name || 'Customer Name'}</div>
-              <div className="text-sm text-gray-500 mt-2 font-inter font-medium">Amount Due:</div>
-              <div className="text-xl text-green-700 font-inter font-medium">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
+              <div className="text-sm text-gray-500 font-light">Invoice #:</div>
+              <div className="text-lg text-gray-800 font-medium">{invoiceData.invoiceNumber}</div>
+              <div className="text-sm text-gray-500 mt-2 font-light">Billed To:</div>
+              <div className="text-gray-700 font-medium">{invoiceData.customer.name || 'Customer Name'}</div>
+              <div className="text-sm text-gray-500 mt-2 font-light">Amount Due:</div>
+              <div className="text-xl text-gray-900 font-medium">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
             </div>
-            <div className="flex flex-col items-end justify-center  gap-4">
+            <div className="flex flex-col items-end justify-center gap-4">
               <Button
                 variant="outline"
-                className="font-inter font-medium mb-2"
+                className="font-light"
                 onClick={() => setIsFormExpanded(true)}
               >
                 Edit Invoice
               </Button>
             </div>
-            {/* Row 2: Buttons centered across both columns */}
             <div className="col-span-2 flex justify-center mt-4">
-              <Button variant="outline" className="font-inter font-medium mx-2" onClick={handleEmailInvoice}>Email Invoice</Button>
-              <Button variant="outline" className="font-inter font-medium mx-2" onClick={() => window.print()}>Print Invoice</Button>
-              <Button variant="outline" className="font-inter font-medium mx-2" onClick={() => {/* TODO: implement get link */}}>Get Invoice Link</Button>
+              <Button variant="outline" className="font-light mx-2" onClick={handleEmailInvoice}>Email Invoice</Button>
+              <Button variant="outline" className="font-light mx-2" onClick={() => window.print()}>Print Invoice</Button>
+              <Button variant="outline" className="font-light mx-2" onClick={() => {/* TODO: implement get link */}}>Get Invoice Link</Button>
             </div>
           </div>
 
-          {/* Invoice Preview */}
-          <div className="bg-white rounded-lg shadow-lg p-8 min-h-[600px] flex items-center justify-center">
+          {/* Invoice Preview - Cleaned up */}
+          <div className="bg-white border rounded-lg p-6">
             <div className="w-full overflow-auto">
               <InvoiceClassic data={invoiceData} businessData={businessData} />
             </div>
@@ -970,52 +968,59 @@ ${businessData.phone}`
       {/* Edit Mode (Form) */}
       {isFormExpanded && (
         <div className=" mt-0 font-inter w-full py-4 sm:py-8 px-4 mx-auto rounded-b-3xl mb-10">
-          <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white border-b pb-6">
-            <div className="flex items-center gap-4">
+          <div className="mb-8">
+            {/* Breadcrumb Navigation */}
+            <nav className="flex items-center space-x-2 text-sm mb-6">
               <Button
                 variant="ghost"
-                size="icon"
-                onClick={() => setIsFormExpanded(false)}
-                className="h-8 w-8"
+                size="sm"
+                onClick={() => navigate('/dashboard')}
+                className="text-gray-500 hover:text-gray-700 font-light"
               >
-                <ArrowLeft className="h-4 w-4" />
-                <span className="sr-only">Back</span>
+                Dashboard
               </Button>
+              <span className="text-gray-400">/</span>
+              <span className="text-gray-900 font-medium">
+                {invoiceToEdit ? "Edit Invoice" : "New Invoice"}
+              </span>
+            </nav>
+
+            {/* Header Content */}
+            <div className="flex items-center justify-between">
               <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-medium text-gray-900">
-                    {invoiceToEdit ? "Invoice Detail" : "Create Invoice"}
-                  </h1>
-                  {invoiceToEdit && (
-                    <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                      invoiceToEdit.status === "Paid"
-                        ? "bg-green-50 text-green-700"
-                        : "bg-yellow-50 text-yellow-700"
-                    }`}>
-                      {invoiceToEdit.status === "Paid" ? (
-                        <CheckCircle className="h-3 w-3" />
-                      ) : (
-                        <Clock className="h-3 w-3" />
-                      )}
-                      {invoiceToEdit.status}
-                    </div>
-                  )}
-                </div>
+                <h1 className="text-2xl font-medium text-gray-900">
+                  {invoiceToEdit ? "Edit Invoice" : "Create New Invoice"}
+                </h1>
                 <p className="mt-1 text-sm text-gray-500 font-light">
                   {invoiceToEdit
                     ? `Invoice #${invoiceData.invoiceNumber} - ${new Date(invoiceData.date).toLocaleDateString()}`
-                    : "Create a new professional invoice"}
+                    : "Create a professional invoice for your client"}
                 </p>
               </div>
+              <div className="flex items-center gap-3">
+                {invoiceToEdit && (
+                  <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                    invoiceToEdit.status === "Paid"
+                      ? "bg-green-50 text-green-700"
+                      : "bg-yellow-50 text-yellow-700"
+                  }`}>
+                    {invoiceToEdit.status === "Paid" ? (
+                      <CheckCircle className="h-3 w-3" />
+                    ) : (
+                      <Clock className="h-3 w-3" />
+                    )}
+                    {invoiceToEdit.status}
+                  </div>
+                )}
+                <Button
+                  variant="outline"
+                  onClick={() => setIsFormExpanded(!isFormExpanded)}
+                  className="font-light"
+                >
+                  {isFormExpanded ? "Hide Form" : "Show Form"}
+                </Button>
+              </div>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => setIsFormExpanded(!isFormExpanded)}
-              className="flex items-center gap-2 font-medium"
-            >
-              {isFormExpanded ? "Hide Form" : invoiceToEdit ? "Edit Invoice" : "Show Form"}
-              <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${isFormExpanded ? "rotate-180" : ""}`} />
-            </Button>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -1286,10 +1291,10 @@ ${businessData.phone}`
               </CollapsibleContent>
             </Collapsible>
 
-            {/* Preview Section */}
+            {/* Preview Section - Cleaned up */}
             <div className="lg:col-span-1">
               <div className="sticky top-4">
-                <div className="bg-white rounded-lg shadow-lg p-4 overflow-auto max-h-[calc(100vh-2rem)]">
+                <div className="bg-white border rounded-lg p-6">
                   <InvoiceClassic data={invoiceData} businessData={businessData} />
                 </div>
               </div>

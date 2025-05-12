@@ -81,9 +81,9 @@ const Header = () => {
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
               <div className="h-8 w-8 rounded bg-green-800 flex items-center justify-center">
-                <span className="text-white font-medium text-lg">$</span>
+                <span className="text-white font-medium text-md">$</span>
               </div>
-              <span className="text-lg font-medium text-green-800">SHEETBILLS <sup className="text-xs  text-green-600">TM</sup></span>
+              <span className="text-lg font-medium text-green-800">SheetBills<sup className="text-xs text-green-600">TM</sup></span>
             </Link>
           </div>
 
@@ -98,13 +98,7 @@ const Header = () => {
                 >
                  Invoices
                 </Link>
-                <Link
-                  to="/reports"
-                  className="px-3 py-2 rounded-md text-slate-600 hover:bg-green-100 hover:text-slate-900 transition-colors"
-                  onClick={handleNavigation}
-                >
-                  Reports
-                </Link>
+           
                 <Link
                   to="/settings"
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-green-100 hover:text-slate-900 transition-colors"

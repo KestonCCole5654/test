@@ -20,8 +20,7 @@ import OnboardingPage from './pages/Onboarding/page';
 import ContactPage from './pages/Contact/contact';
 import { LoadingSpinner } from "./components/ui/loadingSpinner";
 import AuthCallback from './pages/auth-callback'
-import Reports from './pages/Reports/reports';
-import InvoiceViewer from './pages/InvoiceViewer/invoice-viewer';
+
 
 // SidebarLayout already includes the Outlet component
 
@@ -121,8 +120,7 @@ function App() {
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/auth-callback" element={<AuthCallback />} />
-        <Route path="/invoice/:invoiceId/:token" element={<InvoiceViewer />} />
-        
+    
         {/* Onboarding Route */}
         <Route
           path="/Onboarding"
@@ -146,7 +144,7 @@ function App() {
           <Route path="/create-invoice" element={<InvoiceForm />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/reports" element={<Reports />} />
+  
         </Route>
 
         {/* Catch all route */}

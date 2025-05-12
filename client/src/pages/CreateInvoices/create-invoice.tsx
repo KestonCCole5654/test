@@ -1010,7 +1010,7 @@ ${businessData.phone}`
                   <CardTitle className="flex items-center">Invoice Information</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Invoice Details */}
+                  {/* Invoice Details - Used to collect invoice due date and date, invoice number is generated automatically */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="invoiceNumber">Invoice #</Label>
@@ -1041,10 +1041,11 @@ ${businessData.phone}`
                     </div>
                   </div>
 
-                  {/* Customer Information */}
+                  {/* Customer Information - Used to collect customer name, email and address */}
                   <div className="pt-2">
                     <h3 className="text-sm font-medium mb-2">Customer Information</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Customer Name - Used to collect customer name */}
                       <div>
                         <Label htmlFor="customerName">Name</Label>
                         <Input
@@ -1054,6 +1055,7 @@ ${businessData.phone}`
                           placeholder="Customer name"
                         />
                       </div>
+                      {/* Customer Email - Used to collect customer email */}
                       <div>
                         <Label htmlFor="customerEmail">Email</Label>
                         <Input
@@ -1065,6 +1067,7 @@ ${businessData.phone}`
                         />
                       </div>
                     </div>
+                    {/* Customer Address - Used to collect customer address */}
                     <div className="mt-2">
                       <Label htmlFor="customerAddress">Address</Label>
                       <Textarea
@@ -1079,8 +1082,9 @@ ${businessData.phone}`
                 </CardContent>
               </Card>
 
-              {/* Invoice Items */}
+              {/* Invoice Items - Used to collect invoice items, name, description, quantity, price, discount and tax */}
               <Card>
+                {/* Invoice Items Header - Used to collect invoice items, name, description, quantity, price, discount and tax */}
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <div>Items</div>
@@ -1090,8 +1094,10 @@ ${businessData.phone}`
                     </Button>
                   </CardTitle>
                 </CardHeader>
+                {/* Invoice Items Content - Used to collect invoice items, name, description, quantity, price, discount and tax */}
                 <CardContent>
                   <div className="space-y-6">
+
                     {invoiceData.items.map((item, index) => (
                       <div key={index} className="border rounded-lg p-4 space-y-4">
                         <div className="flex items-center justify-between">
@@ -1101,6 +1107,7 @@ ${businessData.phone}`
                               {item.name || "Unnamed Item"}
                             </span>
                           </div>
+                          {/* Remove Item Button - Used to remove invoice item */}
                           <Button
                             type="button"
                             variant="ghost"
@@ -1112,7 +1119,9 @@ ${businessData.phone}`
                             <span className="sr-only">Remove item</span>
                           </Button>
                         </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {/* Item Name - Used to collect invoice item name */}
                           <div className="flex flex-col gap-2">
                             <Label htmlFor={`item-name-${index}`}>Name</Label>
                             <Input
@@ -1122,6 +1131,7 @@ ${businessData.phone}`
                               placeholder="Item name"
                             />
                           </div>
+                          {/* Item Description - Used to collect invoice item description */}
                           <div className="flex flex-col gap-2">
                             <Label htmlFor={`item-description-${index}`}>Description</Label>
                             <Textarea
@@ -1133,6 +1143,7 @@ ${businessData.phone}`
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
+                          {/* Item Quantity - Used to collect invoice item quantity */}
                           <div className="flex flex-col gap-2">
                             <Label htmlFor={`item-quantity-${index}`}>Quantity</Label>
                             <Input
@@ -1143,6 +1154,7 @@ ${businessData.phone}`
                               min="0"
                             />
                           </div>
+                          {/* Item Price - Used to collect invoice item price */}
                           <div className="flex flex-col gap-2">
                             <Label htmlFor={`item-price-${index}`}>Price</Label>
                             <Input
@@ -1156,6 +1168,7 @@ ${businessData.phone}`
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
+                          {/* Item Discount - Used to collect invoice item discount */}
                           <div className="flex flex-col gap-2">
                             <Label htmlFor={`item-discount-${index}`}>Discount</Label>
                             <div className="flex gap-2">
@@ -1184,6 +1197,7 @@ ${businessData.phone}`
                               />
                             </div>
                           </div>
+                          {/* Item Tax - Used to collect invoice item tax */}
                           <div className="flex flex-col gap-2">
                             <Label htmlFor={`item-tax-${index}`}>Tax</Label>
                             <div className="flex gap-2">
@@ -1201,6 +1215,7 @@ ${businessData.phone}`
                                   <SelectItem value="fixed">$</SelectItem>
                                 </SelectContent>
                               </Select>
+                              {/* Item Tax Value - Used to collect invoice item tax value */}
                               <Input
                                 id={`item-tax-${index}`}
                                 type="number"
@@ -1240,8 +1255,9 @@ ${businessData.phone}`
                 </CardContent>
               </Card>
 
-              {/* Save and Download Invoice Button */}
+              {/* Save and Download Invoice Button - Used to save and download invoice */}
               <div className="flex gap-3 justify-end no-print flex-wrap">
+                {/* Update Invoice Button - Used to update invoice */}
                 {invoiceToEdit ? (
                   <Button
                     variant="outline"
@@ -1259,18 +1275,12 @@ ${businessData.phone}`
                     Save Invoice
                   </Button>
                 )}
+                {/* Print Invoice Button - Used to print invoice */}
                 <Button variant="outline" onClick={() => window.print()} className="w-full sm:w-auto text-white">
                   Print Invoice
                 </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={handleEmailInvoice} 
-                  className="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700"
-                  disabled={!invoiceData.customer.email}
-                >
-                  <Mail className="mr-2 h-4 w-4" />
-                  Email Invoice to Client
-                </Button>
+                {/* Email Invoice Button - Used to email invoice */}
+               
               </div>
             </CollapsibleContent>
           </Collapsible>

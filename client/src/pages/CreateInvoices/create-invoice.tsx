@@ -778,13 +778,13 @@ ${businessData.phone}`
         {/* Items Table */}
         <div className="overflow-x-auto font-inter w-full">
           <table className="w-full font-inter max-w-full text-sm">
-            <thead className="bg-green-800 text-white pl-3 pr-3">
+            <thead className="bg-green-800 text-white pl-6 pr-6">
               <tr className="text-left text-md border-b font-medium">
-                <th className="py-3 px-1">Item</th>
-                <th className="py-3">Description</th>
-                <th className="py-3 text-right">Qty</th>
-                <th className="py-3 text-right">Price</th>
-                <th className="py-3 text-right">Amount</th>
+                <th className="py-3 font-inter font-medium px-1">Item</th>
+                <th className="py-3 font-inter font-medium">Description</th>
+                <th className="py-3 font-inter font-medium text-right">Qty</th>
+                <th className="py-3 font-inter font-medium text-right">Price</th>
+                <th className="py-3 font-inter font-medium text-right">Amount</th>
               </tr>
             </thead>
             <tbody className="divide-y font-inter divide-gray-200">

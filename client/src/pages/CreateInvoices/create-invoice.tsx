@@ -732,7 +732,7 @@ ${businessData.phone}`
 
     return (
       <div
-        className="bg-white w-full font-inter max-w-full box-border flex flex-col justify-start  shadow-md p-4"
+        className="bg-white w-full font-inter max-w-full box-border flex flex-col justify-start shadow-md p-2"
         style={{ minHeight: '287mm', margin: 0 }}
       >
         {/* Header with logo */}
@@ -749,36 +749,36 @@ ${businessData.phone}`
         {/* Business and Client Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           <div>
-            <h2 className="text-sm font-semibold text-green-800 uppercase mb-2">From</h2>
+            <h2 className="text-sm font-inter font-medium text-green-800 uppercase mb-2">From</h2>
             <div className="space-y-1">
-              <p className="font-medium">{businessData.companyName || "Loading Company Details..."}</p>
-              <p>{businessData.email || "contact@company.com"}</p>
-              <p>{businessData.address || "123 Business St"}</p>
+              <p className="font-inter font-medium">{businessData.companyName || "Loading Company Details..."}</p>
+              <p className="font-inter font-medium">{businessData.email || "contact@company.com"}</p>
+              <p className="font-inter font-medium">{businessData.address || "123 Business St"}</p>
             </div>
           </div>
 
           <div>
             <div className="mb-4">
-              <h2 className="text-sm font-semibold text-green-800 uppercase mb-2">Bill To</h2>
+              <h2 className="text-sm font-inter font-medium text-green-800 uppercase mb-2">Bill To</h2>
               <div className="space-y-1">
-                <p className="font-medium">{data.customer.name}</p>
-                <p>{data.customer.email}</p>
-                <p className="whitespace-pre-line">{data.customer.address}</p>
+                <p className="font-inter font-medium">{data.customer.name}</p>
+                <p className="font-inter font-medium">{data.customer.email}</p>
+                <p className="font-inter font-medium whitespace-pre-line">{data.customer.address}</p>
               </div>
             </div>
           </div>
 
           <div className="mt-5 font-medium w-full">
             <p className="text-xl text-green-800">
-              ${formatCurrency(total)} due on <span className="pl-1">{formatDate(data.dueDate)}</span>
+              ${formatCurrency(total)} due <span className="pl-1">{formatDate(data.dueDate)}</span>
             </p>
           </div>
         </div>
 
         {/* Items Table */}
-        <div className="overflow-x-auto w-full">
-          <table className="w-full max-w-full text-sm">
-            <thead className="bg-green-800 text-white">
+        <div className="overflow-x-auto font-inter w-full">
+          <table className="w-full font-inter max-w-full text-sm">
+            <thead className="bg-green-800 text-white pl-3 pr-3">
               <tr className="text-left text-md border-b font-medium">
                 <th className="py-3 px-1">Item</th>
                 <th className="py-3">Description</th>
@@ -787,7 +787,7 @@ ${businessData.phone}`
                 <th className="py-3 text-right">Amount</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y font-inter divide-gray-200">
               {data.items.map((item, i) => (
                 <tr key={i} className="text-gray-900">
                   <td className="py-3 px-4 break-words">{item.name || `Item ${i + 1}`}</td>

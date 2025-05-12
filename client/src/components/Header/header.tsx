@@ -96,7 +96,7 @@ const Header = () => {
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-green-100 hover:text-slate-900 transition-colors"
                   onClick={handleNavigation}
                 >
-                  Dashboard
+                 Invoices
                 </Link>
                 <Link
                   to="/reports"
@@ -127,9 +127,7 @@ const Header = () => {
           <div className="hidden md:flex items-center space-x-2">
             {user ? (
               <>
-                <Button variant="ghost" size="icon" className="text-green-700 hover:text-green-800">
-                  <span className="sr-only">Notifications</span>
-                </Button>
+                
                 <Button variant="ghost" size="icon" className="text-green-700 hover:text-green-800">
                   <span className="sr-only">Help</span>
                 </Button>
@@ -207,7 +205,7 @@ const Header = () => {
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:text-slate-900 transition-colors"
                   onClick={handleNavigation}
                 >
-                  Dashboard
+                 Invoices
                 </Link>
                 <Link
                   to="/reports" 

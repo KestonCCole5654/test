@@ -732,24 +732,13 @@ ${businessData.phone}`
 
     return (
       <div
-        className="bg-white"
-        style={{
-          width: "210mm",
-          minHeight: "287mm",
-          margin: 0,
-          boxSizing: "border-box",
-          background: "white",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "flex-start",
-        }}
+        className="bg-white w-full max-w-full box-border flex flex-col justify-start rounded-lg shadow-md p-6"
+        style={{ minHeight: '287mm', margin: 0 }}
       >
-
-
         {/* Header with logo */}
-        <div className="flex justify-between mt-8 items-center mb-8">
+        <div className="flex justify-between mt-4 items-center mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">INVOICE</h1>
+            <h1 className="text-2xl font-bold text-green-800">INVOICE</h1>
             <div className="space-y-1 mt-2">
               <p className="text-sm text-gray-500">Invoice number: {data.invoiceNumber}</p>
               <p className="text-sm text-gray-500">Invoice Created: {formatDate(data.date)}</p>
@@ -758,9 +747,9 @@ ${businessData.phone}`
         </div>
 
         {/* Business and Client Info */}
-        <div className="grid grid-cols-1  md:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           <div>
-            <h2 className="text-sm font-semibold text-gray-500 uppercase mb-2">From</h2>
+            <h2 className="text-sm font-semibold text-green-800 uppercase mb-2">From</h2>
             <div className="space-y-1">
               <p className="font-medium">{businessData.companyName || "Loading Company Details..."}</p>
               <p>{businessData.email || "contact@company.com"}</p>
@@ -770,7 +759,7 @@ ${businessData.phone}`
 
           <div>
             <div className="mb-4">
-              <h2 className="text-sm font-semibold text-gray-500 uppercase mb-2">Bill To</h2>
+              <h2 className="text-sm font-semibold text-green-800 uppercase mb-2">Bill To</h2>
               <div className="space-y-1">
                 <p className="font-medium">{data.customer.name}</p>
                 <p>{data.customer.email}</p>
@@ -779,18 +768,18 @@ ${businessData.phone}`
             </div>
           </div>
 
-          <div className="mt-5 font-medium w-[800px]">
-            <p className="text-xl">
+          <div className="mt-5 font-medium w-full">
+            <p className="text-xl text-green-800">
               ${formatCurrency(total)} due on <span className="pl-1">{formatDate(data.dueDate)}</span>
             </p>
           </div>
         </div>
 
         {/* Items Table */}
-        <div className="overflow-hidden mb-8">
-          <table className="w-full">
-            <thead className="bg-white">
-              <tr className="text-left text-md border-b font-medium text-gray-800">
+        <div className="overflow-x-auto w-full">
+          <table className="w-full max-w-full text-sm">
+            <thead className="bg-green-800 text-white">
+              <tr className="text-left text-md border-b font-medium">
                 <th className="py-3 px-1">Item</th>
                 <th className="py-3">Description</th>
                 <th className="py-3 text-right">Qty</th>
@@ -801,8 +790,8 @@ ${businessData.phone}`
             <tbody className="divide-y divide-gray-200">
               {data.items.map((item, i) => (
                 <tr key={i} className="text-gray-900">
-                  <td className="py-3 px-4">{item.name || `Item ${i + 1}`}</td>
-                  <td className="py-3 px-4">{item.description}</td>
+                  <td className="py-3 px-4 break-words">{item.name || `Item ${i + 1}`}</td>
+                  <td className="py-3 px-4 break-words">{item.description}</td>
                   <td className="py-3 px-4 text-right">{item.quantity}</td>
                   <td className="py-3 px-4 text-right">
                     ${formatCurrency(item.price === "" ? 0 : Number(item.price))}
@@ -817,7 +806,7 @@ ${businessData.phone}`
         </div>
 
         {/* Totals - Fixed right alignment */}
-        <div className="w-full">
+        <div className="w-full mt-6">
           <div className="float-right w-full md:w-1/2">
             <table className="w-full">
               <tbody>
@@ -834,8 +823,8 @@ ${businessData.phone}`
                   <td className="py-1 px-2 text-right font-medium text-gray-800">+${formatCurrency(totalTax)}</td>
                 </tr>
                 <tr className="border-t">
-                  <td className="py-2 px-2 text-right font-bold text-gray-800">Total</td>
-                  <td className="py-2 px-2 text-right font-bold text-lg text-gray-800">${formatCurrency(total)}</td>
+                  <td className="py-2 px-2 text-right font-bold text-green-800">Total</td>
+                  <td className="py-2 px-2 text-right font-bold text-lg text-green-800">${formatCurrency(total)}</td>
                 </tr>
               </tbody>
             </table>
@@ -845,7 +834,7 @@ ${businessData.phone}`
         {/* Notes */}
         {data.notes && (
           <div className="clear-both mt-8 pt-6">
-            <h2 className="text-sm font-semibold text-gray-500 uppercase mb-2">Notes</h2>
+            <h2 className="text-sm font-semibold text-green-800 uppercase mb-2">Notes</h2>
             <p className="text-gray-600 whitespace-pre-line">{data.notes}</p>
           </div>
         )}
@@ -1342,6 +1331,9 @@ ${businessData.phone}`
           </div>
         </div>
       )}
+      <footer className="w-full text-center text-xs text-gray-400 mt-10 mb-2">
+        Powered by <span className="font-bold text-green-800">SheetBills™</span>
+      </footer>
     </>
   )
 }

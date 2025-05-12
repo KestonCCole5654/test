@@ -930,7 +930,7 @@ ${businessData.phone}`
     <>
       {/* Preview Mode - Cleaned up */}
       {!isFormExpanded && (
-        <div className="max-w-7xl mx-auto mt-8">
+        <div className=" w-full max-w-3xl mx-auto mt-8">
           <div className="grid grid-cols-2 gap-4 mb-6 bg-white border rounded-lg p-6">
             <div className="space-y-1">
               <div className="text-sm text-gray-500 font-light">Invoice #:</div>

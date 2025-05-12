@@ -960,15 +960,13 @@ ${businessData.phone}`
               >
                 Edit Invoice
               </Button>
-             
             </div>
-            <div className="flex flex-col gap-4 sm:gap-2 sm:flex-row sm:items-center ml-auto mt-4 sm:mt-0">
-            <Button variant="default" className="font-inter font-medium" onClick={handleEmailInvoice}>Email Invoice</Button>
-              <Button variant="default" className="font-inter font-medium" onClick={() => window.print()}>Print</Button>
-              <Button variant="default" className="font-inter font-medium" onClick={() => {/* TODO: implement get link */}}>Get Link</Button>
-            </div>
-
           </div>
+            <div className="flex flex-row gap-4 sm:gap-2 sm:flex-row sm:items-center ml-auto mt-4 sm:mt-0">
+              <Button variant="default" className="font-inter font-medium" onClick={handleEmailInvoice}>Email Invoice</Button>
+                <Button variant="default" className="font-inter font-medium" onClick={() => window.print()}>Print</Button>
+                <Button variant="default" className="font-inter font-medium" onClick={() => {/* TODO: implement get link */}}>Get Link</Button>
+            </div>
 
           {/* Invoice Preview */}
           <div className="bg-white rounded-lg shadow-lg p-8 min-h-[600px] flex items-center justify-center">

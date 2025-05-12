@@ -1285,7 +1285,14 @@ ${businessData.phone}`
             </CollapsibleContent>
           </Collapsible>
 
-         
+          {/* Preview Section */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-4">
+              <div className="bg-white rounded-lg shadow-lg p-4 overflow-auto max-h-[calc(100vh-2rem)]">
+                <InvoiceClassic data={invoiceData} businessData={businessData} />
+              </div>
+            </div>
+          </div>
         </div>
 
         {showSuccessModal && (

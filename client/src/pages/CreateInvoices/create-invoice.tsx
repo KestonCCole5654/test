@@ -732,7 +732,7 @@ ${businessData.phone}`
 
     return (
       <div
-        className="bg-white w-full font-inter max-w-full box-border flex flex-col justify-start shadow-sm"
+        className="bg-white w-full font-inter max-w-full box-border flex flex-col justify-start shadow-md"
         style={{ minHeight: '287mm', margin: 0 }}
       >
         {/* Header with logo */}

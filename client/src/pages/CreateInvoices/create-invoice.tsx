@@ -1275,7 +1275,8 @@ ${businessData.phone}`
             </CollapsibleContent>
           </Collapsible>
 
-          {/* Preview Section */}
+          {/* --- REMOVED: Invoice Summary Card (Preview Section) --- */}
+          {/* 
           <div className="transition-all duration-500 ease-in-out col-span-full w-full lg:col-span-1">
             <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-sm mx-auto">
               <h2 className="text-xl font-bold mb-4 text-emerald-700">Invoice Summary</h2>
@@ -1307,6 +1308,8 @@ ${businessData.phone}`
               </div>
             </div>
           </div>
+          */}
+          {/* --- END REMOVED --- */}
         </div>
 
         {showSuccessModal && (
@@ -1323,7 +1326,7 @@ ${businessData.phone}`
             </div>
           </div>
         )}
-        
+
       </div>
     </>
   )

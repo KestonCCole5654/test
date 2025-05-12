@@ -732,16 +732,16 @@ ${businessData.phone}`
 
     return (
       <div
-        className="bg-white w-full max-w-full box-border flex flex-col justify-start rounded-lg shadow-md p-6"
+        className="bg-white w-full font-inter max-w-full box-border flex flex-col justify-start  shadow-md p-4"
         style={{ minHeight: '287mm', margin: 0 }}
       >
         {/* Header with logo */}
         <div className="flex justify-between mt-4 items-center mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-green-800">INVOICE</h1>
+            <h1 className="text-2xl font-inter font-medium text-green-800">INVOICE</h1>
             <div className="space-y-1 mt-2">
-              <p className="text-sm text-gray-500">Invoice number: {data.invoiceNumber}</p>
-              <p className="text-sm text-gray-500">Invoice Created: {formatDate(data.date)}</p>
+              <p className="text-sm font-inter font-light text-gray-500">Invoice number: {data.invoiceNumber}</p>
+              <p className="text-sm font-inter font-light text-gray-500">Invoice Created: {formatDate(data.date)}</p>
             </div>
           </div>
         </div>

@@ -778,20 +778,20 @@ ${businessData.phone}`
         {/* Items Table */}
         <div className="overflow-x-auto font-inter w-full">
           <table className="w-full font-inter max-w-full text-sm">
-            <thead className="bg-green-800 text-white p-8">
-              <tr className="text-center text-lg border-b font-semibold">
-                <th className="py-3 px-6 first:pl-8 last:pr-8 font-inter font-bold text-base text-green-100">Item</th>
-                <th className="py-3 px-6 first:pl-8 last:pr-8 font-inter font-bold text-base text-green-100">Description</th>
-                <th className="py-3 px-6 first:pl-8 last:pr-8 font-inter font-bold text-base text-green-100 text-right">Qty</th>
-                <th className="py-3 px-6 first:pl-8 last:pr-8 font-inter font-bold text-base text-green-100 text-right">Price</th>
-                <th className="py-3 px-6 first:pl-8 last:pr-8 font-inter font-bold text-base text-green-100 text-right">Amount</th>
+            <thead className="bg-green-800 text-white">
+              <tr className="border-b font-semibold">
+                <th className="py-3 px-6 first:pl-8 last:pr-8 text-left font-inter font-bold text-base text-green-100">Item</th>
+                <th className="py-3 px-6 first:pl-8 last:pr-8 text-left font-inter font-bold text-base text-green-100">Description</th>
+                <th className="py-3 px-6 first:pl-8 last:pr-8 text-right font-inter font-bold text-base text-green-100">Qty</th>
+                <th className="py-3 px-6 first:pl-8 last:pr-8 text-right font-inter font-bold text-base text-green-100">Price</th>
+                <th className="py-3 px-6 first:pl-8 last:pr-8 text-right font-inter font-bold text-base text-green-100">Amount</th>
               </tr>
             </thead>
             <tbody className="divide-y font-inter divide-gray-200">
               {data.items.map((item, i) => (
                 <tr key={i} className="text-gray-900">
-                  <td className="py-3 px-6 first:pl-8 last:pr-8 break-words">{item.name || `Item ${i + 1}`}</td>
-                  <td className="py-3 px-6 first:pl-8 last:pr-8 break-words">{item.description}</td>
+                  <td className="py-3 px-6 first:pl-8 last:pr-8 text-left break-words">{item.name || `Item ${i + 1}`}</td>
+                  <td className="py-3 px-6 first:pl-8 last:pr-8 text-left break-words">{item.description}</td>
                   <td className="py-3 px-6 first:pl-8 last:pr-8 text-right">{item.quantity}</td>
                   <td className="py-3 px-6 first:pl-8 last:pr-8 text-right">
                     ${formatCurrency(item.price === "" ? 0 : Number(item.price))}

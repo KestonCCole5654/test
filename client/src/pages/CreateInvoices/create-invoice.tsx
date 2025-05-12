@@ -939,21 +939,7 @@ ${businessData.phone}`
 
   return (
     <>
-      {/* Premium Welcome Header for Create Invoice
-      <div className="w-full bg-gradient-to-r from-emerald-600 to-emerald-400 py-10 shadow-lg rounded-b-3xl mb-10">
-        <div className="container max-w-3xl mx-auto flex flex-col items-center justify-center">
-          <h1 className="text-3xl font-extrabold text-white tracking-tight mb-2 text-center">
-            {invoiceToEdit ? "Invoice Details" : "Create Invoice"}
-          </h1>
-          <p className="text-lg text-emerald-50 text-center max-w-2xl">
-            {invoiceToEdit
-              ? `Invoice #${invoiceData.invoiceNumber} - ${new Date(invoiceData.date).toLocaleDateString()}`
-              : "Generate and download professional invoices with ease."}
-          </p>
-        </div>
-      </div>
-      
-      */}
+     
 
 
       {/* Main Content */}
@@ -1337,6 +1323,7 @@ ${businessData.phone}`
             </div>
           </div>
         )}
+        
       </div>
     </>
   )

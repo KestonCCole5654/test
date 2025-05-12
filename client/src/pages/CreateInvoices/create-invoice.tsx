@@ -747,7 +747,7 @@ ${businessData.phone}`
         </div>
 
         {/* Business and Client Info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-8">
           <div>
             <h2 className="text-sm font-inter font-medium text-green-800 uppercase mb-2">From</h2>
             <div className="space-y-1">

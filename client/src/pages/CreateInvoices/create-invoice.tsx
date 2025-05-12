@@ -1275,41 +1275,7 @@ ${businessData.phone}`
             </CollapsibleContent>
           </Collapsible>
 
-          {/* --- REMOVED: Invoice Summary Card (Preview Section) --- */}
-          {/* 
-          <div className="transition-all duration-500 ease-in-out col-span-full w-full lg:col-span-1">
-            <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-sm mx-auto">
-              <h2 className="text-xl font-bold mb-4 text-emerald-700">Invoice Summary</h2>
-              <div className="mb-4 space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Status:</span>
-                  <span className={`font-semibold ${invoiceData.status === "Paid" ? "text-green-600" : "text-yellow-600"}`}>
-                    {invoiceData.status}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Amount:</span>
-                  <span className="font-bold text-lg text-gray-900">
-                    ${formatCurrency(calculateTotal())}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Client:</span>
-                  <span className="text-gray-800">{invoiceData.customer.name || "N/A"}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Due Date:</span>
-                  <span className="text-gray-800">{invoiceData.dueDate}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Invoice #:</span>
-                  <span className="text-gray-800">{invoiceData.invoiceNumber}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          */}
-          {/* --- END REMOVED --- */}
+         
         </div>
 
         {showSuccessModal && (

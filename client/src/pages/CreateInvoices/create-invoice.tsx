@@ -939,378 +939,408 @@ ${businessData.phone}`
 
   return (
     <>
-     
-
-
-      {/* Main Content */}
-      <div className=" mt-0 font-AfacadFlux w-full py-4 sm:py-8 px-4 mx-auto  rounded-b-3xl mb-10">
-        <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gradient-to-r from-emerald-600 to-emerald-700 shadow-lg rounded-2xl px-6 py-8">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate(-1)}
-              className="h-8 w-8 text-white"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span className="sr-only">Back</span>
-            </Button>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-                  {invoiceToEdit ? "Invoice Detail" : "Create Invoice"}
-                </h1>
-                {invoiceToEdit && (
-                  <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${invoiceToEdit.status === "Paid"
-                    ? "bg-green-100 border border-green-200 text-green-800"
-                    : "bg-yellow-100 text-yellow-800"
-                    }`}>
-                    {invoiceToEdit.status === "Paid" ? (
-                      <CheckCircle className="h-3 w-3" />
-                    ) : (
-                      <Clock className="h-3 w-3" />
-                    )}
-                    {invoiceToEdit.status}
-                  </div>
-                )}
-              </div>
-              <p className="mt-2 text-sm sm:text-base text-emerald-50">
-                {invoiceToEdit
-                  ? `Invoice #${invoiceData.invoiceNumber} - ${new Date(invoiceData.date).toLocaleDateString()}`
-                  : "Generate and download professional invoices. "}
-              </p>
+      {/* Preview Mode */}
+      {!isFormExpanded && (
+        <div className="w-full max-w-3xl mx-auto mt-8">
+          {/* Summary Card */}
+          <div className="bg-gray-50 border rounded-lg shadow p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+            <div className="space-y-1">
+              <div className="text-sm text-gray-500">Invoice #:</div>
+              <div className="font-bold text-lg text-gray-800">{invoiceData.invoiceNumber}</div>
+              <div className="text-sm text-gray-500 mt-2">Billed To:</div>
+              <div className="font-medium text-gray-700">{invoiceData.customer.name || 'Customer Name'}</div>
+              <div className="text-sm text-gray-500 mt-2">Amount Due:</div>
+              <div className="font-bold text-xl text-green-700">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
             <Button
               variant="outline"
-              onClick={() => setIsFormExpanded(!isFormExpanded)}
-              className="flex items-center gap-2 bg-white text-emerald-700 border-emerald-200 hover:bg-emerald-50 font-bold shadow"
+              className="ml-auto mt-4 sm:mt-0"
+              onClick={() => setIsFormExpanded(true)}
             >
-              {isFormExpanded ? "Hide Form" : invoiceToEdit ? "Edit Invoice" : "Show Form"}
-              <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${isFormExpanded ? "rotate-180" : ""}`} />
+              Edit Invoice
             </Button>
           </div>
+
+          {/* Action Buttons Row */}
+          <div className="flex flex-wrap justify-center gap-4 mb-6">
+            <Button variant="outline" onClick={handleEmailInvoice}>Email Invoice</Button>
+            <Button variant="outline" onClick={() => window.print()}>Print</Button>
+            <Button variant="outline" onClick={() => {/* TODO: implement get link */}}>Get Link</Button>
+          </div>
+
+          {/* Invoice Preview */}
+          <div className="bg-white rounded-lg shadow-lg p-8 min-h-[600px] flex items-center justify-center">
+            <div className="w-full overflow-auto">
+              <InvoiceClassic data={invoiceData} businessData={businessData} />
+            </div>
+          </div>
         </div>
+      )}
 
-
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 relative">
-          {/* Add a vertical separator between form and preview */}
-          {isFormExpanded && (
-            <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-border -translate-x-1/2 z-10"></div>
-          )}
-
-          {/* Form Section - Now Collapsible */}
-          <Collapsible open={isFormExpanded} onOpenChange={setIsFormExpanded} className="lg:col-span-1">
-            <CollapsibleContent className="space-y-6 transition-all duration-300 ease-in-out">
-              {/* Simplified Invoice Details Card */}
-              <Card className="shadow-sm">
-                <CardHeader>
-                  <CardTitle className="flex items-center">Invoice Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Invoice Details - Used to collect invoice due date and date, invoice number is generated automatically */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <Label htmlFor="invoiceNumber">Invoice #</Label>
-                      <Input
-                        id="invoiceNumber"
-                        value={invoiceData.invoiceNumber}
-                        onChange={(e) => updateInvoiceData("invoiceNumber", e.target.value)}
-                        disabled={!!invoiceToEdit}
-                      />
+      {/* Edit Mode (Form) */}
+      {isFormExpanded && (
+        <div className=" mt-0 font-AfacadFlux w-full py-4 sm:py-8 px-4 mx-auto  rounded-b-3xl mb-10">
+          <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gradient-to-r from-emerald-600 to-emerald-700 shadow-lg rounded-2xl px-6 py-8">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsFormExpanded(false)}
+                className="h-8 w-8 text-white"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                <span className="sr-only">Back</span>
+              </Button>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+                    {invoiceToEdit ? "Invoice Detail" : "Create Invoice"}
+                  </h1>
+                  {invoiceToEdit && (
+                    <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${invoiceToEdit.status === "Paid"
+                      ? "bg-green-100 border border-green-200 text-green-800"
+                      : "bg-yellow-100 text-yellow-800"
+                      }`}>
+                      {invoiceToEdit.status === "Paid" ? (
+                        <CheckCircle className="h-3 w-3" />
+                      ) : (
+                        <Clock className="h-3 w-3" />
+                      )}
+                      {invoiceToEdit.status}
                     </div>
-                    <div>
-                      <Label htmlFor="date">Date</Label>
-                      <Input
-                        id="date"
-                        type="date"
-                        value={invoiceData.date}
-                        onChange={(e) => updateInvoiceData("date", e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="dueDate">Due Date</Label>
-                      <Input
-                        id="dueDate"
-                        type="date"
-                        value={invoiceData.dueDate}
-                        onChange={(e) => updateInvoiceData("dueDate", e.target.value)}
-                      />
-                    </div>
-                  </div>
+                  )}
+                </div>
+                <p className="mt-2 text-sm sm:text-base text-emerald-50">
+                  {invoiceToEdit
+                    ? `Invoice #${invoiceData.invoiceNumber} - ${new Date(invoiceData.date).toLocaleDateString()}`
+                    : "Generate and download professional invoices. "}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setIsFormExpanded(!isFormExpanded)}
+                className="flex items-center gap-2 bg-white text-emerald-700 border-emerald-200 hover:bg-emerald-50 font-bold shadow"
+              >
+                {isFormExpanded ? "Hide Form" : invoiceToEdit ? "Edit Invoice" : "Show Form"}
+                <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${isFormExpanded ? "rotate-180" : ""}`} />
+              </Button>
+            </div>
+          </div>
 
-                  {/* Customer Information - Used to collect customer name, email and address */}
-                  <div className="pt-2">
-                    <h3 className="text-sm font-medium mb-2">Customer Information</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* Customer Name - Used to collect customer name */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 relative">
+            {isFormExpanded && (
+              <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-border -translate-x-1/2 z-10"></div>
+            )}
+            <Collapsible open={isFormExpanded} onOpenChange={setIsFormExpanded} className="lg:col-span-1">
+              <CollapsibleContent className="space-y-6 transition-all duration-300 ease-in-out">
+                {/* Simplified Invoice Details Card */}
+                <Card className="shadow-sm">
+                  <CardHeader>
+                    <CardTitle className="flex items-center">Invoice Information</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Invoice Details - Used to collect invoice due date and date, invoice number is generated automatically */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
-                        <Label htmlFor="customerName">Name</Label>
+                        <Label htmlFor="invoiceNumber">Invoice #</Label>
                         <Input
-                          id="customerName"
-                          value={invoiceData.customer.name}
-                          onChange={(e) => updateInvoiceData("customer.name", e.target.value)}
-                          placeholder="Customer name"
+                          id="invoiceNumber"
+                          value={invoiceData.invoiceNumber}
+                          onChange={(e) => updateInvoiceData("invoiceNumber", e.target.value)}
+                          disabled={!!invoiceToEdit}
                         />
                       </div>
-                      {/* Customer Email - Used to collect customer email */}
                       <div>
-                        <Label htmlFor="customerEmail">Email</Label>
+                        <Label htmlFor="date">Date</Label>
                         <Input
-                          id="customerEmail"
-                          type="email"
-                          value={invoiceData.customer.email}
-                          onChange={(e) => updateInvoiceData("customer.email", e.target.value)}
-                          placeholder="customer@example.com"
+                          id="date"
+                          type="date"
+                          value={invoiceData.date}
+                          onChange={(e) => updateInvoiceData("date", e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="dueDate">Due Date</Label>
+                        <Input
+                          id="dueDate"
+                          type="date"
+                          value={invoiceData.dueDate}
+                          onChange={(e) => updateInvoiceData("dueDate", e.target.value)}
                         />
                       </div>
                     </div>
-                    {/* Customer Address - Used to collect customer address */}
-                    <div className="mt-2">
-                      <Label htmlFor="customerAddress">Address</Label>
-                      <Textarea
-                        id="customerAddress"
-                        value={invoiceData.customer.address}
-                        onChange={(e) => updateInvoiceData("customer.address", e.target.value)}
-                        placeholder="Customer address"
-                        rows={2}
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
 
-              {/* Invoice Items - Used to collect invoice items, name, description, quantity, price, discount and tax */}
-              <Card>
-                {/* Invoice Items Header - Used to collect invoice items, name, description, quantity, price, discount and tax */}
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <div>Items</div>
-                    <Button variant="outline" type="button" onClick={addItem} size="sm">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Item
+                    {/* Customer Information - Used to collect customer name, email and address */}
+                    <div className="pt-2">
+                      <h3 className="text-sm font-medium mb-2">Customer Information</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Customer Name - Used to collect customer name */}
+                        <div>
+                          <Label htmlFor="customerName">Name</Label>
+                          <Input
+                            id="customerName"
+                            value={invoiceData.customer.name}
+                            onChange={(e) => updateInvoiceData("customer.name", e.target.value)}
+                            placeholder="Customer name"
+                          />
+                        </div>
+                        {/* Customer Email - Used to collect customer email */}
+                        <div>
+                          <Label htmlFor="customerEmail">Email</Label>
+                          <Input
+                            id="customerEmail"
+                            type="email"
+                            value={invoiceData.customer.email}
+                            onChange={(e) => updateInvoiceData("customer.email", e.target.value)}
+                            placeholder="customer@example.com"
+                          />
+                        </div>
+                      </div>
+                      {/* Customer Address - Used to collect customer address */}
+                      <div className="mt-2">
+                        <Label htmlFor="customerAddress">Address</Label>
+                        <Textarea
+                          id="customerAddress"
+                          value={invoiceData.customer.address}
+                          onChange={(e) => updateInvoiceData("customer.address", e.target.value)}
+                          placeholder="Customer address"
+                          rows={2}
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Invoice Items - Used to collect invoice items, name, description, quantity, price, discount and tax */}
+                <Card>
+                  {/* Invoice Items Header - Used to collect invoice items, name, description, quantity, price, discount and tax */}
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <div>Items</div>
+                      <Button variant="outline" type="button" onClick={addItem} size="sm">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Item
+                      </Button>
+                    </CardTitle>
+                  </CardHeader>
+                  {/* Invoice Items Content - Used to collect invoice items, name, description, quantity, price, discount and tax */}
+                  <CardContent>
+                    <div className="space-y-6">
+
+                      {invoiceData.items.map((item, index) => (
+                        <div key={index} className="border rounded-lg p-4 space-y-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium">Item {index + 1}</span>
+                              <span className="text-sm text-slate-500">
+                                {item.name || "Unnamed Item"}
+                              </span>
+                            </div>
+                            {/* Remove Item Button - Used to remove invoice item */}
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeItem(index)}
+                              className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">Remove item</span>
+                            </Button>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Item Name - Used to collect invoice item name */}
+                            <div className="flex flex-col gap-2">
+                              <Label htmlFor={`item-name-${index}`}>Name</Label>
+                              <Input
+                                id={`item-name-${index}`}
+                                value={item.name}
+                                onChange={(e) => updateItem(index, "name", e.target.value)}
+                                placeholder="Item name"
+                              />
+                            </div>
+                            {/* Item Description - Used to collect invoice item description */}
+                            <div className="flex flex-col gap-2">
+                              <Label htmlFor={`item-description-${index}`}>Description</Label>
+                              <Textarea
+                                id={`item-description-${index}`}
+                                value={item.description}
+                                onChange={(e) => updateItem(index, "description", e.target.value)}
+                                placeholder="Item description"
+                              />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            {/* Item Quantity - Used to collect invoice item quantity */}
+                            <div className="flex flex-col gap-2">
+                              <Label htmlFor={`item-quantity-${index}`}>Quantity</Label>
+                              <Input
+                                id={`item-quantity-${index}`}
+                                type="number"
+                                value={item.quantity}
+                                onChange={(e) => updateItem(index, "quantity", parseInt(e.target.value) || 0)}
+                                min="0"
+                              />
+                            </div>
+                            {/* Item Price - Used to collect invoice item price */}
+                            <div className="flex flex-col gap-2">
+                              <Label htmlFor={`item-price-${index}`}>Price</Label>
+                              <Input
+                                id={`item-price-${index}`}
+                                type="number"
+                                value={item.price}
+                                onChange={(e) => updateItem(index, "price", parseFloat(e.target.value) || 0)}
+                                min="0"
+                                step="0.01"
+                              />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            {/* Item Discount - Used to collect invoice item discount */}
+                            <div className="flex flex-col gap-2">
+                              <Label htmlFor={`item-discount-${index}`}>Discount</Label>
+                              <div className="flex gap-2">
+                                <Select
+                                  value={item.discount.type}
+                                  onValueChange={(value) => {
+                                    updateItem(index, "discount", { ...item.discount, type: value });
+                                  }}
+                                >
+                                  <SelectTrigger className="w-24">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="percentage">%</SelectItem>
+                                    <SelectItem value="fixed">$</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <Input
+                                  id={`item-discount-${index}`}
+                                  type="number"
+                                  value={item.discount.value}
+                                  onChange={(e) => updateItem(index, "discount", { ...item.discount, value: parseFloat(e.target.value) || 0 })}
+                                  min="0"
+                                  step="0.01"
+                                  className="flex-1"
+                                />
+                              </div>
+                            </div>
+                            {/* Item Tax - Used to collect invoice item tax */}
+                            <div className="flex flex-col gap-2">
+                              <Label htmlFor={`item-tax-${index}`}>Tax</Label>
+                              <div className="flex gap-2">
+                                <Select
+                                  value={item.tax.type}
+                                  onValueChange={(value) => {
+                                    updateItem(index, "tax", { ...item.tax, type: value });
+                                  }}
+                                >
+                                  <SelectTrigger className="w-24">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="percentage">%</SelectItem>
+                                    <SelectItem value="fixed">$</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                {/* Item Tax Value - Used to collect invoice item tax value */}
+                                <Input
+                                  id={`item-tax-${index}`}
+                                  type="number"
+                                  value={item.tax.value}
+                                  onChange={(e) => updateItem(index, "tax", { ...item.tax, value: parseFloat(e.target.value) || 0 })}
+                                  min="0"
+                                  step="0.01"
+                                  className="flex-1"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Notes */}
+                <Card className="shadow-sm">
+                  <CardHeader>
+                    <CardTitle className="flex items-center">Notes</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-col gap-4">
+                      <div className="flex flex-col gap-2">
+                        <Label htmlFor="notes">Notes</Label>
+                        <Textarea
+                          id="notes"
+                          value={invoiceData.notes}
+                          onChange={(e) => updateInvoiceData("notes", e.target.value)}
+                          placeholder="Add any additional notes or terms..."
+                          className="min-h-[100px]"
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Save and Download Invoice Button - Used to save and download invoice */}
+                <div className="flex gap-3 justify-end no-print flex-wrap">
+                  {/* Update Invoice Button - Used to update invoice */}
+                  {invoiceToEdit ? (
+                    <Button
+                      variant="outline"
+                      onClick={handleUpdate}
+                      className="w-full sm:w-auto bg-green-600 text-white hover:bg-green-700"
+                    >
+                      Update Invoice
                     </Button>
-                  </CardTitle>
-                </CardHeader>
-                {/* Invoice Items Content - Used to collect invoice items, name, description, quantity, price, discount and tax */}
-                <CardContent>
-                  <div className="space-y-6">
-
-                    {invoiceData.items.map((item, index) => (
-                      <div key={index} className="border rounded-lg p-4 space-y-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">Item {index + 1}</span>
-                            <span className="text-sm text-slate-500">
-                              {item.name || "Unnamed Item"}
-                            </span>
-                          </div>
-                          {/* Remove Item Button - Used to remove invoice item */}
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => removeItem(index)}
-                            className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            <span className="sr-only">Remove item</span>
-                          </Button>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {/* Item Name - Used to collect invoice item name */}
-                          <div className="flex flex-col gap-2">
-                            <Label htmlFor={`item-name-${index}`}>Name</Label>
-                            <Input
-                              id={`item-name-${index}`}
-                              value={item.name}
-                              onChange={(e) => updateItem(index, "name", e.target.value)}
-                              placeholder="Item name"
-                            />
-                          </div>
-                          {/* Item Description - Used to collect invoice item description */}
-                          <div className="flex flex-col gap-2">
-                            <Label htmlFor={`item-description-${index}`}>Description</Label>
-                            <Textarea
-                              id={`item-description-${index}`}
-                              value={item.description}
-                              onChange={(e) => updateItem(index, "description", e.target.value)}
-                              placeholder="Item description"
-                            />
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          {/* Item Quantity - Used to collect invoice item quantity */}
-                          <div className="flex flex-col gap-2">
-                            <Label htmlFor={`item-quantity-${index}`}>Quantity</Label>
-                            <Input
-                              id={`item-quantity-${index}`}
-                              type="number"
-                              value={item.quantity}
-                              onChange={(e) => updateItem(index, "quantity", parseInt(e.target.value) || 0)}
-                              min="0"
-                            />
-                          </div>
-                          {/* Item Price - Used to collect invoice item price */}
-                          <div className="flex flex-col gap-2">
-                            <Label htmlFor={`item-price-${index}`}>Price</Label>
-                            <Input
-                              id={`item-price-${index}`}
-                              type="number"
-                              value={item.price}
-                              onChange={(e) => updateItem(index, "price", parseFloat(e.target.value) || 0)}
-                              min="0"
-                              step="0.01"
-                            />
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          {/* Item Discount - Used to collect invoice item discount */}
-                          <div className="flex flex-col gap-2">
-                            <Label htmlFor={`item-discount-${index}`}>Discount</Label>
-                            <div className="flex gap-2">
-                              <Select
-                                value={item.discount.type}
-                                onValueChange={(value) => {
-                                  updateItem(index, "discount", { ...item.discount, type: value });
-                                }}
-                              >
-                                <SelectTrigger className="w-24">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="percentage">%</SelectItem>
-                                  <SelectItem value="fixed">$</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <Input
-                                id={`item-discount-${index}`}
-                                type="number"
-                                value={item.discount.value}
-                                onChange={(e) => updateItem(index, "discount", { ...item.discount, value: parseFloat(e.target.value) || 0 })}
-                                min="0"
-                                step="0.01"
-                                className="flex-1"
-                              />
-                            </div>
-                          </div>
-                          {/* Item Tax - Used to collect invoice item tax */}
-                          <div className="flex flex-col gap-2">
-                            <Label htmlFor={`item-tax-${index}`}>Tax</Label>
-                            <div className="flex gap-2">
-                              <Select
-                                value={item.tax.type}
-                                onValueChange={(value) => {
-                                  updateItem(index, "tax", { ...item.tax, type: value });
-                                }}
-                              >
-                                <SelectTrigger className="w-24">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="percentage">%</SelectItem>
-                                  <SelectItem value="fixed">$</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              {/* Item Tax Value - Used to collect invoice item tax value */}
-                              <Input
-                                id={`item-tax-${index}`}
-                                type="number"
-                                value={item.tax.value}
-                                onChange={(e) => updateItem(index, "tax", { ...item.tax, value: parseFloat(e.target.value) || 0 })}
-                                min="0"
-                                step="0.01"
-                                className="flex-1"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Notes */}
-              <Card className="shadow-sm">
-                <CardHeader>
-                  <CardTitle className="flex items-center">Notes</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-col gap-4">
-                    <div className="flex flex-col gap-2">
-                      <Label htmlFor="notes">Notes</Label>
-                      <Textarea
-                        id="notes"
-                        value={invoiceData.notes}
-                        onChange={(e) => updateInvoiceData("notes", e.target.value)}
-                        placeholder="Add any additional notes or terms..."
-                        className="min-h-[100px]"
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Save and Download Invoice Button - Used to save and download invoice */}
-              <div className="flex gap-3 justify-end no-print flex-wrap">
-                {/* Update Invoice Button - Used to update invoice */}
-                {invoiceToEdit ? (
-                  <Button
-                    variant="outline"
-                    onClick={handleUpdate}
-                    className="w-full sm:w-auto bg-green-600 text-white hover:bg-green-700"
-                  >
-                    Update Invoice
+                  ) : (
+                    <Button
+                      variant="outline"
+                      onClick={handleSave}
+                      className="w-full sm:w-auto bg-green-600 text-white hover:bg-green-700"
+                    >
+                      Save Invoice
+                    </Button>
+                  )}
+                  {/* Print Invoice Button - Used to print invoice */}
+                  <Button variant="outline" onClick={() => window.print()} className="w-full sm:w-auto text-white">
+                    Print Invoice
                   </Button>
-                ) : (
-                  <Button
-                    variant="outline"
-                    onClick={handleSave}
-                    className="w-full sm:w-auto bg-green-600 text-white hover:bg-green-700"
-                  >
-                    Save Invoice
-                  </Button>
-                )}
-                {/* Print Invoice Button - Used to print invoice */}
-                <Button variant="outline" onClick={() => window.print()} className="w-full sm:w-auto text-white">
-                  Print Invoice
-                </Button>
-                {/* Email Invoice Button - Used to email invoice */}
-               
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+                  {/* Email Invoice Button - Used to email invoice */}
+                 
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
 
-          {/* Preview Section */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-4">
-              <div className="bg-white rounded-lg shadow-lg p-4 overflow-auto max-h-[calc(100vh-2rem)]">
-                <InvoiceClassic data={invoiceData} businessData={businessData} />
+            {/* Preview Section */}
+            <div className="lg:col-span-1">
+              <div className="sticky top-4">
+                <div className="bg-white rounded-lg shadow-lg p-4 overflow-auto max-h-[calc(100vh-2rem)]">
+                  <InvoiceClassic data={invoiceData} businessData={businessData} />
+                </div>
               </div>
             </div>
           </div>
         </div>
-
-        {showSuccessModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-            <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col items-center">
-              {/* Checkmark animation */}
-              <svg className="w-16 h-16 text-green-600 mb-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" />
-                <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M8 12l3 3 5-5" />
-              </svg>
-              <h2 className="text-2xl font-bold mb-2 text-green-700">Invoice Saved!</h2>
-              <p className="mb-4 text-gray-600">Your invoice has been saved successfully.</p>
-
-            </div>
+      )}
+      {/* Success Modal and other overlays remain unchanged */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col items-center">
+            {/* Checkmark animation */}
+            <svg className="w-16 h-16 text-green-600 mb-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" />
+              <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M8 12l3 3 5-5" />
+            </svg>
+            <h2 className="text-2xl font-bold mb-2 text-green-700">Invoice Saved!</h2>
+            <p className="mb-4 text-gray-600">Your invoice has been saved successfully.</p>
           </div>
-        )}
-
-      </div>
+        </div>
+      )}
     </>
   )
 }

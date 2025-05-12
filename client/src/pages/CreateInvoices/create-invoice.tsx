@@ -952,7 +952,7 @@ ${businessData.phone}`
             <div className="col-span-2 flex justify-center mt-4">
               <Button variant="outline" className="font-light mx-2" onClick={handleEmailInvoice}>Email Invoice</Button>
               <Button variant="outline" className="font-light mx-2" onClick={() => window.print()}>Print Invoice</Button>
-              <Button variant="outline" className="font-light mx-2" onClick={() => {/* TODO: implement get link */}}>Get Invoice Link</Button>
+              <Button variant="outline" className="font-light mx-2" onClick={() => {/* TODO: implement get link */}}>Generate Invoice Link</Button>
             </div>
           </div>
 
@@ -970,7 +970,7 @@ ${businessData.phone}`
         <div className=" mt-0 font-inter w-full py-4 sm:py-8 px-4 mx-auto rounded-b-3xl mb-10">
           <div className="mb-8">
             {/* Breadcrumb Navigation - styled like the reference image */}
-            <nav className="flex items-center space-x-2 text-sm mb-3 select-none" aria-label="Breadcrumb">
+            <nav className="flex items-center space-x-2 text-sm mb-3 select-none border-t border-b border-gray-200 py-2" aria-label="Breadcrumb">
               <a
                 href="/dashboard"
                 className="text-blue-700 font-medium underline underline-offset-2 px-2 py-1 rounded transition hover:bg-blue-50 focus:bg-blue-100 focus:outline-none"

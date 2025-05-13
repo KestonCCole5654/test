@@ -93,7 +93,7 @@ const Header = () => {
               <>
                 <Link
                   to="/invoices"
-                  className="px-3 py-2 rounded-md text-slate-100 hover:bg-green-100 hover:text-slate-900 transition-colors"
+                  className="px-3 py-2 rounded-md text-slate-200 hover:bg-green-100 hover:text-slate-900 transition-colors"
                   onClick={handleNavigation}
                 >
                  Invoices
@@ -101,14 +101,14 @@ const Header = () => {
            
                 <Link
                   to="/settings"
-                  className="px-3 py-2 rounded-md text-slate-100 hover:bg-green-100 hover:text-slate-900 transition-colors"
+                  className="px-3 py-2 rounded-md text-slate-200 hover:bg-green-100 hover:text-slate-900 transition-colors"
                   onClick={handleNavigation}
                 >
                   Account & Settings
                 </Link>
                 <Link
                   to="/contact"
-                  className="px-3 py-2 rounded-md text-slate-100 hover:bg-green-100 hover:text-slate-900 transition-colors"
+                  className="px-3 py-2 rounded-md text-slate-200 hover:bg-green-100 hover:text-slate-900 transition-colors"
                   onClick={handleNavigation}
                 >
                   Contact & Support
@@ -129,14 +129,14 @@ const Header = () => {
                       className="flex items-center gap-2 px-2 py-1.5 rounded-full hover:bg-green-100 transition-colors"
                     >
                       <Avatar className="h-8 w-8 ">
-                        <AvatarFallback className="bg-green-100 text-black ">
+                        <AvatarFallback className="bg-green-200 text-black ">
                           {user.email?.charAt(0).toUpperCase() || "U"}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="text-slate-100 font-medium hidden sm:inline-block max-w-[120px] truncate">
+                      <span className="text-slate-200 font-medium hidden sm:inline-block max-w-[120px] truncate">
                         {user.email?.split("@")[0] || "User"}
                       </span>
-                      <ChevronDown size={16} className="text-slate-100" />
+                      <ChevronDown size={16} className="text-slate-200" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">

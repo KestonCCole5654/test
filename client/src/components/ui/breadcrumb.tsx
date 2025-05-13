@@ -9,7 +9,14 @@ const Breadcrumb = React.forwardRef<
   React.ComponentPropsWithoutRef<"nav"> & {
     separator?: React.ReactNode
   }
->(({ ...props }, ref) => <nav ref={ref} aria-label="breadcrumb" {...props} />)
+>(({ ...props }, ref) => (
+  <nav 
+    ref={ref} 
+    aria-label="breadcrumb" 
+    className="bg-gray-800 rounded-lg p-3 border border-gray-700"
+    {...props} 
+  />
+))
 Breadcrumb.displayName = "Breadcrumb"
 
 const BreadcrumbList = React.forwardRef<
@@ -19,7 +26,7 @@ const BreadcrumbList = React.forwardRef<
   <ol
     ref={ref}
     className={cn(
-      "flex flex-wrap items-center gap-1.5 break-words text-sm text-green-800 sm:gap-2.5 mt-0 mb-0",
+      "flex flex-wrap items-center gap-1.5 break-words text-sm text-gray-100 sm:gap-2.5 mt-0 mb-0",
       className
     )}
     {...props}
@@ -51,7 +58,7 @@ const BreadcrumbLink = React.forwardRef<
     <Comp
       ref={ref}
       className={cn(
-        "transition-colors hover:text-green-900 font-medium px-2 py-1 rounded focus:outline-none relative after:absolute after:left-0 after:bottom-0 after:w-full after:h-0.5 after:bg-green-800 after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:origin-left",
+        "transition-colors hover:text-gray-300 font-medium px-2 py-1 rounded focus:outline-none relative after:absolute after:left-0 after:bottom-0 after:w-full after:h-0.5 after:bg-gray-300 after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:origin-left",
         className
       )}
       {...props}
@@ -69,7 +76,7 @@ const BreadcrumbPage = React.forwardRef<
     role="link"
     aria-disabled="true"
     aria-current="page"
-    className={cn("font-bold text-green-800 border-b-2 border-green-800 pb-0.5", className)}
+    className={cn("font-bold text-gray-100 border-b-2 border-gray-300 pb-0.5", className)}
     {...props}
   />
 ))
@@ -83,7 +90,7 @@ const BreadcrumbSeparator = ({
   <li
     role="presentation"
     aria-hidden="true"
-    className={cn("[&>svg]:w-3.5 [&>svg]:h-3.5", className)}
+    className={cn("[&>svg]:w-3.5 [&>svg]:h-3.5 text-gray-400", className)}
     {...props}
   >
     {children ?? <ChevronRight />}

@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu"
-import { Avatar, AvatarFallback } from "../ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { User as SupabaseUser } from '@supabase/supabase-js'
 
 const Header = () => {
@@ -126,10 +126,14 @@ const Header = () => {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
-                      className="flex items-center gap-2 px-2 py-1.5 rounded-full hover:bg-green-100 transition-colors"
+                      className="flex items-center gap-2 px-2 py-1.5 "
                     >
-                      <Avatar className="h-8 w-8 ">
-                        <AvatarFallback className="bg-green-200 text-black ">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage 
+                          src={user.user_metadata?.avatar_url || user.user_metadata?.picture} 
+                          alt={user.email?.split("@")[0] || "User"}
+                        />
+                        <AvatarFallback className="bg-green-200 text-black">
                           {user.email?.charAt(0).toUpperCase() || "U"}
                         </AvatarFallback>
                       </Avatar>

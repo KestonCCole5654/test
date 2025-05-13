@@ -4,6 +4,14 @@ import React from "react"
 import { Button } from "../../components/ui/button"
 import { CheckCircle2, ChevronDown, ArrowRight, Check, Badge, X } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "../../components/ui/breadcrumb"
 
 export default function LandingPage() {
   const betaFeatures = [
@@ -98,6 +106,17 @@ export default function LandingPage() {
           </div>
         </div>
       </header>
+
+      {/* Breadcrumb Navigation */}
+      <div className="container max-w-6xl mx-auto px-4 md:px-6 mt-2">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbPage>Home</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
 
       {/* Hero Section - Upgraded for commercial look */}
       <section className="w-full py-20 bg-gradient-to-b from-white to-green-50 border-b">

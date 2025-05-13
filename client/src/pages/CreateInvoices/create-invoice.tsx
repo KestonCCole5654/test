@@ -75,9 +75,9 @@ export default function InvoiceForm() {
   const selectedSpreadsheetUrl = location.state?.selectedSpreadsheetUrl
   const key = location.state?.key
   const hideForm = location.state?.hideForm
-  
+
   console.log('InvoiceForm mounted with state:', { invoiceToEdit, selectedSpreadsheetUrl, key, hideForm })
-  
+
   // Add useEffect to handle state changes
   useEffect(() => {
     console.log('InvoiceForm mounted with key:', key)
@@ -395,15 +395,15 @@ export default function InvoiceForm() {
     try {
       // Get the current session
       const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-      
+
       if (sessionError) {
         throw new Error(sessionError.message)
       }
-      
+
       if (!session) {
         throw new Error("No active session")
       }
-      
+
       // Create a shareable link for the invoice
       const response = await fetch("https://sheetbills-server.vercel.app/api/invoices/shared/create-link", {
         method: "POST",
@@ -415,14 +415,14 @@ export default function InvoiceForm() {
           invoiceId: invoiceData.invoiceNumber,
         }),
       })
-      
+
       if (!response.ok) {
         const errorData = await response.json()
         throw new Error(errorData.error || "Failed to create shareable link")
       }
-      
+
       const { shareUrl, expiresAt } = await response.json()
-      
+
       // Format expiration date
       const expirationDate = new Date(expiresAt)
       const formattedExpirationDate = expirationDate.toLocaleDateString('en-US', {
@@ -430,10 +430,10 @@ export default function InvoiceForm() {
         month: 'long',
         day: 'numeric'
       })
-      
+
       // Create a subject line for the email
       const subject = `Invoice ${invoiceData.invoiceNumber} from ${businessData.companyName}`
-      
+
       // Create email body with invoice details and shareable link
       const body = `Dear ${invoiceData.customer.name},
 
@@ -458,13 +458,13 @@ Regards,
 ${businessData.companyName}
 ${businessData.email}
 ${businessData.phone}`
-      
+
       // Open Gmail compose in a new window with prefilled fields
       const mailtoLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(invoiceData.customer.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-      
+
       // Open Gmail in a new window
       window.open(mailtoLink, '_blank')
-      
+
       // Show success toast
       toast({
         title: "Email Ready",
@@ -478,14 +478,14 @@ ${businessData.phone}`
         description: error instanceof Error ? error.message : "Failed to prepare email. Please try again.",
         variant: "destructive",
       })
-      
+
       // Fallback to the PDF attachment method if creating a shareable link fails
       try {
         await generateAndSavePDF(true)
-        
+
         // Create a subject line for the email
         const subject = `Invoice ${invoiceData.invoiceNumber} from ${businessData.companyName}`
-        
+
         // Create email body with invoice details
         const body = `Dear ${invoiceData.customer.name},
 
@@ -502,13 +502,13 @@ Regards,
 ${businessData.companyName}
 ${businessData.email}
 ${businessData.phone}`
-        
+
         // Open Gmail compose in a new window with prefilled fields
         const mailtoLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(invoiceData.customer.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-        
+
         // Open Gmail in a new window
         window.open(mailtoLink, '_blank')
-        
+
         // Show fallback toast
         toast({
           title: "Email Ready (Fallback Mode)",
@@ -529,7 +529,7 @@ ${businessData.phone}`
   // Helper function to generate and save PDF
   const generateAndSavePDF = async (forEmail = false) => {
     if (!previewRef.current) return
-    
+
     try {
       // Create a temporary div to render the invoice without buttons
       const tempDiv = document.createElement("div")
@@ -544,7 +544,7 @@ ${businessData.phone}`
       // Hide any no-print elements
       const noPrintElements = tempDiv.querySelectorAll(".no-print")
       noPrintElements.forEach((el) => {
-        ;(el as HTMLElement).style.display = "none"
+        ; (el as HTMLElement).style.display = "none"
       })
 
       // Capture the canvas
@@ -570,14 +570,14 @@ ${businessData.phone}`
       const imgHeight = (canvas.height * imgWidth) / canvas.width
 
       pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight)
-      
+
       // Save the PDF with a clear filename that indicates it's for email attachment
-      const filename = forEmail 
+      const filename = forEmail
         ? `Invoice-${invoiceData.invoiceNumber}-for-${invoiceData.customer.name.replace(/\s+/g, "-")}.pdf`
         : `Invoice-${invoiceData.invoiceNumber}.pdf`
-      
+
       pdf.save(filename)
-      
+
       if (forEmail) {
         toast({
           title: "PDF Generated",
@@ -585,7 +585,7 @@ ${businessData.phone}`
           variant: "default"
         })
       }
-      
+
       return pdf
     } catch (error) {
       console.error("Error generating PDF:", error)
@@ -960,7 +960,7 @@ ${businessData.phone}`
             <div className="col-span-2 flex justify-center mt-4">
               <Button variant="outline" className="font-light mx-2" onClick={handleEmailInvoice}>Email Invoice</Button>
               <Button variant="outline" className="font-light mx-2" onClick={() => window.print()}>Print Invoice</Button>
-              <Button variant="outline" className="font-light mx-2" onClick={() => {/* TODO: implement get link */}}>Generate Invoice Link</Button>
+              <Button variant="outline" className="font-light mx-2" onClick={() => {/* TODO: implement get link */ }}>Generate Invoice Link</Button>
             </div>
           </div>
 
@@ -975,24 +975,28 @@ ${businessData.phone}`
 
       {/* Edit Mode (Form) */}
       {isFormExpanded && (
-        <div className=" mt-0 font-inter w-full py-4 sm:py-8 px-4 mx-auto rounded-b-3xl mb-10">
+        <div className=" mt-0 max-w-7xl font-inter w-full py-4 sm:py-8 px-4 mx-auto rounded-b-3xl mb-10">
           <div className="mb-8">
-            {/* Breadcrumb Navigation - now using the reusable component */}
-            <Breadcrumb className="mb-2">
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/invoices">Invoices</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>{invoiceToEdit ? "Edit Invoice" : "New Invoice"}</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+           
+            {/* Breadcrumb Navigation */}
+            <div className="mt-4 mb-6">
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="/invoices">Invoices</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>{invoiceToEdit ? "Edit Invoice" : "New Invoice"}</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+            </div>
+
 
             {/* Header Content - Tidy, aligned, simple badge */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -1273,7 +1277,7 @@ ${businessData.phone}`
                 <div className="flex gap-3 justify-end no-print">
                   {invoiceToEdit ? (
                     <Button
-                     variant="outline"
+                      variant="outline"
                       onClick={handleUpdate}
                       className="font-inter font-light"
                     >
@@ -1281,7 +1285,7 @@ ${businessData.phone}`
                     </Button>
                   ) : (
                     <Button
-                     variant="outline"
+                      variant="outline"
                       onClick={handleSave}
                       className="font-inter font-light"
                     >

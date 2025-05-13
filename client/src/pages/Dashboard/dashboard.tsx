@@ -1294,9 +1294,10 @@ export default function Dashboard() {
             </TableBody>
           </Table>
         </div>
+
         {/* Pagination Controls */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-white">
+          <div className="flex font-inter items-center justify-between px-4 py-3 border-t border-gray-200 bg-white">
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
@@ -1326,8 +1327,9 @@ export default function Dashboard() {
             </div>
           </div>
         )}
+        
       </div>
-      
+
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
@@ -1386,7 +1388,7 @@ export default function Dashboard() {
                   setIsDeleteDialogOpen(false)
                 }
               }}
-              className="bg-gray-800 focus:ring-gray-800"
+              className="bg-gray-800 font-inter focus:ring-gray-800"
             >
               Delete
             </AlertDialogAction>
@@ -1405,71 +1407,20 @@ export default function Dashboard() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleBulkDelete} className="bg-gray-800 focus:ring-gray-800">
+            <AlertDialogAction onClick={handleBulkDelete} className="bg-gray-800 font-inter focus:ring-gray-800">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Partial Payment Sidebar */}
-      <Sheet open={isPartialPaymentModalOpen} onOpenChange={setIsPartialPaymentModalOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
-          <SheetHeader className="mb-4">
-            <SheetTitle className="text-xl">Record Partial Payment</SheetTitle>
-            <SheetDescription>Enter the payment amount and date for invoice #{selectedInvoice?.id}</SheetDescription>
-          </SheetHeader>
-          <div className="grid gap-6 py-4">
-            <div className="grid gap-3">
-              <Label htmlFor="amount" className="text-sm font-medium font-inter">
-                Payment Amount
-              </Label>
-              <Input
-                id="amount"
-                type="number"
-                value={partialPaymentAmount}
-                onChange={(e) => setPartialPaymentAmount(e.target.value)}
-                placeholder="Enter amount"
-                min="0"
-                max={selectedInvoice?.amount}
-                step="0.01"
-                className="w-full"
-              />
-              <p className="text-sm bg-green-100 text-green-800 px-3 py-2 rounded-md">
-                Total invoice amount: {formatCurrency(selectedInvoice?.amount || 0)}
-              </p>
-            </div>
-            <div className="grid gap-3">
-              <Label className="text-sm font-medium font-inter">Payment Date</Label>
-              <div className="border rounded-md p-3 bg-white">
-                <Calendar
-                  mode="single"
-                  selected={paymentDate}
-                  onSelect={(date) => date && setPaymentDate(date)}
-                  className="mx-auto"
-                  classNames={{
-                    day_selected: "bg-green-600 text-white hover:bg-green-600 focus:bg-green-600",
-                    day_today: "bg-slate-100 text-slate-900",
-                    day_outside: "text-slate-300",
-                    day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 font-inter",
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-          <SheetFooter className="flex flex-col sm:flex-row gap-3 mt-6">
-            <Button variant="outline" onClick={() => setIsPartialPaymentModalOpen(false)} className="w-full sm:w-auto">
-              Cancel
-            </Button>
-            <Button onClick={handlePartialPayment} className="w-full sm:w-auto bg-gray-800 hover:bg-gray-900">
-              Record Payment
-            </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
     </div>
   )
 }
+
+
+
+
 
 // =====================
 // Sortable Table Row Component
@@ -1531,7 +1482,7 @@ function SortableTableRow({ id, children, invoice, spreadsheets, ...props }: Sor
           {...listeners}
           className="inline-flex items-center justify-center cursor-grab text-gray-400 hover:text-gray-600 active:text-gray-800"
         >
-          <GripVertical className="h-5 w-5" />
+          <GripVertical className="h-6 w-6" />
         </span>
       </td>
       {children}

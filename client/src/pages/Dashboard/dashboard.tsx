@@ -809,7 +809,7 @@ export default function Dashboard() {
               variant="outline"
               size="sm"
               onClick={handleSelectAllVisible}
-              className="text-gray-700"
+              className="text-white"
               disabled={currentItems.length === 0}
             >
               {allVisibleSelected ? "Deselect All" : "Select All"}
@@ -1078,8 +1078,8 @@ export default function Dashboard() {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure you want to delete this invoice?</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="font-inter font-medium" >Are you sure you want to delete this invoice?</AlertDialogTitle>
+            <AlertDialogDescription className="font-inter text-gray-700">
               This action cannot be undone. This will permanently delete the invoice
               {invoiceToDelete ? <span className="font-medium font-inter"> #{invoiceToDelete.id}</span> : null}.
             </AlertDialogDescription>

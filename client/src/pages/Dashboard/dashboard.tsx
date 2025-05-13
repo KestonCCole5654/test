@@ -1640,7 +1640,6 @@ function SortableTableRow({ id, children, invoice, spreadsheets, ...props }: Sor
           {...attributes}
           {...listeners}
           className="inline-flex items-center justify-center cursor-grab text-gray-400 hover:text-gray-600 active:text-gray-800"
-          onClick={(e) => e.stopPropagation()}
         >
           <GripVertical className="h-5 w-5" />
         </span>

@@ -83,7 +83,7 @@ const Header = () => {
               <div className="h-8 w-8 rounded bg-green-800 flex items-center justify-center">
                 <span className="text-white font-medium text-md">$</span>
               </div>
-              <span className="text-lg font-medium text-green-800">SheetBills™</span>
+              <span className="text-lg font-medium text-green-600">SheetBills™</span>
             </Link>
           </div>
 
@@ -93,7 +93,7 @@ const Header = () => {
               <>
                 <Link
                   to="/invoices"
-                  className="px-3 py-2 rounded-md text-slate-200 hover:bg-green-100 hover:text-slate-900 transition-colors"
+                  className="px-3 py-2 rounded-md text-slate-200 hover:text-slate-300 transition-colors"
                   onClick={handleNavigation}
                 >
                  Invoices
@@ -101,14 +101,14 @@ const Header = () => {
            
                 <Link
                   to="/settings"
-                  className="px-3 py-2 rounded-md text-slate-200 hover:bg-green-100 hover:text-slate-900 transition-colors"
+                  className="px-3 py-2 rounded-md text-slate-200 hover:text-slate-300  transition-colors"
                   onClick={handleNavigation}
                 >
                   Account & Settings
                 </Link>
                 <Link
                   to="/contact"
-                  className="px-3 py-2 rounded-md text-slate-200 hover:bg-green-100 hover:text-slate-900 transition-colors"
+                  className="px-3 py-2 rounded-md text-slate-200 hover:text-slate-300  transition-colors"
                   onClick={handleNavigation}
                 >
                   Contact & Support

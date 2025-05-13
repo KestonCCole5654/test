@@ -1111,11 +1111,11 @@ export default function Dashboard() {
   return (
     <div className="container bg-white max-w-7xl mx-auto px-4">
       {/* Breadcrumb Navigation */}
-      <div className="mt-4 mb-6 bg-gray-800 rounded-lg p-3 border border-gray-200">
+      <div className="mt-4 mb-6">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbPage className="text-gray-700">Dashboard</BreadcrumbPage>
+              <BreadcrumbPage className="text-slate-200">Invoices</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>

@@ -13,7 +13,7 @@ const Breadcrumb = React.forwardRef<
   <nav 
     ref={ref} 
     aria-label="breadcrumb" 
-    className="bg-gray-800 rounded-lg p-3 border border-gray-700"
+    className="bg-gray-800 rounded-lg text-slate-200 border border-gray-700"
     {...props} 
   />
 ))

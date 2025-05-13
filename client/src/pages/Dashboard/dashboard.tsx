@@ -35,6 +35,7 @@ import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from 
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { Sheet, SheetContent, SheetHeader, SheetFooter, SheetTitle, SheetDescription } from "../../components/ui/sheet"
+import { InvoiceStats, InvoiceStat } from "../../components/ui/InvoiceStats"
 
 // =====================
 // Types & Interfaces
@@ -1106,9 +1107,28 @@ export default function Dashboard() {
     )
   }
 
+  // Calculate stats from invoices
+  const now = new Date();
+  const totalAmount = invoices.reduce((sum, inv) => sum + (inv.amount || 0), 0);
+  const paidAmount = invoices.filter(inv => inv.status === "Paid").reduce((sum, inv) => sum + (inv.amount || 0), 0);
+  const overdueAmount = invoices
+    .filter(inv => inv.status === "Pending" && new Date(inv.dueDate) < now)
+    .reduce((sum, inv) => sum + (inv.amount || 0), 0);
+  const unpaidAmount = invoices
+    .filter(inv => inv.status === "Pending" && new Date(inv.dueDate) >= now)
+    .reduce((sum, inv) => sum + (inv.amount || 0), 0);
+
+  const stats: InvoiceStat[] = [
+    { label: "Total Invoices", value: `$${totalAmount.toLocaleString()}`, percent: 0, trend: "neutral" },
+    { label: "Paid", value: `$${paidAmount.toLocaleString()}`, percent: 0, trend: "neutral" },
+    { label: "Unpaid", value: `$${unpaidAmount.toLocaleString()}`, percent: 0, trend: "neutral" },
+    { label: "Overdue", value: `$${overdueAmount.toLocaleString()}`, percent: 0, trend: "neutral" },
+  ];
+
   return (
     <div className="min-h-screen w-full font-inter px-6 pb-6 bg-white text-gray-700">
-    
+      {/* Invoice Summary Stats */}
+      <InvoiceStats stats={stats} />
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
         <div className="flex  bg-white">

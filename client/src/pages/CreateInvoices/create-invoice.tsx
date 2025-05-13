@@ -944,7 +944,7 @@ ${businessData.phone}`
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem>
-                    <BreadcrumbLink href="/dashboard">Dashboard Page</BreadcrumbLink>
+                    <BreadcrumbLink href="/dashboard">Dashboard </BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>

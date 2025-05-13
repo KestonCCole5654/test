@@ -1109,7 +1109,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="container bg-white max-w-7xl mx-auto px-4">
+    <div className="container bg-transparent max-w-7xl mx-auto px-4">
       {/* Breadcrumb Navigation */}
       <div className="mt-4 mb-6">
         <Breadcrumb>

@@ -331,10 +331,18 @@ export default function Dashboard() {
   // Utility function to calculate overdue days accurately
   function getOverdueDays(dueDateString: string): number {
     const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    today.setHours(0, 0, 0, 0) // Reset time to start of day
     const dueDate = new Date(dueDateString)
-    dueDate.setHours(0, 0, 0, 0)
-    return Math.ceil((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24))
+    dueDate.setHours(0, 0, 0, 0) // Reset time to start of day
+    
+    // If due date is in the future, return 0
+    if (dueDate > today) return 0
+    
+    // Calculate the difference in days
+    const diffTime = today.getTime() - dueDate.getTime()
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    
+    return diffDays
   }
 
   // =====================
@@ -898,11 +906,11 @@ export default function Dashboard() {
                         <TableCell className="px-6 py-4 whitespace-nowrap">{formatDate(invoice.dueDate)}</TableCell>
                         <TableCell className="px-6 py-4">
                           {invoice.status === "Paid" ? (
-                            <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium font-inter">
+                            <span className="inline-block px-3 py-1 rounded-md border border-green-200 bg-green-50 text-green-700 text-xs font-medium font-inter">
                               Paid
                             </span>
                           ) : invoice.status === "Pending" ? (
-                            <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-100 text-gray-700 text-xs font-medium font-inter">
+                            <span className="inline-block px-3 py-1 rounded-md border border-amber-200 bg-amber-50 text-amber-700 text-xs font-medium font-inter">
                               Pending
                             </span>
                           ) : (
@@ -913,10 +921,16 @@ export default function Dashboard() {
                         </TableCell>
                         <TableCell className="text-right px-6 py-4">{formatCurrency(invoice.amount)}</TableCell>
                         <TableCell className="text-center px-8 py-6">
-                          {invoice.status === "Pending" && new Date(invoice.dueDate) < new Date() ? (
-                            <span className="text-red-600 px-4 py-1.5  text-sm">
-                              {getOverdueDays(invoice.dueDate)} days
-                            </span>
+                          {invoice.status === "Pending" ? (
+                            getOverdueDays(invoice.dueDate) > 0 ? (
+                              <span className="text-red-600 px-4 py-1.5 text-sm font-medium">
+                                {getOverdueDays(invoice.dueDate)} {getOverdueDays(invoice.dueDate) === 1 ? 'day' : 'days'}
+                              </span>
+                            ) : (
+                              <span className="text-green-600 px-4 py-1.5 text-sm font-medium">
+                                {getOverdueDays(invoice.dueDate) === 0 ? 'Due today' : 'Not due'}
+                              </span>
+                            )
                           ) : (
                             <span className="text-gray-400 px-4 py-1.5 text-sm">-</span>
                           )}

@@ -886,7 +886,7 @@ export default function Dashboard() {
                             )}
                           </TableCell>
                           <TableCell onClick={(e) => e.stopPropagation()} className="px-6 py-4">
-                            <div className="flex justify-end gap-2">
+                            <div className="flex justify-center gap-2">
                               <Button
                                 onClick={async (e) => {
                                   e.stopPropagation()
@@ -895,11 +895,9 @@ export default function Dashboard() {
                                       data: { session },
                                       error: sessionError,
                                     } = await supabase.auth.getSession()
-
                                     if (sessionError) {
                                       throw new Error(sessionError.message)
                                     }
-
                                     const response = await fetch(
                                       "https://sheetbills-server.vercel.app/api/sheets/mark-as-paid",
                                       {
@@ -916,19 +914,15 @@ export default function Dashboard() {
                                         }),
                                       },
                                     )
-
                                     if (!response.ok) {
                                       const errorData = await response.json()
                                       throw new Error(errorData.error || "Failed to mark invoice as paid")
                                     }
-
-                                    // Update local state
                                     const updatedInvoices = invoices.map((inv) =>
                                       inv.id === invoice.id ? { ...inv, status: "Paid" as const } : inv,
                                     )
                                     setInvoices(updatedInvoices)
                                     if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
-
                                     toast({
                                       title: "Status Updated",
                                       description: "Invoice marked as paid successfully.",
@@ -936,13 +930,12 @@ export default function Dashboard() {
                                   } catch (error) {
                                     toast({
                                       title: "Error",
-                                      description:
-                                        error instanceof Error ? error.message : "Failed to update invoice status",
+                                      description: error instanceof Error ? error.message : "Failed to update invoice status",
                                       variant: "destructive",
                                     })
                                   }
                                 }}
-                                className={`bg-gray-100 text-gray-800 hover:bg-gray-200 px-3`}
+                                className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
                                 size="sm"
                                 disabled={invoice.status === "Paid"}
                               >
@@ -956,11 +949,9 @@ export default function Dashboard() {
                                       data: { session },
                                       error: sessionError,
                                     } = await supabase.auth.getSession()
-
                                     if (sessionError) {
                                       throw new Error(sessionError.message)
                                     }
-
                                     const response = await fetch(
                                       "https://sheetbills-server.vercel.app/api/sheets/mark-as-pending",
                                       {
@@ -977,19 +968,15 @@ export default function Dashboard() {
                                         }),
                                       },
                                     )
-
                                     if (!response.ok) {
                                       const errorData = await response.json()
                                       throw new Error(errorData.error || "Failed to mark invoice as pending")
                                     }
-
-                                    // Update local state
                                     const updatedInvoices = invoices.map((inv) =>
                                       inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv,
                                     )
                                     setInvoices(updatedInvoices)
                                     if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
-
                                     toast({
                                       title: "Status Updated",
                                       description: "Invoice marked as pending successfully.",
@@ -997,13 +984,12 @@ export default function Dashboard() {
                                   } catch (error) {
                                     toast({
                                       title: "Error",
-                                      description:
-                                        error instanceof Error ? error.message : "Failed to update invoice status",
+                                      description: error instanceof Error ? error.message : "Failed to update invoice status",
                                       variant: "destructive",
                                     })
                                   }
                                 }}
-                                className={`bg-gray-50 text-gray-700 hover:bg-gray-100 px-3`}
+                                className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
                                 size="sm"
                                 disabled={invoice.status === "Pending"}
                               >
@@ -1298,7 +1284,7 @@ export default function Dashboard() {
                         <span className="text-gray-400 px-4 py-1.5 text-sm">-</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-center px-6 py-4">
+                    <TableCell onClick={(e) => e.stopPropagation()} className="px-6 py-4">
                       <div className="flex justify-center gap-2">
                         <Button
                           onClick={async (e) => {
@@ -1407,23 +1393,6 @@ export default function Dashboard() {
                           disabled={invoice.status === "Pending"}
                         >
                           Mark as Pending
-                        </Button>
-                        <Button
-                          size="sm"
-                          className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            navigate("/create-invoice", {
-                              state: {
-                                invoiceToEdit: invoice,
-                                selectedSpreadsheetUrl: spreadsheets.find(
-                                  (sheet) => sheet.name === "SheetBills Invoices",
-                                )?.sheetUrl,
-                              },
-                            })
-                          }}
-                        >
-                          Edit
                         </Button>
                       </div>
                     </TableCell>

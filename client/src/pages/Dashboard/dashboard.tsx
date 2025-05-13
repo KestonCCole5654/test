@@ -1111,11 +1111,11 @@ export default function Dashboard() {
   return (
     <div className="container max-w-7xl mx-auto px-4">
       {/* Breadcrumb Navigation */}
-      <div className="mt-4 mb-6">
+      <div className="mt-4 mb-6 bg-slate-50 rounded-lg p-3 border border-slate-200">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbPage>Dashboard</BreadcrumbPage>
+              <BreadcrumbPage className="text-slate-800">Dashboard</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -1124,7 +1124,7 @@ export default function Dashboard() {
       <InvoiceStats stats={stats} />
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
-        <div className="flex  bg-white">
+        <div className="flex bg-slate-50 rounded-lg border border-slate-200">
           {[
             { label: "All", value: "all" },
             { label: "Pending", value: "pending" },
@@ -1133,12 +1133,11 @@ export default function Dashboard() {
           ].map((tab) => (
             <button
               key={tab.value}
-              className={`px-6 py-2 text-sm transition-colors border border-gray-50 focus:outline-none ${
+              className={`px-6 py-2 text-sm transition-colors border border-slate-200 focus:outline-none ${
                 statusFilter === tab.value
-                  ? "text-gray-700 border-gray-50  bg-gray-100" // active
-                  : "text-gray-700 border-gray-50  bg-white "
+                  ? "text-slate-800 border-slate-300 bg-slate-100" // active
+                  : "text-slate-600 border-slate-200 bg-slate-50 hover:bg-slate-100"
               } `}
-              
               onClick={() => setStatusFilter(tab.value)}
             >
               {tab.label}

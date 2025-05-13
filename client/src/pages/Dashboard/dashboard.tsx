@@ -1162,7 +1162,7 @@ export default function Dashboard() {
                     checked={allVisibleSelected && currentItems.length > 0}
                     onChange={handleSelectAllVisible}
                     aria-label="Select all invoices on this page"
-                    className="mx-auto accent-gray-600 h-4 w-4 rounded border-gray-300"
+                    className="mx-auto accent-green-800 h-4 w-4 rounded border-gray-300"
                   />
                 </TableHead>
                 <TableHead className="px-6 py-4">Number</TableHead>
@@ -1174,7 +1174,7 @@ export default function Dashboard() {
                 <TableHead className="px-6 py-4 text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
+            <TableBody className="cursor-pointer" > 
               {rowOrder.map((id) => {
                 const invoice = currentItems.find((inv) => inv.id === id)
                 if (!invoice) return null

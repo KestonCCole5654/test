@@ -940,7 +940,7 @@ ${businessData.phone}`
       {!isFormExpanded && (
         <div className=" w-full max-w-3xl mx-auto mt-8">
            {/* Breadcrumb Navigation */}
-           <div className="mt-4 mb-6">
+           <div className="mt-4 max-w-7xl mb-6">
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem>

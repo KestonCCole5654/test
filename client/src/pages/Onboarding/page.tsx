@@ -24,6 +24,14 @@ import {
 } from "lucide-react"
 import { motion } from "framer-motion"
 import confetti from "canvas-confetti"
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "../../components/ui/breadcrumb"
 
 // Custom SVG Illustrations
 const CompanyIllustration = () => (
@@ -1196,6 +1204,21 @@ export default function InitializePage() {
           </div>
         </div>
       </header>
+
+      {/* Breadcrumb Navigation */}
+      <div className="max-w-md mx-auto px-4 mt-2">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Onboarding</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
 
       <main className="flex-1 flex items-center justify-center p-4 md:p-8 relative z-10">
         {showSuccess ? renderSuccessScreen() : showReview ? renderReviewScreen() : renderCurrentQuestion()}

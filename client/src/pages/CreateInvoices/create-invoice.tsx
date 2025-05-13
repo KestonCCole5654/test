@@ -1003,7 +1003,7 @@ ${businessData.phone}`
                 <p className="text-sm text-gray-500 font-light">
                   {invoiceToEdit
                     ? `Invoice #${invoiceData.invoiceNumber} - ${new Date(invoiceData.date).toLocaleDateString()}`
-                    : "Create professional invoices for your clients"}
+                    : "Create a professional invoice for your client"}
                 </p>
               </div>
               <div className="flex items-center gap-3 mt-2 sm:mt-0">

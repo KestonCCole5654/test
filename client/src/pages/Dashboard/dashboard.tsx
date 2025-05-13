@@ -510,6 +510,7 @@ export default function Dashboard() {
       setSelectedInvoices(new Set(filteredInvoices.map((invoice) => invoice.id)))
     }
   }
+  
   // Bulk delete selected invoices
   const handleBulkDelete = async () => {
     try {
@@ -740,7 +741,7 @@ export default function Dashboard() {
                   variant="outline"
                   size="sm"
                   onClick={handleSelectAllVisible}
-                  className="text-white"
+                  className="text-gray-700"
                   disabled={currentItems.length === 0}
                 >
                   {allVisibleSelected ? "Deselect All" : "Select All"}

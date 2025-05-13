@@ -131,7 +131,7 @@ export default function Dashboard() {
   const headerCheckboxRef = useRef<HTMLInputElement>(null)
   const [bulkDeleteMessage, setBulkDeleteMessage] = useState<string | null>(null)
   // Row order for drag-and-drop
-  const [rowOrder, setRowOrder] = React.useState(invoices.map((inv) => inv.id))
+  const [rowOrder, setRowOrder] = React.useState<string[]>([])
 
   // =====================
   // Table Pagination & Selection (must be above useEffect hooks)
@@ -279,7 +279,7 @@ export default function Dashboard() {
     setCurrentPage(1) // Reset to first page when filters change
   }, [invoices, searchQuery, statusFilter])
 
-  // Update row order when current items change (for drag-and-drop)
+  // Update row order when current items change
   useEffect(() => {
     setRowOrder(currentItems.map((inv) => inv.id))
   }, [currentItems])
@@ -684,6 +684,23 @@ export default function Dashboard() {
 
   const sensors = useSensors(useSensor(PointerSensor))
 
+  // Handle drag end
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event
+    if (active.id !== over?.id) {
+      const oldIndex = rowOrder.indexOf(active.id)
+      const newIndex = rowOrder.indexOf(over.id)
+      const newOrder = arrayMove(rowOrder, oldIndex, newIndex)
+      setRowOrder(newOrder)
+      
+      // Reorder the invoices array
+      const reorderedInvoices = [...invoices]
+      const [movedInvoice] = reorderedInvoices.splice(oldIndex, 1)
+      reorderedInvoices.splice(newIndex, 0, movedInvoice)
+      setInvoices(reorderedInvoices)
+    }
+  }
+
   function renderInvoiceTable() {
     // Show only skeletons while loading
     if (isStateLoading) {
@@ -743,26 +760,7 @@ export default function Dashboard() {
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
-              onDragEnd={(event: any) => {
-                const { active, over } = event
-                if (active.id !== over?.id) {
-                  const oldIndex = rowOrder.indexOf(active.id)
-                  const newIndex = rowOrder.indexOf(over.id)
-                  const newOrder = arrayMove(rowOrder, oldIndex, newIndex)
-                  setRowOrder(newOrder)
-                  // Reorder currentItems and update invoices state accordingly
-                  const reordered = newOrder
-                    .map((id) => currentItems.find((inv) => inv.id === id))
-                    .filter((inv): inv is Invoice => Boolean(inv))
-                  // Update invoices state (for persistence)
-                  setInvoices((prev) => {
-                    // Only reorder the current page, keep others as is
-                    const start = indexOfFirstItem
-                    const end = indexOfLastItem
-                    return [...prev.slice(0, start), ...reordered, ...prev.slice(end)]
-                  })
-                }
-              }}
+              onDragEnd={handleDragEnd}
             >
               <SortableContext items={rowOrder} strategy={verticalListSortingStrategy}>
                 <Table>
@@ -1595,20 +1593,35 @@ interface SortableTableRowProps {
 }
 
 function SortableTableRow({ id, children, invoice, spreadsheets, ...props }: SortableTableRowProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    position: 'relative' as const,
+    zIndex: isDragging ? 1 : 0,
+  }
+
   const navigate = useNavigate()
 
   const handleRowClick = () => {
     if (invoice) {
-      const invoicesSheet = spreadsheets.find((sheet: Spreadsheet) => sheet.name === "SheetBills Invoices")
+      const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
       const invoicesSheetUrl = invoicesSheet?.sheetUrl
 
-      // Navigate to create-invoice page with invoice data and hideForm=true
       navigate("/create-invoice", {
         state: {
           invoiceToEdit: invoice,
           selectedSpreadsheetUrl: invoicesSheetUrl,
-          hideForm: true, // This will collapse the form and show only the preview
+          hideForm: true,
         },
       })
     }
@@ -1617,23 +1630,17 @@ function SortableTableRow({ id, children, invoice, spreadsheets, ...props }: Sor
   return (
     <tr
       ref={setNodeRef}
-      style={{
-        transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.5 : 1,
-        cursor: "pointer",
-      }}
+      style={style}
       onClick={handleRowClick}
       className="hover:bg-slate-50"
       {...props}
     >
-      {/* Drag handle cell */}
       <td className="w-8 px-2 align-middle text-center cursor-grab" style={{ verticalAlign: "middle" }}>
         <span
           {...attributes}
           {...listeners}
           className="inline-flex items-center justify-center cursor-grab text-gray-400 hover:text-gray-600 active:text-gray-800"
-          onClick={(e) => e.stopPropagation()} // Prevent row click when dragging
+          onClick={(e) => e.stopPropagation()}
         >
           <GripVertical className="h-5 w-5" />
         </span>

@@ -1127,7 +1127,7 @@ export default function Dashboard() {
       {/* Invoice Summary Stats
         <InvoiceStats stats={stats} />
       */}
-       <InvoiceStats stats={stats} />
+      
 
     
       {/* Filter Tabs, Search, and Create Invoice Row */}

@@ -752,6 +752,7 @@ export default function Dashboard() {
                 size="sm"
                 onClick={() => setIsBulkDeleteDialogOpen(true)}
                 disabled={selectedInvoices.size === 0}
+                className="bg-red-100 text-red-700 border-red-200 hover:bg-red-200"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete Selected
@@ -1077,7 +1078,7 @@ export default function Dashboard() {
         <InvoiceStats stats={stats} />
       */}
 
-      
+    
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
         <div className="flex bg-gray-100 rounded-lg border border-gray-200">

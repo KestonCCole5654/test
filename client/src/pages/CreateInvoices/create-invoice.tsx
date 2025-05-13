@@ -939,6 +939,24 @@ ${businessData.phone}`
       {/* Preview Mode - Cleaned up */}
       {!isFormExpanded && (
         <div className=" w-full max-w-3xl mx-auto mt-8">
+           {/* Breadcrumb Navigation */}
+           <div className="mt-4 mb-6">
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="/invoices">Invoices</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>{invoiceToEdit ? "Edit Invoice" : "New Invoice"}</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+            </div>
           <div className="grid grid-cols-2 gap-4 mb-6 bg-white border rounded-lg p-6">
             <div className="space-y-1">
               <div className="text-sm text-gray-500 font-light">Invoice #:</div>

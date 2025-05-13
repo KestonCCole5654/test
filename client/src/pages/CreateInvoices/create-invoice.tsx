@@ -1015,7 +1015,7 @@ ${businessData.phone}`
                   <Button
                     type="button"
                     disabled
-                    className="bg-green-800 text-white px-7 py-2 rounded-lg font-bold cursor-default border-none shadow-lg text-lg tracking-wide hover:bg-green-900 focus:ring-0 focus:outline-none"
+                    className="bg-green-800 text-white px-7 py-2 font-medium cursor-default shadow-lg"
                   >
                     {invoiceToEdit.status}
                   </Button>

@@ -1227,7 +1227,7 @@ export default function Dashboard() {
                         <span className="text-gray-400 px-4 py-1.5 text-sm">-</span>
                       )}
                     </TableCell>
-                    <TableCell onClick={(e) => e.stopPropagation()} className="px-6 py-4">
+                    <TableCell className="text-center px-6 py-4">
                       <div className="flex justify-center gap-2">
                         <Button
                           onClick={async (e) => {
@@ -1251,8 +1251,7 @@ export default function Dashboard() {
                                   },
                                   body: JSON.stringify({
                                     invoiceId: invoice.id,
-                                    sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
-                                      ?.sheetUrl,
+                                    sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
                                   }),
                                 },
                               )
@@ -1265,17 +1264,14 @@ export default function Dashboard() {
                               )
                               setInvoices(updatedInvoices)
                               if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
-                              setBulkDeleteMessage(
-                                `Invoice #${invoice.id} has been deleted successfully and removed from your dashboard.`
-                              )
                               toast({
-                                title: "Invoice Deleted",
-                                description: "Invoice has been deleted successfully.",
+                                title: "Status Updated",
+                                description: "Invoice marked as paid successfully.",
                               })
                             } catch (error) {
                               toast({
                                 title: "Error",
-                                description: error instanceof Error ? error.message : "Failed to delete invoice",
+                                description: error instanceof Error ? error.message : "Failed to update invoice status",
                                 variant: "destructive",
                               })
                             }
@@ -1284,7 +1280,60 @@ export default function Dashboard() {
                           size="sm"
                           disabled={invoice.status === "Paid"}
                         >
-                          Delete
+                          Mark as Paid
+                        </Button>
+                        <Button
+                          onClick={async (e) => {
+                            e.stopPropagation()
+                            try {
+                              const {
+                                data: { session },
+                                error: sessionError,
+                              } = await supabase.auth.getSession()
+                              if (sessionError) {
+                                throw new Error(sessionError.message)
+                              }
+                              const response = await fetch(
+                                "https://sheetbills-server.vercel.app/api/sheets/mark-as-pending",
+                                {
+                                  method: "PUT",
+                                  headers: {
+                                    "Content-Type": "application/json",
+                                    Authorization: `Bearer ${session?.provider_token}`,
+                                    "X-Supabase-Token": session?.access_token || "",
+                                  },
+                                  body: JSON.stringify({
+                                    invoiceId: invoice.id,
+                                    sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
+                                  }),
+                                },
+                              )
+                              if (!response.ok) {
+                                const errorData = await response.json()
+                                throw new Error(errorData.error || "Failed to mark invoice as pending")
+                              }
+                              const updatedInvoices = invoices.map((inv) =>
+                                inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv,
+                              )
+                              setInvoices(updatedInvoices)
+                              if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
+                              toast({
+                                title: "Status Updated",
+                                description: "Invoice marked as pending successfully.",
+                              })
+                            } catch (error) {
+                              toast({
+                                title: "Error",
+                                description: error instanceof Error ? error.message : "Failed to update invoice status",
+                                variant: "destructive",
+                              })
+                            }
+                          }}
+                          className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
+                          size="sm"
+                          disabled={invoice.status === "Pending"}
+                        >
+                          Mark as Pending
                         </Button>
                       </div>
                     </TableCell>

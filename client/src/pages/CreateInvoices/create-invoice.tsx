@@ -15,6 +15,14 @@ import { useLocation, useNavigate } from "react-router-dom"
 import supabase from "../../components/Auth/supabaseClient"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 import { useToast } from "../../components/ui/use-toast"
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "../../components/ui/breadcrumb"
 
 
 export interface InvoiceData {
@@ -676,7 +684,7 @@ ${businessData.phone}`
   }, [invoiceToEdit])
 
   // Invoice Classic Template
-  const InvoiceClassic = ({ data, businessData }: { data: InvoiceData; businessData: BusinessData }) => {
+  const InvoiceClassic = ({ data, businessData, showShadow = true }: { data: InvoiceData; businessData: BusinessData; showShadow?: boolean }) => {
     // Calculate all amounts
     const calculateItemTotal = (item: InvoiceItem) => {
       const price = item.price === "" ? 0 : Number(item.price);
@@ -732,7 +740,7 @@ ${businessData.phone}`
 
     return (
       <div
-        className="bg-white w-full font-inter max-w-full box-border flex flex-col justify-start shadow-md"
+        className={`bg-white w-full font-inter max-w-full box-border flex flex-col justify-start${showShadow ? ' shadow-md' : ''}`}
         style={{ minHeight: '287mm', margin: 0 }}
       >
         {/* Header with logo */}
@@ -959,7 +967,7 @@ ${businessData.phone}`
           {/* Invoice Preview - Cleaned up */}
           <div className="bg-white border rounded-lg p-6">
             <div className="w-full overflow-auto">
-              <InvoiceClassic data={invoiceData} businessData={businessData} />
+              <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
             </div>
           </div>
         </div>
@@ -969,21 +977,22 @@ ${businessData.phone}`
       {isFormExpanded && (
         <div className=" mt-0 font-inter w-full py-4 sm:py-8 px-4 mx-auto rounded-b-3xl mb-10">
           <div className="mb-8">
-            {/* Breadcrumb Navigation - styled like the reference image */}
-            <nav className="flex items-center space-x-2 text-sm mb-3 select-none border-t border-b border-gray-200 py-2" aria-label="Breadcrumb">
-              <a
-                href="/dashboard"
-                className="text-blue-700 font-medium underline underline-offset-2 px-2 py-1 rounded transition hover:bg-blue-50 focus:bg-blue-100 focus:outline-none"
-              >
-                Dashboard
-              </a>
-              <span className="text-gray-400">&gt;</span>
-              <span className="text-gray-500 font-medium px-2">Invoices</span>
-              <span className="text-gray-400">&gt;</span>
-              <span className="text-black font-medium px-2 bg-gray-100 rounded">
-                {invoiceToEdit ? "Edit Invoice" : "New Invoice"}
-              </span>
-            </nav>
+            {/* Breadcrumb Navigation - now using the reusable component */}
+            <Breadcrumb className="mb-2">
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/invoices">Invoices</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{invoiceToEdit ? "Edit Invoice" : "New Invoice"}</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
 
             {/* Header Content - Tidy, aligned, simple badge */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -1002,7 +1011,7 @@ ${businessData.phone}`
                   <Button
                     type="button"
                     disabled
-                    className="bg-green-700 text-white px-6 py-2 rounded font-medium cursor-default border-none shadow-none hover:bg-green-700 focus:ring-0 focus:outline-none"
+                    className="bg-green-800 text-white px-7 py-2 rounded-lg font-bold cursor-default border-none shadow-lg text-lg tracking-wide hover:bg-green-900 focus:ring-0 focus:outline-none"
                   >
                     {invoiceToEdit.status}
                   </Button>
@@ -1290,7 +1299,7 @@ ${businessData.phone}`
             <div className="lg:col-span-1">
               <div className="sticky top-4">
                 <div className="bg-white border rounded-lg p-6">
-                  <InvoiceClassic data={invoiceData} businessData={businessData} />
+                  <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
                 </div>
               </div>
             </div>

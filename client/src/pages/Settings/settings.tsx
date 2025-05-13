@@ -13,14 +13,6 @@ import axios from "axios"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar"
 import supabase from "../../components/Auth/supabaseClient"
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "../../components/ui/breadcrumb"
 
 interface UserData {
   name: string
@@ -216,21 +208,6 @@ export default function SettingsPage() {
 
   return (
     <div className="container max-w-7xl mx-auto px-4">
-      {/* Breadcrumb Navigation */}
-      <div className="mt-4 mb-6">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Settings</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-      </div>
-
       {/* Premium Welcome Header for Settings */}
       <div className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 py-10 shadow-lg rounded-b-3xl mb-10">
         <div className="container max-w-3xl mx-auto flex flex-col items-center justify-center">

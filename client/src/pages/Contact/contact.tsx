@@ -10,14 +10,6 @@ import { Loader2, ArrowLeft, Mail, MessageSquare, HelpCircle, Send } from "lucid
 import { toast } from "../../components/ui/use-toast"
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar"
 import supabase from "../../components/Auth/supabaseClient"
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "../../components/ui/breadcrumb"
 
 export default function ContactPage() {
   const navigate = useNavigate()
@@ -86,21 +78,6 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen w-full">
-      {/* Breadcrumb Navigation */}
-      <div className="container max-w-7xl mx-auto px-4 mt-4">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Contact & Support</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-      </div>
-
       {/* Premium Welcome Header */}
       <div className="max-w-7xl mx-auto bg-gradient-to-r from-emerald-600 to-emerald-400 py-10 shadow-lg rounded-b-3xl">
         <div className="container max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between">

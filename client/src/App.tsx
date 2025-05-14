@@ -147,13 +147,13 @@ function App() {
           <Route path="/contact" element={<ContactPage />} />
         </Route>
 
+        {/* Public Invoice Route - must be after catch-all to take precedence */}
+        <Route path="/invoice/shared/:token" element={<PublicInvoice />} />
+
         {/* Catch all route - only for authenticated routes */}
         <Route path="*" element={
           <Navigate to={user ? "/invoices" : "/login"} />
         } />
-
-        {/* Public Invoice Route - must be after catch-all to take precedence */}
-        <Route path="/invoice/shared/:token" element={<PublicInvoice />} />
       </Routes>
     </HelmetProvider>
   );

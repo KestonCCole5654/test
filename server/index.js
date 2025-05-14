@@ -1826,7 +1826,7 @@ app.put('/api/sheets/mark-as-paid', async (req, res) => {
     // Fetch data from sheet
     console.log('Fetching sheet data...');
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: sheetId,
+      spreadsheetId,
       range: `${sheetName}!A2:M`,
     });
 
@@ -1847,7 +1847,7 @@ app.put('/api/sheets/mark-as-paid', async (req, res) => {
     console.log('Updating range:', updateRange);
     
     await sheets.spreadsheets.values.update({
-      spreadsheetId: sheetId,
+      spreadsheetId,
       range: updateRange,
       valueInputOption: 'RAW',
       requestBody: { values: [['Paid']] },
@@ -2123,5 +2123,71 @@ app.post('/api/invoices/shared/create-link', async (req, res) => {
   } catch (error) {
     console.error('Error generating shareable link:', error);
     res.status(500).json({ error: 'Failed to generate shareable link' });
+  }
+});
+
+/**
+ * Public endpoint to view an invoice by share token
+ * @route GET /api/invoices/shared/:token
+ */
+app.get('/api/invoices/shared/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+    if (!token) return res.status(400).json({ error: 'Missing token' });
+
+    // Decode the token (format: base64(invoiceId:expiresAt))
+    let decoded;
+    try {
+      decoded = Buffer.from(token, 'base64').toString('utf-8');
+    } catch (e) {
+      return res.status(400).json({ error: 'Invalid token format' });
+    }
+    const [invoiceId, expiresAt] = decoded.split(':');
+    if (!invoiceId || !expiresAt) return res.status(400).json({ error: 'Invalid token data' });
+    if (Date.now() > Number(expiresAt)) return res.status(410).json({ error: 'Link expired' });
+
+    // For demo: you need to know the sheetUrl. In a real app, store this mapping in a DB.
+    // For now, require sheetUrl as a query param (since it's in the original link)
+    const { sheetUrl } = req.query;
+    if (!sheetUrl) return res.status(400).json({ error: 'Missing sheetUrl' });
+
+    // Use a service account or a public Google Sheet for public access, or use a bot account's token
+    // For demo, try to fetch the invoice from the sheet (assuming public read access)
+    const spreadsheetId = extractSheetIdFromUrl(sheetUrl);
+    if (!spreadsheetId) return res.status(400).json({ error: 'Invalid sheetUrl' });
+
+    // Fetch all invoices from the sheet
+    const sheets = google.sheets({ version: 'v4' });
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: 'SheetBills Invoices!A2:M',
+      // No auth for public read (sheet must be shared as public or with a service account)
+    });
+    const rows = response.data.values || [];
+    const invoiceRow = rows.find(row => row[0] === invoiceId);
+    if (!invoiceRow) return res.status(404).json({ error: 'Invoice not found' });
+
+    // Map row to invoice object (simplified)
+    const invoice = {
+      invoiceNumber: invoiceRow[0],
+      date: invoiceRow[1],
+      dueDate: invoiceRow[2],
+      customer: {
+        name: invoiceRow[3],
+        email: invoiceRow[4],
+        address: invoiceRow[5],
+      },
+      items: JSON.parse(invoiceRow[6] || '[]'),
+      amount: invoiceRow[7],
+      tax: invoiceRow[8],
+      discount: invoiceRow[9],
+      notes: invoiceRow[10],
+      template: invoiceRow[11],
+      status: invoiceRow[12],
+    };
+    res.json({ invoice });
+  } catch (error) {
+    console.error('Error fetching shared invoice:', error);
+    res.status(500).json({ error: 'Failed to fetch shared invoice' });
   }
 });

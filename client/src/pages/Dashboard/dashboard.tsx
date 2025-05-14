@@ -869,7 +869,6 @@ export default function Dashboard() {
                 <TableHead className="px-6 py-4">Due Date</TableHead>
                 <TableHead className="px-6 py-4">Status</TableHead>
                 <TableHead className="px-6 py-4 text-right">Total</TableHead>
-                <TableHead className="px-6 py-4 text-center">Overdue</TableHead>
                 <TableHead className="px-6 py-4 text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -924,28 +923,6 @@ export default function Dashboard() {
                       )}
                     </TableCell>
                     <TableCell className="text-right px-6 py-4">{formatCurrency(invoice.amount)}</TableCell>
-                    <TableCell className="text-center px-8 py-6">
-                          {invoice.status === "Pending" ? (() => {
-                            const today = new Date();
-                            today.setHours(0, 0, 0, 0);
-                            const dueDate = new Date(invoice.dueDate);
-                            dueDate.setHours(0, 0, 0, 0);
-                            if (dueDate.getTime() === today.getTime()) {
-                              return <span className="text-green-700 px-4 py-1.5 text-sm font-medium">Due today</span>;
-                            } else if (dueDate > today) {
-                              return <span className="text-gray-400 px-4 py-1.5 text-sm font-medium">Not due</span>;
-                            } else {
-                              const diffDays = Math.ceil((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
-                              return (
-                                <span className="text-red-600 px-4 py-1.5 text-sm font-medium">
-                                  {diffDays} {diffDays === 1 ? 'day' : 'days'}
-                        </span>
-                              );
-                            }
-                          })() : (
-                        <span className="text-gray-400 px-4 py-1.5 text-sm">-</span>
-                      )}
-                    </TableCell>
                     <TableCell className="text-center px-6 py-4">
                       <div className="flex justify-center gap-2">
                         <Button

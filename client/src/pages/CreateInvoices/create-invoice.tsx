@@ -120,35 +120,67 @@ export default function InvoiceForm() {
   }, [key])
 
   const [isFormExpanded, setIsFormExpanded] = useState(!location.state?.hideForm)
-  const [invoiceData, setInvoiceData] = useState<InvoiceData>({
-    invoiceNumber:
-      invoiceToEdit?.invoiceNumber ||
-      `INV-${new Date().getFullYear()}-${String(Math.floor(1000 + Math.random() * 9000))}`,
-    date: invoiceToEdit?.date || new Date().toISOString().split("T")[0],
-    dueDate: invoiceToEdit?.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
-    customer: invoiceToEdit?.customer || {
-      name: "",
-      email: "",
-      address: "",
-    },
-    items: invoiceToEdit?.items || [{
-      name: "",
-      description: "",
-      quantity: 1,
-      price: "",
-      discount: {
-        type: "percentage",
-        value: ""
-      },
-      tax: {
-        type: "percentage",
-        value: ""
+  const [invoiceData, setInvoiceData] = useState<InvoiceData>(() => {
+    if (invoiceToEdit) {
+      return {
+        invoiceNumber: invoiceToEdit.invoiceNumber, // Always use the number from the sheet
+        date: invoiceToEdit.date || new Date().toISOString().split("T")[0],
+        dueDate: invoiceToEdit.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+        customer: invoiceToEdit.customer || {
+          name: "",
+          email: "",
+          address: "",
+        },
+        items: invoiceToEdit.items || [{
+          name: "",
+          description: "",
+          quantity: 1,
+          price: "",
+          discount: {
+            type: "percentage",
+            value: ""
+          },
+          tax: {
+            type: "percentage",
+            value: ""
+          }
+        }],
+        amount: invoiceToEdit.amount || 0,
+        notes: invoiceToEdit.notes || "",
+        template: invoiceToEdit.template || "classic",
+        status: invoiceToEdit.status || "Pending"
       }
-    }],
-    amount: invoiceToEdit?.amount || 0,
-    notes: invoiceToEdit?.notes || "",
-    template: invoiceToEdit?.template || "classic",
-    status: invoiceToEdit?.status || "Pending"
+    } else {
+      // Only generate a new invoice number if creating a new invoice
+      return {
+        invoiceNumber: `INV-${new Date().getFullYear()}-${String(Math.floor(1000 + Math.random() * 9000))}`,
+        date: new Date().toISOString().split("T")[0],
+        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+        customer: {
+          name: "",
+          email: "",
+          address: "",
+        },
+        items: [{
+          name: "",
+          description: "",
+          quantity: 1,
+          price: "",
+          discount: {
+            type: "percentage",
+            value: ""
+          },
+          tax: {
+            type: "percentage",
+            value: ""
+          }
+        }],
+        amount: 0,
+        notes: "",
+        template: "classic",
+        status: "Pending"
+      }
+    }
   })
   const previewRef = useRef<HTMLDivElement>(null)
 

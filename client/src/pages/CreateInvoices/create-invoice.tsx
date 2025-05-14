@@ -949,13 +949,17 @@ ${businessData.phone}`
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('No active session');
+      if (!selectedSpreadsheetUrl) throw new Error('No sheetUrl found');
       const response = await fetch('https://sheetbills-server.vercel.app/api/invoices/shared/create-link', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-Supabase-Token': session.access_token || '',
         },
-        body: JSON.stringify({ invoiceId: invoiceData.invoiceNumber }),
+        body: JSON.stringify({
+          invoiceId: invoiceData.invoiceNumber,
+          sheetUrl: selectedSpreadsheetUrl,
+        }),
       });
       if (!response.ok) throw new Error('Failed to generate link');
       const { shareUrl } = await response.json();

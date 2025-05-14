@@ -123,7 +123,7 @@ export default function InvoiceForm() {
   const [invoiceData, setInvoiceData] = useState<InvoiceData>(() => {
     if (invoiceToEdit) {
       return {
-        invoiceNumber: invoiceToEdit.invoiceNumber, // Always use the number from the sheet
+        invoiceNumber: invoiceToEdit.invoiceNumber || invoiceToEdit.id, // Always use the number from the sheet or id
         date: invoiceToEdit.date || new Date().toISOString().split("T")[0],
         dueDate: invoiceToEdit.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
         customer: invoiceToEdit.customer || {
@@ -686,7 +686,7 @@ ${businessData.phone}`
 
       // Process invoice data with guaranteed fields
       const processedInvoiceData: InvoiceData = {
-        invoiceNumber: invoiceToEdit.invoiceNumber || `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+        invoiceNumber: invoiceToEdit.invoiceNumber || invoiceToEdit.id || `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
         date: invoiceToEdit.date || new Date().toISOString().split("T")[0],
         dueDate: invoiceToEdit.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
         customer: invoiceToEdit.customer || {

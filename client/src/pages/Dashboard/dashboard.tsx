@@ -50,6 +50,7 @@ import {
 // =====================
 interface Invoice {
   id: string
+  invoiceNumber: string
   date: string
   dueDate: string
   amount: number
@@ -1204,10 +1205,11 @@ function SortableTableRow({ id, children, invoice, spreadsheets, ...props }: Sor
     if (invoice) {
       const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
       const invoicesSheetUrl = invoicesSheet?.sheetUrl
-
+      // Ensure invoiceNumber is always present and matches id
+      const invoiceToEdit = { ...invoice, invoiceNumber: invoice.invoiceNumber || invoice.id }
       navigate("/create-invoice", {
         state: {
-          invoiceToEdit: invoice,
+          invoiceToEdit,
           selectedSpreadsheetUrl: invoicesSheetUrl,
           hideForm: true,
         },

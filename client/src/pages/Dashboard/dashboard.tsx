@@ -331,18 +331,10 @@ export default function Dashboard() {
   // Utility function to calculate overdue days accurately
   function getOverdueDays(dueDateString: string): number {
     const today = new Date()
-    today.setHours(0, 0, 0, 0) // Reset time to start of day
+    today.setHours(0, 0, 0, 0)
     const dueDate = new Date(dueDateString)
-    dueDate.setHours(0, 0, 0, 0) // Reset time to start of day
-    
-    // If due date is in the future, return 0
-    if (dueDate > today) return 0
-    
-    // Calculate the difference in days
-    const diffTime = today.getTime() - dueDate.getTime()
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    
-    return diffDays
+    dueDate.setHours(0, 0, 0, 0)
+    return Math.ceil((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24))
   }
 
   // =====================
@@ -695,12 +687,12 @@ export default function Dashboard() {
 
   // Handle drag end
   const handleDragEnd = (event: any) => {
-    const { active, over } = event
-    if (active.id !== over?.id) {
-      const oldIndex = rowOrder.indexOf(active.id)
-      const newIndex = rowOrder.indexOf(over.id)
-      const newOrder = arrayMove(rowOrder, oldIndex, newIndex)
-      setRowOrder(newOrder)
+                const { active, over } = event
+                if (active.id !== over?.id) {
+                  const oldIndex = rowOrder.indexOf(active.id)
+                  const newIndex = rowOrder.indexOf(over.id)
+                  const newOrder = arrayMove(rowOrder, oldIndex, newIndex)
+                  setRowOrder(newOrder)
       
       // Reorder the invoices array
       const reorderedInvoices = [...invoices]
@@ -743,7 +735,7 @@ export default function Dashboard() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-      </div>
+                            </div>
 
       {/* Invoice Summary Stats
         <InvoiceStats stats={stats} />
@@ -854,6 +846,7 @@ export default function Dashboard() {
             <TableHeader>
               <TableRow className="bg-gray-50 border-b border-gray-200">
                 <TableHead className="w-8 px-4"></TableHead>
+                
                 <TableHead className="w-[56px] px-6 py-4 align-middle text-center">
                   <input
                     type="checkbox"
@@ -864,6 +857,8 @@ export default function Dashboard() {
                     className="mx-auto accent-green-800 h-4 w-4 rounded border-gray-300"
                   />
                 </TableHead>
+
+
                 <TableHead className="px-6 py-4">Number</TableHead>
                 <TableHead className="px-6 py-4">Client</TableHead>
                 <TableHead className="px-6 py-4">Due Date</TableHead>
@@ -873,195 +868,174 @@ export default function Dashboard() {
                 <TableHead className="px-6 py-4 text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={rowOrder} strategy={verticalListSortingStrategy}>
-                <TableBody className="cursor-pointer">
-                  {rowOrder.map((id) => {
-                    const invoice = currentItems.find((inv) => inv.id === id)
-                    if (!invoice) return null
-                    return (
-                      <SortableTableRow key={invoice.id} id={invoice.id} invoice={invoice} spreadsheets={spreadsheets}>
-                        <TableCell
-                          onClick={(e) => e.stopPropagation()}
-                          className="w-[56px] px-6 py-4 align-middle text-center"
-                        >
-                          <Checkbox
-                            checked={selectedInvoices.has(invoice.id)}
-                            onCheckedChange={() => handleSelectInvoice(invoice.id)}
-                            aria-label={`Select invoice ${invoice.id}`}
-                            className="mx-auto"
-                          />
-                        </TableCell>
-                        <TableCell className="px-6 py-4 whitespace-nowrap">{invoice.id}</TableCell>
-                        <TableCell className="px-6 py-4">
-                          <div className="flex flex-col">
-                            <span className="font-medium font-inter">
-                              {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}
-                            </span>
-                            <span className="text-xs text-gray-400">
-                              {typeof invoice.customer === "object" ? invoice.customer.email : ""}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-6 py-4 whitespace-nowrap">{formatDate(invoice.dueDate)}</TableCell>
-                        <TableCell className="px-6 py-4">
-                          {invoice.status === "Paid" ? (
-                            <span className="inline-block px-3 py-1 rounded-md border border-green-200 bg-green-50 text-green-700 text-xs font-medium font-inter">
-                              Paid
-                            </span>
-                          ) : invoice.status === "Pending" && getOverdueDays(invoice.dueDate) > 0 ? (
-                            <span className="inline-block px-3 py-1 rounded-md border border-amber-200 bg-amber-50 text-amber-700 text-xs font-medium font-inter">
-                              Pending
-                            </span>
-                          ) : invoice.status === "Pending" ? (
-                            <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium font-inter">
-                              Pending
-                            </span>
-                          ) : (
-                            <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium font-inter">
-                              {invoice.status}
-                            </span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right px-6 py-4">{formatCurrency(invoice.amount)}</TableCell>
-                        <TableCell className="text-center px-8 py-6">
-                          {invoice.status === "Pending" ? (() => {
-                            const today = new Date();
-                            today.setHours(0, 0, 0, 0);
-                            const dueDate = new Date(invoice.dueDate);
-                            dueDate.setHours(0, 0, 0, 0);
-                            if (dueDate.getTime() === today.getTime()) {
-                              return <span className="text-green-700 px-4 py-1.5 text-sm font-medium">Due today</span>;
-                            } else if (dueDate > today) {
-                              return <span className="text-gray-400 px-4 py-1.5 text-sm font-medium">Not due</span>;
-                            } else {
-                              const diffDays = Math.ceil((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
-                              return (
-                                <span className="text-red-600 px-4 py-1.5 text-sm font-medium">
-                                  {diffDays} {diffDays === 1 ? 'day' : 'days'}
-                                </span>
-                              );
+            <TableBody className="cursor-pointer" > 
+              {rowOrder.map((id) => {
+                const invoice = currentItems.find((inv) => inv.id === id)
+                if (!invoice) return null
+                return (
+                  <SortableTableRow key={invoice.id} id={invoice.id} invoice={invoice} spreadsheets={spreadsheets}>
+                    <TableCell
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-[56px] px-6 py-4 align-middle text-center"
+                    >
+                      <Checkbox
+                        checked={selectedInvoices.has(invoice.id)}
+                        onCheckedChange={() => handleSelectInvoice(invoice.id)}
+                        aria-label={`Select invoice ${invoice.id}`}
+                        className="mx-auto"
+                      />
+                    </TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap">{invoice.id}</TableCell>
+                    <TableCell className="px-6 py-4">
+                      <div className="flex flex-col">
+                        <span className="font-medium font-inter">
+                          {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          {typeof invoice.customer === "object" ? invoice.customer.email : ""}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap">{formatDate(invoice.dueDate)}</TableCell>
+                    <TableCell className="px-6 py-4">
+                      {invoice.status === "Paid" ? (
+                        <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium font-inter">
+                          Paid
+                        </span>
+                      ) : invoice.status === "Pending" ? (
+                        <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-100 text-gray-700 text-xs font-medium font-inter">
+                          Pending
+                        </span>
+                      ) : (
+                        <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium font-inter">
+                          {invoice.status}
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right px-6 py-4">{formatCurrency(invoice.amount)}</TableCell>
+                    <TableCell className="text-center px-8 py-6">
+                      {invoice.status === "Pending" && new Date(invoice.dueDate) < new Date() ? (
+                        <span className="text-red-600 px-4 py-1.5  text-sm">
+                          {getOverdueDays(invoice.dueDate)} days
+                        </span>
+                      ) : (
+                        <span className="text-gray-400 px-4 py-1.5 text-sm">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center px-6 py-4">
+                      <div className="flex justify-center gap-2">
+                        <Button
+                          onClick={async (e) => {
+                            e.stopPropagation()
+                            try {
+                              const {
+                                data: { session },
+                                error: sessionError,
+                              } = await supabase.auth.getSession()
+                              if (sessionError) {
+                                throw new Error(sessionError.message)
+                              }
+                              const response = await fetch(
+                                "https://sheetbills-server.vercel.app/api/sheets/mark-as-paid",
+                                {
+                                  method: "PUT",
+                                  headers: {
+                                    "Content-Type": "application/json",
+                                    Authorization: `Bearer ${session?.provider_token}`,
+                                    "X-Supabase-Token": session?.access_token || "",
+                                  },
+                                  body: JSON.stringify({
+                                    invoiceId: invoice.id,
+                                    sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
+                                  }),
+                                },
+                              )
+                              if (!response.ok) {
+                                const errorData = await response.json()
+                                throw new Error(errorData.error || "Failed to mark invoice as paid")
+                              }
+                              const updatedInvoices = invoices.map((inv) =>
+                                inv.id === invoice.id ? { ...inv, status: "Paid" as const } : inv,
+                              )
+                              setInvoices(updatedInvoices)
+                              if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
+                              toast({
+                                title: "Status Updated",
+                                description: "Invoice marked as paid successfully.",
+                              })
+                            } catch (error) {
+                              toast({
+                                title: "Error",
+                                description: error instanceof Error ? error.message : "Failed to update invoice status",
+                                variant: "destructive",
+                              })
                             }
-                          })() : (
-                            <span className="text-gray-400 px-4 py-1.5 text-sm">-</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-center px-6 py-4">
-                          <div className="flex justify-center gap-2">
-                            <Button
-                              onClick={async (e) => {
-                                e.stopPropagation()
-                                try {
-                                  const {
-                                    data: { session },
-                                    error: sessionError,
-                                  } = await supabase.auth.getSession()
-                                  if (sessionError) {
-                                    throw new Error(sessionError.message)
-                                  }
-                                  const response = await fetch(
-                                    "https://sheetbills-server.vercel.app/api/sheets/mark-as-paid",
-                                    {
-                                      method: "PUT",
-                                      headers: {
-                                        "Content-Type": "application/json",
-                                        Authorization: `Bearer ${session?.provider_token}`,
-                                        "X-Supabase-Token": session?.access_token || "",
-                                      },
-                                      body: JSON.stringify({
-                                        invoiceId: invoice.id,
-                                        sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
-                                      }),
-                                    },
-                                  )
-                                  if (!response.ok) {
-                                    const errorData = await response.json()
-                                    throw new Error(errorData.error || "Failed to mark invoice as paid")
-                                  }
-                                  const updatedInvoices = invoices.map((inv) =>
-                                    inv.id === invoice.id ? { ...inv, status: "Paid" as const } : inv,
-                                  )
-                                  setInvoices(updatedInvoices)
-                                  if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
-                                  toast({
-                                    title: "Status Updated",
-                                    description: "Invoice marked as paid successfully.",
-                                  })
-                                } catch (error) {
-                                  toast({
-                                    title: "Error",
-                                    description: error instanceof Error ? error.message : "Failed to update invoice status",
-                                    variant: "destructive",
-                                  })
-                                }
-                              }}
-                              className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
-                              size="sm"
-                              disabled={invoice.status === "Paid"}
-                            >
-                              Mark as Paid
-                            </Button>
-                            <Button
-                              onClick={async (e) => {
-                                e.stopPropagation()
-                                try {
-                                  const {
-                                    data: { session },
-                                    error: sessionError,
-                                  } = await supabase.auth.getSession()
-                                  if (sessionError) {
-                                    throw new Error(sessionError.message)
-                                  }
-                                  const response = await fetch(
-                                    "https://sheetbills-server.vercel.app/api/sheets/mark-as-pending",
-                                    {
-                                      method: "PUT",
-                                      headers: {
-                                        "Content-Type": "application/json",
-                                        Authorization: `Bearer ${session?.provider_token}`,
-                                        "X-Supabase-Token": session?.access_token || "",
-                                      },
-                                      body: JSON.stringify({
-                                        invoiceId: invoice.id,
-                                        sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
-                                      }),
-                                    },
-                                  )
-                                  if (!response.ok) {
-                                    const errorData = await response.json()
-                                    throw new Error(errorData.error || "Failed to mark invoice as pending")
-                                  }
-                                  const updatedInvoices = invoices.map((inv) =>
-                                    inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv,
-                                  )
-                                  setInvoices(updatedInvoices)
-                                  if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
-                                  toast({
-                                    title: "Status Updated",
-                                    description: "Invoice marked as pending successfully.",
-                                  })
-                                } catch (error) {
-                                  toast({
-                                    title: "Error",
-                                    description: error instanceof Error ? error.message : "Failed to update invoice status",
-                                    variant: "destructive",
-                                  })
-                                }
-                              }}
-                              className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
-                              size="sm"
-                              disabled={invoice.status === "Pending"}
-                            >
-                              Mark as Pending
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </SortableTableRow>
-                    )
-                  })}
-                </TableBody>
-              </SortableContext>
-            </DndContext>
+                          }}
+                          className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
+                          size="sm"
+                          disabled={invoice.status === "Paid"}
+                        >
+                          Mark as Paid
+                        </Button>
+                        <Button
+                          onClick={async (e) => {
+                            e.stopPropagation()
+                            try {
+                              const {
+                                data: { session },
+                                error: sessionError,
+                              } = await supabase.auth.getSession()
+                              if (sessionError) {
+                                throw new Error(sessionError.message)
+                              }
+                              const response = await fetch(
+                                "https://sheetbills-server.vercel.app/api/sheets/mark-as-pending",
+                                {
+                                  method: "PUT",
+                                  headers: {
+                                    "Content-Type": "application/json",
+                                    Authorization: `Bearer ${session?.provider_token}`,
+                                    "X-Supabase-Token": session?.access_token || "",
+                                  },
+                                  body: JSON.stringify({
+                                    invoiceId: invoice.id,
+                                    sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
+                                  }),
+                                },
+                              )
+                              if (!response.ok) {
+                                const errorData = await response.json()
+                                throw new Error(errorData.error || "Failed to mark invoice as pending")
+                              }
+                              const updatedInvoices = invoices.map((inv) =>
+                                inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv,
+                              )
+                              setInvoices(updatedInvoices)
+                              if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
+                              toast({
+                                title: "Status Updated",
+                                description: "Invoice marked as pending successfully.",
+                              })
+                            } catch (error) {
+                              toast({
+                                title: "Error",
+                                description: error instanceof Error ? error.message : "Failed to update invoice status",
+                                variant: "destructive",
+                              })
+                            }
+                          }}
+                          className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
+                          size="sm"
+                          disabled={invoice.status === "Pending"}
+                        >
+                          Mark as Pending
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </SortableTableRow>
+                )
+              })}
+            </TableBody>
           </Table>
         </div>
 

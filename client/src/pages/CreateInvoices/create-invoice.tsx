@@ -970,6 +970,7 @@ ${businessData.phone}`
         },
         body: JSON.stringify({
           invoiceId: invoiceData.invoiceNumber,
+          sheetUrl: selectedSpreadsheetUrl,
         }),
       })
 

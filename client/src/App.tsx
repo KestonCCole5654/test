@@ -151,7 +151,7 @@ function App() {
         {/* Catch all route - only for authenticated routes */}
         <Route path="*" element={
           location.pathname.startsWith('/invoice/shared/') ? (
-            <Navigate to={`/invoice/shared${location.pathname.replace('/invoice/shared', '')}`} />
+            <PublicInvoice />
           ) : (
             <Navigate to={user ? "/invoices" : "/login"} />
           )

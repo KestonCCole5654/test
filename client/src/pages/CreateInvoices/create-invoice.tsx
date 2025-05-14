@@ -23,6 +23,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../../components/ui/dialog"
 
 
 export interface InvoiceData {
@@ -241,11 +242,22 @@ export default function InvoiceForm() {
     })
   }
 
+  // Utility function to format dates
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  }
+
   const handleUpdate = async () => {
     try {
       const {
         data: { session },
       } = await supabase.auth.getSession()
+      if (!session) throw new Error('No active session');
       if (!session?.provider_token) {
         alert("Google authentication required")
         return
@@ -313,6 +325,7 @@ export default function InvoiceForm() {
       const {
         data: { session },
       } = await supabase.auth.getSession()
+      if (!session) throw new Error('No active session');
       if (!session?.provider_token) {
         alert("Google authentication required")
         return
@@ -491,8 +504,8 @@ ${businessData.phone}`
 
 Please find attached invoice ${invoiceData.invoiceNumber} for the amount of ${formatCurrency(invoiceData.amount)}.
 
-Invoice Date: ${formatDate(invoiceData.date)}
-Due Date: ${formatDate(invoiceData.dueDate)}
+Invoice Date: ${invoiceData.date}
+Due Date: ${invoiceData.dueDate}
 
 If you have any questions, please don't hesitate to contact us.
 
@@ -924,15 +937,33 @@ ${businessData.phone}`
   }, [])
 
   const [showSuccessModal, setShowSuccessModal] = useState(false)
-  // Format date to show month name, day and year for email body
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
+  const [showLinkModal, setShowLinkModal] = useState(false)
+  const [generatedLink, setGeneratedLink] = useState<string | null>(null)
+
+  const handleGenerateInvoiceLink = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('No active session');
+      const response = await fetch('https://sheetbills-server.vercel.app/api/invoices/shared/create-link', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Supabase-Token': session.access_token || '',
+        },
+        body: JSON.stringify({ invoiceId: invoiceData.invoiceNumber }),
+      });
+      if (!response.ok) throw new Error('Failed to generate link');
+      const { shareUrl } = await response.json();
+      setGeneratedLink(shareUrl);
+      setShowLinkModal(true);
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to generate invoice link.',
+        variant: 'destructive',
+      });
+    }
+  };
 
   return (
     <>
@@ -978,7 +1009,7 @@ ${businessData.phone}`
             <div className="col-span-2 flex justify-center mt-4">
               <Button variant="outline" className="font-light mx-2" onClick={handleEmailInvoice}>Email Invoice</Button>
               <Button variant="outline" className="font-light mx-2" onClick={() => window.print()}>Print Invoice</Button>
-              <Button variant="outline" className="font-light mx-2" onClick={() => {/* TODO: implement get link */ }}>Generate Invoice Link</Button>
+              <Button variant="outline" className="font-light mx-2" onClick={handleGenerateInvoiceLink}>Generate Invoice Link</Button>
             </div>
           </div>
 
@@ -1343,6 +1374,38 @@ ${businessData.phone}`
           </div>
         </div>
       )}
+
+      {/* Invoice Link Modal */}
+      <Dialog open={showLinkModal} onOpenChange={setShowLinkModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Shareable Invoice Link</DialogTitle>
+          </DialogHeader>
+          {generatedLink ? (
+            <div className="flex flex-col gap-4 items-center">
+              <a href={generatedLink} target="_blank" rel="noopener noreferrer" className="text-green-700 underline break-all text-center">
+                {generatedLink}
+              </a>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  navigator.clipboard.writeText(generatedLink)
+                }}
+                className="w-full"
+              >
+                Copy Link
+              </Button>
+            </div>
+          ) : (
+            <div className="text-gray-500">Generating link...</div>
+          )}
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setShowLinkModal(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <footer className="w-full font-inter  text-center text-md text-gray-400 mt-10 mb-2">
         Powered by <span className=" font-inter font-medium text-green-800">SheetBills™</span>
       </footer>

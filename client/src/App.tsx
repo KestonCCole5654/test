@@ -148,9 +148,13 @@ function App() {
           <Route path="/contact" element={<ContactPage />} />
         </Route>
 
-        {/* Catch all route */}
+        {/* Catch all route - only for authenticated routes */}
         <Route path="*" element={
-          <Navigate to={user ? "/invoices" : "/login"} />
+          location.pathname.startsWith('/invoice/shared/') ? (
+            <Navigate to={`/invoice/shared${location.pathname.replace('/invoice/shared', '')}`} />
+          ) : (
+            <Navigate to={user ? "/invoices" : "/login"} />
+          )
         } />
       </Routes>
     </HelmetProvider>

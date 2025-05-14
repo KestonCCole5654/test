@@ -146,7 +146,6 @@ function App() {
           <Route path="/create-invoice" element={<InvoiceForm />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/contact" element={<ContactPage />} />
-  
         </Route>
 
         {/* Catch all route */}

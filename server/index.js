@@ -2113,10 +2113,10 @@ app.post('/api/invoices/shared/create-link', async (req, res) => {
       return res.status(400).json({ error: 'Invoice ID and sheetUrl are required' });
     }
 
-    // 3. Generate a shareable link (for demo, just a dummy link with a token)
+    // 3. Generate a shareable link with sheetUrl as a query parameter
     const expiresAt = Date.now() + 1000 * 60 * 60 * 24; // 24 hours from now
     const shareToken = Buffer.from(`${invoiceId}:${expiresAt}`).toString('base64');
-    const shareUrl = `https://sheetbills-client.vercel.app/invoice/shared/${shareToken}`;
+    const shareUrl = `https://sheetbills-client.vercel.app/invoice/shared/${shareToken}?sheetUrl=${encodeURIComponent(sheetUrl)}`;
 
     // 4. Return the link and expiration
     res.json({ shareUrl, expiresAt });
@@ -2146,28 +2146,59 @@ app.get('/api/invoices/shared/:token', async (req, res) => {
     if (!invoiceId || !expiresAt) return res.status(400).json({ error: 'Invalid token data' });
     if (Date.now() > Number(expiresAt)) return res.status(410).json({ error: 'Link expired' });
 
-    // For demo: you need to know the sheetUrl. In a real app, store this mapping in a DB.
-    // For now, require sheetUrl as a query param (since it's in the original link)
+    // Get sheetUrl from query params
     const { sheetUrl } = req.query;
     if (!sheetUrl) return res.status(400).json({ error: 'Missing sheetUrl' });
 
-    // Use a service account or a public Google Sheet for public access, or use a bot account's token
-    // For demo, try to fetch the invoice from the sheet (assuming public read access)
+    // Extract spreadsheet ID
     const spreadsheetId = extractSheetIdFromUrl(sheetUrl);
     if (!spreadsheetId) return res.status(400).json({ error: 'Invalid sheetUrl' });
 
-    // Fetch all invoices from the sheet
-    const sheets = google.sheets({ version: 'v4' });
+    // Initialize Google Sheets API with service account
+    const auth = new google.auth.GoogleAuth({
+      credentials: {
+        client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+        private_key: process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      },
+      scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+    });
+
+    const sheets = google.sheets({ version: 'v4', auth });
+
+    // Get sheet metadata
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
+    const invoiceSheet = spreadsheet.data.sheets.find(
+      s => s.properties.title === "SheetBills Invoices"
+    );
+    if (!invoiceSheet) {
+      return res.status(404).json({ error: 'SheetBills Invoices tab not found' });
+    }
+    const sheetName = invoiceSheet.properties.title;
+
+    // Fetch invoice data
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: 'SheetBills Invoices!A2:M',
-      // No auth for public read (sheet must be shared as public or with a service account)
+      range: `${sheetName}!A2:M`,
     });
+
     const rows = response.data.values || [];
     const invoiceRow = rows.find(row => row[0] === invoiceId);
     if (!invoiceRow) return res.status(404).json({ error: 'Invoice not found' });
 
-    // Map row to invoice object (simplified)
+    // Parse items, tax, and discount
+    let items = [];
+    let tax = { type: 'percentage', value: 0 };
+    let discount = { type: 'percentage', value: 0 };
+
+    try {
+      items = JSON.parse(invoiceRow[6] || '[]');
+      tax = JSON.parse(invoiceRow[8] || '{"type":"percentage","value":0}');
+      discount = JSON.parse(invoiceRow[9] || '{"type":"percentage","value":0}');
+    } catch (e) {
+      console.error('Error parsing JSON fields:', e);
+    }
+
+    // Map row to invoice object
     const invoice = {
       invoiceNumber: invoiceRow[0],
       date: invoiceRow[1],
@@ -2177,15 +2208,53 @@ app.get('/api/invoices/shared/:token', async (req, res) => {
         email: invoiceRow[4],
         address: invoiceRow[5],
       },
-      items: JSON.parse(invoiceRow[6] || '[]'),
-      amount: invoiceRow[7],
-      tax: invoiceRow[8],
-      discount: invoiceRow[9],
+      items,
+      amount: parseFloat(invoiceRow[7]) || 0,
+      tax,
+      discount,
       notes: invoiceRow[10],
-      template: invoiceRow[11],
-      status: invoiceRow[12],
+      template: invoiceRow[11] || 'classic',
+      status: invoiceRow[12] || 'Pending',
     };
-    res.json({ invoice });
+
+    // Get business details
+    const businessResponse = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: 'Business Details!A2:C6',
+    });
+
+    const businessRows = businessResponse.data.values || [];
+    const businessData = {
+      companyName: '',
+      phone: '',
+      address: '',
+      email: '',
+      logo: ''
+    };
+
+    businessRows.forEach(row => {
+      if (row[0] && row[1]) {
+        switch (row[0]) {
+          case 'Company Name':
+            businessData.companyName = row[1];
+            break;
+          case 'Phone Number':
+            businessData.phone = row[1];
+            break;
+          case 'Address':
+            businessData.address = row[1];
+            break;
+          case 'Business Email':
+            businessData.email = row[1];
+            break;
+          case 'Logo':
+            businessData.logo = row[1];
+            break;
+        }
+      }
+    });
+
+    res.json({ invoice, businessData });
   } catch (error) {
     console.error('Error fetching shared invoice:', error);
     res.status(500).json({ error: 'Failed to fetch shared invoice' });

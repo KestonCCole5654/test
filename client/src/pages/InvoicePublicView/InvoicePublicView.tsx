@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import InvoiceClassic from "../CreateInvoices/create-invoice";
+import { InvoiceClassic } from "../CreateInvoices/create-invoice";
 import { LoadingSpinner } from "../../components/ui/loadingSpinner";
 import { Card } from "../../components/ui/card";
+import { InvoiceData, BusinessData } from "../CreateInvoices/create-invoice";
 
 export default function InvoicePublicView() {
   const { token } = useParams();
@@ -10,8 +11,8 @@ export default function InvoicePublicView() {
   const sheetUrl = searchParams.get("sheetUrl");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [invoiceData, setInvoiceData] = useState<any>(null);
-  const [businessData, setBusinessData] = useState<any>(null);
+  const [invoiceData, setInvoiceData] = useState<InvoiceData | null>(null);
+  const [businessData, setBusinessData] = useState<BusinessData | null>(null);
 
   useEffect(() => {
     const fetchInvoice = async () => {
@@ -69,10 +70,13 @@ export default function InvoicePublicView() {
       </div>
     );
   }
+  if (!invoiceData || !businessData) {
+    return null;
+  }
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center py-8">
       <div className="w-full max-w-3xl">
-        <InvoiceClassic invoiceData={invoiceData} businessData={businessData} showShadow={true} />
+        <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={true} />
       </div>
     </div>
   );

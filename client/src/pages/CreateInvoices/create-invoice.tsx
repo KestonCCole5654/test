@@ -976,6 +976,12 @@ ${businessData.phone}`
       console.log("Google Token from localStorage:", googleToken);
       console.log("Supabase Token Used:", session.access_token);
 
+      // Debug log for invoiceId and sheetUrl
+      console.log("About to create share link with:", {
+        invoiceId: invoiceData.invoiceNumber,
+        sheetUrl
+      });
+
       // Create a shareable link for the invoice
       const response = await fetch("https://sheetbills-server.vercel.app/api/invoices/shared/create-link", {
         method: "POST",

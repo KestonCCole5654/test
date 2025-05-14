@@ -953,12 +953,17 @@ ${businessData.phone}`
         throw new Error("No active session")
       }
 
+      // Use provider_token or fallback to localStorage
+      const googleToken = session.provider_token || localStorage.getItem("google_access_token")
+      console.log("Google Token Used:", googleToken)
+      console.log("Supabase Token Used:", session.access_token)
+
       // Create a shareable link for the invoice
       const response = await fetch("https://sheetbills-server.vercel.app/api/invoices/shared/create-link", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${session.provider_token}`,
+          "Authorization": `Bearer ${googleToken}`,
           "X-Supabase-Token": session.access_token || "",
         },
         body: JSON.stringify({

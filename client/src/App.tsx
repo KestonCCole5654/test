@@ -121,7 +121,6 @@ function App() {
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/auth-callback" element={<AuthCallback />} />
-        <Route path="/invoice/shared/:token" element={<PublicInvoice />} />
     
         {/* Onboarding Route */}
         <Route
@@ -150,12 +149,11 @@ function App() {
 
         {/* Catch all route - only for authenticated routes */}
         <Route path="*" element={
-          location.pathname.startsWith('/invoice/shared/') ? (
-            <PublicInvoice />
-          ) : (
-            <Navigate to={user ? "/invoices" : "/login"} />
-          )
+          <Navigate to={user ? "/invoices" : "/login"} />
         } />
+
+        {/* Public Invoice Route - must be after catch-all to take precedence */}
+        <Route path="/invoice/shared/:token" element={<PublicInvoice />} />
       </Routes>
     </HelmetProvider>
   );

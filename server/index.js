@@ -1651,6 +1651,40 @@ app.get('/health', (req, res) => {
 // Used to specify the port number
 const PORT = process.env.PORT || 5000;
 
+// Add this before the app.listen call
+app.get('/api/test-service-account', async (req, res) => {
+  try {
+    // Initialize Google Sheets API with service account
+    const auth = new google.auth.GoogleAuth({
+      credentials: {
+        client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+        private_key: process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      },
+      scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+    });
+
+    // Test the authentication
+    const sheets = google.sheets({ version: 'v4', auth });
+    
+    // Get the service account email
+    const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+    
+    res.json({
+      success: true,
+      message: 'Service account configuration is valid',
+      serviceAccountEmail,
+      status: 'Service account is properly configured'
+    });
+  } catch (error) {
+    console.error('Service account test error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Service account configuration error',
+      details: error.message
+    });
+  }
+});
+
 // Start the server
 app.listen(PORT, '0.0.0.0', (err) => {
   if (err) {

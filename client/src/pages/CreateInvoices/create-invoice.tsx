@@ -939,7 +939,6 @@ ${businessData.phone}`
 
   // Function to generate shareable invoice link
   const handleGenerateInvoiceLink = async () => {
-    alert("Generate Invoice Link function called!");
     try {
       setIsGeneratingLink(true)
       
@@ -953,6 +952,23 @@ ${businessData.phone}`
       if (!session) {
         console.log("No session found!");
         throw new Error("No active session")
+      }
+
+      // Get the SheetBills Invoices sheet URL if not available in location state
+      let sheetUrl = selectedSpreadsheetUrl;
+      if (!sheetUrl) {
+        const response = await axios.get("https://sheetbills-server.vercel.app/api/sheets/spreadsheets", {
+          headers: {
+            Authorization: `Bearer ${session.provider_token}`,
+            "X-Supabase-Token": session.access_token,
+          },
+        });
+
+        const invoicesSheet = response.data.spreadsheets.find((sheet: { name: string; sheetUrl: string }) => sheet.name === "SheetBills Invoices");
+        if (!invoicesSheet) {
+          throw new Error("SheetBills Invoices sheet not found");
+        }
+        sheetUrl = invoicesSheet.sheetUrl;
       }
 
       // Use only the google_access_token from localStorage for debugging
@@ -970,7 +986,7 @@ ${businessData.phone}`
         },
         body: JSON.stringify({
           invoiceId: invoiceData.invoiceNumber,
-          sheetUrl: selectedSpreadsheetUrl,
+          sheetUrl: sheetUrl,
         }),
       })
 

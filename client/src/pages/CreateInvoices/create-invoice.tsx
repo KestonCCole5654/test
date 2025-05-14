@@ -934,6 +934,72 @@ ${businessData.phone}`
     })
   }
 
+  const [shareableLink, setShareableLink] = useState<string>("")
+  const [isGeneratingLink, setIsGeneratingLink] = useState(false)
+
+  // Function to generate shareable invoice link
+  const handleGenerateInvoiceLink = async () => {
+    try {
+      setIsGeneratingLink(true)
+      
+      // Get the current session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+
+      if (sessionError) {
+        throw new Error(sessionError.message)
+      }
+
+      if (!session) {
+        throw new Error("No active session")
+      }
+
+      // Create a shareable link for the invoice
+      const response = await fetch("https://sheetbills-server.vercel.app/api/invoices/shared/create-link", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Supabase-Token": session.access_token || "",
+        },
+        body: JSON.stringify({
+          invoiceId: invoiceData.invoiceNumber,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to create shareable link")
+      }
+
+      const { shareUrl, expiresAt } = await response.json()
+
+      // Format expiration date
+      const expirationDate = new Date(expiresAt)
+      const formattedExpirationDate = expirationDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
+
+      setShareableLink(shareUrl)
+      
+      // Show success toast
+      toast({
+        title: "Link Generated",
+        description: `Shareable link created. Link expires on ${formattedExpirationDate}`,
+        variant: "default",
+      })
+    } catch (error) {
+      console.error("Error generating shareable link:", error)
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to generate shareable link",
+        variant: "destructive",
+      })
+    } finally {
+      setIsGeneratingLink(false)
+    }
+  }
+
   return (
     <>
       {/* Preview Mode - Cleaned up */}
@@ -978,7 +1044,14 @@ ${businessData.phone}`
             <div className="col-span-2 flex justify-center mt-4">
               <Button variant="outline" className="font-light mx-2" onClick={handleEmailInvoice}>Email Invoice</Button>
               <Button variant="outline" className="font-light mx-2" onClick={() => window.print()}>Print Invoice</Button>
-              <Button variant="outline" className="font-light mx-2" onClick={() => {/* TODO: implement get link */ }}>Generate Invoice Link</Button>
+              <Button 
+                variant="outline" 
+                className="font-light mx-2" 
+                onClick={handleGenerateInvoiceLink}
+                disabled={isGeneratingLink}
+              >
+                {isGeneratingLink ? "Generating..." : "Generate Invoice Link"}
+              </Button>
             </div>
           </div>
 
@@ -1340,6 +1413,33 @@ ${businessData.phone}`
             </svg>
             <h2 className="text-2xl font-bold mb-2 text-green-700">Invoice Saved!</h2>
             <p className="mb-4 text-gray-600">Your invoice has been saved successfully.</p>
+          </div>
+        </div>
+      )}
+      {shareableLink && (
+        <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+          <p className="text-sm text-gray-600 mb-2">Shareable Link:</p>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={shareableLink}
+              readOnly
+              className="flex-1 p-2 border rounded text-sm font-mono"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                navigator.clipboard.writeText(shareableLink)
+                toast({
+                  title: "Copied!",
+                  description: "Link copied to clipboard",
+                  variant: "default",
+                })
+              }}
+            >
+              Copy
+            </Button>
           </div>
         </div>
       )}

@@ -7,7 +7,6 @@ import Dashboard from './pages/Dashboard/dashboard';
 import SidebarLayout from './components/Layout/SidebarLayout';
 import AuthenticatedRoute from './components/Auth/authenticatedRoute';
 import InvoiceForm from './pages/CreateInvoices/create-invoice';
-import InvoicePublicView from './pages/InvoicePublicView/InvoicePublicView';
 import type { 
   Subscription,
   AuthChangeEvent,
@@ -145,7 +144,6 @@ function App() {
           <Route path="/create-invoice" element={<InvoiceForm />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/invoice/view/:token" element={<InvoicePublicView />} />
   
         </Route>
 

@@ -911,7 +911,7 @@ export default function Dashboard() {
                           ) : invoice.status === "Pending" && getOverdueDays(invoice.dueDate) > 0 ? (
                             <span className="inline-block px-3 py-1 rounded-md border border-amber-200 bg-amber-50 text-amber-700 text-xs font-medium font-inter">
                               Pending
-                            </span>
+                        </span>
                       ) : invoice.status === "Pending" ? (
                             <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium font-inter">
                           Pending

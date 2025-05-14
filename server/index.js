@@ -2092,3 +2092,36 @@ app.delete('/api/sheets/bulk-delete', async (req, res) => {
     });
   }
 });
+
+/**
+ * Generate a shareable link for an invoice.
+ * @route POST /api/invoices/shared/create-link
+ * @access Protected (Supabase + Google Auth)
+ */
+app.post('/api/invoices/shared/create-link', async (req, res) => {
+  try {
+    // 1. Validate tokens
+    const supabaseToken = req.headers['x-supabase-token'];
+    const authHeader = req.headers.authorization;
+    if (!supabaseToken) return res.status(401).json({ error: 'Supabase authentication required' });
+    if (!authHeader?.startsWith('Bearer ')) return res.status(401).json({ error: 'Google authentication required' });
+    const googleToken = authHeader.split(' ')[1];
+
+    // 2. Validate body
+    const { invoiceId, sheetUrl } = req.body;
+    if (!invoiceId || !sheetUrl) {
+      return res.status(400).json({ error: 'Invoice ID and sheetUrl are required' });
+    }
+
+    // 3. Generate a shareable link (for demo, just a dummy link with a token)
+    const expiresAt = Date.now() + 1000 * 60 * 60 * 24; // 24 hours from now
+    const shareToken = Buffer.from(`${invoiceId}:${expiresAt}`).toString('base64');
+    const shareUrl = `https://sheetbills-client.vercel.app/invoice/shared/${shareToken}`;
+
+    // 4. Return the link and expiration
+    res.json({ shareUrl, expiresAt });
+  } catch (error) {
+    console.error('Error generating shareable link:', error);
+    res.status(500).json({ error: 'Failed to generate shareable link' });
+  }
+});

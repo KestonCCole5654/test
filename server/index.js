@@ -8,6 +8,7 @@ import cors from 'cors'; // Cross-Origin Resource Sharing middleware
 import { google } from 'googleapis'; // Google APIs client
 import nodemailer from 'nodemailer'; // Email sending
 import { createClient } from '@supabase/supabase-js'; // Supabase client
+import crypto from 'crypto'; // Add at the top if not already imported
 
 dotenv.config(); // Load environment variables
 
@@ -2090,5 +2091,118 @@ app.delete('/api/sheets/bulk-delete', async (req, res) => {
     res.status(500).json({
       error: error instanceof Error ? error.message : 'Failed to delete invoices',
     });
+  }
+});
+
+// POST /api/invoices/shared/create-link
+app.post('/api/invoices/shared/create-link', async (req, res) => {
+  try {
+    const { invoiceId, sheetUrl } = req.body;
+    if (!invoiceId || !sheetUrl) {
+      return res.status(400).json({ error: 'Invoice ID and sheetUrl are required' });
+    }
+
+    // Generate a unique token
+    const token = crypto.randomBytes(16).toString('hex');
+    const createdAt = new Date().toISOString();
+
+    // Extract spreadsheet ID
+    const spreadsheetId = extractSheetIdFromUrl(sheetUrl);
+    if (!spreadsheetId) {
+      return res.status(400).json({ error: 'Invalid sheet URL' });
+    }
+
+    // Google Auth
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Google authentication required' });
+    }
+    const googleToken = authHeader.split(' ')[1];
+    const auth = new google.auth.OAuth2();
+    auth.setCredentials({ access_token: googleToken });
+    const sheets = google.sheets({ version: 'v4', auth });
+
+    // Check if "Invoice Links" sheet exists, create if not
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
+    let linksSheet = spreadsheet.data.sheets.find(
+      s => s.properties.title === "Invoice Links"
+    );
+    if (!linksSheet) {
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId,
+        requestBody: {
+          requests: [{
+            addSheet: { properties: { title: "Invoice Links" } }
+          }]
+        }
+      });
+      // Add header row
+      await sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range: `'Invoice Links'!A1:C1`,
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: [["Token", "Invoice ID", "Created At"]]
+        }
+      });
+    }
+
+    // Append the new link to the "Invoice Links" sheet
+    await sheets.spreadsheets.values.append({
+      spreadsheetId,
+      range: `'Invoice Links'!A:C`,
+      valueInputOption: 'USER_ENTERED',
+      insertDataOption: 'INSERT_ROWS',
+      requestBody: {
+        values: [[token, invoiceId, createdAt]]
+      }
+    });
+
+    // Construct the shareable URL
+    const shareUrl = `https://sheetbills-client.vercel.app/invoice/view/${token}`;
+    res.json({ shareUrl });
+  } catch (error) {
+    console.error('Error generating invoice link:', error);
+    res.status(500).json({ error: 'Failed to generate invoice link' });
+  }
+});
+
+// GET /api/invoices/shared/:token
+app.get('/api/invoices/shared/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { sheetUrl } = req.query;
+    if (!token || !sheetUrl) {
+      return res.status(400).json({ error: 'Token and sheetUrl are required' });
+    }
+    // Extract spreadsheet ID
+    const spreadsheetId = extractSheetIdFromUrl(sheetUrl);
+    if (!spreadsheetId) {
+      return res.status(400).json({ error: 'Invalid sheet URL' });
+    }
+    // Google Auth
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Google authentication required' });
+    }
+    const googleToken = authHeader.split(' ')[1];
+    const auth = new google.auth.OAuth2();
+    auth.setCredentials({ access_token: googleToken });
+    const sheets = google.sheets({ version: 'v4', auth });
+    // Read the Invoice Links sheet
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `'Invoice Links'!A2:C`,
+    });
+    const rows = response.data.values || [];
+    const found = rows.find(row => row[0] === token);
+    if (!found) {
+      return res.status(404).json({ error: 'Invalid or expired link' });
+    }
+    const invoiceId = found[1];
+    res.json({ invoiceId });
+  } catch (error) {
+    console.error('Error fetching invoice by token:', error);
+    res.status(500).json({ error: 'Failed to fetch invoice by token' });
   }
 });

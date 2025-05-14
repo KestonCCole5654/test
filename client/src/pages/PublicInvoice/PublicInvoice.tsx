@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { Card } from "../../components/ui/card";
-import { InvoiceClassic } from "../CreateInvoices/create-invoice";
+import InvoiceClassic from "../../components/InvoiceClassic";
 
 // You can import your InvoiceClassic component if you want to reuse the design
 // import { InvoiceClassic } from "../CreateInvoices/create-invoice";

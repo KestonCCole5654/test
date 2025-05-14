@@ -909,8 +909,12 @@ export default function Dashboard() {
                             <span className="inline-block px-3 py-1 rounded-md border border-green-200 bg-green-50 text-green-700 text-xs font-medium font-inter">
                               Paid
                             </span>
-                          ) : invoice.status === "Pending" ? (
+                          ) : invoice.status === "Pending" && getOverdueDays(invoice.dueDate) > 0 ? (
                             <span className="inline-block px-3 py-1 rounded-md border border-amber-200 bg-amber-50 text-amber-700 text-xs font-medium font-inter">
+                              Pending
+                            </span>
+                          ) : invoice.status === "Pending" ? (
+                            <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium font-inter">
                               Pending
                             </span>
                           ) : (
@@ -926,9 +930,13 @@ export default function Dashboard() {
                               <span className="text-red-600 px-4 py-1.5 text-sm font-medium">
                                 {getOverdueDays(invoice.dueDate)} {getOverdueDays(invoice.dueDate) === 1 ? 'day' : 'days'}
                               </span>
+                            ) : getOverdueDays(invoice.dueDate) === 0 ? (
+                              <span className="text-green-700 px-4 py-1.5 text-sm font-medium">
+                                Due today
+                              </span>
                             ) : (
-                              <span className="text-green-600 px-4 py-1.5 text-sm font-medium">
-                                {getOverdueDays(invoice.dueDate) === 0 ? 'Due today' : 'Not due'}
+                              <span className="text-gray-400 px-4 py-1.5 text-sm font-medium">
+                                Not due
                               </span>
                             )
                           ) : (

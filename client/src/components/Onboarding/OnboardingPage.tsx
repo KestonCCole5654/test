@@ -94,15 +94,15 @@ const OnboardingPage: React.FC = () => {
   return (
     <div className="min-h-screen font-cal-sans bg-background flex flex-col items-center justify-center p-4">
       <div className="flex-1 flex items-center justify-center w-full">
-        <Card className="w-full max-w-2xl p-8">
+        <Card className="w-full max-w-2xl p-8 font-cal-sans">
           <div className="mb-8">
             <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-semibold">{currentStepData.title}</h1>
-              <div className="text-sm text-muted-foreground">
+              <h1 className="text-2xl font-cal-sans font-semibold">{currentStepData.title}</h1>
+              <div className="text-sm text-muted-foreground font-cal-sans">
                 Step {currentStep} of {steps.length}
               </div>
             </div>
-            <p className="text-muted-foreground">{currentStepData.description}</p>
+            <p className="text-muted-foreground font-cal-sans">{currentStepData.description}</p>
           </div>
 
           <AnimatePresence mode="wait">

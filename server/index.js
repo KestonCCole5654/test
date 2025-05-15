@@ -2359,3 +2359,48 @@ app.get('/api/invoices/shared/:token', async (req, res) => {
     });
   }
 });
+
+/**
+ * Checks if the user's Master Tracking Sheet exists (for onboarding status).
+ * @route GET /api/onboarding/status
+ * @access Protected (Supabase + Google Auth)
+ * Returns: { onboarded: true } if exists, { onboarded: false } if not
+ */
+app.get('/api/onboarding/status', async (req, res) => {
+  try {
+    // Get Google access token from headers
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ onboarded: false, error: 'Missing or invalid authorization header' });
+    }
+    const accessToken = authHeader.split(' ')[1];
+
+    // Get user info to get Google user ID
+    const userInfo = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    const userId = userInfo.data.sub;
+
+    // Initialize Google Drive API
+    const auth = new google.auth.OAuth2();
+    auth.setCredentials({ access_token: accessToken });
+    const drive = google.drive({ version: 'v3', auth });
+
+    // Search for Master Tracking Sheet by name and type
+    const driveResponse = await drive.files.list({
+      q: "name='Master Tracking Sheet' and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false",
+      fields: 'files(id, name, webViewLink)',
+      spaces: 'drive',
+    });
+
+    // If found, user is onboarded
+    if (driveResponse.data.files.length > 0) {
+      return res.json({ onboarded: true });
+    } else {
+      return res.json({ onboarded: false });
+    }
+  } catch (error) {
+    console.error('[ONBOARDING STATUS ERROR]', error);
+    return res.status(500).json({ onboarded: false, error: error.message });
+  }
+});

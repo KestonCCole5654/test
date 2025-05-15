@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Route, Routes, Navigate, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import supabase from './components/Auth/supabaseClient';
@@ -50,6 +50,7 @@ async function checkBusinessSheet(supabaseToken: string, googleToken: string) {
 function App() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [onboardingChecked, setOnboardingChecked] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -107,8 +108,43 @@ function App() {
     });
   }, [location, user, loading]);
 
-  if (loading) {
-    console.log('App is in loading state');
+  // Onboarding check logic
+  useEffect(() => {
+    // Only run after user is loaded and not loading
+    if (!loading && user) {
+      const checkOnboardingStatus = async () => {
+        try {
+          // Get Supabase session for Google token
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session) return;
+          const googleToken = session.provider_token;
+          if (!googleToken) return;
+          // Call backend onboarding status endpoint
+          const response = await fetch('https://sheetbills-server.vercel.app/api/onboarding/status', {
+            headers: {
+              'Authorization': `Bearer ${googleToken}`,
+            },
+          });
+          const data = await response.json();
+          // If not onboarded and not already on onboarding page, redirect
+          if (!data.onboarded && location.pathname !== '/Onboarding') {
+            navigate('/Onboarding', { replace: true });
+          }
+          // If onboarded and on onboarding page, redirect to dashboard
+          if (data.onboarded && location.pathname === '/Onboarding') {
+            navigate('/invoices', { replace: true });
+          }
+          setOnboardingChecked(true);
+        } catch (error) {
+          console.error('Onboarding status check failed:', error);
+        }
+      };
+      checkOnboardingStatus();
+    }
+  }, [user, loading, location.pathname, navigate]);
+
+  if (loading || (user && !onboardingChecked)) {
+    // Show loading spinner until onboarding check is done
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner />

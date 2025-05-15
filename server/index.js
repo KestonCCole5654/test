@@ -182,7 +182,11 @@ async function getOrCreateMasterSheet(accessToken, userId) {
       created: true
     };
   } catch (error) {
-    console.error('[CREATE] Master sheet error:', error);
+    // Improved logging: log the full error object, not just message
+    console.error('[CREATE] Master sheet error (full object):', error);
+    // Also log error.message for quick reference
+    console.error('[CREATE] Master sheet error (message):', error.message);
+    // Throw with full error message for upstream handling
     throw new Error(`Master sheet initialization failed: ${error.message}`);
   }
 }
@@ -1478,10 +1482,15 @@ app.post('/api/create-business-sheet', async (req, res) => {
       masterSheet = await getOrCreateMasterSheet(accessToken, userInfo.data.sub);
       console.log(`[CREATE] Master sheet: ${masterSheet.id} (${masterSheet.created ? 'new' : 'existing'})`);
     } catch (err) {
-      console.error('[CREATE] Master sheet error:', err.message);
+      // Improved logging: log the full error object
+      console.error('[CREATE] Master sheet error (full object):', err);
+      // Also log error.message for quick reference
+      console.error('[CREATE] Master sheet error (message):', err.message);
+      // Return error details in response for easier debugging
       return res.status(500).json({
         success: false,
-        error: 'Master sheet initialization failed'
+        error: 'Master sheet initialization failed',
+        details: err.message || err
       });
     }
 
@@ -1528,11 +1537,13 @@ app.post('/api/create-business-sheet', async (req, res) => {
     }
 
   } catch (error) {
-    console.error('[CREATE] Endpoint failure:', error.message);
+    // Improved logging for endpoint-level errors
+    console.error('[CREATE] Endpoint failure (full object):', error);
+    console.error('[CREATE] Endpoint failure (message):', error.message);
     return res.status(500).json({
       success: false,
       error: 'Business sheet creation failed',
-      details: error.message
+      details: error.message || error
     });
   }
 });

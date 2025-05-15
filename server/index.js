@@ -2415,3 +2415,206 @@ app.get('/api/onboarding/status', async (req, res) => {
     return res.status(500).json({ onboarded: false, error: error.message });
   }
 });
+
+// Refactored: Create a single spreadsheet with 'SheetBills Invoices' and 'Business Details' tabs
+async function createUnifiedBusinessSheet(accessToken, businessData) {
+  try {
+    // Initialize Google Sheets API
+    const auth = new google.auth.OAuth2();
+    auth.setCredentials({ access_token: accessToken });
+    const sheets = google.sheets({ version: 'v4', auth });
+    const drive = google.drive({ version: 'v3', auth });
+
+    // Create new spreadsheet with two tabs
+    const spreadsheet = await sheets.spreadsheets.create({
+      requestBody: {
+        properties: {
+          title: `${businessData.companyName} - SheetBills Invoices`,
+          locale: 'en_US',
+          timeZone: 'America/New_York'
+        },
+        sheets: [
+          {
+            properties: {
+              title: 'SheetBills Invoices',
+              gridProperties: { rowCount: 1000, columnCount: 15 }
+            }
+          },
+          {
+            properties: {
+              title: 'Business Details',
+              gridProperties: { rowCount: 100, columnCount: 3 }
+            }
+          }
+        ]
+      }
+    });
+
+    const spreadsheetId = spreadsheet.data.spreadsheetId;
+    const spreadsheetUrl = spreadsheet.data.spreadsheetUrl;
+
+    // Add service account as editor (if configured)
+    const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+    if (serviceAccountEmail) {
+      try {
+        await drive.permissions.create({
+          fileId: spreadsheetId,
+          requestBody: {
+            role: 'writer',
+            type: 'user',
+            emailAddress: serviceAccountEmail
+          },
+          sendNotificationEmail: false
+        });
+      } catch (error) {
+        console.warn('Failed to add service account as editor:', error.message);
+      }
+    }
+
+    // Add headers to 'SheetBills Invoices' tab
+    const invoiceHeaders = [
+      'Invoice ID', 'Invoice Date', 'Due Date', 'Customer Name',
+      'Customer Email', 'Customer Address', 'Items', 'Amount',
+      'Tax', 'Discount', 'Notes', 'Template', 'Status'
+    ];
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: 'SheetBills Invoices!A1:M1',
+      valueInputOption: 'RAW',
+      requestBody: { values: [invoiceHeaders] }
+    });
+
+    // Add headers and business details to 'Business Details' tab
+    const businessHeaders = ['Field', 'Value', 'Last Updated'];
+    const now = new Date().toISOString();
+    const businessDetails = [
+      ['Company Name', businessData.companyName, now],
+      ['Business Email', businessData.email, now],
+      ['Phone Number', businessData.phone, now],
+      ['Address', businessData.address, now],
+      ['Created At', now, now]
+    ];
+    await sheets.spreadsheets.values.batchUpdate({
+      spreadsheetId,
+      requestBody: {
+        valueInputOption: 'USER_ENTERED',
+        data: [
+          { range: 'Business Details!A1:C1', values: [businessHeaders] },
+          { range: 'Business Details!A2:C6', values: businessDetails }
+        ]
+      }
+    });
+
+    // Format headers for both tabs
+    const invoiceSheetId = spreadsheet.data.sheets[0].properties.sheetId;
+    const businessSheetId = spreadsheet.data.sheets[1].properties.sheetId;
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: {
+        requests: [
+          {
+            repeatCell: {
+              range: { sheetId: invoiceSheetId, startRowIndex: 0, endRowIndex: 1 },
+              cell: {
+                userEnteredFormat: {
+                  backgroundColor: { red: 0.8, green: 0.8, blue: 0.8 },
+                  textFormat: { bold: true }
+                }
+              },
+              fields: 'userEnteredFormat(backgroundColor,textFormat)'
+            }
+          },
+          {
+            repeatCell: {
+              range: { sheetId: businessSheetId, startRowIndex: 0, endRowIndex: 1 },
+              cell: {
+                userEnteredFormat: {
+                  backgroundColor: { red: 0.8, green: 0.8, blue: 0.8 },
+                  textFormat: { bold: true }
+                }
+              },
+              fields: 'userEnteredFormat(backgroundColor,textFormat)'
+            }
+          }
+        ]
+      }
+    });
+
+    return { spreadsheetId, spreadsheetUrl };
+  } catch (error) {
+    console.error('Unified business sheet creation error:', error);
+    throw new Error(`Failed to create unified business sheet: ${error.message}`);
+  }
+}
+
+// Refactored endpoint: create a single spreadsheet with both tabs
+app.post('/api/create-business-sheet', async (req, res) => {
+  console.log('[CREATE] Initiating unified business sheet creation request');
+  try {
+    // 1. Validate request format
+    if (!req.headers['content-type']?.includes('application/json')) {
+      return res.status(415).json({ success: false, error: 'Invalid content type - requires JSON' });
+    }
+    // 2. Validate tokens
+    const supabaseToken = req.headers['x-supabase-token'];
+    const { accessToken, businessData } = req.body;
+    if (!supabaseToken?.startsWith('eyJ')) {
+      return res.status(400).json({ success: false, error: 'Invalid Supabase token format' });
+    }
+    if (!accessToken?.startsWith('ya29.')) {
+      return res.status(400).json({ success: false, error: 'Invalid Google token format' });
+    }
+    // 3. Verify Supabase session
+    const { data: { user }, error: supabaseError } = await supabase.auth.getUser(supabaseToken);
+    if (supabaseError || !user) {
+      return res.status(401).json({ success: false, error: 'Invalid Supabase session' });
+    }
+    // 4. Verify Google scopes
+    const tokenInfo = await axios.get('https://www.googleapis.com/oauth2/v3/tokeninfo', { params: { access_token: accessToken } });
+    const requiredScopes = [
+      'https://www.googleapis.com/auth/drive',
+      'https://www.googleapis.com/auth/spreadsheets'
+    ];
+    if (!requiredScopes.every(scope => tokenInfo.data.scope?.includes(scope))) {
+      return res.status(403).json({ success: false, error: 'Missing required Google Drive & Sheets permissions' });
+    }
+    // 5. Get Google user ID
+    const userInfo = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: `Bearer ${accessToken}` }, timeout: 5000 });
+    if (!userInfo.data.sub) {
+      return res.status(400).json({ success: false, error: 'Failed to retrieve Google user ID' });
+    }
+    // 6. Validate business data
+    if (!businessData?.companyName || !businessData?.email) {
+      return res.status(400).json({ success: false, error: 'Missing required business details (companyName and email are required)' });
+    }
+    // 7. Create unified business sheet (one spreadsheet, two tabs)
+    const unifiedSheet = await createUnifiedBusinessSheet(accessToken, businessData);
+    // 8. Register the sheet in the master sheet
+    const masterSheet = await getOrCreateMasterSheet(accessToken, userInfo.data.sub);
+    const sheetId = `SHEET-${Date.now().toString().slice(-6)}`;
+    await google.sheets({ version: 'v4', auth: new google.auth.OAuth2().setCredentials({ access_token: accessToken }) })
+      .spreadsheets.values.append({
+        spreadsheetId: masterSheet.id,
+        range: 'My Sheets!A:E',
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+          values: [[
+            sheetId,
+            'SheetBills Invoices',
+            new Date().toISOString(),
+            'Unified business/invoice sheet',
+            unifiedSheet.spreadsheetUrl
+          ]]
+        }
+      });
+    // 9. Respond with the spreadsheet info
+    return res.json({
+      success: true,
+      spreadsheetId: unifiedSheet.spreadsheetId,
+      spreadsheetUrl: unifiedSheet.spreadsheetUrl
+    });
+  } catch (error) {
+    console.error('[CREATE] Unified business sheet creation failed:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+});

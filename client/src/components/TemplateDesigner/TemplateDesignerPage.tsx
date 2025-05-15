@@ -170,7 +170,7 @@ const TemplateDesignerPage: React.FC<TemplateDesignerPageProps> = ({ onSave }) =
       <div className="border-b bg-white">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-medium">Invoice Template Designer</h1>
+            <h1 className="text-2xl font-medium">Invoice Designer</h1>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"

@@ -162,6 +162,12 @@ export default function SettingsPage() {
         throw new Error("Authentication required");
       }
 
+      // Get the current sheet URL from localStorage
+      const currentSheetUrl = localStorage.getItem("defaultSheetUrl");
+      if (!currentSheetUrl) {
+        throw new Error("No invoice spreadsheet selected");
+      }
+
       const response = await axios.put(
         "https://sheetbills-server.vercel.app/api/update-business-details",
         {
@@ -169,7 +175,7 @@ export default function SettingsPage() {
           email: businessData.email,
           phone: businessData.phone,
           address: businessData.address,
-          sheetUrl // Always include the sheetUrl in the update request
+          sheetUrl: currentSheetUrl
         },
         {
           headers: {

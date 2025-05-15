@@ -70,7 +70,7 @@ export default function LoginPage() {
           <Card className="border-0 shadow-lg overflow-hidden">
             <div className="bg-emerald-600 h-1.5 w-full"></div>
             <CardContent className="p-8">
-              <h1 className="text-2xl font-cal-sans text-gray-900 mb-2 text-center">Welcome to <span className=" font-cal-sans font-bold text-green-800">SheetBills™</span></h1>
+              <h1 className="text-2xl font-cal-sans text-gray-900 mb-2 text-center">Welcome to <span className=" font-cal-sans font-medium text-green-800">SheetBills™</span></h1>
               <p className="text-gray-600 font-cal-sans text-center text-sm mb-6">
                 Your professional invoicing platform with seamless Google Sheets integration
               </p>

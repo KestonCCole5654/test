@@ -10,6 +10,7 @@ export default function PublicInvoice() {
   const { token } = useParams();
   const location = useLocation();
   const [invoice, setInvoice] = useState<any>(null);
+  const [businessData, setBusinessData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,20 +18,12 @@ export default function PublicInvoice() {
   const query = new URLSearchParams(location.search);
   const sheetUrl = query.get("sheetUrl");
 
-  // Minimal business data for public view
-  const businessData = {
-    companyName: "SheetBills User",
-    phone: "",
-    address: "",
-    email: "",
-    logo: ""
-  };
-
   useEffect(() => {
     async function fetchInvoice() {
       setLoading(true);
       setError(null);
       setInvoice(null);
+      setBusinessData(null);
       if (!token || !sheetUrl) {
         setError("Missing token or sheetUrl");
         setLoading(false);
@@ -48,6 +41,7 @@ export default function PublicInvoice() {
         }
         const data = await res.json();
         setInvoice(data.invoice);
+        setBusinessData(data.businessData || {});
       } catch (err) {
         setError("Network error. Please try again later.");
       } finally {
@@ -67,7 +61,7 @@ export default function PublicInvoice() {
         )}
         {invoice && (
           <div className="bg-white rounded-lg p-4 border">
-            <InvoiceClassic data={invoice} businessData={businessData} showShadow={false} />
+            <InvoiceClassic data={invoice} businessData={businessData || {}} showShadow={false} />
           </div>
         )}
         <div className="mt-6 text-center text-xs text-gray-400">Powered by SheetBills™</div>

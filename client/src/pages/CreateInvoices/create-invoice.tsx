@@ -73,9 +73,53 @@ export default function InvoiceForm() {
   const navigate = useNavigate()
   const { toast } = useToast()
   const invoiceToEdit = location.state?.invoiceToEdit
-  const selectedSpreadsheetUrl = location.state?.selectedSpreadsheetUrl
+  const [selectedSpreadsheetUrl, setSelectedSpreadsheetUrl] = useState<string | null>(() => {
+    // First try to get from location state
+    if (location.state?.selectedSpreadsheetUrl) {
+      localStorage.setItem("defaultSheetUrl", location.state.selectedSpreadsheetUrl)
+      return location.state.selectedSpreadsheetUrl
+    }
+    // Then try to get from localStorage
+    return localStorage.getItem("defaultSheetUrl")
+  })
   const key = location.state?.key
   const hideForm = location.state?.hideForm
+
+  // Add useEffect to fetch spreadsheet URL if not available
+  useEffect(() => {
+    const fetchSpreadsheetUrl = async () => {
+      if (!selectedSpreadsheetUrl) {
+        try {
+          const { data: { session } } = await supabase.auth.getSession()
+          if (!session?.provider_token) {
+            throw new Error("Google authentication required")
+          }
+
+          const response = await axios.get("https://sheetbills-server.vercel.app/api/sheets/spreadsheets", {
+            headers: {
+              Authorization: `Bearer ${session.provider_token}`,
+              "X-Supabase-Token": session.access_token,
+            },
+          })
+
+          const invoicesSheet = response.data.spreadsheets.find((sheet: { name: string; sheetUrl: string }) => sheet.name === "SheetBills Invoices")
+          if (invoicesSheet?.sheetUrl) {
+            setSelectedSpreadsheetUrl(invoicesSheet.sheetUrl)
+            localStorage.setItem("defaultSheetUrl", invoicesSheet.sheetUrl)
+          }
+        } catch (error) {
+          console.error("Error fetching spreadsheet URL:", error)
+          toast({
+            title: "Error",
+            description: "Failed to fetch spreadsheet URL. Please try again.",
+            variant: "destructive",
+          })
+        }
+      }
+    }
+
+    fetchSpreadsheetUrl()
+  }, [selectedSpreadsheetUrl, toast])
 
   console.log('InvoiceForm mounted with state:', { invoiceToEdit, selectedSpreadsheetUrl, key, hideForm })
 

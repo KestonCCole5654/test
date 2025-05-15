@@ -34,520 +34,7 @@ import {
 } from "../../components/ui/breadcrumb"
 import supabase from "../../components/Auth/supabaseClient"
 
-// Custom SVG Illustrations
-const CompanyIllustration = () => (
-  <motion.svg
-    width="200"
-    height="160"
-    viewBox="0 0 200 160"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.5, delay: 0.2 }}
-  >
-    <motion.rect
-      initial={{ height: 0 }}
-      animate={{ height: 120 }}
-      transition={{ duration: 0.8, delay: 0.3 }}
-      x="40"
-      y="40"
-      width="50"
-      height="120"
-      rx="2"
-      fill="#E2F0FF"
-      stroke="#94C2FF"
-      strokeWidth="2"
-    />
-    <motion.rect
-      initial={{ height: 0 }}
-      animate={{ height: 140 }}
-      transition={{ duration: 0.8, delay: 0.5 }}
-      x="100"
-      y="20"
-      width="60"
-      height="140"
-      rx="2"
-      fill="#E5F5EC"
-      stroke="#A7E3C0"
-      strokeWidth="2"
-    />
-    <motion.path
-      initial={{ pathLength: 0 }}
-      animate={{ pathLength: 1 }}
-      transition={{ duration: 1, delay: 0.7 }}
-      d="M100 20H160V80H100V20Z"
-      fill="#D1EBE1"
-    />
-    <motion.rect
-      initial={{ opacity: 0, y: -5 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.9 }}
-      x="110"
-      y="30"
-      width="15"
-      height="15"
-      rx="2"
-      fill="#FFFFFF"
-      stroke="#A7E3C0"
-      strokeWidth="2"
-    />
-    <motion.rect
-      initial={{ opacity: 0, y: -5 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 1 }}
-      x="135"
-      y="30"
-      width="15"
-      height="15"
-      rx="2"
-      fill="#FFFFFF"
-      stroke="#A7E3C0"
-      strokeWidth="2"
-    />
-    <motion.rect
-      initial={{ opacity: 0, y: -5 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 1.1 }}
-      x="110"
-      y="55"
-      width="15"
-      height="15"
-      rx="2"
-      fill="#FFFFFF"
-      stroke="#A7E3C0"
-      strokeWidth="2"
-    />
-    <motion.rect
-      initial={{ opacity: 0, y: -5 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 1.2 }}
-      x="135"
-      y="55"
-      width="15"
-      height="15"
-      rx="2"
-      fill="#FFFFFF"
-      stroke="#A7E3C0"
-      strokeWidth="2"
-    />
-    <motion.rect
-      initial={{ opacity: 0, y: -5 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.8 }}
-      x="50"
-      y="60"
-      width="12"
-      height="12"
-      rx="2"
-      fill="#FFFFFF"
-      stroke="#94C2FF"
-      strokeWidth="2"
-    />
-    <motion.rect
-      initial={{ opacity: 0, y: -5 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.9 }}
-      x="68"
-      y="60"
-      width="12"
-      height="12"
-      rx="2"
-      fill="#FFFFFF"
-      stroke="#94C2FF"
-      strokeWidth="2"
-    />
-    <motion.rect
-      initial={{ opacity: 0, y: -5 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 1 }}
-      x="50"
-      y="80"
-      width="12"
-      height="12"
-      rx="2"
-      fill="#FFFFFF"
-      stroke="#94C2FF"
-      strokeWidth="2"
-    />
-    <motion.rect
-      initial={{ opacity: 0, y: -5 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 1.1 }}
-      x="68"
-      y="80"
-      width="12"
-      height="12"
-      rx="2"
-      fill="#FFFFFF"
-      stroke="#94C2FF"
-      strokeWidth="2"
-    />
-    <motion.rect
-      initial={{ opacity: 0, y: -5 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 1.2 }}
-      x="50"
-      y="100"
-      width="12"
-      height="12"
-      rx="2"
-      fill="#FFFFFF"
-      stroke="#94C2FF"
-      strokeWidth="2"
-    />
-    <motion.rect
-      initial={{ opacity: 0, y: -5 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 1.3 }}
-      x="68"
-      y="100"
-      width="12"
-      height="12"
-      rx="2"
-      fill="#FFFFFF"
-      stroke="#94C2FF"
-      strokeWidth="2"
-    />
-    <motion.rect
-      initial={{ opacity: 0, y: -5 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 1.4 }}
-      x="110"
-      y="90"
-      width="40"
-      height="10"
-      rx="2"
-      fill="#FFFFFF"
-      stroke="#A7E3C0"
-      strokeWidth="2"
-    />
-    <motion.rect
-      initial={{ opacity: 0, y: -5 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 1.5 }}
-      x="110"
-      y="110"
-      width="40"
-      height="10"
-      rx="2"
-      fill="#FFFFFF"
-      stroke="#A7E3C0"
-      strokeWidth="2"
-    />
-    <motion.rect
-      initial={{ opacity: 0, y: -5 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 1.6 }}
-      x="110"
-      y="130"
-      width="40"
-      height="10"
-      rx="2"
-      fill="#FFFFFF"
-      stroke="#A7E3C0"
-      strokeWidth="2"
-    />
-    <motion.rect
-      initial={{ y: 160 }}
-      animate={{ y: 150 }}
-      transition={{ duration: 0.5, delay: 0.3 }}
-      x="30"
-      y="150"
-      width="140"
-      height="10"
-      rx="2"
-      fill="#D1D5DB"
-    />
-  </motion.svg>
-)
 
-const EmailIllustration = () => (
-  <motion.svg
-    width="200"
-    height="160"
-    viewBox="0 0 200 160"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.5, delay: 0.2 }}
-  >
-    <motion.rect
-      initial={{ scale: 0 }}
-      animate={{ scale: 1 }}
-      transition={{ duration: 0.5, delay: 0.3 }}
-      x="40"
-      y="40"
-      width="120"
-      height="80"
-      rx="4"
-      fill="#E5EDFF"
-      stroke="#94A3FF"
-      strokeWidth="2"
-    />
-    <motion.path
-      initial={{ pathLength: 0 }}
-      animate={{ pathLength: 1 }}
-      transition={{ duration: 1, delay: 0.5 }}
-      d="M40 40L100 80L160 40"
-      stroke="#94A3FF"
-      strokeWidth="2"
-      fill="none"
-    />
-    <motion.path
-      initial={{ pathLength: 0 }}
-      animate={{ pathLength: 1 }}
-      transition={{ duration: 1, delay: 0.7 }}
-      d="M40 120L80 90"
-      stroke="#94A3FF"
-      strokeWidth="2"
-    />
-    <motion.path
-      initial={{ pathLength: 0 }}
-      animate={{ pathLength: 1 }}
-      transition={{ duration: 1, delay: 0.7 }}
-      d="M160 120L120 90"
-      stroke="#94A3FF"
-      strokeWidth="2"
-    />
-    <motion.circle
-      initial={{ scale: 0 }}
-      animate={{ scale: 1 }}
-      transition={{ duration: 0.5, delay: 0.9 }}
-      cx="100"
-      cy="80"
-      r="5"
-      fill="#94A3FF"
-    />
-    <motion.path
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 1.1 }}
-      d="M85 65H115M85 72H105"
-      stroke="#94A3FF"
-      strokeWidth="2"
-      strokeLinecap="round"
-    />
-  </motion.svg>
-)
-
-const PhoneIllustration = () => (
-  <motion.svg
-    width="200"
-    height="160"
-    viewBox="0 0 200 160"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.5, delay: 0.2 }}
-  >
-    <motion.rect
-      initial={{ y: 100, height: 0 }}
-      animate={{ y: 30, height: 100 }}
-      transition={{ duration: 0.8, delay: 0.3 }}
-      x="70"
-      y="30"
-      width="60"
-      height="100"
-      rx="10"
-      fill="#F0E6FF"
-      stroke="#C4A7FF"
-      strokeWidth="2"
-    />
-    <motion.rect
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5, delay: 0.6 }}
-      x="75"
-      y="40"
-      width="50"
-      height="70"
-      rx="4"
-      fill="#E2D8F5"
-    />
-    <motion.circle
-      initial={{ scale: 0 }}
-      animate={{ scale: 1 }}
-      transition={{ duration: 0.5, delay: 0.8 }}
-      cx="100"
-      cy="120"
-      r="8"
-      fill="#FFFFFF"
-      stroke="#C4A7FF"
-      strokeWidth="2"
-    />
-    <motion.rect
-      initial={{ width: 0 }}
-      animate={{ width: 20 }}
-      transition={{ duration: 0.5, delay: 1 }}
-      x="90"
-      y="35"
-      width="20"
-      height="3"
-      rx="1.5"
-      fill="#C4A7FF"
-    />
-    <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 1.2 }}>
-      <motion.rect x="85" y="50" width="10" height="10" rx="2" fill="#FFFFFF" />
-      <motion.rect x="95" y="50" width="10" height="10" rx="2" fill="#FFFFFF" />
-      <motion.rect x="105" y="50" width="10" height="10" rx="2" fill="#FFFFFF" />
-      <motion.rect x="85" y="60" width="10" height="10" rx="2" fill="#FFFFFF" />
-      <motion.rect x="95" y="60" width="10" height="10" rx="2" fill="#FFFFFF" />
-      <motion.rect x="105" y="60" width="10" height="10" rx="2" fill="#FFFFFF" />
-      <motion.rect x="85" y="70" width="10" height="10" rx="2" fill="#FFFFFF" />
-      <motion.rect x="95" y="70" width="10" height="10" rx="2" fill="#FFFFFF" />
-      <motion.rect x="105" y="70" width="10" height="10" rx="2" fill="#FFFFFF" />
-      <motion.rect x="85" y="80" width="10" height="10" rx="2" fill="#FFFFFF" />
-      <motion.rect x="95" y="80" width="10" height="10" rx="2" fill="#FFFFFF" />
-      <motion.rect x="105" y="80" width="10" height="10" rx="2" fill="#FFFFFF" />
-    </motion.g>
-  </motion.svg>
-)
-
-const AddressIllustration = () => (
-  <motion.svg
-    width="200"
-    height="160"
-    viewBox="0 0 200 160"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.5, delay: 0.2 }}
-  >
-    <motion.rect
-      initial={{ scale: 0 }}
-      animate={{ scale: 1 }}
-      transition={{ duration: 0.5, delay: 0.3 }}
-      x="40"
-      y="40"
-      width="120"
-      height="80"
-      rx="4"
-      fill="#FFF2E6"
-      stroke="#FFCCA7"
-      strokeWidth="2"
-    />
-    <motion.circle
-      initial={{ scale: 0 }}
-      animate={{ scale: 1 }}
-      transition={{ duration: 0.5, delay: 0.5 }}
-      cx="100"
-      cy="65"
-      r="15"
-      fill="#FFECDB"
-      stroke="#FFCCA7"
-      strokeWidth="2"
-    />
-    <motion.path
-      initial={{ scale: 0 }}
-      animate={{ scale: 1 }}
-      transition={{ duration: 0.5, delay: 0.7 }}
-      d="M100 55L100 75M90 65L110 65"
-      stroke="#FFCCA7"
-      strokeWidth="2"
-      strokeLinecap="round"
-    />
-    <motion.path
-      initial={{ pathLength: 0 }}
-      animate={{ pathLength: 1 }}
-      transition={{ duration: 1, delay: 0.9 }}
-      d="M100 80L100 100"
-      stroke="#FFCCA7"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeDasharray="2 2"
-    />
-    <motion.rect
-      initial={{ scale: 0 }}
-      animate={{ scale: 1 }}
-      transition={{ duration: 0.5, delay: 1.1 }}
-      x="85"
-      y="100"
-      width="30"
-      height="10"
-      rx="2"
-      fill="#FFECDB"
-      stroke="#FFCCA7"
-      strokeWidth="2"
-    />
-    <motion.path
-      initial={{ pathLength: 0 }}
-      animate={{ pathLength: 1 }}
-      transition={{ duration: 1, delay: 1.3 }}
-      d="M60 60H70M60 70H75M60 80H65"
-      stroke="#FFCCA7"
-      strokeWidth="2"
-      strokeLinecap="round"
-    />
-    <motion.path
-      initial={{ pathLength: 0 }}
-      animate={{ pathLength: 1 }}
-      transition={{ duration: 1, delay: 1.3 }}
-      d="M130 60H140M125 70H140M135 80H140"
-      stroke="#FFCCA7"
-      strokeWidth="2"
-      strokeLinecap="round"
-    />
-  </motion.svg>
-)
-
-const SuccessIllustration = () => (
-  <motion.svg
-    width="200"
-    height="200"
-    viewBox="0 0 200 200"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.5 }}
-  >
-    <motion.circle
-      initial={{ scale: 0 }}
-      animate={{ scale: 1 }}
-      transition={{ duration: 0.5, delay: 0.2 }}
-      cx="100"
-      cy="100"
-      r="60"
-      fill="#E5F5EC"
-      stroke="#A7E3C0"
-      strokeWidth="2"
-    />
-    <motion.path
-      initial={{ pathLength: 0 }}
-      animate={{ pathLength: 1 }}
-      transition={{ duration: 0.8, delay: 0.5 }}
-      d="M75 100L90 115L125 80"
-      stroke="#22C55E"
-      strokeWidth="4"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <motion.circle
-      initial={{ scale: 0, opacity: 0 }}
-      animate={{ scale: [0, 1.2, 1], opacity: [0, 0.2, 0] }}
-      transition={{ duration: 1, delay: 0.8, repeat: Number.POSITIVE_INFINITY, repeatDelay: 2 }}
-      cx="100"
-      cy="100"
-      r="70"
-      stroke="#22C55E"
-      strokeWidth="2"
-    />
-    <motion.circle
-      initial={{ scale: 0, opacity: 0 }}
-      animate={{ scale: [0, 1.2, 1], opacity: [0, 0.2, 0] }}
-      transition={{ duration: 1, delay: 1, repeat: Number.POSITIVE_INFINITY, repeatDelay: 2 }}
-      cx="100"
-      cy="100"
-      r="80"
-      stroke="#22C55E"
-      strokeWidth="2"
-    />
-  </motion.svg>
-)
 
 // Progress Dots Component
 const ProgressDots = ({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) => {
@@ -578,13 +65,13 @@ const WelcomeScreen = ({ onStart }: { onStart: () => void }) => {
       transition={{ duration: 0.5 }}
       className="w-full max-w-md mx-auto text-center"
     >
-      <h1 className="text-3xl font-bold mb-4">Let's Get Started</h1>
-      <p className="text-gray-600 dark:text-gray-400 mb-8">
+      <h1 className="text-3xl font-cal-sans font-semibold mb-4">Let's Get Started</h1>
+      <p className="text-gray-600 font-cal-sans dark:text-gray-400 mb-8">
         Set up your SheetBills™ account to start managing your invoices efficiently.
       </p>
       <Button
         onClick={onStart}
-        className="bg-green-600 hover:bg-green-700 px-8 py-6 text-lg"
+        className="bg-green-600 font-cal-sans hover:bg-green-700 px-8 py-6 text-lg"
       >
         Get Started
         <ArrowRight className="ml-2 h-5 w-5" />
@@ -918,7 +405,7 @@ export default function InitializePage() {
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="text-2xl font-semibold text-center mb-2"
+            className="text-2xl font-cal-sans font-semibold text-center mb-2"
           >
             {currentQ.question}
           </motion.h2>
@@ -927,7 +414,7 @@ export default function InitializePage() {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-gray-600 dark:text-gray-400 text-center text-sm"
+            className="text-gray-600 font-cal-sans dark:text-gray-400 text-center text-sm"
           >
             {currentQ.description}
           </motion.p>
@@ -949,7 +436,7 @@ export default function InitializePage() {
               onFocus={() => setInputFocused(true)}
               onBlur={() => setInputFocused(false)}
               placeholder={currentQ.placeholder}
-              className={`w-full p-4 text-base ${inputBorderClass} focus-visible:ring-0 focus-visible:ring-offset-0 transition-all duration-300`}
+              className={`w-full p-4 text-base ${inputBorderClass} focus-visible:ring-0  focus-visible:ring-offset-0 transition-all duration-300`}
             />
 
             {inputValid !== null && value.trim() !== "" && (
@@ -959,18 +446,18 @@ export default function InitializePage() {
                 className="absolute right-3 top-1/2 -translate-y-1/2"
               >
                 {inputValid ? (
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <CheckCircle className="h-5 w-5 font-cal-sans text-green-500" />
                 ) : (
-                  <X className="h-5 w-5 text-red-500" />
+                  <X className="h-5 w-5 font-cal-sans text-red-500" />
                 )}
               </motion.div>
             )}
           </div>
 
           {currentQ.required ? (
-            <p className="text-sm text-gray-500 mt-2">* Required field</p>
+            <p className="text-sm text-gray-500 font-cal-sans mt-2">* Required field</p>
           ) : (
-            <p className="text-sm text-gray-500 mt-2">Optional field</p>
+            <p className="text-sm text-gray-500 font-cal-sans mt-2">Optional field</p>
           )}
         </motion.div>
 
@@ -985,7 +472,7 @@ export default function InitializePage() {
           {!currentQ.required && (
             <Button
               variant="ghost"
-              className="flex-1 text-gray-500 hover:text-gray-700"
+              className="flex-1 text-gray-500 font-cal-sans hover:text-gray-700"
               onClick={handleSkip}
             >
               Skip
@@ -996,7 +483,7 @@ export default function InitializePage() {
             className={`flex-1 ${
               currentQuestion === 0 && !value
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-green-600 hover:bg-green-700"
+                : "bg-green-600 font-cal-sans hover:bg-green-700"
             }`}
             onClick={handleNext}
             disabled={currentQ.required && !value}
@@ -1019,8 +506,8 @@ export default function InitializePage() {
           transition={{ duration: 0.5 }}
           className="text-center mb-8"
         >
-          <h2 className="text-2xl font-semibold mb-2">Great! You're Almost There</h2>
-          <p className="text-gray-600 dark:text-gray-400">
+          <h2 className="text-2xl font-cal-sans font-medium mb-2">Great! You're Almost There</h2>
+          <p className="text-gray-600 font-cal-sans dark:text-gray-400">
             Please review your business details before we set up your account.
           </p>
         </motion.div>
@@ -1029,25 +516,25 @@ export default function InitializePage() {
           {[
             {
               id: "companyName",
-              icon: <Building2 className="h-5 w-5 text-green-600 dark:text-green-400" />,
+              icon: <Building2 className="h-5 w-5 font-cal-sans text-green-600 dark:text-green-400" />,
               label: "Company Name",
               color: "green",
             },
             {
               id: "email",
-              icon: <Mail className="h-5 w-5 text-blue-600 dark:text-blue-400" />,
+              icon: <Mail className="h-5 w-5 font-cal-sans text-blue-600 dark:text-blue-400" />,
               label: "Business Email",
               color: "blue",
             },
             {
               id: "phone",
-              icon: <Phone className="h-5 w-5 text-purple-600 dark:text-purple-400" />,
+              icon: <Phone className="h-5 w-5 font-cal-sans text-purple-600 dark:text-purple-400" />,
               label: "Phone Number",
               color: "purple",
             },
             {
               id: "address",
-              icon: <MapPin className="h-5 w-5 text-orange-600 dark:text-orange-400" />,
+              icon: <MapPin className="h-5 w-5 font-cal-sans text-orange-600 dark:text-orange-400" />,
               label: "Business Address",
               color: "orange",
             },
@@ -1064,8 +551,8 @@ export default function InitializePage() {
                   {item.icon}
                 </div>
                 <div>
-                  <h3 className="font-medium text-sm text-gray-500">{item.label}</h3>
-                  <p className="text-gray-900 dark:text-gray-100">
+                  <h3 className="font-medium text-sm text-gray-500 font-cal-sans">{item.label}</h3>
+                  <p className="text-gray-900 dark:text-gray-100 font-cal-sans">
                     {businessData[item.id as keyof typeof businessData] || "Not provided"}
                   </p>
                 </div>
@@ -1081,11 +568,11 @@ export default function InitializePage() {
           >
             <div className="flex items-center gap-3">
               <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded-full">
-                <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                <CheckCircle className="h-5 w-5 font-cal-sans text-green-600 dark:text-green-400" />
             </div>
               <div>
-                <h3 className="font-medium text-sm text-green-800 dark:text-green-300">Ready to Go!</h3>
-                <p className="text-green-700 dark:text-green-400 text-sm">
+                <h3 className="font-medium text-sm text-green-800 dark:text-green-300 font-cal-sans">Ready to Go!</h3>
+                <p className="text-green-700 dark:text-green-400 text-sm font-cal-sans">
                   Your business profile is ready to be created. Click "Complete Setup" to finish.
                 </p>
               </div>
@@ -1135,14 +622,14 @@ export default function InitializePage() {
         className="flex flex-col items-center justify-center h-full text-center"
       >
         <div className="mb-6">
-          <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto" />
+          <CheckCircle2 className="h-16 w-16 font-cal-sans text-green-500 mx-auto" />
         </div>
 
         <motion.h2
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
-          className="text-2xl font-semibold mb-2"
+          className="text-2xl font-cal-sans font-medium mb-2"
         >
           Setup Complete!
         </motion.h2>
@@ -1151,7 +638,7 @@ export default function InitializePage() {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.5 }}
-          className="text-gray-600 dark:text-gray-400 mb-8"
+          className="text-gray-600 font-cal-sans dark:text-gray-400 mb-8"
         >
           Your business profile has been created successfully.
         </motion.p>
@@ -1162,7 +649,7 @@ export default function InitializePage() {
           transition={{ delay: 0.6, duration: 0.5 }}
           className="w-full max-w-xs bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800"
         >
-          <p className="text-green-800 dark:text-green-300 text-sm">Redirecting you to invoices in a moment...</p>
+          <p className="text-green-800 font-cal-sans dark:text-green-300 text-sm">Redirecting you to invoices in a moment...</p>
         </motion.div>
       </motion.div>
     )

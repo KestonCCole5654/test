@@ -7,6 +7,7 @@ import { Label } from '../ui/label';
 import { Card } from '../ui/card';
 import { useToast } from '../ui/use-toast';
 
+// Type for the business profile data
 interface BusinessProfile {
   businessName: string;
   businessType: string;
@@ -15,10 +16,18 @@ interface BusinessProfile {
   address: string;
 }
 
+/**
+ * OnboardingPage component
+ * - Step-based onboarding for new users
+ * - Collects business info and contact details
+ * - Submits to backend and redirects to dashboard on success
+ */
 const OnboardingPage: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  // Track the current step (1-based index)
   const [currentStep, setCurrentStep] = useState(1);
+  // Store the business profile form data
   const [profile, setProfile] = useState<BusinessProfile>({
     businessName: '',
     businessType: '',
@@ -27,10 +36,11 @@ const OnboardingPage: React.FC = () => {
     address: '',
   });
 
+  // Define the onboarding steps and their fields
   const steps = [
     {
       title: 'Welcome to SheetBills',
-      description: 'Let\'s get your business set up in just a few steps.',
+      description: "Let's get your business set up in just a few steps.",
       fields: [],
     },
     {
@@ -52,22 +62,23 @@ const OnboardingPage: React.FC = () => {
     },
   ];
 
+  // Handle input changes for form fields
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setProfile(prev => ({ ...prev, [name]: value }));
   };
 
+  // Handle advancing to the next step or submitting the form
   const handleNext = async () => {
     if (currentStep === steps.length) {
+      // Final step: submit profile to backend
       try {
         const response = await fetch('/api/business/profile', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(profile),
         });
-
         if (!response.ok) throw new Error('Failed to save profile');
-
         toast({
           title: 'Success!',
           description: 'Your business profile has been created.',
@@ -85,16 +96,19 @@ const OnboardingPage: React.FC = () => {
     }
   };
 
+  // Handle going back to the previous step
   const handleBack = () => {
     setCurrentStep(prev => prev - 1);
   };
 
+  // Get the current step's data
   const currentStepData = steps[currentStep - 1];
 
   return (
     <div className="min-h-screen font-cal-sans bg-background flex flex-col items-center justify-center p-4">
       <div className="flex-1 flex items-center justify-center w-full">
         <Card className="w-full max-w-2xl p-8 font-cal-sans">
+          {/* Step header and description */}
           <div className="mb-8">
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-2xl font-cal-sans font-semibold">{currentStepData.title}</h1>
@@ -105,6 +119,7 @@ const OnboardingPage: React.FC = () => {
             <p className="text-muted-foreground font-cal-sans">{currentStepData.description}</p>
           </div>
 
+          {/* Step content: either fields or welcome message */}
           <AnimatePresence mode="wait">
             <motion.div
               key={currentStep}
@@ -147,6 +162,7 @@ const OnboardingPage: React.FC = () => {
             </motion.div>
           </AnimatePresence>
 
+          {/* Navigation buttons */}
           <div className="flex justify-between mt-8 font-cal-sans">
             <Button
               variant="outline"
@@ -161,6 +177,7 @@ const OnboardingPage: React.FC = () => {
           </div>
         </Card>
       </div>
+      {/* Footer */}
       <footer className="w-full font-cal-sans text-center text-md text-gray-400 mt-10 mb-2">
         Powered by <span className="font-cal-sans font-medium text-green-800">SheetBills™</span>
       </footer>

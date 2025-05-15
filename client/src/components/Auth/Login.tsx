@@ -5,8 +5,6 @@ import { useNavigate, useLocation } from "react-router-dom"
 import { Button } from "../../components/ui/button"
 import { Card, CardContent } from "../../components/ui/card"
 import { Loader2, Shield } from "lucide-react"
-import { useToast } from "../../components/ui/use-toast"
-import { Toaster } from "../../components/ui/toaster"
 import supabase from "./supabaseClient"
 
 
@@ -16,7 +14,6 @@ export default function LoginPage() {
   const [mounted, setMounted] = useState<boolean>(false)
   const navigate = useNavigate()
   const location = useLocation()
-  const { toast } = useToast()
 
   useEffect(() => {
     setMounted(true)
@@ -45,30 +42,19 @@ export default function LoginPage() {
         },
       })
       if (error) throw error
-      if (data) {
-        toast({
-          title: "Login successful",
-          description: "Setting up your account...",
-        })
-      }
     } catch (err: any) {
       setError(err.message || "Login failed")
-      toast({
-        title: "Login failed",
-        description: err.message || "An error occurred during login",
-        variant: "destructive",
-      })
     } finally {
       setLoading(false)
     }
-  }, [toast])
+  }, [])
 
   if (!mounted || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-gray-50">
+      <div className="min-h-screen font-cal-sans flex items-center justify-center bg-gradient-to-b from-white to-gray-50">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-emerald-600 mx-auto" />
-          <p className="mt-4 text-slate-600 text-sm font-medium">
+          <Loader2 className="h-8 w-8 font-cal-sans animate-spin text-emerald-600 mx-auto" />
+          <p className="mt-4 text-slate-600 font-cal-sans text-sm font-medium">
             {loading ? "Connecting to Google..." : "Loading..."}
           </p>
         </div>
@@ -77,15 +63,15 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen font-inter flex flex-col bg-gradient-to-b from-white to-gray-50">
+    <div className="min-h-screen font-cal-sans flex flex-col bg-gradient-to-b from-white to-gray-50">
    
       <div className="flex flex-1 flex-col items-center justify-center px-4 py-8">
         <div className="max-w-md w-full mx-auto">
           <Card className="border-0 shadow-lg overflow-hidden">
             <div className="bg-emerald-600 h-1.5 w-full"></div>
             <CardContent className="p-8">
-              <h1 className="text-2xl font-inter text-gray-900 mb-2 text-center">Welcome to <span className=" font-inter font-bold text-green-800">SheetBills™</span></h1>
-              <p className="text-gray-600 font-inter text-center text-sm mb-6">
+              <h1 className="text-2xl font-cal-sans text-gray-900 mb-2 text-center">Welcome to <span className=" font-cal-sans font-bold text-green-800">SheetBills™</span></h1>
+              <p className="text-gray-600 font-cal-sans text-center text-sm mb-6">
                 Your professional invoicing platform with seamless Google Sheets integration
               </p>
 
@@ -119,27 +105,25 @@ export default function LoginPage() {
                     fill="#EA4335"
                   />
                 </svg>
-                <span className="font-medium font-inter">Continue with Google</span>
+                <span className="font-medium font-cal-sans">Continue with Google</span>
               </Button>
 
             </CardContent>
           </Card>
 
           <div className="mt-4 text-center">
-            <p className="text-xs text-slate-500 font-inter">
+            <p className="text-xs text-slate-500 font-cal-sans">
               By signing in, you agree to our{" "}
-              <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium font-inter ">
+              <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium font-cal-sans ">
                 Terms
               </a>{" "}
               and{" "}
-              <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium font-inter">
+              <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium font-cal-sans">
                 Privacy Policy
               </a>
               .
             </p>
           </div>
-
-          <Toaster />
         </div>
       </div>
     </div>

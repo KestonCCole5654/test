@@ -6,8 +6,6 @@ import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
-import { useToast } from "../../components/ui/use-toast"
-import { Toaster } from "../../components/ui/toaster"
 import {
   Loader2,
   ArrowRight,
@@ -82,7 +80,6 @@ const WelcomeScreen = ({ onStart }: { onStart: () => void }) => {
 
 export default function InitializePage() {
   const navigate = useNavigate()
-  const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
@@ -231,19 +228,13 @@ export default function InitializePage() {
     const currentQ = questions[currentQuestion]
     const field = currentQ.field as keyof typeof businessData
     const value = businessData[field]
-
     // Validate current question
     const validationError = currentQ.validate(value)
     if (validationError) {
-      toast({
-        title: "Error",
-        description: validationError,
-        variant: "destructive",
-      })
       setInputValid(false)
+      setError(validationError)
       return
     }
-
     // Move to next question or review
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1)
@@ -277,20 +268,13 @@ export default function InitializePage() {
   const handleSubmit = async () => {
     setIsSubmitting(true)
     setError("")
-
     // Check for required tokens AFTER user clicks submit
     if (!supabaseToken || !googleAccessToken) {
-      toast({
-        title: "Authentication Required",
-        description: "Please sign in and connect your Google account to continue.",
-        variant: "destructive",
-      })
+      setError("Authentication Required: Please sign in and connect your Google account to continue.")
       setIsSubmitting(false)
       return
     }
-
     try {
-      // Call the API with all required data
       const response = await fetch("https://sheetbills-server.vercel.app/api/create-business-sheet", {
         method: "POST",
         headers: {
@@ -302,44 +286,25 @@ export default function InitializePage() {
           businessData: businessData,
         }),
       })
-
       const data = await response.json()
-
       if (!response.ok) {
         throw new Error(data.error || "Failed to set up your business")
       }
-
-      // Handle successful response
-      toast({
-        title: "Setup Complete",
-        description: "Your business sheet has been created successfully.",
-      })
-
       // Store the spreadsheet ID and URL for future use
       if (data.businessSheetId) {
         localStorage.setItem("business_sheet_id", data.businessSheetId)
       }
-
       if (data.spreadsheetUrl) {
         localStorage.setItem("business_sheet_url", data.spreadsheetUrl)
       }
-
       // Trigger confetti
       triggerConfetti()
-
       // Show success state
       setShowSuccess(true)
-
-      // Redirect to dashboard after successful setup
-      setTimeout(() => navigate("/invoices"), 3000)
     } catch (err) {
       console.error("Setup error:", err)
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred"
-      toast({
-        title: "Error",
-        description: errorMessage || "Failed to save your business details. Please try again.",
-        variant: "destructive",
-      })
+      setError(errorMessage || "Failed to save your business details. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
@@ -436,7 +401,7 @@ export default function InitializePage() {
               onFocus={() => setInputFocused(true)}
               onBlur={() => setInputFocused(false)}
               placeholder={currentQ.placeholder}
-              className={`w-full p-4 text-base ${inputBorderClass} focus-visible:ring-0  focus-visible:ring-offset-0 transition-all duration-300`}
+              className={`w-full p-4 text-base font-cal-sans ${inputBorderClass} focus-visible:ring-0 focus-visible:ring-offset-0 transition-all duration-300`}
             />
 
             {inputValid !== null && value.trim() !== "" && (
@@ -624,7 +589,6 @@ export default function InitializePage() {
         <div className="mb-6">
           <CheckCircle2 className="h-16 w-16 font-cal-sans text-green-500 mx-auto" />
         </div>
-
         <motion.h2
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -633,7 +597,6 @@ export default function InitializePage() {
         >
           Setup Complete!
         </motion.h2>
-
         <motion.p
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -642,22 +605,26 @@ export default function InitializePage() {
         >
           Your business profile has been created successfully.
         </motion.p>
-
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.5 }}
-          className="w-full max-w-xs bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800"
+          className="w-full max-w-xs bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800 mb-6"
         >
-          <p className="text-green-800 font-cal-sans dark:text-green-300 text-sm">Redirecting you to invoices in a moment...</p>
+          <p className="text-green-800 font-cal-sans dark:text-green-300 text-sm">You can now continue to your dashboard.</p>
         </motion.div>
+        <Button
+          className="bg-green-600 hover:bg-green-700 font-cal-sans px-8 py-3 text-lg"
+          onClick={() => navigate("/invoices")}
+        >
+          Continue to Dashboard
+        </Button>
       </motion.div>
     )
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900">
-      <Toaster />
+    <div className="flex flex-col font-cal-sans min-h-screen bg-white dark:bg-gray-900">
       <canvas
         ref={confettiCanvasRef}
         className="fixed inset-0 pointer-events-none z-50"
@@ -674,7 +641,7 @@ export default function InitializePage() {
         </div>
       </header>
 
-      <main className="flex-1 flex items-center justify-center p-4 md:p-8">
+      <main className="flex-1 flex items-center font-cal-sans justify-center p-4 md:p-8">
         {showWelcome ? (
           <WelcomeScreen onStart={() => setShowWelcome(false)} />
         ) : showSuccess ? (

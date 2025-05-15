@@ -757,22 +757,6 @@ export default function Dashboard() {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      {/* Welcoming container for new users with no invoices */}
-      {showWelcome && (
-        <div className="w-full max-w-2xl mx-auto my-12 p-8 border-2 border-dashed border-gray-800 rounded-lg bg-white text-center shadow-sm">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-2 font-cal-sans">Welcome to SheetBills™</h2>
-          <p className="text-gray-600 mb-4 font-cal-sans">You haven't created any invoices yet.</p>
-          <p className="text-gray-700 mb-6 font-cal-sans">Click <span className="font-semibold text-green-800">New Invoice</span> to create your first invoice and get started!</p>
-          <div className="flex justify-center">
-            <button
-              className="bg-green-700 hover:bg-green-800 text-white font-cal-sans px-6 py-3 rounded-md text-lg transition"
-              onClick={() => (document.querySelector('button.bg-green-700,button.bg-green-800') as HTMLElement)?.click()}
-            >
-              New Invoice
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
@@ -1065,6 +1049,8 @@ export default function Dashboard() {
           </Table>
         </div>
 
+        
+
         {/* Pagination Controls */}
         {totalPages > 1 && (
           <div className="flex font-inter items-center justify-between px-4 py-3 border-t border-gray-200 bg-white">
@@ -1099,6 +1085,22 @@ export default function Dashboard() {
         )}
         
       </div>
+
+      {showWelcome && (
+        <div className="w-full max-w-2xl mx-auto my-12 p-8 border-2 border-dashed border-gray-800 rounded-lg bg-white text-center shadow-sm">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-2 font-cal-sans">Welcome to SheetBills™</h2>
+          <p className="text-gray-600 mb-4 font-cal-sans">You haven't created any invoices yet.</p>
+          <p className="text-gray-700 mb-6 font-cal-sans">Click <span className="font-semibold text-green-800">New Invoice</span> to create your first invoice and get started!</p>
+          <div className="flex justify-center">
+            <button
+              className="bg-green-700 hover:bg-green-800 text-white font-cal-sans px-6 py-3 rounded-md text-lg transition"
+              onClick={() => (document.querySelector('button.bg-green-700,button.bg-green-800') as HTMLElement)?.click()}
+            >
+              New Invoice
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

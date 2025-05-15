@@ -21,6 +21,7 @@ import ContactPage from './pages/Contact/contact';
 import { LoadingSpinner } from "./components/ui/loadingSpinner";
 import AuthCallback from './pages/auth-callback'
 import PublicInvoice from "./pages/PublicInvoice/PublicInvoice";
+import TemplateDesignerPage from './components/TemplateDesigner/TemplateDesignerPage';
 
 
 // SidebarLayout already includes the Outlet component
@@ -143,6 +144,7 @@ function App() {
           <Route path="/" element={<Navigate to="/invoices" />} />
           <Route path="/invoices" element={<Dashboard />} />
           <Route path="/create-invoice" element={<InvoiceForm />} />
+          <Route path="/template-designer" element={<TemplateDesignerPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/contact" element={<ContactPage />} />
         </Route>

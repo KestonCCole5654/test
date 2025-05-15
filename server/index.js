@@ -2291,6 +2291,11 @@ app.get('/api/invoices/shared/:token', async (req, res) => {
     res.json({ invoice, businessData });
   } catch (error) {
     console.error('Error fetching shared invoice:', error);
-    res.status(500).json({ error: 'Failed to fetch shared invoice' });
+    res.status(500).json({ 
+      error: 'Failed to fetch shared invoice',
+      details: error.message,
+      stack: error.stack,
+      googleError: error.response?.data || null
+    });
   }
 });

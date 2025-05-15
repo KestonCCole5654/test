@@ -515,6 +515,15 @@ app.post('/api/create-sheet', async (req, res) => {
     });
     const newSheetId = newSheet.data.spreadsheetId;
     const newSheetUrl = newSheet.data.spreadsheetUrl;
+    // --- Add sharing permissions so anyone with the link can view ---
+    const drive = google.drive({ version: 'v3', auth });
+    await drive.permissions.create({
+      fileId: newSheetId,
+      requestBody: {
+        role: 'reader',
+        type: 'anyone',
+      },
+    });
     // Prepare invoice headers
     const headers = [
       'Invoice ID', 'Invoice Date', 'Due Date', 'Customer Name',

@@ -65,7 +65,7 @@ const TemplateDesignerPage: React.FC<TemplateDesignerPageProps> = ({ onSave }) =
       }
 
       const data = await response.json();
-      setTemplates(data.sheets.map((sheet: any) => ({
+      const templatesList = data.sheets.map((sheet: any) => ({
         id: sheet.id,
         name: sheet.name,
         description: sheet.description || '',
@@ -73,11 +73,15 @@ const TemplateDesignerPage: React.FC<TemplateDesignerPageProps> = ({ onSave }) =
         spreadsheetUrl: sheet.sheetUrl,
         createdAt: sheet.createdAt,
         isDefault: sheet.isDefault
-      })));
+      }));
+      setTemplates(templatesList);
 
-      // Set current template to default or first template
-      const defaultTemplate = data.sheets.find((sheet: any) => sheet.isDefault);
-      setCurrentTemplate(defaultTemplate || data.sheets[0]);
+      // Set current template to the most recently created one (last in the list)
+      if (templatesList.length > 0) {
+        setCurrentTemplate(templatesList[templatesList.length - 1]);
+      } else {
+        setCurrentTemplate(null);
+      }
     } catch (error) {
       console.error('Error loading templates:', error);
       toast({
@@ -139,7 +143,18 @@ const TemplateDesignerPage: React.FC<TemplateDesignerPageProps> = ({ onSave }) =
       }
 
       const data = await response.json();
-      await loadTemplates(); // Reload templates to include the new one
+      // Add the new template to the list and set as current
+      const newTemplate = {
+        id: data.sheetId,
+        name: 'New Invoice Template',
+        description: 'Created from template designer',
+        spreadsheetId: data.spreadsheetId,
+        spreadsheetUrl: data.spreadsheetUrl,
+        createdAt: new Date().toISOString(),
+        isDefault: false
+      };
+      setTemplates(prev => [...prev, newTemplate]);
+      setCurrentTemplate(newTemplate);
       toast({
         title: 'Success',
         description: 'New template created successfully'

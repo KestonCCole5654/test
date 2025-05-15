@@ -64,6 +64,14 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen font-cal-sans flex flex-col bg-gradient-to-b from-white to-gray-50">
+       <div className="flex items-center">
+          <a href="/" className="flex items-center space-x-2">
+            <div className="h-8 w-8 rounded bg-green-800 flex items-center justify-center">
+              <span className="text-white font-medium text-md">$</span>
+            </div>
+            <span className="text-lg font-medium text-green-600">SheetBills™</span>
+          </a>
+        </div>
    
       <div className="flex flex-1 flex-col items-center justify-center px-4 py-8">
         <div className="max-w-md w-full mx-auto">

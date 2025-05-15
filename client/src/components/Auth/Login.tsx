@@ -77,15 +77,15 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-gray-50">
-      <Header />
+    <div className="min-h-screen font-inter flex flex-col bg-gradient-to-b from-white to-gray-50">
+   
       <div className="flex flex-1 flex-col items-center justify-center px-4 py-8">
         <div className="max-w-md w-full mx-auto">
           <Card className="border-0 shadow-lg overflow-hidden">
             <div className="bg-emerald-600 h-1.5 w-full"></div>
             <CardContent className="p-8">
-              <h1 className="text-2xl font-bold text-gray-900 mb-2 text-center">Welcome to SheetBills</h1>
-              <p className="text-gray-600 text-center text-sm mb-6">
+              <h1 className="text-2xl font-inter text-gray-900 mb-2 text-center">Welcome to <span className=" font-inter font-medium text-green-800">SheetBills™</span></h1>
+              <p className="text-gray-600 font-inter text-center text-sm mb-6">
                 Your professional invoicing platform with seamless Google Sheets integration
               </p>
 
@@ -119,34 +119,20 @@ export default function LoginPage() {
                     fill="#EA4335"
                   />
                 </svg>
-                <span className="font-medium">Continue with Google</span>
+                <span className="font-medium font-inter">Continue with Google</span>
               </Button>
 
-              <div className="mt-6 pt-6 border-t border-gray-100">
-                <div className="space-y-3">
-                  <p className="text-sm text-gray-600">
-                    <span className="font-semibold text-emerald-700">SheetBills</span> is a professional invoicing
-                    platform built for seamless integration with Google Sheets. All your invoices and business data are
-                    securely managed in your own Google Drive.
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-semibold">Why Google Login?</span> For your security and privacy, SheetBills
-                    uses Google authentication. This ensures only you can access your data, and enables direct,
-                    real-time connection to your Google Sheets—no extra accounts or passwords required.
-                  </p>
-                </div>
-              </div>
             </CardContent>
           </Card>
 
           <div className="mt-4 text-center">
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 font-inter">
               By signing in, you agree to our{" "}
-              <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">
+              <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium font-inter ">
                 Terms
               </a>{" "}
               and{" "}
-              <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">
+              <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium font-inter">
                 Privacy Policy
               </a>
               .

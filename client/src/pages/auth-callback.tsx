@@ -10,23 +10,18 @@ export default function AuthCallback() {
 
   const checkUserOnboarding = async (userId: string) => {
     try {
-      // Check business profile
-      const { data: profile, error: profileError } = await supabase
-        .from('business_profiles')
+      const { data, error } = await supabase
+        .from('user_settings')
         .select('onboarding_completed')
         .eq('user_id', userId)
         .single()
 
-      if (profileError && profileError.code !== 'PGRST116') { // PGRST116 is "no rows returned"
-        throw profileError
-      }
+      if (error) throw error
 
-      // If no profile exists or onboarding is not completed, show onboarding
-      if (!profile || !profile.onboarding_completed) {
-        return true
-      }
-
-      // Check if we have any spreadsheets as a backup
+      // Check if business details sheet exists in localStorage
+      const businessSheetUrl = localStorage.getItem('business_sheet_url')
+      
+      // Also check if we have any spreadsheets
       const { data: spreadsheets, error: sheetsError } = await supabase
         .from('spreadsheets')
         .select('*')
@@ -34,17 +29,19 @@ export default function AuthCallback() {
 
       if (sheetsError) throw sheetsError
 
-      // If we have spreadsheets but no profile, create a profile
-      if (spreadsheets && spreadsheets.length > 0 && !profile) {
-        await supabase
-          .from('business_profiles')
-          .insert({
-            user_id: userId,
-            onboarding_completed: true
-          })
+      // If we have either a business sheet URL or any spreadsheets, mark onboarding as completed
+      if (businessSheetUrl || (spreadsheets && spreadsheets.length > 0)) {
+        // If onboarding isn't marked as completed, update it
+        if (!data?.onboarding_completed) {
+          await supabase
+            .from('user_settings')
+            .update({ onboarding_completed: true })
+            .eq('user_id', userId)
+        }
+        return false // Don't show onboarding if we have any sheets
       }
 
-      return false // Don't show onboarding if we have a completed profile
+      return !data?.onboarding_completed
     } catch (err) {
       console.error('Error checking onboarding status:', err)
       return true // Default to showing onboarding if there's an error
@@ -65,18 +62,11 @@ export default function AuthCallback() {
             sessionStorage.setItem('google_access_token', session.provider_token)
           }
 
-          // Check if user needs onboarding
-          const needsOnboarding = await checkUserOnboarding(session.user.id)
-          
           // Get the previous location from state or default to invoices
           const from = location.state?.from || '/invoices'
           
-          // Redirect to onboarding if needed, otherwise to the intended destination
-          if (needsOnboarding) {
-            window.location.href = '/Onboarding'
-          } else {
-            window.location.href = from
-          }
+          // Force a page reload to ensure proper state reset
+          window.location.href = from
         } else {
           window.location.href = '/login'
         }

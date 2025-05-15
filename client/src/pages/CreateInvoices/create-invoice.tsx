@@ -1007,18 +1007,19 @@ ${businessData.phone}`
             </div>
             {/* Shareable Link UI - shown directly under the three buttons */}
             {shareableLink && (
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <div className="col-span-2 mt-4 p-4 bg-gray-50 rounded-lg w-full">
                 <p className="text-sm text-gray-600 mb-2">Shareable Link:</p>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
                   <input
                     type="text"
                     value={shareableLink}
                     readOnly
-                    className="flex-1 p-2 border rounded text-sm font-mono"
+                    className="w-full sm:flex-1 p-2 border rounded text-sm font-mono"
                   />
                   <Button
                     variant="outline"
                     size="sm"
+                    className="w-full sm:w-auto"
                     onClick={() => {
                       navigator.clipboard.writeText(shareableLink)
                       setCopied(true)

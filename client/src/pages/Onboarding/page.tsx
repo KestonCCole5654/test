@@ -67,7 +67,7 @@ const WelcomeScreen = ({ onStart }: { onStart: () => void }) => {
     >
       <h1 className="text-3xl font-cal-sans font-semibold mb-4">Let's Get Started</h1>
       <p className="text-gray-600 font-cal-sans dark:text-gray-400 mb-8">
-        Set up your <span className="font-bold text-green-800">SheetBills™</span> account to start managing your invoices efficiently.
+        Set up your <span className="font-bold text-green-800 text-md">SheetBills™</span> account to start managing your invoices efficiently.
       </p>
       <Button
         onClick={onStart}

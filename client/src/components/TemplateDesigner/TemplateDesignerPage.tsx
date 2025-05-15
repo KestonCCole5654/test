@@ -44,7 +44,7 @@ const TemplateDesignerPage: React.FC<TemplateDesignerPageProps> = ({ onSave }) =
       <div className="border-b bg-white">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold">Invoice Template Designer</h1>
+            <h1 className="text-2xl font-medium">Invoice Template Designer</h1>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
@@ -69,7 +69,7 @@ const TemplateDesignerPage: React.FC<TemplateDesignerPageProps> = ({ onSave }) =
           {/* Left Sidebar - Template Elements */}
           <div className="col-span-2">
             <Card className="p-4">
-              <h2 className="font-semibold mb-4">Template Elements</h2>
+              <h2 className="font-medium mb-4">Template Elements</h2>
               <div className="space-y-2">
                 {templateElements.map((element) => (
                   <Button
@@ -128,7 +128,7 @@ const TemplateDesignerPage: React.FC<TemplateDesignerPageProps> = ({ onSave }) =
           {/* Right Sidebar - Properties */}
           <div className="col-span-2">
             <Card className="p-4">
-              <h2 className="font-semibold mb-4">Properties</h2>
+              <h2 className="font-med mb-4">Properties</h2>
               <div className="space-y-4">
                 <div>
                   <label className="text-sm text-gray-500">Template Name</label>

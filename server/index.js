@@ -192,6 +192,7 @@ async function getDefaultSheetId(accessToken) {
   const auth = new google.auth.OAuth2();
   auth.setCredentials({ access_token: accessToken });
   const sheets = google.sheets({ version: 'v4', auth });
+  const drive = google.drive({ version: 'v3', auth });
 
   try {
     // 1. Get master sheet reference
@@ -231,6 +232,22 @@ async function getDefaultSheetId(accessToken) {
         }]
       }
     });
+
+    // Add service account as editor
+    const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+    if (serviceAccountEmail) {
+      await drive.permissions.create({
+        fileId: newSheet.data.spreadsheetId,
+        requestBody: {
+          role: 'writer',
+          type: 'user',
+          emailAddress: serviceAccountEmail
+        },
+        sendNotificationEmail: false
+      });
+    } else {
+      console.warn('Service account email not configured. Sheet sharing not automated.');
+    }
 
     // Add headers to the new sheet
     const headers = [
@@ -1218,6 +1235,7 @@ async function createBusinessSheet(accessToken, businessData) {
     const auth = new google.auth.OAuth2();
     auth.setCredentials({ access_token: accessToken });
     const sheets = google.sheets({ version: 'v4', auth });
+    const drive = google.drive({ version: 'v3', auth });
 
     // Create new spreadsheet
     const spreadsheet = await sheets.spreadsheets.create({
@@ -1241,6 +1259,26 @@ async function createBusinessSheet(accessToken, businessData) {
 
     const spreadsheetId = spreadsheet.data.spreadsheetId;
     const spreadsheetUrl = spreadsheet.data.spreadsheetUrl;
+
+    // Add service account as editor
+    const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+    if (serviceAccountEmail) {
+      try {
+        await drive.permissions.create({
+          fileId: spreadsheetId,
+          requestBody: {
+            role: 'writer',
+            type: 'user',
+            emailAddress: serviceAccountEmail
+          },
+          sendNotificationEmail: false
+        });
+      } catch (error) {
+        console.warn('Failed to add service account as editor:', error.message);
+      }
+    } else {
+      console.warn('Service account email not configured. Sheet sharing not automated.');
+    }
 
     // Add headers and business details
     const headers = [
@@ -1278,6 +1316,7 @@ async function createBusinessSheet(accessToken, businessData) {
     // Get the correct sheetId from the spreadsheet creation response
     const sheetId = spreadsheet.data.sheets[0].properties.sheetId;
 
+    // Format the headers
     await sheets.spreadsheets.batchUpdate({
       spreadsheetId,
       requestBody: {
@@ -1285,7 +1324,7 @@ async function createBusinessSheet(accessToken, businessData) {
           {
             repeatCell: {
               range: {
-                sheetId: sheetId, // <-- Use the actual sheetId
+                sheetId: sheetId,
                 startRowIndex: 0,
                 endRowIndex: 1
               },

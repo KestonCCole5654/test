@@ -32,6 +32,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb"
+import supabase from "../../components/Auth/supabaseClient"
 
 // Custom SVG Illustrations
 const CompanyIllustration = () => (
@@ -548,6 +549,50 @@ const SuccessIllustration = () => (
   </motion.svg>
 )
 
+// Progress Dots Component
+const ProgressDots = ({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) => {
+  return (
+    <div className="flex items-center justify-center gap-2">
+      {Array.from({ length: totalSteps }).map((_, index) => (
+        <div
+          key={index}
+          className={`w-2 h-2 rounded-full transition-all duration-300 ${
+            index === currentStep
+              ? "bg-green-600 w-4"
+              : index < currentStep
+              ? "bg-green-400"
+              : "bg-gray-200 dark:bg-gray-700"
+          }`}
+        />
+      ))}
+    </div>
+  )
+}
+
+// Welcome Screen Component
+const WelcomeScreen = ({ onStart }: { onStart: () => void }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="w-full max-w-md mx-auto text-center"
+    >
+      <h1 className="text-3xl font-bold mb-4">Let's Get Started</h1>
+      <p className="text-gray-600 dark:text-gray-400 mb-8">
+        Set up your SheetBills™ account to start managing your invoices efficiently.
+      </p>
+      <Button
+        onClick={onStart}
+        className="bg-green-600 hover:bg-green-700 px-8 py-6 text-lg"
+      >
+        Get Started
+        <ArrowRight className="ml-2 h-5 w-5" />
+      </Button>
+    </motion.div>
+  )
+}
+
 export default function InitializePage() {
   const navigate = useNavigate()
   const { toast } = useToast()
@@ -557,6 +602,7 @@ export default function InitializePage() {
   const confettiCanvasRef = useRef<HTMLCanvasElement>(null)
   const [inputFocused, setInputFocused] = useState(false)
   const [inputValid, setInputValid] = useState<boolean | null>(null)
+  const [showWelcome, setShowWelcome] = useState(true)
 
   // Auth tokens state
   const [supabaseToken, setSupabaseToken] = useState("")
@@ -572,7 +618,6 @@ export default function InitializePage() {
 
   // Survey state
   const [currentQuestion, setCurrentQuestion] = useState(0)
-  const [progress, setProgress] = useState(0)
   const [showReview, setShowReview] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
 
@@ -584,8 +629,7 @@ export default function InitializePage() {
       description: "This will appear on all your invoices and documents.",
       field: "companyName",
       required: true,
-      icon: <Building2 className="h-6 w-6" />,
-      illustration: <CompanyIllustration />,
+      icon: <Building2 className="h-5 w-5" />,
       placeholder: "e.g. Acme Inc.",
       validate: (value: string) => (value.trim() ? "" : "Company name is required"),
     },
@@ -595,8 +639,7 @@ export default function InitializePage() {
       description: "We'll use this for communications related to your account.",
       field: "email",
       required: true,
-      icon: <Mail className="h-6 w-6" />,
-      illustration: <EmailIllustration />,
+      icon: <Mail className="h-5 w-5" />,
       placeholder: "e.g. contact@yourcompany.com",
       validate: (value: string) => {
         if (!value.trim()) return "Business email is required"
@@ -610,8 +653,7 @@ export default function InitializePage() {
       description: "Optional: This will appear on your invoices.",
       field: "phone",
       required: false,
-      icon: <Phone className="h-6 w-6" />,
-      illustration: <PhoneIllustration />,
+      icon: <Phone className="h-5 w-5" />,
       placeholder: "e.g. (555) 123-4567",
       validate: () => "",
     },
@@ -621,8 +663,7 @@ export default function InitializePage() {
       description: "Optional: This will appear on your invoices and documents.",
       field: "address",
       required: false,
-      icon: <MapPin className="h-6 w-6" />,
-      illustration: <AddressIllustration />,
+      icon: <MapPin className="h-5 w-5" />,
       placeholder: "e.g. 123 Business St, City, State, ZIP",
       validate: () => "",
     },
@@ -637,19 +678,6 @@ export default function InitializePage() {
     // Reset input validation state when question changes
     setInputValid(null)
   }, [currentQuestion])
-
-  // Update progress bar
-  useEffect(() => {
-    const totalSteps = questions.length
-    const currentProgress = ((currentQuestion + 1) / totalSteps) * 100
-
-    // Animate progress
-    const timer = setTimeout(() => {
-      setProgress(currentProgress)
-    }, 300)
-
-    return () => clearTimeout(timer)
-  }, [currentQuestion, questions.length])
 
   // Get auth tokens on mount
   useEffect(() => {
@@ -734,14 +762,12 @@ export default function InitializePage() {
       setCurrentQuestion(currentQuestion + 1)
     } else {
       setShowReview(true)
-      setProgress(100)
     }
   }
 
   const handlePrevious = () => {
     if (showReview) {
       setShowReview(false)
-      setProgress((questions.length / questions.length) * 100)
     } else if (currentQuestion > 0) {
       setCurrentQuestion(currentQuestion - 1)
     }
@@ -752,7 +778,6 @@ export default function InitializePage() {
       setCurrentQuestion(currentQuestion + 1)
     } else {
       setShowReview(true)
-      setProgress(100)
     }
   }
 
@@ -877,26 +902,23 @@ export default function InitializePage() {
     const field = currentQ.field as keyof typeof businessData
     const value = businessData[field]
 
-    // Determine input border color based on validation state
-    let inputBorderClass = "border-2 border-gray-200 dark:border-gray-700"
+    let inputBorderClass = "border border-gray-200 dark:border-gray-700"
     if (inputValid === true) {
-      inputBorderClass = "border-2 border-green-500 dark:border-green-600"
+      inputBorderClass = "border border-green-500 dark:border-green-600"
     } else if (inputValid === false) {
-      inputBorderClass = "border-2 border-red-500 dark:border-red-600"
+      inputBorderClass = "border border-red-500 dark:border-red-600"
     } else if (inputFocused) {
-      inputBorderClass = "border-2 border-blue-500 dark:border-blue-600"
+      inputBorderClass = "border border-green-500 dark:border-green-600"
     }
 
     return (
       <div className="w-full max-w-md mx-auto">
-        <div className="mb-6 flex justify-center">{currentQ.illustration}</div>
-
         <div className="mb-8">
           <motion.h2
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="text-2xl font-bold text-center mb-2"
+            className="text-2xl font-semibold text-center mb-2"
           >
             {currentQ.question}
           </motion.h2>
@@ -905,7 +927,7 @@ export default function InitializePage() {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-gray-600 dark:text-gray-400 text-center"
+            className="text-gray-600 dark:text-gray-400 text-center text-sm"
           >
             {currentQ.description}
           </motion.p>
@@ -915,9 +937,9 @@ export default function InitializePage() {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="mb-8 relative"
+          className="mb-8"
         >
-          <div className="relative group">
+          <div className="relative">
             <Input
               ref={inputRef}
               type={currentQ.id === "email" ? "email" : "text"}
@@ -927,15 +949,9 @@ export default function InitializePage() {
               onFocus={() => setInputFocused(true)}
               onBlur={() => setInputFocused(false)}
               placeholder={currentQ.placeholder}
-              className={`w-full p-6 text-lg ${inputBorderClass} focus-visible:ring-0 focus-visible:ring-offset-0 transition-all duration-300 ease-in-out`}
+              className={`w-full p-4 text-base ${inputBorderClass} focus-visible:ring-0 focus-visible:ring-offset-0 transition-all duration-300`}
             />
 
-            {/* Subtle glow effect on focus */}
-            {inputFocused && (
-              <div className="absolute inset-0 -z-10 rounded-md bg-blue-500/20 dark:bg-blue-500/10 blur-sm transition-all duration-300 ease-in-out"></div>
-            )}
-
-            {/* Validation icons */}
             {inputValid !== null && value.trim() !== "" && (
               <motion.div
                 initial={{ scale: 0, opacity: 0 }}
@@ -969,11 +985,10 @@ export default function InitializePage() {
           {!currentQ.required && (
             <Button
               variant="ghost"
-              className="flex-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300"
+              className="flex-1 text-gray-500 hover:text-gray-700"
               onClick={handleSkip}
             >
               Skip
-              <SkipForward className="h-4 w-4 ml-2" />
             </Button>
           )}
 
@@ -981,8 +996,8 @@ export default function InitializePage() {
             className={`flex-1 ${
               currentQuestion === 0 && !value
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
-            } transition-all duration-300`}
+                : "bg-green-600 hover:bg-green-700"
+            }`}
             onClick={handleNext}
             disabled={currentQ.required && !value}
           >
@@ -1128,14 +1143,14 @@ export default function InitializePage() {
         className="flex flex-col items-center justify-center h-full text-center"
       >
         <div className="mb-6">
-          <SuccessIllustration />
+          <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto" />
         </div>
 
         <motion.h2
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
-          className="text-2xl font-bold mb-2"
+          className="text-2xl font-semibold mb-2"
         >
           Setup Complete!
         </motion.h2>
@@ -1162,7 +1177,7 @@ export default function InitializePage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 relative overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900">
       <Toaster />
       <canvas
         ref={confettiCanvasRef}
@@ -1172,56 +1187,24 @@ export default function InitializePage() {
 
       <FloatingElements />
 
-      <header className="border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md py-4 px-4 shadow-md relative z-10">
-        <div className="max-w-md mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <motion.div
-              initial={{ rotate: -10, scale: 0.8 }}
-              animate={{ rotate: 10, scale: 1 }}
-              transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, repeatType: "reverse" }}
-            >
-              <Sparkles className="h-6 w-6 text-green-500" />
-            </motion.div>
-            <div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-                USER ONBOARDING 
-              </h1>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-end">
-            <div className="w-32 mb-1">
-              <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-green-500 to-green-600"
-                  style={{ width: `${progress}%`, transition: "width 0.5s ease" }}
-                />
-              </div>
-            </div>
-            <p className="text-xs text-gray-500">
-              {showReview ? "Review" : `Question ${currentQuestion + 1} of ${questions.length}`}
-            </p>
-          </div>
+      <header className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 py-4 px-4">
+        <div className="max-w-md mx-auto">
+          {!showWelcome && !showSuccess && (
+            <ProgressDots currentStep={showReview ? questions.length : currentQuestion} totalSteps={questions.length} />
+          )}
         </div>
       </header>
 
-      {/* Breadcrumb Navigation */}
-      <div className="max-w-md mx-auto px-4 mt-2">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Onboarding</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-      </div>
-
-      <main className="flex-1 flex items-center justify-center p-4 md:p-8 relative z-10">
-        {showSuccess ? renderSuccessScreen() : showReview ? renderReviewScreen() : renderCurrentQuestion()}
+      <main className="flex-1 flex items-center justify-center p-4 md:p-8">
+        {showWelcome ? (
+          <WelcomeScreen onStart={() => setShowWelcome(false)} />
+        ) : showSuccess ? (
+          renderSuccessScreen()
+        ) : showReview ? (
+          renderReviewScreen()
+        ) : (
+          renderCurrentQuestion()
+        )}
       </main>
     </div>
   )

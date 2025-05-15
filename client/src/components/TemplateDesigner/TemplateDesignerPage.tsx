@@ -38,6 +38,8 @@ const TemplateDesignerPage: React.FC<TemplateDesignerPageProps> = ({ onSave }) =
   const [currentTemplate, setCurrentTemplate] = useState<Template | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const [isCooldown, setIsCooldown] = useState(false);
+  const [cooldownSeconds, setCooldownSeconds] = useState(60);
 
   // Load templates on component mount
   useEffect(() => {
@@ -89,6 +91,7 @@ const TemplateDesignerPage: React.FC<TemplateDesignerPageProps> = ({ onSave }) =
   };
 
   const createNewTemplate = async () => {
+    if (isCooldown) return;
     try {
       const session = await supabase.auth.getSession();
       if (!session.data.session) {
@@ -109,23 +112,47 @@ const TemplateDesignerPage: React.FC<TemplateDesignerPageProps> = ({ onSave }) =
       });
 
       if (!response.ok) {
+        const errorData = await response.json();
+        // Check for 429 rate limit error
+        if (response.status === 429 || errorData?.details?.error?.reason === 'rateLimitExceeded' || errorData?.details?.error?.status === 'RESOURCE_EXHAUSTED') {
+          setIsCooldown(true);
+          setCooldownSeconds(60);
+          toast({
+            title: 'Rate Limit Exceeded',
+            description: 'You are creating templates too quickly. Please wait a minute and try again.',
+            variant: 'destructive',
+          });
+          // Start cooldown timer
+          const interval = setInterval(() => {
+            setCooldownSeconds((prev) => {
+              if (prev <= 1) {
+                clearInterval(interval);
+                setIsCooldown(false);
+                return 60;
+              }
+              return prev - 1;
+            });
+          }, 1000);
+          return;
+        }
         throw new Error('Failed to create template');
       }
 
       const data = await response.json();
       await loadTemplates(); // Reload templates to include the new one
-      
       toast({
         title: 'Success',
         description: 'New template created successfully'
       });
     } catch (error) {
       console.error('Error creating template:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to create template. Please try again.',
-        variant: 'destructive'
-      });
+      if (!isCooldown) {
+        toast({
+          title: 'Error',
+          description: 'Failed to create template. Please try again.',
+          variant: 'destructive'
+        });
+      }
     }
   };
 
@@ -135,9 +162,9 @@ const TemplateDesignerPage: React.FC<TemplateDesignerPageProps> = ({ onSave }) =
         <div className="w-full h-[600px] bg-white border rounded-lg shadow-sm flex items-center justify-center">
           <div className="text-center">
             <p className="text-gray-400 mb-4">No template selected</p>
-            <Button onClick={createNewTemplate} className="flex items-center gap-2">
+            <Button onClick={createNewTemplate} className="flex items-center gap-2" disabled={isCooldown}>
               <Plus className="w-4 h-4" />
-              Create New Template
+              {isCooldown ? `New Template (${cooldownSeconds})` : 'New Template'}
             </Button>
           </div>
         </div>
@@ -183,9 +210,10 @@ const TemplateDesignerPage: React.FC<TemplateDesignerPageProps> = ({ onSave }) =
               <Button 
                 onClick={createNewTemplate}
                 className="flex items-center gap-2"
+                disabled={isCooldown}
               >
                 <Plus className="w-4 h-4" />
-                New Template
+                {isCooldown ? `New Template (${cooldownSeconds})` : 'New Template'}
               </Button>
             </div>
           </div>

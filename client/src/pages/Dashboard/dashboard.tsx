@@ -843,7 +843,7 @@ export default function Dashboard() {
           </Button>
         </div>
         {bulkDeleteMessage && (
-          <div className="flex items-center justify-between bg-green-50 border border-green-200 text-green-800 rounded px-4 py-2 mb-2">
+          <div className="flex items-center font-light justify-between bg-green-50 border border-green-200 text-green-800 rounded px-4 py-2 mb-2">
             <span>{bulkDeleteMessage}</span>
             <button
               onClick={() => setBulkDeleteMessage(null)}

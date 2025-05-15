@@ -766,7 +766,7 @@ export default function Dashboard() {
           <div className="flex justify-center">
             <button
               className="bg-green-700 hover:bg-green-800 text-white font-cal-sans px-6 py-3 rounded-md text-lg transition"
-              onClick={() => document.querySelector('button.bg-green-700,button.bg-green-800')?.click()}
+              onClick={() => (document.querySelector('button.bg-green-700,button.bg-green-800') as HTMLElement)?.click()}
             >
               New Invoice
             </button>

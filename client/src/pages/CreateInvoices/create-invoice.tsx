@@ -753,11 +753,21 @@ ${businessData.phone}`
         throw new Error("Google authentication required")
       }
 
+      // Always pass the current invoice spreadsheet URL as sheetUrl
+      const sheetUrl = selectedSpreadsheetUrl;
+      if (!sheetUrl) {
+        throw new Error("No invoice spreadsheet selected")
+      }
+
+      // Fetch business details from the correct spreadsheet
       const response = await axios.get("https://sheetbills-server.vercel.app/api/business-details", {
         headers: {
           Authorization: `Bearer ${session.provider_token}`,
           "X-Supabase-Token": session.access_token,
         },
+        params: {
+          sheetUrl: sheetUrl
+        }
       })
 
       if (response.data.businessDetails) {

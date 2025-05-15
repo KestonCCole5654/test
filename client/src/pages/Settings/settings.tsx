@@ -88,7 +88,15 @@ export default function SettingsPage() {
       }
 
       // Fetch business details
-      const businessResponse = await axios.get("https://sheetbills-server.vercel.app/api/business-details", { headers });
+      // Always pass the current invoice spreadsheet URL as sheetUrl
+      const sheetUrl = localStorage.getItem("defaultSheetUrl") || "";
+      if (!sheetUrl) {
+        throw new Error("No invoice spreadsheet selected")
+      }
+      const businessResponse = await axios.get("https://sheetbills-server.vercel.app/api/business-details", {
+        headers,
+        params: { sheetUrl }
+      });
       if (businessResponse.data.businessDetails) {
         setBusinessData({
           companyName: businessResponse.data.businessDetails["Company Name"] || "",
@@ -161,6 +169,7 @@ export default function SettingsPage() {
           email: businessData.email,
           phone: businessData.phone,
           address: businessData.address,
+          sheetUrl // Always include the sheetUrl in the update request
         },
         {
           headers: {

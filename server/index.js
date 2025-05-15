@@ -538,7 +538,38 @@ app.post('/api/create-sheet', async (req, res) => {
               dimension: 'COLUMNS'
             }
           }
-        }]
+        },
+        // Add a new 'Business Details' tab to the spreadsheet
+        {
+          addSheet: {
+            properties: {
+              title: 'Business Details',
+              gridProperties: { rowCount: 100, columnCount: 3 }
+            }
+          }
+        }
+        ]
+      }
+    });
+    // Initialize the 'Business Details' tab with headers and default rows
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: newSheetId,
+      range: 'Business Details!A1:C1',
+      valueInputOption: 'RAW',
+      resource: { values: [['Field', 'Value', 'Last Updated']] }
+    });
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: newSheetId,
+      range: 'Business Details!A2:C6',
+      valueInputOption: 'RAW',
+      resource: {
+        values: [
+          ['Company Name', '', new Date().toISOString()],
+          ['Business Email', '', new Date().toISOString()],
+          ['Phone Number', '', new Date().toISOString()],
+          ['Address', '', new Date().toISOString()],
+          ['Created At', new Date().toISOString(), new Date().toISOString()]
+        ]
       }
     });
     // Add to master sheet
@@ -1070,42 +1101,42 @@ app.get('/api/business-details', async (req, res) => {
     if (!supabaseToken) {
       return res.status(401).json({ error: 'Missing Supabase token' });
     }
-
     // Verify the Supabase user session is valid
     const { data: { user }, error } = await supabase.auth.getUser(supabaseToken);
     if (error || !user) {
       return res.status(401).json({ error: 'Invalid Supabase session' });
     }
-
     // Extract and validate Google authentication token
     const googleToken = req.headers.authorization?.split(' ')[1];
     if (!googleToken) {
       return res.status(401).json({ error: 'Missing Google credentials' });
     }
-
-    // Get or create business sheet
-    const { id: spreadsheetId, isNew } = await getOrCreateBusinessSheet(googleToken, user.id);
-
+    // Get the invoice spreadsheet URL from query params
+    const sheetUrl = req.query.sheetUrl;
+    if (!sheetUrl) {
+      return res.status(400).json({ error: 'Missing sheetUrl parameter' });
+    }
+    // Extract spreadsheetId from the URL
+    const spreadsheetId = extractSheetIdFromUrl(sheetUrl);
+    if (!spreadsheetId) {
+      return res.status(400).json({ error: 'Invalid sheetUrl format' });
+    }
     // Initialize Google Sheets API
     const auth = new google.auth.OAuth2();
     auth.setCredentials({ access_token: googleToken });
     const sheets = google.sheets({ version: 'v4', auth });
-
-    // Get business details
+    // Get business details from the 'Business Details' tab in the invoice spreadsheet
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
       range: 'Business Details!A2:C6',
     });
-
     const rows = response.data.values || [];
     const businessDetails = {};
-    
     rows.forEach(row => {
       if (row[0] && row[1]) {
         businessDetails[row[0]] = row[1];
       }
     });
-
     res.json({ 
       businessDetails,
       sheetConnection: {
@@ -1115,7 +1146,6 @@ app.get('/api/business-details', async (req, res) => {
         lastSynced: new Date().toISOString()
       }
     });
-
   } catch (error) {
     console.error('Business details fetch error:', error);
     res.status(500).json({ 
@@ -1129,51 +1159,31 @@ app.put('/api/update-business-details', async (req, res) => {
     // Get authentication tokens from headers
     const supabaseToken = req.headers['x-supabase-token'];
     const googleToken = req.headers.authorization?.split(' ')[1];
-
     if (!supabaseToken || !googleToken) {
       return res.status(401).json({ error: 'Authentication tokens required' });
     }
-
     // Verify Supabase session
     const { data: { user }, error } = await supabase.auth.getUser(supabaseToken);
     if (error || !user) {
       return res.status(401).json({ error: 'Invalid Supabase session' });
     }
-
     // Get business data from request body
     const businessData = req.body;
-
+    // Get the invoice spreadsheet URL from request body
+    const sheetUrl = req.body.sheetUrl;
+    if (!sheetUrl) {
+      return res.status(400).json({ error: 'Missing sheetUrl parameter' });
+    }
+    // Extract spreadsheetId from the URL
+    const spreadsheetId = extractSheetIdFromUrl(sheetUrl);
+    if (!spreadsheetId) {
+      return res.status(400).json({ error: 'Invalid sheetUrl format' });
+    }
     // Initialize Google Sheets API
     const auth = new google.auth.OAuth2();
     auth.setCredentials({ access_token: googleToken });
     const sheets = google.sheets({ version: 'v4', auth });
-
-    // Get user's master sheet
-    const userInfo = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
-      headers: { Authorization: `Bearer ${googleToken}` }
-    });
-    const masterSheet = await getOrCreateMasterSheet(googleToken, userInfo.data.sub);
-
-    // Find business sheet in master
-    const masterData = await sheets.spreadsheets.values.get({
-      spreadsheetId: masterSheet.id,
-      range: 'My Sheets!A:E',
-    });
-
-    const businessSheet = masterData.data.values?.find(row => 
-      row[1]?.toLowerCase().includes('business')
-    );
-
-    if (!businessSheet) {
-      return res.status(404).json({ error: 'Business sheet not found' });
-    }
-
-    const spreadsheetId = extractSheetIdFromUrl(businessSheet[4]);
-    if (!spreadsheetId) {
-      return res.status(400).json({ error: 'Invalid sheet URL' });
-    }
-
-    // Update business details
+    // Update business details in the 'Business Details' tab in the invoice spreadsheet
     const now = new Date().toISOString();
     const updateData = [
       ['Company Name', businessData.companyName, now],
@@ -1182,7 +1192,6 @@ app.put('/api/update-business-details', async (req, res) => {
       ['Address', businessData.address, now],
       ['Created At', now, now]
     ];
-
     await sheets.spreadsheets.values.update({
       spreadsheetId,
       range: 'Business Details!A2:C6',
@@ -1191,12 +1200,10 @@ app.put('/api/update-business-details', async (req, res) => {
         values: updateData
       },
     });
-
     res.json({ 
       success: true,
       message: 'Business details updated successfully'
     });
-
   } catch (error) {
     console.error('Update error:', error);
     res.status(500).json({ 

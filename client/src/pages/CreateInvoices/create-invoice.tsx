@@ -856,6 +856,7 @@ ${businessData.phone}`
 
   const [shareableLink, setShareableLink] = useState<string>("")
   const [isGeneratingLink, setIsGeneratingLink] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   // Function to generate shareable invoice link
   const handleGenerateInvoiceLink = async () => {
@@ -1004,6 +1005,31 @@ ${businessData.phone}`
                 {isGeneratingLink ? "Generating..." : "Generate Invoice Link"}
               </Button>
             </div>
+            {/* Shareable Link UI - shown directly under the three buttons */}
+            {shareableLink && (
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-600 mb-2">Shareable Link:</p>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={shareableLink}
+                    readOnly
+                    className="flex-1 p-2 border rounded text-sm font-mono"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      navigator.clipboard.writeText(shareableLink)
+                      setCopied(true)
+                      setTimeout(() => setCopied(false), 2000)
+                    }}
+                  >
+                    {copied ? "Copied" : "Copy"}
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Invoice Preview - Cleaned up */}
@@ -1364,33 +1390,6 @@ ${businessData.phone}`
             </svg>
             <h2 className="text-2xl font-bold mb-2 text-green-700">Invoice Saved!</h2>
             <p className="mb-4 text-gray-600">Your invoice has been saved successfully.</p>
-          </div>
-        </div>
-      )}
-      {shareableLink && (
-        <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600 mb-2">Shareable Link:</p>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={shareableLink}
-              readOnly
-              className="flex-1 p-2 border rounded text-sm font-mono"
-            />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                navigator.clipboard.writeText(shareableLink)
-                toast({
-                  title: "Copied!",
-                  description: "Link copied to clipboard",
-                  variant: "default",
-                })
-              }}
-            >
-              Copy
-            </Button>
           </div>
         </div>
       )}

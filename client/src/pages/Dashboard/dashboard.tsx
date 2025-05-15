@@ -757,6 +757,14 @@ export default function Dashboard() {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
+      {/* Welcome message for newly onboarded users only */}
+      {showWelcome && (
+        <div className="mb-6 text-center">
+          <span className="text-lg font-cal-sans text-gray-800">
+            Welcome {user?.user_metadata?.name || user?.email?.split("@")[0] || "there"}, start by creating your first invoice by clicking the <span className="font-semibold text-green-800">New Invoice</span> button.
+          </span>
+        </div>
+      )}
 
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
@@ -1094,22 +1102,6 @@ export default function Dashboard() {
         )}
         
       </div>
-
-      {showWelcome && (
-        <div className="w-full max-w-7xl mx-auto my-12 p-8 border border-dashed border-gray-800 rounded-lg bg-white text-center shadow-sm">
-         
-          <p className="text-gray-600 mb-4 font-cal-sans">You haven't created any invoices yet.</p>
-          <p className="text-gray-700 mb-6 font-cal-sans">Click <span className="font-semibold text-green-800">New Invoice</span> to create your first invoice and get started!</p>
-          <div className="flex justify-center">
-            <button
-              className="bg-green-700 hover:bg-green-800 text-white font-cal-sans px-6 py-3 rounded-md text-md transition"
-              onClick={() => (document.querySelector('button.bg-green-700,button.bg-green-800') as HTMLElement)?.click()}
-            >
-              New Invoice
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

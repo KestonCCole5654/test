@@ -133,6 +133,7 @@ export default function Dashboard() {
   const [bulkDeleteMessage, setBulkDeleteMessage] = useState<string | null>(null)
   // Row order for drag-and-drop
   const [rowOrder, setRowOrder] = React.useState<string[]>([])
+  const [showWelcome, setShowWelcome] = useState(false)
 
   // =====================
   // Table Pagination & Selection (must be above useEffect hooks)
@@ -291,6 +292,17 @@ export default function Dashboard() {
       headerCheckboxRef.current.indeterminate = someVisibleSelected
     }
   }, [someVisibleSelected])
+
+  // Check for just_onboarded flag and no invoices on mount or when invoices change
+  useEffect(() => {
+    const justOnboarded = localStorage.getItem('just_onboarded') === 'true'
+    if (justOnboarded && invoices.length === 0) {
+      setShowWelcome(true)
+      localStorage.removeItem('just_onboarded') // Remove flag after showing
+    } else {
+      setShowWelcome(false)
+    }
+  }, [invoices])
 
   // =====================
   // Utility Functions
@@ -744,14 +756,24 @@ export default function Dashboard() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-                            </div>
+      </div>
+      {/* Welcoming container for new users with no invoices */}
+      {showWelcome && (
+        <div className="w-full max-w-2xl mx-auto my-12 p-8 border-2 border-dashed border-gray-800 rounded-lg bg-white text-center shadow-sm">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-2 font-cal-sans">Welcome to SheetBills™</h2>
+          <p className="text-gray-600 mb-4 font-cal-sans">You haven't created any invoices yet.</p>
+          <p className="text-gray-700 mb-6 font-cal-sans">Click <span className="font-semibold text-green-800">New Invoice</span> to create your first invoice and get started!</p>
+          <div className="flex justify-center">
+            <button
+              className="bg-green-700 hover:bg-green-800 text-white font-cal-sans px-6 py-3 rounded-md text-lg transition"
+              onClick={() => document.querySelector('button.bg-green-700,button.bg-green-800')?.click()}
+            >
+              New Invoice
+            </button>
+          </div>
+        </div>
+      )}
 
-      {/* Invoice Summary Stats
-        <InvoiceStats stats={stats} />
-      */}
-      
-
-    
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
         <div className="flex bg-gray-100 rounded-lg border border-gray-200">

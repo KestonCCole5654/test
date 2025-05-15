@@ -120,7 +120,6 @@ const Header = () => {
           <div className="hidden md:flex items-center space-x-2">
             {user ? (
               <>
-               
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button

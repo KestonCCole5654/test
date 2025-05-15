@@ -579,6 +579,11 @@ export default function InitializePage() {
 
   // Render the success screen
   const renderSuccessScreen = () => {
+    // Handler for continue button: set just_onboarded flag and navigate
+    const handleContinue = () => {
+      localStorage.setItem('just_onboarded', 'true'); // Set flag for dashboard UX
+      navigate('/invoices');
+    };
     return (
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
@@ -615,7 +620,7 @@ export default function InitializePage() {
         </motion.div>
         <Button
           className="bg-green-600 hover:bg-green-700 font-cal-sans px-8 py-3 text-lg"
-          onClick={() => navigate("/invoices")}
+          onClick={handleContinue}
         >
           Continue to Dashboard
         </Button>

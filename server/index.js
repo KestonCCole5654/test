@@ -517,13 +517,18 @@ app.post('/api/create-sheet', async (req, res) => {
     const newSheetUrl = newSheet.data.spreadsheetUrl;
     // --- Add sharing permissions so anyone with the link can view ---
     const drive = google.drive({ version: 'v3', auth });
-    await drive.permissions.create({
-      fileId: newSheetId,
-      requestBody: {
-        role: 'reader',
-        type: 'anyone',
-      },
-    });
+    try {
+      await drive.permissions.create({
+        fileId: newSheetId,
+        requestBody: {
+          role: 'reader',
+          type: 'anyone',
+        },
+      });
+      console.log('Sharing permission set for sheet:', newSheetId);
+    } catch (err) {
+      console.error('Failed to set sharing permission:', err);
+    }
     // Prepare invoice headers
     const headers = [
       'Invoice ID', 'Invoice Date', 'Due Date', 'Customer Name',

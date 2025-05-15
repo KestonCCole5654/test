@@ -1019,13 +1019,13 @@ export default function InitializePage() {
           transition={{ duration: 0.5 }}
           className="text-center mb-8"
         >
-          <h2 className="text-2xl font-bold mb-2">Review Your Information</h2>
+          <h2 className="text-2xl font-semibold mb-2">Great! You're Almost There</h2>
           <p className="text-gray-600 dark:text-gray-400">
-            Please review your business details before completing setup.
+            Please review your business details before we set up your account.
           </p>
         </motion.div>
 
-        <div className="space-y-6 mb-8">
+        <div className="space-y-4 mb-8">
           {[
             {
               id: "companyName",
@@ -1057,13 +1057,15 @@ export default function InitializePage() {
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: index * 0.1, duration: 0.5 }}
-              className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300"
+              className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700"
             >
-              <div className="flex items-center gap-3 mb-2">
-                <div className={`bg-${item.color}-100 dark:bg-${item.color}-900/30 p-2 rounded-full`}>{item.icon}</div>
+              <div className="flex items-center gap-3">
+                <div className={`bg-${item.color}-50 dark:bg-${item.color}-900/20 p-2 rounded-full`}>
+                  {item.icon}
+                </div>
                 <div>
-                  <h3 className="font-medium">{item.label}</h3>
-                  <p className="text-gray-700 dark:text-gray-300">
+                  <h3 className="font-medium text-sm text-gray-500">{item.label}</h3>
+                  <p className="text-gray-900 dark:text-gray-100">
                     {businessData[item.id as keyof typeof businessData] || "Not provided"}
                   </p>
                 </div>
@@ -1075,27 +1077,17 @@ export default function InitializePage() {
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.5 }}
-            className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md border border-gray-200 dark:border-gray-700"
+            className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800"
           >
-            <div className="flex items-center gap-3 mb-2">
-              <h3 className="font-medium">Authentication Status</h3>
+            <div className="flex items-center gap-3">
+              <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded-full">
+                <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
             </div>
-            <div className="space-y-2 mt-2">
-              <div className="flex items-center gap-2">
-                {supabaseToken ? (
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                ) : (
-                  <X className="h-4 w-4 text-red-500" />
-                )}
-                <span className="text-sm">Supabase Auth: {supabaseToken ? "Connected" : "Not Connected"}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                {googleAccessToken ? (
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                ) : (
-                  <X className="h-4 w-4 text-red-500" />
-                )}
-                <span className="text-sm">Google Account: {googleAccessToken ? "Connected" : "Not Connected"}</span>
+              <div>
+                <h3 className="font-medium text-sm text-green-800 dark:text-green-300">Ready to Go!</h3>
+                <p className="text-green-700 dark:text-green-400 text-sm">
+                  Your business profile is ready to be created. Click "Complete Setup" to finish.
+                </p>
               </div>
             </div>
           </motion.div>
@@ -1109,7 +1101,7 @@ export default function InitializePage() {
         >
           <Button
             variant="outline"
-            className="flex-1 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300"
+            className="flex-1"
             onClick={handlePrevious}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -1117,7 +1109,7 @@ export default function InitializePage() {
           </Button>
 
           <Button
-            className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 transition-all duration-300"
+            className="flex-1 bg-green-600 hover:bg-green-700"
             onClick={handleSubmit}
             disabled={isSubmitting}
           >
@@ -1126,7 +1118,7 @@ export default function InitializePage() {
             ) : (
               <CheckCircle2 className="h-4 w-4 mr-2" />
             )}
-            {isSubmitting ? "Processing..." : "Complete Setup"}
+            {isSubmitting ? "Setting Up..." : "Complete Setup"}
           </Button>
         </motion.div>
       </div>

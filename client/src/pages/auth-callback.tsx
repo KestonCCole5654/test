@@ -36,7 +36,7 @@ export default function AuthCallback() {
 
       // If we have spreadsheets but no profile, create a profile
       if (spreadsheets && spreadsheets.length > 0 && !profile) {
-        await supabase
+          await supabase
           .from('business_profiles')
           .insert({
             user_id: userId,
@@ -67,7 +67,7 @@ export default function AuthCallback() {
 
           // Check if user needs onboarding
           const needsOnboarding = await checkUserOnboarding(session.user.id)
-          
+
           // Get the previous location from state or default to invoices
           const from = location.state?.from || '/invoices'
           
@@ -75,7 +75,7 @@ export default function AuthCallback() {
           if (needsOnboarding) {
             window.location.href = '/Onboarding'
           } else {
-            window.location.href = from
+          window.location.href = from
           }
         } else {
           window.location.href = '/login'

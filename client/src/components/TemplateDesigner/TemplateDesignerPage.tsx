@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
@@ -11,25 +11,151 @@ import {
   Palette,
   Save,
   Eye,
-  Settings
+  Settings,
+  Plus
 } from 'lucide-react';
+import { useToast } from '../ui/use-toast';
+import supabase from '../Auth/supabaseClient';
 
 interface TemplateDesignerPageProps {
   onSave?: (templateId: string) => void;
 }
 
+interface Template {
+  id: string;
+  name: string;
+  description: string;
+  spreadsheetId: string;
+  spreadsheetUrl: string;
+  createdAt: string;
+  isDefault: boolean;
+}
+
 const TemplateDesignerPage: React.FC<TemplateDesignerPageProps> = ({ onSave }) => {
   const [activeTab, setActiveTab] = useState('design');
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [currentTemplate, setCurrentTemplate] = useState<Template | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
-  // This would be replaced with actual Google Sheets embed
-  const mockSheetEmbed = (
-    <div className="w-full h-[600px] bg-white border rounded-lg shadow-sm">
-      <div className="h-full flex items-center justify-center text-gray-400">
-        Google Sheets Editor will be embedded here
-      </div>
-    </div>
-  );
+  // Load templates on component mount
+  useEffect(() => {
+    loadTemplates();
+  }, []);
+
+  const loadTemplates = async () => {
+    try {
+      const session = await supabase.auth.getSession();
+      if (!session.data.session) {
+        throw new Error('No active session');
+      }
+
+      const response = await fetch('https://sheetbills-server.vercel.app/api/sheets', {
+        headers: {
+          'Authorization': `Bearer ${session.data.session.provider_token}`,
+          'x-supabase-token': session.data.session.access_token
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch templates');
+      }
+
+      const data = await response.json();
+      setTemplates(data.sheets.map((sheet: any) => ({
+        id: sheet.id,
+        name: sheet.name,
+        description: sheet.description || '',
+        spreadsheetId: sheet.id,
+        spreadsheetUrl: sheet.sheetUrl,
+        createdAt: sheet.createdAt,
+        isDefault: sheet.isDefault
+      })));
+
+      // Set current template to default or first template
+      const defaultTemplate = data.sheets.find((sheet: any) => sheet.isDefault);
+      setCurrentTemplate(defaultTemplate || data.sheets[0]);
+    } catch (error) {
+      console.error('Error loading templates:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load templates. Please try again.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const createNewTemplate = async () => {
+    try {
+      const session = await supabase.auth.getSession();
+      if (!session.data.session) {
+        throw new Error('No active session');
+      }
+
+      const response = await fetch('https://sheetbills-server.vercel.app/api/create-sheet', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.data.session.provider_token}`,
+          'x-supabase-token': session.data.session.access_token
+        },
+        body: JSON.stringify({
+          name: 'New Invoice Template',
+          description: 'Created from template designer'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create template');
+      }
+
+      const data = await response.json();
+      await loadTemplates(); // Reload templates to include the new one
+      
+      toast({
+        title: 'Success',
+        description: 'New template created successfully'
+      });
+    } catch (error) {
+      console.error('Error creating template:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to create template. Please try again.',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const renderGoogleSheetsEmbed = () => {
+    if (!currentTemplate) {
+      return (
+        <div className="w-full h-[600px] bg-white border rounded-lg shadow-sm flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-gray-400 mb-4">No template selected</p>
+            <Button onClick={createNewTemplate} className="flex items-center gap-2">
+              <Plus className="w-4 h-4" />
+              Create New Template
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    const spreadsheetId = currentTemplate.spreadsheetId;
+    const embedUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit?usp=sharing&rm=minimal`;
+
+    return (
+      <iframe
+        src={embedUrl}
+        className="w-full h-[600px] border-0"
+        allowFullScreen
+        title="Template Designer"
+      />
+    );
+  };
 
   const templateElements = [
     { icon: <Table className="w-5 h-5" />, label: 'Line Items Table', type: 'table' },
@@ -54,9 +180,12 @@ const TemplateDesignerPage: React.FC<TemplateDesignerPageProps> = ({ onSave }) =
                 <Eye className="w-4 h-4" />
                 {isPreviewMode ? 'Edit Mode' : 'Preview Mode'}
               </Button>
-              <Button className="flex items-center gap-2">
-                <Save className="w-4 h-4" />
-                Save Template
+              <Button 
+                onClick={createNewTemplate}
+                className="flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                New Template
               </Button>
             </div>
           </div>
@@ -95,7 +224,7 @@ const TemplateDesignerPage: React.FC<TemplateDesignerPageProps> = ({ onSave }) =
                   <TabsTrigger value="settings">Settings</TabsTrigger>
                 </TabsList>
                 <TabsContent value="design">
-                  {mockSheetEmbed}
+                  {renderGoogleSheetsEmbed()}
                 </TabsContent>
                 <TabsContent value="preview">
                   <div className="w-full h-[600px] bg-white border rounded-lg shadow-sm">
@@ -128,7 +257,7 @@ const TemplateDesignerPage: React.FC<TemplateDesignerPageProps> = ({ onSave }) =
           {/* Right Sidebar - Properties */}
           <div className="col-span-2">
             <Card className="p-4">
-              <h2 className="font-med mb-4">Properties</h2>
+              <h2 className="font-medium mb-4">Properties</h2>
               <div className="space-y-4">
                 <div>
                   <label className="text-sm text-gray-500">Template Name</label>
@@ -136,6 +265,15 @@ const TemplateDesignerPage: React.FC<TemplateDesignerPageProps> = ({ onSave }) =
                     type="text"
                     className="w-full mt-1 p-2 border rounded"
                     placeholder="My Invoice Template"
+                    value={currentTemplate?.name || ''}
+                    onChange={(e) => {
+                      if (currentTemplate) {
+                        setCurrentTemplate({
+                          ...currentTemplate,
+                          name: e.target.value
+                        });
+                      }
+                    }}
                   />
                 </div>
                 <div>
@@ -144,6 +282,15 @@ const TemplateDesignerPage: React.FC<TemplateDesignerPageProps> = ({ onSave }) =
                     className="w-full mt-1 p-2 border rounded"
                     placeholder="Template description..."
                     rows={3}
+                    value={currentTemplate?.description || ''}
+                    onChange={(e) => {
+                      if (currentTemplate) {
+                        setCurrentTemplate({
+                          ...currentTemplate,
+                          description: e.target.value
+                        });
+                      }
+                    }}
                   />
                 </div>
               </div>

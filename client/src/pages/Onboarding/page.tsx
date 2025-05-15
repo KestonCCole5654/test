@@ -595,7 +595,7 @@ export default function InitializePage() {
           transition={{ delay: 0.4, duration: 0.5 }}
           className="text-2xl font-cal-sans font-medium mb-2"
         >
-          Setup Complete!
+          Welcome to <span className=" font-cal-sans font-medium text-green-800 text-lg">SheetBills™</span>, Setup Complete!
         </motion.h2>
         <motion.p
           initial={{ y: 20, opacity: 0 }}
@@ -603,7 +603,7 @@ export default function InitializePage() {
           transition={{ delay: 0.5, duration: 0.5 }}
           className="text-gray-600 font-cal-sans dark:text-gray-400 mb-8"
         >
-          Your business profile has been created successfully.
+          Your Account and Business Profile has been created successfully. 
         </motion.p>
         <motion.div
           initial={{ y: 20, opacity: 0 }}

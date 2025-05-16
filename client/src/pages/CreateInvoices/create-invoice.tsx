@@ -1067,7 +1067,13 @@ ${businessData.phone}`
             </div>
             <div className="col-span-2 flex justify-center mt-4">
               <Button variant="outline" className="font-light mx-2" onClick={handleEmailInvoice}>Email Invoice</Button>
-              <Button variant="outline" className="font-light mx-2" onClick={() => window.print()}>Print Invoice</Button>
+              <Button 
+                variant="outline" 
+                className="font-light mx-2" 
+                onClick={() => navigate(`/print-invoice/${invoiceData.invoiceNumber}`)}
+              >
+                Print Invoice
+              </Button>
               <Button 
                 variant="outline" 
                 className="font-light mx-2" 
@@ -1435,7 +1441,11 @@ ${businessData.phone}`
                       Save Invoice
                     </Button>
                   )}
-                  <Button variant="outline" onClick={() => window.print()} className="font-medium">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => navigate(`/print-invoice/${invoiceData.invoiceNumber}`)}
+                    className="font-medium"
+                  >
                     Print Invoice
                   </Button>
                 </div>

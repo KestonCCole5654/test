@@ -111,18 +111,13 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
   return (
     <div
       className={`bg-white w-full font-cal max-w-full box-border flex flex-col justify-start${showShadow ? ' shadow-md' : ''}`}
-      style={{ 
-        minHeight: 'auto',
-        maxHeight: '100%',
-        margin: 0,
-        padding: '1cm'
-      }}
+      style={{ minHeight: '287mm', margin: 0 }}
     >
       {/* Header with logo */}
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between mt-4 items-center mb-8">
         <div>
           <h1 className="text-2xl font-cal-sans font-semibold text-green-800">INVOICE</h1>
-          <div className="space-y-1 mt-1">
+          <div className="space-y-1 mt-2">
             <p className="text-sm font-cal-sans font-light text-gray-500">Invoice number: {data.invoiceNumber}</p>
             <p className="text-sm font-cal font-light text-gray-500">Invoice Created: {formatDate(data.date)}</p>
           </div>
@@ -130,10 +125,10 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
       </div>
 
       {/* Business and Client Info */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-8">
         <div>
-          <h2 className="text-sm font-cal font-medium text-green-800 uppercase mb-1">From</h2>
-          <div className="space-y-0.5">
+          <h2 className="text-sm font-cal font-medium text-green-800 uppercase mb-2">From</h2>
+          <div className="space-y-1">
             <p className="font-cal font-medium">{businessData.companyName || "Loading Company Details..."}</p>
             <p className="font-cal font-medium">{businessData.email || "contact@company.com"}</p>
             <p className="font-cal font-medium">{businessData.address || "123 Business St"}</p>
@@ -141,39 +136,45 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
         </div>
 
         <div>
-          <div className="mb-2">
-            <h2 className="text-sm font-cal font-medium text-green-800 uppercase mb-1">Bill To</h2>
-            <div className="space-y-0.5">
+          <div className="mb-4">
+            <h2 className="text-sm font-cal font-medium text-green-800 uppercase mb-2">Bill To</h2>
+            <div className="space-y-1">
               <p className="font-cal font-medium">{data.customer.name}</p>
               <p className="font-cal font-medium">{data.customer.email}</p>
               <p className="font-cal font-medium whitespace-pre-line">{data.customer.address}</p>
             </div>
           </div>
         </div>
+
+        <div className="mt-5 font-medium w-full">
+          <p className="text-2xl text-green-800">
+            ${formatCurrency(total)} due <span className="pl-1">{formatDate(data.dueDate)}</span>
+          </p>
+        </div>
       </div>
 
       {/* Items Table */}
-      <div className="overflow-x-auto font-cal w-full mb-4">
+      <div className="overflow-x-auto font-cal w-full">
         <table className="w-full font-cal max-w-full text-sm">
           <thead className="bg-green-800 text-white">
             <tr className="border-b font-semibold">
-              <th className="py-2 px-4 first:pl-4 last:pr-4 text-left font-cal font-medium text-base text-green-100">Item</th>
-              <th className="py-2 px-4 first:pl-4 last:pr-4 text-left font-cal font-medium text-base text-green-100">Description</th>
-              <th className="py-2 px-4 first:pl-4 last:pr-4 text-right font-cal font-medium text-base text-green-100">Qty</th>
-              <th className="py-2 px-4 first:pl-4 last:pr-4 text-right font-cal font-medium text-base text-green-100">Price</th>
-              <th className="py-2 px-4 first:pl-4 last:pr-4 text-right font-cal font-medium text-base text-green-100">Amount</th>
+              <th className="py-3 px-6 first:pl-8 last:pr-8 text-left font-cal font-medium text-base text-green-100">Item</th>
+              <th className="py-3 px-6 first:pl-8 last:pr-8 text-left font-cal font-medium text-base text-green-100">Description</th>
+              <th className="py-3 px-6 first:pl-8 last:pr-8 text-right font-cal font-medium text-base text-green-100">Qty</th>
+              <th className="py-3 px-6 first:pl-8 last:pr-8 text-right font-cal font-medium text-base text-green-100">Price</th>
+              <th className="py-3 px-6 first:pl-8 last:pr-8 text-right font-cal font-medium text-base text-green-100">Amount</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y font-cal divide-gray-200">
             {data.items.map((item, i) => (
               <tr key={i} className="text-gray-900">
-                <td className="py-2 px-4 first:pl-4 last:pr-4 text-left break-words">{item.name || `Item ${i + 1}`}</td>
-                <td className="py-2 px-4 first:pl-4 last:pr-4 text-left break-words">{item.description}</td>
-                <td className="py-2 px-4 first:pl-4 last:pr-4 text-right">{item.quantity}</td>
-                <td className="py-2 px-4 first:pl-4 last:pr-4 text-right">
+                <td className="py-3 px-6 first:pl-8 last:pr-8 text-left break-words">{item.name || `Item ${i + 1}`}</td>
+                <td className="py-3 px-6 first:pl-8 last:pr-8 text-left break-words">{item.description}</td>
+                <td className="py-3 px-6 first:pl-8 last:pr-8 text-right">{item.quantity}</td>
+                <td className="py-3 px-6 first:pl-8 last:pr-8 text-right">
                   ${formatCurrency(item.price === "" ? 0 : Number(item.price))}
                 </td>
-                <td className="py-2 px-4 first:pl-4 last:pr-4 text-right font-cal font-medium">
+                <td className="py-3 px-6 first:pl-8 last:pr-8 text-right font-cal font-medium">
                   ${formatCurrency(calculateItemTotal(item).total)}
                 </td>
               </tr>
@@ -182,35 +183,37 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
         </table>
       </div>
 
-      {/* Totals */}
-      <div className="float-right w-full md:w-1/2 mb-4">
-        <table className="w-full">
-          <tbody>
-            <tr>
-              <td className="py-1 px-2 text-right text-gray-600">Subtotal</td>
-              <td className="py-1 px-2 text-right font-medium">${formatCurrency(subtotal)}</td>
-            </tr>
-            <tr>
-              <td className="py-1 px-2 text-right text-gray-600">Discount</td>
-              <td className="py-1 px-2 text-right font-medium text-gray-800">-${formatCurrency(totalDiscount)}</td>
-            </tr>
-            <tr>
-              <td className="py-1 px-2 text-right text-gray-600">Tax</td>
-              <td className="py-1 px-2 text-right font-medium text-gray-800">+${formatCurrency(totalTax)}</td>
-            </tr>
-            <tr className="border-t">
-              <td className="py-2 px-2 text-right font-bold text-green-800">Total</td>
-              <td className="py-2 px-2 text-right font-bold text-lg text-green-800">${formatCurrency(total)}</td>
-            </tr>
-          </tbody>
-        </table>
+      {/* Totals - Fixed right alignment */}
+      <div className="w-full mt-6">
+        <div className="float-right w-full md:w-1/2">
+          <table className="w-full">
+            <tbody>
+              <tr>
+                <td className="py-1 px-2 text-right text-gray-600">Subtotal</td>
+                <td className="py-1 px-2 text-right font-medium">${formatCurrency(subtotal)}</td>
+              </tr>
+              <tr>
+                <td className="py-1 px-2 text-right text-gray-600">Discount</td>
+                <td className="py-1 px-2 text-right font-medium text-gray-800">-${formatCurrency(totalDiscount)}</td>
+              </tr>
+              <tr>
+                <td className="py-1 px-2 text-right text-gray-600">Tax</td>
+                <td className="py-1 px-2 text-right font-medium text-gray-800">+${formatCurrency(totalTax)}</td>
+              </tr>
+              <tr className="border-t">
+                <td className="py-2 px-2 text-right font-bold text-green-800">Total</td>
+                <td className="py-2 px-2 text-right font-bold text-lg text-green-800">${formatCurrency(total)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Notes */}
       {data.notes && (
-        <div className="clear-both mt-4 pt-4">
-          <h2 className="text-sm font-semibold text-green-800 uppercase mb-1">Notes</h2>
-          <p className="text-gray-600 whitespace-pre-line text-sm">{data.notes}</p>
+        <div className="clear-both mt-8 pt-6">
+          <h2 className="text-sm font-semibold text-green-800 uppercase mb-2">Notes</h2>
+          <p className="text-gray-600 whitespace-pre-line">{data.notes}</p>
         </div>
       )}
     </div>

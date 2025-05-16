@@ -1119,9 +1119,9 @@ ${businessData.phone}`
 
           {/* Invoice Preview - Modified print wrapper */}
           <div className="invoice-preview-print" style={{ backgroundColor: 'white' }}>
-            <div className="bg-white border rounded-lg p-6">
-              <div className="w-full overflow-auto">
-                <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
+          <div className="bg-white border rounded-lg p-6">
+            <div className="w-full overflow-auto">
+              <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
               </div>
             </div>
           </div>
@@ -1463,8 +1463,8 @@ ${businessData.phone}`
               <div className="sticky top-4">
                 {/* Add a print-specific wrapper */}
                 <div className="invoice-preview-print" style={{ backgroundColor: 'white' }}>
-                  <div className="bg-white border rounded-lg p-6">
-                    <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
+                <div className="bg-white border rounded-lg p-6">
+                  <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
                   </div>
                 </div>
               </div>

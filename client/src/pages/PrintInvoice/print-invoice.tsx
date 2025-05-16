@@ -153,20 +153,22 @@ export default function PrintInvoice() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="mt-4 mb-6">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Invoices</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+      {/* Improved Breadcrumb Navigation */}
+      <div className="w-full flex justify-center bg-white border-b mb-8 py-4 px-4 sm:px-8">
+        <div className="max-w-4xl w-full">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Invoices</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
       </div>
-
       {/* Print-friendly header - only visible when not printing */}
       <div className="print:hidden bg-white border-b p-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
@@ -180,7 +182,6 @@ export default function PrintInvoice() {
           </Button>
         </div>
       </div>
-
       {/* Invoice content - visible both on screen and when printing */}
       <div className="max-w-4xl mx-auto p-8">
         <div className="bg-white">
@@ -191,36 +192,6 @@ export default function PrintInvoice() {
           />
         </div>
       </div>
-
-      {/* Print styles */}
-      <style>
-        {`
-          @media print {
-            /* Hide the header when printing */
-            .print\\:hidden {
-              display: none !important;
-            }
-            
-            /* Reset page margins */
-            @page {
-              margin: 0;
-              size: A4;
-            }
-            
-            /* Ensure proper page breaks */
-            .invoice-page {
-              page-break-after: always;
-              page-break-inside: avoid;
-            }
-            
-            /* Ensure proper colors in print */
-            body {
-              -webkit-print-color-adjust: exact !important;
-              print-color-adjust: exact !important;
-            }
-          }
-        `}
-      </style>
       <footer className="w-full font-inter  text-center text-md text-gray-400 mt-10 mb-2">
         Powered by <span className=" font-inter font-medium text-green-800">SheetBills™</span>
       </footer>

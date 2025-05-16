@@ -129,20 +129,21 @@ export default function EmailInvoice() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="mt-4 mb-6">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Invoices</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+      <div className="w-full flex justify-center bg-white border-b mb-8 py-4 px-4 sm:px-8">
+        <div className="max-w-5xl w-full">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Invoices</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
       </div>
-
       <div className="max-w-5xl mx-auto p-8">
         <h1 className="text-2xl font-medium mb-6">Send Invoice Email</h1>
         <div className="mb-4">

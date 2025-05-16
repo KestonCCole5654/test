@@ -121,7 +121,7 @@ export default function EmailInvoice() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-xl mx-auto p-8">
+      <div className="max-w-7xl mx-auto p-8">
         <h1 className="text-2xl font-bold mb-6">Send Invoice Email</h1>
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">To</label>

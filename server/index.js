@@ -798,7 +798,6 @@ app.delete('/api/sheets/delete-invoice', async (req, res) => {
 });
 
 // Add this to your server/index.js
-
 app.get('/api/invoices/:invoiceId', async (req, res) => {
   try {
     const { invoiceId } = req.params;
@@ -1050,7 +1049,6 @@ app.get('/api/sheets/data', async (req, res) => {
   }
 });
 
-
 // fetch spreadsheets
 app.get('/api/sheets/spreadsheets', async (req, res) => {
   try {
@@ -1209,7 +1207,6 @@ app.post('/api/saveInvoice', async (req, res) => {
     });
   }
 });
-
 
 
 ////////////////////////////////////////////////////////////////////

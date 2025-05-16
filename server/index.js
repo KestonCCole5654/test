@@ -796,6 +796,93 @@ app.delete('/api/sheets/delete-invoice', async (req, res) => {
     });
   }
 });
+
+// Add this to your server/index.js
+
+app.get('/api/invoices/:invoiceId', async (req, res) => {
+  try {
+    const { invoiceId } = req.params;
+    const { sheetUrl } = req.query;
+
+    // Validate input
+    if (!invoiceId || !sheetUrl) {
+      return res.status(400).json({ error: 'Missing invoiceId or sheetUrl' });
+    }
+
+    // Extract spreadsheetId from sheetUrl
+    const spreadsheetId = extractSheetIdFromUrl(sheetUrl);
+    if (!spreadsheetId) {
+      return res.status(400).json({ error: 'Invalid sheetUrl' });
+    }
+
+    // Auth: get Google token from headers
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Google authentication required' });
+    }
+    const googleToken = authHeader.split(' ')[1];
+
+    // Initialize Google Sheets API
+    const auth = new google.auth.OAuth2();
+    auth.setCredentials({ access_token: googleToken });
+    const sheets = google.sheets({ version: 'v4', auth });
+
+    // Find the correct sheet/tab
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
+    const invoiceSheet = spreadsheet.data.sheets.find(
+      s => s.properties.title === "SheetBills Invoices"
+    );
+    if (!invoiceSheet) {
+      return res.status(404).json({ error: 'SheetBills Invoices tab not found' });
+    }
+    const sheetName = invoiceSheet.properties.title;
+
+    // Fetch all invoice rows
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${sheetName}!A2:M`,
+    });
+
+    const rows = response.data.values || [];
+    const row = rows.find(r => r[0] === invoiceId);
+    if (!row) {
+      return res.status(404).json({ error: 'Invoice not found' });
+    }
+
+    // Parse items, tax, discount, customer
+    let items = [];
+    let tax = { type: 'percentage', value: 0 };
+    let discount = { type: 'percentage', value: 0 };
+    try { items = JSON.parse(row[6] || '[]'); } catch {}
+    try { tax = JSON.parse(row[8] || '{"type":"percentage","value":0}'); } catch {}
+    try { discount = JSON.parse(row[9] || '{"type":"percentage","value":0}'); } catch {}
+
+    // Build invoice object
+    const invoice = {
+      id: row[0],
+      invoiceNumber: row[0],
+      date: row[1],
+      dueDate: row[2],
+      customer: {
+        name: row[3],
+        email: row[4],
+        address: row[5],
+      },
+      items,
+      amount: parseFloat(row[7]) || 0,
+      tax,
+      discount,
+      notes: row[10],
+      template: row[11] || 'classic',
+      status: row[12] || 'Pending',
+    };
+
+    res.json({ invoice });
+  } catch (error) {
+    console.error('Error fetching invoice:', error);
+    res.status(500).json({ error: 'Failed to fetch invoice', details: error.message });
+  }
+});
 // fetch invoices from google sheets to dashbaord
 
 app.get('/api/sheets/data', async (req, res) => {

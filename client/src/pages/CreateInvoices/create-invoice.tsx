@@ -1066,7 +1066,13 @@ ${businessData.phone}`
               </Button>
             </div>
             <div className="col-span-2 flex justify-center mt-4">
-              <Button variant="outline" className="font-light mx-2" onClick={handleEmailInvoice}>Email Invoice</Button>
+              <Button 
+                variant="outline" 
+                className="font-light mx-2" 
+                onClick={() => navigate(`/email-invoice/${invoiceToEdit?.id || invoiceData.invoiceNumber}`)}
+              >
+                Email Invoice
+              </Button>
               <Button 
                 variant="outline" 
                 className="font-light mx-2" 

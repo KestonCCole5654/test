@@ -917,7 +917,7 @@ export default function Dashboard() {
                       <TableCell className="px-6 py-4 whitespace-nowrap">{invoice.id}</TableCell>
                       <TableCell className="px-6 py-4">
                         <div className="flex flex-col">
-                          <span className="font-medium font-inter">
+                          <span className="font-medium font-">
                             {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}
                           </span>
                           <span className="text-xs text-gray-400">
@@ -928,19 +928,19 @@ export default function Dashboard() {
                       <TableCell className="px-6 py-4 whitespace-nowrap">{formatDate(invoice.dueDate)}</TableCell>
                       <TableCell className="px-6 py-4">
                         {invoice.status === "Paid" ? (
-                              <span className="inline-block px-3 py-1 rounded-md border border-green-200 bg-green-50 text-green-700 text-xs font-medium font-inter">
+                              <span className="inline-block px-3 py-1 rounded-md border border-green-200 bg-green-50 text-green-700 text-xs font-medium font-">
                             Paid
                           </span>
                             ) : invoice.status === "Pending" && getOverdueDays(invoice.dueDate) > 0 ? (
-                              <span className="inline-block px-3 py-1 rounded-md border border-amber-200 bg-amber-50 text-amber-700 text-xs font-medium font-inter">
+                              <span className="inline-block px-3 py-1 rounded-md border border-amber-200 bg-amber-50 text-amber-700 text-xs font-medium font-">
                                 Pending
                           </span>
                         ) : invoice.status === "Pending" ? (
-                              <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium font-inter">
+                              <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium font-">
                             Pending
                           </span>
                         ) : (
-                          <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium font-inter">
+                          <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium font-">
                             {invoice.status}
                           </span>
                         )}
@@ -1070,7 +1070,7 @@ export default function Dashboard() {
 
         {/* Pagination Controls */}
         {totalPages > 1 && (
-          <div className="flex font-inter items-center justify-between px-4 py-3 border-t border-gray-200 bg-white">
+          <div className="flex font- items-center justify-between px-4 py-3 border-t border-gray-200 bg-white">
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
@@ -1107,10 +1107,10 @@ export default function Dashboard() {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-inter font-medium" >Are you sure you want to delete this invoice?</AlertDialogTitle>
-            <AlertDialogDescription className="font-inter text-gray-700">
+            <AlertDialogTitle className="font-cal-sans font-medium" >Are you sure you want to delete this invoice?</AlertDialogTitle>
+            <AlertDialogDescription className="font-cal-sans text-gray-700">
               This action cannot be undone. This will permanently delete the invoice
-              {invoiceToDelete ? <span className="font-medium font-inter"> #{invoiceToDelete.id}</span> : null}.
+              {invoiceToDelete ? <span className="font-medium font-cal-sans"> #{invoiceToDelete.id}</span> : null}.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -1161,7 +1161,7 @@ export default function Dashboard() {
                   setIsDeleteDialogOpen(false)
                 }
               }}
-              className="bg-gray-800 font-inter focus:ring-gray-800"
+              className="bg-gray-800 font- focus:ring-gray-800"
             >
               Delete
             </AlertDialogAction>
@@ -1173,14 +1173,14 @@ export default function Dashboard() {
       <AlertDialog open={isBulkDeleteDialogOpen} onOpenChange={setIsBulkDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure you want to delete these invoices?</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="font-cal-sans font-medium">Are you sure you want to delete these invoices?</AlertDialogTitle>
+            <AlertDialogDescription className="font-cal-sans text-gray-700">
               This action cannot be undone. This will permanently delete {selectedInvoices.size} selected invoice(s).
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleBulkDelete} className="bg-gray-800 font-inter focus:ring-gray-800">
+            <AlertDialogCancel className="font-cal-sans">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkDelete} className="bg-gray-800 font-cal-sans focus:ring-gray-800">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

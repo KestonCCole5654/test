@@ -87,19 +87,19 @@ export default function ContactPage() {
     <div className="min-h-screen w-full bg-gray-50">
       <div className="container max-w-3xl mx-auto px-4 py-8">
         {/* Breadcrumb Navigation */}
-        <Breadcrumb className="mb-6">
+        <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Contact & Support</BreadcrumbPage>
+              <BreadcrumbPage>Invoices</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
-        <div className="space-y-6">
+        <div className="space-y-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Contact Form */}
           <Card>
             <CardHeader>

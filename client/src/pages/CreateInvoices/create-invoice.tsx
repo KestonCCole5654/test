@@ -1070,7 +1070,7 @@ ${businessData.phone}`
               <Button 
                 variant="outline" 
                 className="font-light mx-2" 
-                onClick={() => navigate(`/print-invoice/${invoiceData.invoiceNumber}`)}
+                onClick={() => navigate(`/print-invoice/${invoiceToEdit?.id || invoiceData.invoiceNumber}`)}
               >
                 Print Invoice
               </Button>
@@ -1443,7 +1443,7 @@ ${businessData.phone}`
                   )}
                   <Button 
                     variant="outline" 
-                    onClick={() => navigate(`/print-invoice/${invoiceData.invoiceNumber}`)}
+                    onClick={() => navigate(`/print-invoice/${invoiceToEdit?.id || invoiceData.invoiceNumber}`)}
                     className="font-medium"
                   >
                     Print Invoice

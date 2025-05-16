@@ -10,55 +10,42 @@
 @media print {
   @page {
     size: A4;
-    margin: 0;
+    margin: 0.5cm;
   }
-  body * {
-    visibility: hidden !important;
-  }
-  #invoice-print-area, #invoice-print-area * {
-    visibility: visible !important;
-  }
-  #invoice-print-area {
-    width: 210mm !important;
-    height: 297mm !important;
-    max-width: 210mm !important;
-    margin: 0 auto !important;
-    padding:  0mm !important;
-    box-sizing: border-box !important;
-    background: white !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-    display: block !important;
-  }
-  #invoice-print-area * {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-  /* Remove box shadows and borders for print */
-  #invoice-print-area .shadow,
-  #invoice-print-area .shadow-md,
-  #invoice-print-area .shadow-sm {
-    box-shadow: none !important;
-  }
-  #invoice-print-area .border,
-  #invoice-print-area .border-gray-200 {
-    border: 1px solid #ccc !important;
-  }
-  /* Hide navigation, buttons, etc. */
-  .no-print, .no-print * {
+  
+  /* Hide elements that shouldn't be printed */
+  .print\\:hidden,
+  .no-print {
     display: none !important;
   }
-  #invoice-print-area .bg-green-500 {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    margin-top: 0 !important;
-    height: 8px !important;
+  
+  /* Ensure the invoice content is visible and properly formatted */
+  .max-w-4xl {
     width: 100% !important;
-    background-color: #22c55e !important; /* Tailwind green-500 */
-    display: block !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Remove shadows and adjust borders for print */
+  .shadow,
+  .shadow-md,
+  .shadow-sm {
+    box-shadow: none !important;
+  }
+  
+  /* Ensure proper page breaks */
+  .bg-white {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  
+  /* Ensure background colors print */
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }
-
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {

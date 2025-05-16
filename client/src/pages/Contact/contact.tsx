@@ -111,7 +111,7 @@ export default function ContactPage() {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <label htmlFor="email" className="text-sm font-semibold">
+                  <label htmlFor="email" className="text-sm font-medium">
                     Email Address
                   </label>
                   <Input
@@ -124,7 +124,7 @@ export default function ContactPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="subject" className="text-sm font-semibold">
+                  <label htmlFor="subject" className="text-sm font-med">
                     Subject
                   </label>
                   <Input
@@ -136,7 +136,7 @@ export default function ContactPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="message" className="text-sm font-semibold">
+                  <label htmlFor="message" className="text-sm font-med">
                     Message
                   </label>
                   <Textarea
@@ -179,7 +179,7 @@ export default function ContactPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-base text-gray-700 font-semibold mb-2">
+              <p className="text-base text-gray-700 font-med mb-2">
                 We typically respond to all inquiries within 24-48 hours
               </p>
             </CardContent>

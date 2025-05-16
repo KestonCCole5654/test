@@ -959,6 +959,13 @@ export default function Dashboard() {
                                 if (sessionError) {
                                   throw new Error(sessionError.message)
                                 }
+
+                                // Find the invoices sheet and validate it exists
+                                const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
+                                if (!invoicesSheet?.sheetUrl) {
+                                  throw new Error("Invoice spreadsheet not found. Please ensure you have access to the SheetBills Invoices spreadsheet.")
+                                }
+
                                 const response = await fetch(
                                   "https://sheetbills-server.vercel.app/api/sheets/mark-as-paid",
                                   {
@@ -970,7 +977,7 @@ export default function Dashboard() {
                                     },
                                     body: JSON.stringify({
                                       invoiceId: invoice.id,
-                                      sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
+                                      sheetUrl: invoicesSheet.sheetUrl,
                                     }),
                                   },
                                 )

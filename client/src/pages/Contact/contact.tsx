@@ -6,9 +6,8 @@ import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Textarea } from "../../components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card"
-import { Loader2, ArrowLeft, Mail, MessageSquare, HelpCircle, Send } from "lucide-react"
+import { Loader2, Send } from "lucide-react"
 import { toast } from "../../components/ui/use-toast"
-import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar"
 import supabase from "../../components/Auth/supabaseClient"
 import {
   Breadcrumb,
@@ -85,10 +84,10 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen w-full">
-      {/* Breadcrumb Navigation */}
-      <div className="container max-w-7xl mx-auto px-4 mt-4">
-        <Breadcrumb>
+    <div className="min-h-screen w-full bg-gray-50">
+      <div className="container max-w-3xl mx-auto px-4 py-8">
+        {/* Breadcrumb Navigation */}
+        <Breadcrumb className="mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
@@ -99,55 +98,18 @@ export default function ContactPage() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-      </div>
 
-      {/* Premium Welcome Header */}
-      <div className="max-w-7xl mx-auto bg-gradient-to-r from-emerald-600 to-emerald-400 py-10 shadow-lg rounded-b-3xl">
-        <div className="container max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between">
-          <div className="flex items-center gap-6">
-            
-            <div className="relative">
-              <Avatar className="h-16 w-16 ring-4 ring-white shadow-lg">
-                {user?.user_metadata?.avatar_url ? (
-                  <AvatarImage src={user.user_metadata.avatar_url} alt={user.email} />
-                ) : (
-                  <AvatarFallback>
-                    {user?.email?.[0]?.toUpperCase() || "U"}
-                  </AvatarFallback>
-                )}
-              </Avatar>
-              <span className="absolute bottom-0 right-0 bg-gradient-to-tr from-yellow-400 to-yellow-600 text-white text-xs px-2 py-0.5 rounded-full shadow-md font-semibold border-2 border-white">
-                PRO
-              </span>
-            </div>
-            <div>
-              <h2 className="text-3xl font-extrabold text-white drop-shadow-lg flex items-center gap-2">
-                Contact & Support
-                <span className="ml-2 animate-bounce text-yellow-300 text-2xl">💬</span>
-              </h2>
-              <p className="text-slate-100 mt-2 text-lg font-medium">
-                We're here to help with any questions or issues
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="container max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-6">
           {/* Contact Form */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="h-5 w-5 text-green-600" />
-                Send us a Message
-              </CardTitle>
+              <CardTitle>Contact Us</CardTitle>
               <CardDescription>
                 Fill out the form below and we'll get back to you as soon as possible
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <label htmlFor="email" className="text-sm font-medium">
                     Email Address
@@ -159,7 +121,6 @@ export default function ContactPage() {
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     required
                     disabled={!!user?.email}
-                    className="bg-gray-50"
                   />
                 </div>
                 <div className="space-y-2">
@@ -172,7 +133,6 @@ export default function ContactPage() {
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                     required
                     placeholder="What's this about?"
-                    className="bg-gray-50"
                   />
                 </div>
                 <div className="space-y-2">
@@ -185,13 +145,13 @@ export default function ContactPage() {
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     required
                     placeholder="Describe your issue or question in detail..."
-                    className="min-h-[200px] bg-gray-50"
+                    className="min-h-[200px]"
                   />
                 </div>
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800"
+                  className="w-full"
                 >
                   {isSubmitting ? (
                     <>
@@ -212,40 +172,15 @@ export default function ContactPage() {
           {/* Support Info */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <HelpCircle className="h-5 w-5 text-green-600" />
-                Support Information
-              </CardTitle>
+              <CardTitle>Support Information</CardTitle>
               <CardDescription>
-                Here are some ways to get help and support
+                For general inquiries and support, email us at support@sheetbills.com
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-start gap-4">
-                  <div className="p-2 bg-green-50 rounded-lg">
-                    <Mail className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium">Email Support</h3>
-                    <p className="text-sm text-gray-500">
-                      For general inquiries and support, email us at support@sheetbills.com
-                    </p>
-                  </div>
-                </div>
-               
-                <div className="flex items-start gap-4">
-                  <div className="p-2 bg-green-50 rounded-lg">
-                    <MessageSquare className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium">Response Time</h3>
-                    <p className="text-sm text-gray-500">
-                      We typically respond to all inquiries within 24-48 hours
-                    </p>
-                  </div>
-                </div>
-              </div>
+            <CardContent>
+              <p className="text-sm text-gray-500">
+                We typically respond to all inquiries within 24-48 hours
+              </p>
             </CardContent>
           </Card>
         </div>

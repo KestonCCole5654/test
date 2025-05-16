@@ -7,6 +7,14 @@ import { ArrowLeft, Mail } from "lucide-react"
 import supabase from "../../components/Auth/supabaseClient"
 import axios from "axios"
 import { useToast } from "../../components/ui/use-toast"
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "../../components/ui/breadcrumb"
 
 export default function EmailInvoice() {
   const { invoiceId } = useParams<{ invoiceId: string }>()
@@ -121,6 +129,20 @@ export default function EmailInvoice() {
 
   return (
     <div className="min-h-screen bg-white">
+      <div className="mt-4 mb-6">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Invoices</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
+
       <div className="max-w-5xl mx-auto p-8">
         <h1 className="text-2xl font-medium mb-6">Send Invoice Email</h1>
         <div className="mb-4">

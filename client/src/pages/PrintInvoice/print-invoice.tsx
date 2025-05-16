@@ -8,6 +8,14 @@ import InvoiceClassic from "../../components/InvoiceClassic"
 import supabase from "../../components/Auth/supabaseClient"
 import axios from "axios"
 import { useToast } from "../../components/ui/use-toast"
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "../../components/ui/breadcrumb"
 
 // Import the same interfaces from create-invoice
 import { InvoiceData, BusinessData } from "../CreateInvoices/create-invoice"
@@ -16,7 +24,7 @@ export default function PrintInvoice() {
   const { invoiceId } = useParams<{ invoiceId: string }>()
   const navigate = useNavigate()
   const { toast } = useToast()
-  
+
   // State for invoice and business data
   const [invoiceData, setInvoiceData] = useState<InvoiceData | null>(null)
   const [businessData, setBusinessData] = useState<BusinessData | null>(null)
@@ -145,6 +153,20 @@ export default function PrintInvoice() {
 
   return (
     <div className="min-h-screen bg-white">
+      <div className="mt-4 mb-6">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Invoices</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
+
       {/* Print-friendly header - only visible when not printing */}
       <div className="print:hidden bg-white border-b p-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
@@ -162,9 +184,9 @@ export default function PrintInvoice() {
       {/* Invoice content - visible both on screen and when printing */}
       <div className="max-w-4xl mx-auto p-8">
         <div className="bg-white">
-          <InvoiceClassic 
-            data={invoiceData} 
-            businessData={businessData} 
+          <InvoiceClassic
+            data={invoiceData}
+            businessData={businessData}
             showShadow={false}
           />
         </div>

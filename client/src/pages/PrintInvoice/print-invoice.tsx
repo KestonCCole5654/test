@@ -171,7 +171,7 @@ export default function PrintInvoice() {
       </div>
       {/* Print-friendly header - only visible when not printing */}
       <div className="print:hidden bg-white border-b p-4">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
+        <div className="max-w-4xl mx-auto flex justify-between items-center">
           <Button onClick={handleBack} variant="outline" size="sm">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back

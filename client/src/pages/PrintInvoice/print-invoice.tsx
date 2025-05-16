@@ -185,6 +185,7 @@ export default function PrintInvoice() {
       {/* Invoice content - visible both on screen and when printing */}
       <div className="max-w-4xl mx-auto p-8">
         <div className="bg-white">
+        <div>TEST</div>
           <InvoiceClassic
             data={invoiceData}
             businessData={businessData}
@@ -195,6 +196,31 @@ export default function PrintInvoice() {
       <footer className="w-full font-inter  text-center text-md text-gray-400 mt-10 mb-2">
         Powered by <span className=" font-inter font-medium text-green-800">SheetBills™</span>
       </footer>
+      <style>
+        {`
+          @media print {
+            .shadow-md, .shadow {
+              box-shadow: none !important;
+            }
+            .overflow-x-auto {
+              overflow: visible !important;
+            }
+            .float-right {
+              float: none !important;
+            }
+            .max-w-full, .w-full {
+              max-width: 100% !important;
+              width: 100% !important;
+            }
+            body {
+              background: white !important;
+              color: black !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+          }
+        `}
+      </style>
     </div>
   )
 } 

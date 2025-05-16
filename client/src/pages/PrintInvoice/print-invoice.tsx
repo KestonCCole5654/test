@@ -186,6 +186,7 @@ export default function PrintInvoice() {
       
       {/* Invoice content - visible both on screen and when printing */}
       <div className="print:p-0 max-w-4xl mx-auto p-8">
+        <div style={{ color: 'red', fontSize: 32 }}>TEST PRINT</div>
         <div className="bg-white print:shadow-none">
           <InvoiceClassic
             data={invoiceData}

@@ -25,38 +25,62 @@ import {
 } from "../../components/ui/breadcrumb"
 import InvoiceClassic from "../../components/InvoiceClassic"
 
-// Add these print styles at the top of the file, after the imports
+// Replace the printStyles constant with this updated version
 const printStyles = `
   @media print {
-    /* Hide all UI elements except the invoice */
-    body * {
-      visibility: hidden;
+    /* Reset page margins and hide unnecessary elements */
+    @page {
+      margin: 0;
+      size: A4;
     }
-    
-    /* Show only the invoice preview */
-    .invoice-preview-print,
-    .invoice-preview-print * {
-      visibility: visible;
-    }
-    
-    /* Position the invoice preview */
-    .invoice-preview-print {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-    }
-    
-    /* Hide buttons and other UI elements */
-    .no-print {
+
+    /* Hide navigation, buttons, and other UI elements */
+    nav, 
+    button,
+    .no-print,
+    .breadcrumb,
+    .sticky,
+    .grid > div:not(.invoice-preview-print) {
       display: none !important;
     }
-    
-    /* Reset any background colors */
+
+    /* Show the invoice preview container */
     .invoice-preview-print {
+      display: block !important;
+      position: relative !important;
+      left: 0 !important;
+      top: 0 !important;
+      width: 100% !important;
+      margin: 0 !important;
+      padding: 20px !important;
       background: white !important;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
+      page-break-after: always !important;
+      page-break-inside: avoid !important;
+    }
+
+    /* Ensure the invoice content is visible */
+    .invoice-preview-print * {
+      visibility: visible !important;
+      color: black !important;
+    }
+
+    /* Reset any background colors and ensure text is black */
+    body {
+      background: white !important;
+      color: black !important;
+    }
+
+    /* Ensure proper layout in print mode */
+    .grid {
+      display: block !important;
+    }
+
+    /* Remove any shadows or decorative elements */
+    * {
+      box-shadow: none !important;
+      text-shadow: none !important;
     }
   }
 `;
@@ -1081,10 +1105,12 @@ ${businessData.phone}`
             )}
           </div>
 
-          {/* Invoice Preview - Cleaned up */}
-          <div className="bg-white border rounded-lg p-6 invoice-preview-print">
-            <div className="w-full overflow-auto">
-              <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
+          {/* Invoice Preview - Modified print wrapper */}
+          <div className="invoice-preview-print" style={{ backgroundColor: 'white' }}>
+            <div className="bg-white border rounded-lg p-6">
+              <div className="w-full overflow-auto">
+                <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
+              </div>
             </div>
           </div>
         </div>
@@ -1419,8 +1445,11 @@ ${businessData.phone}`
             {/* Preview Section - Modified for proper printing */}
             <div className="lg:col-span-1">
               <div className="sticky top-4">
-                <div className="bg-white border rounded-lg p-6 invoice-preview-print">
-                  <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
+                {/* Add a print-specific wrapper */}
+                <div className="invoice-preview-print" style={{ backgroundColor: 'white' }}>
+                  <div className="bg-white border rounded-lg p-6">
+                    <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
+                  </div>
                 </div>
               </div>
             </div>

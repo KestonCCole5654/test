@@ -103,7 +103,7 @@ export default function ContactPage() {
           {/* Contact Form */}
           <Card className="bg-white border border-gray-200 shadow-none">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold">Contact Us</CardTitle>
+              <CardTitle className="text-2xl font-medium">Contact Us</CardTitle>
               <CardDescription className="text-gray-600">
                 Fill out the form below and we'll get back to you as soon as possible
               </CardDescription>
@@ -124,7 +124,7 @@ export default function ContactPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="subject" className="text-sm font-med">
+                  <label htmlFor="subject" className="text-sm font-medium">
                     Subject
                   </label>
                   <Input
@@ -136,7 +136,7 @@ export default function ContactPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="message" className="text-sm font-med">
+                  <label htmlFor="message" className="text-sm font-medium">
                     Message
                   </label>
                   <Textarea
@@ -173,13 +173,13 @@ export default function ContactPage() {
           {/* Support Info */}
           <Card className="bg-white border border-gray-200 shadow-none">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold">Support Information</CardTitle>
+              <CardTitle className="text-2xl font-medium">Support Information</CardTitle>
               <CardDescription className="text-gray-600">
                 For general inquiries and support, email us at support@sheetbills.com
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-base text-gray-700 font-med mb-2">
+              <p className="text-base text-gray-700 font-medium mb-2">
                 We typically respond to all inquiries within 24-48 hours
               </p>
             </CardContent>

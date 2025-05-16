@@ -230,9 +230,9 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="container max-w-7xl mx-auto px-4">
+    <div className="container max-w-3xl mx-auto px-4 py-8">
       {/* Breadcrumb Navigation */}
-      <div className="mt-4 mb-6">
+      <div className="mb-6">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -246,66 +246,33 @@ export default function SettingsPage() {
         </Breadcrumb>
       </div>
 
-      {/* Premium Welcome Header for Settings */}
-      <div className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 py-10 shadow-lg rounded-b-3xl mb-10">
-        <div className="container max-w-3xl mx-auto flex flex-col items-center justify-center">
-          <Avatar className="h-24 w-24 ring-4 ring-white shadow-lg mb-4">
-            {userData.avatarUrl ? (
-              <AvatarImage src={userData.avatarUrl} alt={userData.name} />
-            ) : (
-              <AvatarFallback className="text-2xl">
-                {userData.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")
-                  .toUpperCase()}
-              </AvatarFallback>
-            )}
-          </Avatar>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-2xl font-bold text-white">{userData.name || "—"}</span>
-            <span className="bg-gradient-to-tr from-yellow-400 to-yellow-600 text-white text-xs px-2 py-0.5 rounded-full shadow-md font-semibold border-2 border-white">
-              PRO
-            </span>
-          </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight mb-1 text-center">
-            Account & Business Settings
-          </h1>
-          <p className="text-lg text-emerald-50 text-center max-w-2xl">
-            Manage your account, business profile, and billing details all in one place. Keep your information up to date for a seamless SheetBills experience.
-          </p>
-        </div>
-      </div>
-
       {/* User Information Card */}
-      <Card className="mb-8 shadow-lg border border-emerald-100">
-        <CardHeader className="flex  mb-6 flex-row items-center justify-between bg-emerald-50 rounded-t-lg">
-          <div>
-            <CardTitle>Account Information</CardTitle>
-            <CardDescription>These details are used to identify you and your account</CardDescription>
-          </div>
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Account Information</CardTitle>
+          <CardDescription>These details are used to identify you and your account</CardDescription>
         </CardHeader>
         <CardContent>
           <dl className="grid grid-cols-1 mt-6 md:grid-cols-2 gap-x-8 gap-y-4">
             <div>
-              <dt className="text-sm text-muted-foreground flex items-center gap-1">Full Name</dt>
+              <dt className="text-sm text-muted-foreground">Full Name</dt>
               <dd className="font-medium">{userData.name || "—"}</dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground flex items-center gap-1">Email</dt>
+              <dt className="text-sm text-muted-foreground">Email</dt>
               <dd className="font-medium">{userData.email || "—"}</dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground flex items-center gap-1">Account Created</dt>
+              <dt className="text-sm text-muted-foreground">Account Created</dt>
               <dd>{formatDate(userData.createdAt)}</dd>
             </div>
             <div>
-              <dt className="text-sm text-muted-foreground flex items-center gap-1">Last Login</dt>
+              <dt className="text-sm text-muted-foreground">Last Login</dt>
               <dd>{userData.lastLogin ? formatDate(userData.lastLogin) : "—"}</dd>
             </div>
             {userData.phone && (
               <div>
-                <dt className="text-sm text-muted-foreground flex items-center gap-1">Phone</dt>
+                <dt className="text-sm text-muted-foreground">Phone</dt>
                 <dd>{userData.phone}</dd>
               </div>
             )}
@@ -314,19 +281,19 @@ export default function SettingsPage() {
       </Card>
 
       {/* Business Information Card */}
-      <Card className="mb-8 shadow-lg border border-emerald-100">
-        <CardHeader className="flex mb-6 flex-row items-center justify-between bg-emerald-50 rounded-t-lg">
+      <Card className="mb-8">
+        <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>Business Information</CardTitle>
             <CardDescription>These details appear on your invoices and documents</CardDescription>
           </div>
           {!isEditing ? (
-            <Button variant="outline" size="sm" className="text-white" onClick={() => setIsEditing(true)}>
+            <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
               <Edit className="h-4 w-4 mr-2" />
               Edit
             </Button>
           ) : (
-            <Button variant="outline" size="sm" className="text-white" onClick={() => {
+            <Button variant="outline" size="sm" onClick={() => {
               setIsEditing(false);
               fetchData();
             }}>
@@ -402,7 +369,6 @@ export default function SettingsPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="border-green-600 text-white"
                   onClick={() => setIsEditing(false)}
                 >
                   Cancel
@@ -410,7 +376,7 @@ export default function SettingsPage() {
                 <Button
                   type="submit"
                   disabled={isUpdatingBusiness}
-                  className="min-w-[120px] bg-green-600 text-white hover:bg-green-700"
+                  className="min-w-[120px]"
                 >
                   {isUpdatingBusiness ? (
                     <>

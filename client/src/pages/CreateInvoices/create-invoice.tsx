@@ -25,6 +25,41 @@ import {
 } from "../../components/ui/breadcrumb"
 import InvoiceClassic from "../../components/InvoiceClassic"
 
+// Add these print styles at the top of the file, after the imports
+const printStyles = `
+  @media print {
+    /* Hide all UI elements except the invoice */
+    body * {
+      visibility: hidden;
+    }
+    
+    /* Show only the invoice preview */
+    .invoice-preview-print,
+    .invoice-preview-print * {
+      visibility: visible;
+    }
+    
+    /* Position the invoice preview */
+    .invoice-preview-print {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+    }
+    
+    /* Hide buttons and other UI elements */
+    .no-print {
+      display: none !important;
+    }
+    
+    /* Reset any background colors */
+    .invoice-preview-print {
+      background: white !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+  }
+`;
 
 export interface InvoiceData {
   invoiceNumber: string
@@ -952,6 +987,19 @@ ${businessData.phone}`
     }
   }
 
+  // Add useEffect to inject print styles
+  useEffect(() => {
+    // Create style element
+    const styleElement = document.createElement('style');
+    styleElement.textContent = printStyles;
+    document.head.appendChild(styleElement);
+
+    // Cleanup
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
+
   return (
     <>
       {/* Preview Mode - Cleaned up */}
@@ -1034,7 +1082,7 @@ ${businessData.phone}`
           </div>
 
           {/* Invoice Preview - Cleaned up */}
-          <div className="bg-white border rounded-lg p-6">
+          <div className="bg-white border rounded-lg p-6 invoice-preview-print">
             <div className="w-full overflow-auto">
               <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
             </div>
@@ -1368,10 +1416,10 @@ ${businessData.phone}`
               </CollapsibleContent>
             </Collapsible>
 
-            {/* Preview Section - Cleaned up */}
+            {/* Preview Section - Modified for proper printing */}
             <div className="lg:col-span-1">
               <div className="sticky top-4">
-                <div className="bg-white border rounded-lg p-6">
+                <div className="bg-white border rounded-lg p-6 invoice-preview-print">
                   <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
                 </div>
               </div>

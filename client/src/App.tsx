@@ -22,6 +22,7 @@ import { LoadingSpinner } from "./components/ui/loadingSpinner";
 import AuthCallback from './pages/auth-callback'
 import PublicInvoice from "./pages/PublicInvoice/PublicInvoice";
 import PrintInvoice from './pages/PrintInvoice/print-invoice';
+import EmailInvoice from './pages/EmailInvoice/email-invoice';
 // import TemplateDesignerPage from './components/TemplateDesigner/TemplateDesignerPage';
 
 
@@ -182,6 +183,7 @@ function App() {
           <Route path="/invoices" element={<Dashboard />} />
           <Route path="/create-invoice" element={<InvoiceForm />} />
           <Route path="/print-invoice/:invoiceId" element={<PrintInvoice />} />
+          <Route path="/email-invoice/:invoiceId" element={<EmailInvoice />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/contact" element={<ContactPage />} />
         </Route>

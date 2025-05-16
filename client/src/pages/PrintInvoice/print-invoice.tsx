@@ -206,16 +206,39 @@ export default function PrintInvoice() {
         @media print {
           @page {
             margin: 0.5cm;
-            size: auto;
+            size: A4 portrait;
           }
           
           body {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
+            background: white !important;
           }
           
           .print\\:hidden {
             display: none !important;
+          }
+
+          /* Ensure invoice fits on one page */
+          .bg-white {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            max-height: 100vh !important;
+            overflow: hidden !important;
+          }
+
+          /* Remove any extra spacing */
+          .max-w-4xl {
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+
+          /* Ensure proper scaling */
+          html, body {
+            width: 210mm;
+            height: 297mm;
           }
         }
       `}</style>

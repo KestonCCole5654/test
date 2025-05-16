@@ -116,7 +116,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
       {/* Header with logo */}
       <div className="flex justify-between mt-4 items-center mb-8">
         <div>
-          <h1 className="text-2xl font-cal-sans font-medium text-green-800">INVOICE</h1>
+          <h1 className="text-2xl font-cal-sans font-semibold text-green-800">INVOICE</h1>
           <div className="space-y-1 mt-2">
             <p className="text-sm font-cal-sans font-light text-gray-500">Invoice number: {data.invoiceNumber}</p>
             <p className="text-sm font-cal font-light text-gray-500">Invoice Created: {formatDate(data.date)}</p>
@@ -147,7 +147,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
         </div>
 
         <div className="mt-5 font-medium w-full">
-          <p className="text-xl text-green-800">
+          <p className="text-2xl text-green-800">
             ${formatCurrency(total)} due <span className="pl-1">{formatDate(data.dueDate)}</span>
           </p>
         </div>

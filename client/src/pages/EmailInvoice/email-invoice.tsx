@@ -98,7 +98,7 @@ export default function EmailInvoice() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading invoice...</p>
+          <p className="mt-4 text-gray-600">Getting Email Ready ...</p>
         </div>
       </div>
     )
@@ -121,8 +121,8 @@ export default function EmailInvoice() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto p-8">
-        <h1 className="text-2xl font-bold mb-6">Send Invoice Email</h1>
+      <div className="max-w-5xl mx-auto p-8">
+        <h1 className="text-2xl font-medium mb-6">Send Invoice Email</h1>
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">To</label>
           <input

@@ -149,7 +149,7 @@ export default function ContactPage() {
                   />
                 </div>
                 <Button
-                  variant="default"
+                  variant="outline"
                   type="submit"
                   disabled={isSubmitting}
                   className="w-full"

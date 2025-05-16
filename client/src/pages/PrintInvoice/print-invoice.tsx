@@ -153,8 +153,8 @@ export default function PrintInvoice() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Improved Breadcrumb Navigation */}
-      <div className="w-full flex justify-center bg-white border-b mb-8 py-4 px-4 sm:px-8">
+      {/* Improved Breadcrumb Navigation - hide when printing */}
+      <div className="w-full flex justify-center bg-white border-b mb-8 py-4 px-4 sm:px-8 print:hidden">
         <div className="max-w-4xl w-full">
           <Breadcrumb>
             <BreadcrumbList>
@@ -169,6 +169,7 @@ export default function PrintInvoice() {
           </Breadcrumb>
         </div>
       </div>
+      
       {/* Print-friendly header - only visible when not printing */}
       <div className="print:hidden bg-white border-b p-4">
         <div className="max-w-4xl mx-auto flex justify-between items-center">
@@ -182,10 +183,10 @@ export default function PrintInvoice() {
           </Button>
         </div>
       </div>
+      
       {/* Invoice content - visible both on screen and when printing */}
-      <div className="max-w-4xl mx-auto p-8">
-        <div className="bg-white">
-        <div>TEST</div>
+      <div className="print:p-0 max-w-4xl mx-auto p-8">
+        <div className="bg-white print:shadow-none">
           <InvoiceClassic
             data={invoiceData}
             businessData={businessData}
@@ -193,34 +194,30 @@ export default function PrintInvoice() {
           />
         </div>
       </div>
-      <footer className="w-full font-inter  text-center text-md text-gray-400 mt-10 mb-2">
-        Powered by <span className=" font-inter font-medium text-green-800">SheetBills™</span>
+      
+      {/* Footer - hide when printing */}
+      <footer className="w-full font-inter text-center text-md text-gray-400 mt-10 mb-2 print:hidden">
+        Powered by <span className="font-inter font-medium text-green-800">SheetBills™</span>
       </footer>
-      <style>
-        {`
-          @media print {
-            .shadow-md, .shadow {
-              box-shadow: none !important;
-            }
-            .overflow-x-auto {
-              overflow: visible !important;
-            }
-            .float-right {
-              float: none !important;
-            }
-            .max-w-full, .w-full {
-              max-width: 100% !important;
-              width: 100% !important;
-            }
-            body {
-              background: white !important;
-              color: black !important;
-              -webkit-print-color-adjust: exact !important;
-              print-color-adjust: exact !important;
-            }
+      
+      {/* Add print-specific styles */}
+      <style>{`
+        @media print {
+          @page {
+            margin: 0.5cm;
+            size: auto;
           }
-        `}
-      </style>
+          
+          body {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          
+          .print\\:hidden {
+            display: none !important;
+          }
+        }
+      `}</style>
     </div>
   )
-} 
+}

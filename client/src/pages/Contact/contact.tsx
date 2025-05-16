@@ -99,19 +99,19 @@ export default function ContactPage() {
           </BreadcrumbList>
         </Breadcrumb>
 
-        <div className="space-y-6 mt-10 grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Contact Form */}
-          <Card>
+          <Card className="bg-white border border-gray-200 shadow-none">
             <CardHeader>
-              <CardTitle>Contact Us</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-2xl font-bold">Contact Us</CardTitle>
+              <CardDescription className="text-gray-600">
                 Fill out the form below and we'll get back to you as soon as possible
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <label htmlFor="email" className="text-sm font-medium">
+                  <label htmlFor="email" className="text-sm font-semibold">
                     Email Address
                   </label>
                   <Input
@@ -124,7 +124,7 @@ export default function ContactPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="subject" className="text-sm font-medium">
+                  <label htmlFor="subject" className="text-sm font-semibold">
                     Subject
                   </label>
                   <Input
@@ -136,7 +136,7 @@ export default function ContactPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="message" className="text-sm font-medium">
+                  <label htmlFor="message" className="text-sm font-semibold">
                     Message
                   </label>
                   <Textarea
@@ -149,7 +149,7 @@ export default function ContactPage() {
                   />
                 </div>
                 <Button
-                variant="default"
+                  variant="default"
                   type="submit"
                   disabled={isSubmitting}
                   className="w-full"
@@ -171,15 +171,15 @@ export default function ContactPage() {
           </Card>
 
           {/* Support Info */}
-          <Card>
+          <Card className="bg-white border border-gray-200 shadow-none">
             <CardHeader>
-              <CardTitle>Support Information</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-2xl font-bold">Support Information</CardTitle>
+              <CardDescription className="text-gray-600">
                 For general inquiries and support, email us at support@sheetbills.com
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500">
+              <p className="text-base text-gray-700 font-semibold mb-2">
                 We typically respond to all inquiries within 24-48 hours
               </p>
             </CardContent>

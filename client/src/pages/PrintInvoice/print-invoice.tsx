@@ -209,34 +209,30 @@ export default function PrintInvoice() {
       <style>{`
         @media print {
           @page {
-            margin: 0;
+            margin: 0.5cm;
             size: A4 portrait;
           }
+          
           body {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
             background: white !important;
           }
+          
           .no-print {
             display: none !important;
           }
-          /* Remove all padding/margin from print wrappers */
-          .print-content, .print-content .max-w-4xl, .print-content .p-8 {
+          
+          .print-content {
             margin: 0 !important;
             padding: 0 !important;
-            max-width: 100% !important;
+          }
+          
+          .print-content .max-w-4xl {
+            max-width: none !important;
             width: 100% !important;
-          }
-          /* Prevent page breaks inside the invoice */
-          .print-content .bg-white {
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
-            max-height: 100vh !important;
-            overflow: visible !important;
-          }
-          /* Remove box shadows for print */
-          .shadow, .shadow-md, .shadow-sm {
-            box-shadow: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
           }
         }
       `}</style>

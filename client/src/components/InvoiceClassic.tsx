@@ -110,16 +110,16 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
 
   return (
     <div
-      className={`bg-white w-full font-inter max-w-full box-border flex flex-col justify-start${showShadow ? ' shadow-md' : ''}`}
+      className={`bg-white w-full font-cal max-w-full box-border flex flex-col justify-start${showShadow ? ' shadow-md' : ''}`}
       style={{ minHeight: '287mm', margin: 0 }}
     >
       {/* Header with logo */}
       <div className="flex justify-between mt-4 items-center mb-8">
         <div>
-          <h1 className="text-2xl font-inter font-medium text-green-800">INVOICE</h1>
+          <h1 className="text-2xl font-cal-sans font-medium text-green-800">INVOICE</h1>
           <div className="space-y-1 mt-2">
-            <p className="text-sm font-inter font-light text-gray-500">Invoice number: {data.invoiceNumber}</p>
-            <p className="text-sm font-inter font-light text-gray-500">Invoice Created: {formatDate(data.date)}</p>
+            <p className="text-sm font-cal-sans font-light text-gray-500">Invoice number: {data.invoiceNumber}</p>
+            <p className="text-sm font-cal font-light text-gray-500">Invoice Created: {formatDate(data.date)}</p>
           </div>
         </div>
       </div>
@@ -127,21 +127,21 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
       {/* Business and Client Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-8">
         <div>
-          <h2 className="text-sm font-inter font-medium text-green-800 uppercase mb-2">From</h2>
+          <h2 className="text-sm font-cal font-medium text-green-800 uppercase mb-2">From</h2>
           <div className="space-y-1">
-            <p className="font-inter font-medium">{businessData.companyName || "Loading Company Details..."}</p>
-            <p className="font-inter font-medium">{businessData.email || "contact@company.com"}</p>
-            <p className="font-inter font-medium">{businessData.address || "123 Business St"}</p>
+            <p className="font-cal font-medium">{businessData.companyName || "Loading Company Details..."}</p>
+            <p className="font-cal font-medium">{businessData.email || "contact@company.com"}</p>
+            <p className="font-cal font-medium">{businessData.address || "123 Business St"}</p>
           </div>
         </div>
 
         <div>
           <div className="mb-4">
-            <h2 className="text-sm font-inter font-medium text-green-800 uppercase mb-2">Bill To</h2>
+            <h2 className="text-sm font-cal font-medium text-green-800 uppercase mb-2">Bill To</h2>
             <div className="space-y-1">
-              <p className="font-inter font-medium">{data.customer.name}</p>
-              <p className="font-inter font-medium">{data.customer.email}</p>
-              <p className="font-inter font-medium whitespace-pre-line">{data.customer.address}</p>
+              <p className="font-cal font-medium">{data.customer.name}</p>
+              <p className="font-cal font-medium">{data.customer.email}</p>
+              <p className="font-cal font-medium whitespace-pre-line">{data.customer.address}</p>
             </div>
           </div>
         </div>
@@ -154,18 +154,18 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
       </div>
 
       {/* Items Table */}
-      <div className="overflow-x-auto font-inter w-full">
-        <table className="w-full font-inter max-w-full text-sm">
+      <div className="overflow-x-auto font-cal w-full">
+        <table className="w-full font-cal max-w-full text-sm">
           <thead className="bg-green-800 text-white">
             <tr className="border-b font-semibold">
-              <th className="py-3 px-6 first:pl-8 last:pr-8 text-left font-inter font-medium text-base text-green-100">Item</th>
-              <th className="py-3 px-6 first:pl-8 last:pr-8 text-left font-inter font-medium text-base text-green-100">Description</th>
-              <th className="py-3 px-6 first:pl-8 last:pr-8 text-right font-inter font-medium text-base text-green-100">Qty</th>
-              <th className="py-3 px-6 first:pl-8 last:pr-8 text-right font-inter font-medium text-base text-green-100">Price</th>
-              <th className="py-3 px-6 first:pl-8 last:pr-8 text-right font-inter font-medium text-base text-green-100">Amount</th>
+              <th className="py-3 px-6 first:pl-8 last:pr-8 text-left font-cal font-medium text-base text-green-100">Item</th>
+              <th className="py-3 px-6 first:pl-8 last:pr-8 text-left font-cal font-medium text-base text-green-100">Description</th>
+              <th className="py-3 px-6 first:pl-8 last:pr-8 text-right font-cal font-medium text-base text-green-100">Qty</th>
+              <th className="py-3 px-6 first:pl-8 last:pr-8 text-right font-cal font-medium text-base text-green-100">Price</th>
+              <th className="py-3 px-6 first:pl-8 last:pr-8 text-right font-cal font-medium text-base text-green-100">Amount</th>
             </tr>
           </thead>
-          <tbody className="divide-y font-inter divide-gray-200">
+          <tbody className="divide-y font-cal divide-gray-200">
             {data.items.map((item, i) => (
               <tr key={i} className="text-gray-900">
                 <td className="py-3 px-6 first:pl-8 last:pr-8 text-left break-words">{item.name || `Item ${i + 1}`}</td>
@@ -174,7 +174,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
                 <td className="py-3 px-6 first:pl-8 last:pr-8 text-right">
                   ${formatCurrency(item.price === "" ? 0 : Number(item.price))}
                 </td>
-                <td className="py-3 px-6 first:pl-8 last:pr-8 text-right font-inter font-medium">
+                <td className="py-3 px-6 first:pl-8 last:pr-8 text-right font-cal font-medium">
                   ${formatCurrency(calculateItemTotal(item).total)}
                 </td>
               </tr>

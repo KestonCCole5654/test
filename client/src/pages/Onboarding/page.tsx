@@ -291,8 +291,9 @@ export default function InitializePage() {
         throw new Error(data.error || "Failed to set up your business")
       }
       // Store the spreadsheet ID and URL for future use
-      if (data.businessSheetId) {
-        localStorage.setItem("business_sheet_id", data.businessSheetId)
+      // Use spreadsheetId and spreadsheetUrl from backend response
+      if (data.spreadsheetId) {
+        localStorage.setItem("business_sheet_id", data.spreadsheetId)
       }
       if (data.spreadsheetUrl) {
         localStorage.setItem("business_sheet_url", data.spreadsheetUrl)

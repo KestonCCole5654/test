@@ -303,96 +303,6 @@ async function getDefaultSheetId(accessToken) {
   }
 }
 
-// Add this function after getDefaultSheetId
-async function getOrCreateBusinessSheet(accessToken, userId) {
-  const auth = new google.auth.OAuth2();
-  auth.setCredentials({ access_token: accessToken });
-  const sheets = google.sheets({ version: 'v4', auth });
-
-  try {
-    // Get master sheet
-    const masterSheet = await getOrCreateMasterSheet(accessToken, userId);
-
-    // Look for existing business sheet
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: masterSheet.id,
-      range: 'My Sheets!A:E',
-    });
-
-    const rows = response.data.values || [];
-    const businessSheet = rows.find(row => row[1]?.toLowerCase().includes('business'));
-
-    if (businessSheet) {
-      const sheetId = extractSheetIdFromUrl(businessSheet[4]);
-      if (sheetId) return { id: sheetId, isNew: false };
-    }
-
-    // Create new business sheet if none exists
-    const newSheet = await sheets.spreadsheets.create({
-      requestBody: {
-        properties: {
-          title: 'Business Details',
-        },
-        sheets: [{
-          properties: {
-            title: 'Business Details',
-            gridProperties: { frozenRowCount: 1 }
-          }
-        }]
-      }
-    });
-
-    const spreadsheetId = newSheet.data.spreadsheetId;
-
-    // Initialize the sheet with headers and empty data
-    await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range: 'Business Details!A1:C1',
-      valueInputOption: 'RAW',
-      requestBody: {
-        values: [['Field', 'Value', 'Last Updated']]
-      }
-    });
-
-    // Add initial rows
-    await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range: 'Business Details!A2:C6',
-      valueInputOption: 'RAW',
-      requestBody: {
-        values: [
-          ['Company Name', '', new Date().toISOString()],
-          ['Business Email', '', new Date().toISOString()],
-          ['Phone Number', '', new Date().toISOString()],
-          ['Address', '', new Date().toISOString()],
-          ['Created At', new Date().toISOString(), new Date().toISOString()]
-        ]
-      }
-    });
-
-    // Add to master sheet
-    await sheets.spreadsheets.values.append({
-      spreadsheetId: masterSheet.id,
-      range: 'My Sheets!A:E',
-      valueInputOption: 'RAW',
-      requestBody: {
-        values: [[
-          new Date().toISOString(),
-          'Business Details',
-          'Settings',
-          'Active',
-          newSheet.data.spreadsheetUrl
-        ]]
-      }
-    });
-
-    return { id: spreadsheetId, isNew: true };
-  } catch (error) {
-    console.error('Error in getOrCreateBusinessSheet:', error);
-    throw error;
-  }
-}
-
 // ==========================
 // Calculation Utilities
 // ==========================
@@ -796,7 +706,6 @@ app.delete('/api/sheets/delete-invoice', async (req, res) => {
     });
   }
 });
-
 // Add this to your server/index.js
 app.get('/api/invoices/:invoiceId', async (req, res) => {
   try {
@@ -883,7 +792,6 @@ app.get('/api/invoices/:invoiceId', async (req, res) => {
   }
 });
 // fetch invoices from google sheets to dashbaord
-
 app.get('/api/sheets/data', async (req, res) => {
   try {
     console.log('[API] /api/sheets/data request received');
@@ -1048,7 +956,6 @@ app.get('/api/sheets/data', async (req, res) => {
     });
   }
 });
-
 // fetch spreadsheets
 app.get('/api/sheets/spreadsheets', async (req, res) => {
   try {
@@ -1207,7 +1114,6 @@ app.post('/api/saveInvoice', async (req, res) => {
     });
   }
 });
-
 
 ////////////////////////////////////////////////////////////////////
 {/*Methods to Hanlde Business Details Logic*/}
@@ -1467,7 +1373,6 @@ async function createBusinessSheet(accessToken, businessData) {
     throw new Error(`Failed to create business sheet: ${error.message}`);
   }
 }
-
 app.post('/api/create-business-sheet', async (req, res) => {
   console.log('[CREATE] Initiating business sheet creation request');
   
@@ -1631,7 +1536,6 @@ app.post('/api/create-business-sheet', async (req, res) => {
     });
   }
 });
-
 ////////////////////////////////////////////////////////////////////
 {/*Method to Hanlde Getting User Data Logic*/}
 ////////////////////////////////////////////////////////////////////
@@ -2500,7 +2404,16 @@ app.get('/api/onboarding/status', async (req, res) => {
   }
 });
 
-// Refactored: Create a single spreadsheet with 'SheetBills Invoices' and 'Business Details' tabs
+// ==========================
+// Unified Business Sheet Creation (Refactored)
+// ==========================
+
+/**
+ * Creates a single spreadsheet with both 'SheetBills Invoices' and 'Business Details' tabs.
+ * @param {string} accessToken - Google OAuth access token.
+ * @param {object} businessData - Business details to initialize the sheet.
+ * @returns {Promise<{spreadsheetId: string, spreadsheetUrl: string}>}
+ */
 async function createUnifiedBusinessSheet(accessToken, businessData) {
   try {
     // Initialize Google Sheets API
@@ -2631,11 +2544,13 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
   }
 }
 
-// Refactored endpoint: create a single spreadsheet with both tabs
+/**
+ * Endpoint: Create a single spreadsheet with both tabs (Unified)
+ * POST /api/create-business-sheet
+ */
 app.post('/api/create-business-sheet', async (req, res) => {
   console.log('[CREATE] Initiating unified business sheet creation request');
   try {
-    // 1. Validate request format
     if (!req.headers['content-type']?.includes('application/json')) {
       return res.status(415).json({ success: false, error: 'Invalid content type - requires JSON' });
     }

@@ -52,23 +52,23 @@ export default function PublicInvoice() {
   }, [token, sheetUrl]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center font-cal-sans justify-center bg-gray-50 py-8 px-2">
+    <div className="min-h-screen flex flex-col items-center font-cal-sans justify-center bg-gray-50 dark:bg-background text-foreground py-8 px-2">
       <Card className="w-full max-w-4xl">
         
-        {loading && <div className="text-center text-gray-500">Loading invoice from link ...</div>}
+        {loading && <div className="text-center text-gray-500 dark:text-gray-300">Loading invoice from link ...</div>}
         {error && (
           <div className="text-center text-red-600 mb-4">{error}</div>
         )}
         {invoice && (
-          <div className="bg-white font-cal-sans p-6">
+          <div className="bg-white dark:bg-gray-900 font-cal-sans p-6">
             <InvoiceClassic data={invoice} businessData={businessData || {}} showShadow={false} />
           </div>
         )}
      
       </Card>
-      <footer className="w-full font-inter  text-center text-md text-gray-400 mt-10 mb-2">
-          Powered by <span className=" font-inter font-medium text-green-800">SheetBills™</span>
-        </footer>
+      <footer className="w-full font-inter text-center text-md text-gray-400 dark:text-gray-500 mt-10 mb-2">
+        Powered by <span className=" font-inter font-medium text-green-800 dark:text-green-400">SheetBills™</span>
+      </footer>
     </div>
   );
 } 

@@ -51,10 +51,10 @@ export default function LoginPage() {
 
   if (!mounted || loading) {
     return (
-      <div className="min-h-screen font-cal-sans flex items-center justify-center bg-gradient-to-b from-white to-gray-50">
+      <div className="min-h-screen font-cal-sans flex items-center justify-center bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
         <div className="text-center">
           <Loader2 className="h-8 w-8 font-cal-sans animate-spin text-emerald-600 mx-auto" />
-          <p className="mt-4 text-slate-600 font-cal-sans text-sm font-medium">
+          <p className="mt-4 text-slate-600 dark:text-slate-300 font-cal-sans text-sm font-medium">
             {loading ? "Connecting to Google..." : "Loading..."}
           </p>
         </div>
@@ -63,14 +63,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen font-cal-sans flex flex-col bg-gradient-to-b from-white to-gray-50">
+    <div className="min-h-screen font-cal-sans flex flex-col bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
       
        <div className="flex items-center mb-10 p-10">
           <a href="/" className="flex items-center space-x-2">
-            <div className="h-8 w-8 rounded bg-green-800 flex items-center justify-center">
+            <div className="h-8 w-8 rounded bg-green-800 dark:bg-green-600 flex items-center justify-center">
               <span className="text-white font-medium text-md">$</span>
             </div>
-            <span className="text-lg font-medium text-green-800">SheetBills™</span>
+            <span className="text-lg font-medium text-green-800 dark:text-green-400">SheetBills™</span>
           </a>
         </div>
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { Menu, X, ChevronDown, LogOut, Settings, User, Bell, HelpCircle } from "lucide-react"
+import { Menu, X, ChevronDown, LogOut, Settings, User, Bell, HelpCircle, Moon, Sun } from "lucide-react"
 import supabase from "../../components/Auth/supabaseClient"
 import { Button } from "../ui/button"
 import {
@@ -14,6 +14,51 @@ import {
 } from "../ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { User as SupabaseUser } from '@supabase/supabase-js'
+
+function DarkModeToggle() {
+  const [isDark, setIsDark] = useState(() =>
+    typeof window !== 'undefined'
+      ? document.documentElement.classList.contains('dark')
+      : false
+  )
+
+  useEffect(() => {
+    if (
+      localStorage.theme === "dark" ||
+      (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
+    ) {
+      document.documentElement.classList.add("dark")
+      setIsDark(true)
+    } else {
+      document.documentElement.classList.remove("dark")
+      setIsDark(false)
+    }
+  }, [])
+
+  const toggleDarkMode = () => {
+    if (document.documentElement.classList.contains("dark")) {
+      document.documentElement.classList.remove("dark")
+      localStorage.theme = "light"
+      setIsDark(false)
+    } else {
+      document.documentElement.classList.add("dark")
+      localStorage.theme = "dark"
+      setIsDark(true)
+    }
+  }
+
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      aria-label="Toggle dark mode"
+      onClick={toggleDarkMode}
+      className="mx-1"
+    >
+      {isDark ? <Sun size={18} /> : <Moon size={18} />}
+    </Button>
+  )
+}
 
 const Header = () => {
   const navigate = useNavigate()
@@ -74,16 +119,16 @@ const Header = () => {
   }
 
   return (
-    <header className="sticky no-print top-0 font-inter z-50 border-b border-gray-50 bg-gray-800 shadow-xs">
+    <header className="sticky no-print top-0 font-inter z-50 border-b border-gray-50 dark:border-gray-800 bg-gray-800 dark:bg-background shadow-xs">
       <div className="container max-w-8xl mx-auto sm:px-6">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded bg-green-800 flex items-center justify-center">
+              <div className="h-8 w-8 rounded bg-green-800 dark:bg-green-600 flex items-center justify-center">
                 <span className="text-white font-medium text-md">$</span>
               </div>
-              <span className="text-xl font-light text-green-700">SheetBills ™</span>
+              <span className="text-xl font-light text-green-700 dark:text-green-400">SheetBills ™</span>
             </Link>
           </div>
 
@@ -93,21 +138,21 @@ const Header = () => {
               <>
                 <Link
                   to="/invoices"
-                  className="px-3 py-2 rounded-md text-slate-200 hover:text-slate-300 transition-colors"
+                  className="px-3 py-2 rounded-md text-slate-200 dark:text-slate-100 hover:text-slate-300 dark:hover:text-slate-200 transition-colors"
                   onClick={handleNavigation}
                 >
                  Invoices
                 </Link>
                 <Link
                   to="/settings"
-                  className="px-3 py-2 rounded-md text-slate-200 hover:text-slate-300  transition-colors"
+                  className="px-3 py-2 rounded-md text-slate-200 dark:text-slate-100 hover:text-slate-300 dark:hover:text-slate-200  transition-colors"
                   onClick={handleNavigation}
                 >
                   Account & Settings
                 </Link>
                 <Link
                   to="/contact"
-                  className="px-3 py-2 rounded-md text-slate-200 hover:text-slate-300  transition-colors"
+                  className="px-3 py-2 rounded-md text-slate-200 dark:text-slate-100 hover:text-slate-300 dark:hover:text-slate-200  transition-colors"
                   onClick={handleNavigation}
                 >
                   Contact & Support
@@ -118,6 +163,7 @@ const Header = () => {
 
           {/* User profile section - desktop */}
           <div className="hidden md:flex items-center space-x-2">
+            <DarkModeToggle />
             {user ? (
               <>
                 <DropdownMenu>
@@ -131,14 +177,14 @@ const Header = () => {
                           src={user.user_metadata?.avatar_url || user.user_metadata?.picture} 
                           alt={user.email?.split("@")[0] || "User"}
                         />
-                        <AvatarFallback className="bg-green-200 text-black">
+                        <AvatarFallback className="bg-green-200 dark:bg-green-700 text-black dark:text-white">
                           {user.email?.charAt(0).toUpperCase() || "U"}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="text-slate-200 font-medium hidden sm:inline-block max-w-[120px] truncate">
+                      <span className="text-slate-200 dark:text-slate-100 font-medium hidden sm:inline-block max-w-[120px] truncate">
                         {user.email?.split("@")[0] || "User"}
                       </span>
-                      <ChevronDown size={16} className="text-slate-200" />
+                      <ChevronDown size={16} className="text-slate-200 dark:text-slate-100" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">

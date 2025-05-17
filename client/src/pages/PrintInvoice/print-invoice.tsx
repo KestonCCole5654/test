@@ -200,38 +200,6 @@ export default function PrintInvoice() {
       <footer className="w-full font-inter text-center text-md text-gray-400 mt-10 mb-2 print:hidden">
         Powered by <span className="font-inter font-medium text-green-800">SheetBills™</span>
       </footer>
-      
-      {/* Add print-specific styles */}
-      <style>{`
-        @media print {
-          @page {
-            margin: 0.5cm;
-            size: auto;
-          }
-          
-          body {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          
-          /* Hide all elements except the invoice content */
-          body > *:not(.invoice-content) {
-            display: none !important;
-          }
-          
-          .print\\:hidden {
-            display: none !important;
-          }
-
-          /* Ensure the invoice content is properly formatted */
-          .invoice-content {
-            display: block !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            width: 100% !important;
-          }
-        }
-      `}</style>
     </div>
   )
 }

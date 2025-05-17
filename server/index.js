@@ -2617,3 +2617,84 @@ app.post('/api/create-business-sheet', async (req, res) => {
     return res.status(500).json({ success: false, error: error.message });
   }
 });
+
+/**
+ * Adds a Business Details tab to an existing SheetBills Invoices spreadsheet.
+ * @param {string} accessToken - Google OAuth access token.
+ * @param {object} businessData - Business details to initialize the sheet.
+ * @param {string} spreadsheetId - ID of the existing spreadsheet.
+ * @returns {Promise<{spreadsheetId: string, spreadsheetUrl: string}>}
+ */
+async function addBusinessDetailsTab(accessToken, businessData, spreadsheetId) {
+  try {
+    // Initialize Google Sheets API
+    const auth = new google.auth.OAuth2();
+    auth.setCredentials({ access_token: accessToken });
+    const sheets = google.sheets({ version: 'v4', auth });
+
+    // Add new Business Details tab
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: {
+        requests: [{
+          addSheet: {
+            properties: {
+              title: 'Business Details',
+              gridProperties: { rowCount: 100, columnCount: 3 }
+            }
+          }
+        }]
+      }
+    });
+
+    // Add headers and business details to the new tab
+    const businessHeaders = ['Field', 'Value', 'Last Updated'];
+    const now = new Date().toISOString();
+    const businessDetails = [
+      ['Company Name', businessData.companyName, now],
+      ['Business Email', businessData.email, now],
+      ['Phone Number', businessData.phone, now],
+      ['Address', businessData.address, now],
+      ['Created At', now, now]
+    ];
+
+    // Update the new tab with headers and data
+    await sheets.spreadsheets.values.batchUpdate({
+      spreadsheetId,
+      requestBody: {
+        valueInputOption: 'USER_ENTERED',
+        data: [
+          { range: 'Business Details!A1:C1', values: [businessHeaders] },
+          { range: 'Business Details!A2:C6', values: businessDetails }
+        ]
+      }
+    });
+
+    // Format headers
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
+    const businessSheetId = spreadsheet.data.sheets.find(s => s.properties.title === 'Business Details').properties.sheetId;
+    
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: {
+        requests: [{
+          repeatCell: {
+            range: { sheetId: businessSheetId, startRowIndex: 0, endRowIndex: 1 },
+            cell: {
+              userEnteredFormat: {
+                backgroundColor: { red: 0.8, green: 0.8, blue: 0.8 },
+                textFormat: { bold: true }
+              }
+            },
+            fields: 'userEnteredFormat(backgroundColor,textFormat)'
+          }
+        }]
+      }
+    });
+
+    return { spreadsheetId, spreadsheetUrl: `https://docs.google.com/spreadsheets/d/${spreadsheetId}` };
+  } catch (error) {
+    console.error('Error adding Business Details tab:', error);
+    throw new Error(`Failed to add Business Details tab: ${error.message}`);
+  }
+}

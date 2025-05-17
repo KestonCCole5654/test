@@ -67,23 +67,21 @@ function extractSheetIdFromUrl(url) {
  * @returns {Promise<{id: string, url: string, created: boolean}>}
  */
 async function getOrCreateMasterSheet(accessToken, userId) {
-  // Initialize authentication with API key
+  // Initialize authentication with OAuth2 only
   const auth = new google.auth.OAuth2({
     clientId: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   });
   auth.setCredentials({ access_token: accessToken });
 
-  // Initialize API clients with authentication
+  // Initialize API clients with authentication (NO API KEY)
   const drive = google.drive({
     version: 'v3',
-    auth,
-    params: { key: process.env.GOOGLE_API_KEY }
+    auth
   });
   const sheetsAPI = google.sheets({
     version: 'v4',
-    auth,
-    params: { key: process.env.GOOGLE_API_KEY }
+    auth
   });
 
   try {
@@ -92,8 +90,7 @@ async function getOrCreateMasterSheet(accessToken, userId) {
       q: "name='Master Tracking Sheet' and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false",
       fields: 'files(id, name, webViewLink)',
       spaces: 'drive',
-      auth: auth,
-      key: process.env.GOOGLE_API_KEY
+      auth: auth
     });
     if (driveResponse.data.files.length > 0) {
       return {
@@ -111,8 +108,7 @@ async function getOrCreateMasterSheet(accessToken, userId) {
           timeZone: 'UTC'
         }
       },
-      auth: auth,
-      key: process.env.GOOGLE_API_KEY
+      auth: auth
     });
     const spreadsheetId = createResponse.data.spreadsheetId;
     const spreadsheetUrl = createResponse.data.spreadsheetUrl;
@@ -135,8 +131,7 @@ async function getOrCreateMasterSheet(accessToken, userId) {
           }
         }]
       },
-      auth: auth,
-      key: process.env.GOOGLE_API_KEY
+      auth: auth
     });
     // 4. Add headers
     await sheetsAPI.spreadsheets.values.update({
@@ -152,8 +147,7 @@ async function getOrCreateMasterSheet(accessToken, userId) {
           'URL'
         ]]
       },
-      auth: auth,
-      key: process.env.GOOGLE_API_KEY
+      auth: auth
     });
     // 5. Add basic protection to header row
     await sheetsAPI.spreadsheets.batchUpdate({
@@ -173,8 +167,7 @@ async function getOrCreateMasterSheet(accessToken, userId) {
           }
         }]
       },
-      auth: auth,
-      key: process.env.GOOGLE_API_KEY
+      auth: auth
     });
     return {
       id: spreadsheetId,

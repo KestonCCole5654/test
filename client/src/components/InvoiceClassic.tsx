@@ -114,7 +114,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
       style={{ minHeight: 'auto', margin: 0 }}
     >
       {/* Green strip at the top */}
-      <div className="w-full h-4 bg-green-800 rounded-t-sm"></div>
+      <div className="w-full h-3 bg-green-800 "></div>
       
       {/* Header with logo */}
       <div className="flex justify-between mt-3 items-center mb-4 px-4">

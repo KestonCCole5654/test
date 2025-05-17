@@ -146,7 +146,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
           </div>
         </div>
 
-        <div className="mt-5 font-medium w-full">
+        <div className="mt-3 font-medium w-full">
           <p className="text-2xl text-green-800">
             ${formatCurrency(total)} due <span className="pl-1">{formatDate(data.dueDate)}</span>
           </p>

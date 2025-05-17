@@ -24,8 +24,6 @@ import PublicInvoice from "./pages/PublicInvoice/PublicInvoice";
 import PrintInvoice from './pages/PrintInvoice/print-invoice';
 import EmailInvoice from './pages/EmailInvoice/email-invoice';
 // import TemplateDesignerPage from './components/TemplateDesigner/TemplateDesignerPage';
-
-
 // SidebarLayout already includes the Outlet component
 
 async function checkBusinessSheet(supabaseToken: string, googleToken: string) {

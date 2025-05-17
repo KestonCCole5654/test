@@ -113,8 +113,11 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
       className={`bg-white w-full font-cal max-w-full box-border flex flex-col justify-start${showShadow ? ' shadow-md' : ''}`}
       style={{ minHeight: 'auto', margin: 0 }}
     >
+      {/* Green strip at the top */}
+      <div className="w-full h-4 bg-green-800 rounded-t-sm"></div>
+      
       {/* Header with logo */}
-      <div className="flex justify-between mt-2 items-center mb-4">
+      <div className="flex justify-between mt-3 items-center mb-4 px-4">
         <div>
           <h1 className="text-xl font-cal-sans font-semibold text-green-800">INVOICE</h1>
           <div className="space-y-1 mt-1">
@@ -125,7 +128,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
       </div>
 
       {/* Business and Client Info */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4 px-4">
         <div>
           <h2 className="text-sm font-cal font-medium text-green-800 uppercase mb-1">From</h2>
           <div className="space-y-1">
@@ -154,7 +157,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
       </div>
 
       {/* Items Table */}
-      <div className="overflow-x-auto font-cal w-full">
+      <div className="overflow-x-auto font-cal w-full px-4">
         <table className="w-full font-cal max-w-full text-xs">
           <thead className="bg-green-800 text-white">
             <tr className="border-b font-semibold">
@@ -184,7 +187,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
       </div>
 
       {/* Totals - Fixed right alignment */}
-      <div className="w-full mt-3">
+      <div className="w-full mt-3 px-4">
         <div className="float-right w-full md:w-1/2">
           <table className="w-full">
             <tbody>
@@ -211,7 +214,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
 
       {/* Notes */}
       {data.notes && (
-        <div className="clear-both mt-4 pt-2">
+        <div className="clear-both mt-4 pt-2 px-4">
           <h2 className="text-xs font-semibold text-green-800 uppercase mb-1">Notes</h2>
           <p className="text-gray-600 text-xs whitespace-pre-line">{data.notes}</p>
         </div>

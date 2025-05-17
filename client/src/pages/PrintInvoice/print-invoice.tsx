@@ -156,7 +156,7 @@ export default function PrintInvoice() {
       <div className="bg-white">
         {/* Print-friendly header - only visible when not printing */}
         <div className="print:hidden bg-white p-4">
-          <div className="max-w-4xl mx-auto flex justify-between items-center">
+          <div className="max-w-3xl mx-auto flex justify-between items-center">
             <Button onClick={handleBack} variant="outline" size="sm">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back
@@ -168,7 +168,7 @@ export default function PrintInvoice() {
           </div>
         </div>
         {/* Invoice content - visible both on screen and when printing */}
-        <div className="print:p-0 max-w-4xl mx-auto p-4 invoice-container">
+        <div className="print:p-0 max-w-3xl mx-auto p-4 invoice-container">
           <div className="bg-white print:shadow-none single-page-invoice">
             <InvoiceClassic
               data={invoiceData}

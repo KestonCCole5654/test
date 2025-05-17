@@ -2,18 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Afacad+Flux&family=Poppins:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Source+Serif+Pro:wght@400;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cal+Sans&display=swap');
 
-html, body, #root, .font-AfacadFlux {
-  font-family: "Inter", sans-serif;
+@layer base {
+  body {
+    @apply font-cal-sans;
+    background: #fff !important;
+  }
 }
-
-body {
-  font-family: "Inter", sans-serif;
-  background: #fff !important;
-}
-
 
 @layer utilities {
   .text-balance {
@@ -99,12 +95,6 @@ body {
   }
   body {
     @apply bg-background text-foreground;
-  }
-}
-
-@layer base {
-  body {
-    @apply font-sans;
   }
 }
 

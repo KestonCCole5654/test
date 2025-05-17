@@ -168,8 +168,8 @@ export default function PrintInvoice() {
           </div>
         </div>
         {/* Invoice content - visible both on screen and when printing */}
-        <div className="print:p-0 max-w-4xl mx-auto p-4 invoice-content">
-          <div className="bg-white print:shadow-none">
+        <div className="print:p-0 max-w-4xl mx-auto p-4 invoice-container">
+          <div className="bg-white print:shadow-none single-page-invoice">
             <InvoiceClassic
               data={invoiceData}
               businessData={businessData}
@@ -184,13 +184,64 @@ export default function PrintInvoice() {
       </div>
       <style>{`
         @media print {
-          .invoice-content, .bg-white {
-            break-inside: avoid;
-            page-break-inside: avoid;
+          @page {
+            size: A4;
+            margin: 0.5cm;
           }
-          .invoice-content {
+          
+          body {
+            margin: 0;
+            padding: 0;
+          }
+          
+          .single-page-invoice {
+            width: 100%;
+            height: 100%;
+            page-break-inside: avoid;
+            break-inside: avoid;
             page-break-after: avoid;
             page-break-before: avoid;
+          }
+          
+          .invoice-container {
+            overflow: hidden;
+            max-height: 98vh;
+            box-sizing: border-box;
+          }
+          
+          /* Scale down the invoice if it's too large */
+          @media print and (min-height: 1000px) {
+            .single-page-invoice {
+              transform: scale(0.95);
+              transform-origin: top center;
+            }
+          }
+          
+          /* For smaller screens, scale even more */
+          @media print and (max-height: 950px) {
+            .single-page-invoice {
+              transform: scale(0.9);
+              transform-origin: top center;
+            }
+          }
+          
+          /* For extra small screens */
+          @media print and (max-height: 900px) {
+            .single-page-invoice {
+              transform: scale(0.85);
+              transform-origin: top center;
+            }
+          }
+          
+          /* Adjust table sizes for print */
+          table {
+            width: 100% !important;
+            table-layout: fixed;
+          }
+          
+          th, td {
+            padding: 0.15rem 0.3rem !important;
+            font-size: 0.9rem !important;
           }
         }
       `}</style>

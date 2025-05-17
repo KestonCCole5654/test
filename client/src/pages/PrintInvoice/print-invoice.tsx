@@ -185,7 +185,7 @@ export default function PrintInvoice() {
       </div>
       
       {/* Invoice content - visible both on screen and when printing */}
-      <div className="print:p-0 max-w-4xl mx-auto p-8">
+      <div className="print:p-0 max-w-4xl mx-auto p-8 invoice-content">
        
         <div className="bg-white print:shadow-none">
           <InvoiceClassic
@@ -214,8 +214,21 @@ export default function PrintInvoice() {
             print-color-adjust: exact !important;
           }
           
+          /* Hide all elements except the invoice content */
+          body > *:not(.invoice-content) {
+            display: none !important;
+          }
+          
           .print\\:hidden {
             display: none !important;
+          }
+
+          /* Ensure the invoice content is properly formatted */
+          .invoice-content {
+            display: block !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
           }
         }
       `}</style>

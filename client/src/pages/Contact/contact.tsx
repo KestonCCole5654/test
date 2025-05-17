@@ -84,7 +84,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-background text-foreground">
+    <div className="min-h-screen w-full bg-gray-50">
       <div className="container max-w-7xl mx-auto px-4 py-8">
         {/* Breadcrumb Navigation */}
         <Breadcrumb>
@@ -101,10 +101,10 @@ export default function ContactPage() {
 
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Contact Form */}
-          <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-none">
+          <Card className="bg-white border border-gray-200 shadow-none">
             <CardHeader>
-              <CardTitle className="text-2xl font-medium text-gray-900 dark:text-gray-100">Contact Us</CardTitle>
-              <CardDescription className="text-gray-600 dark:text-gray-300">
+              <CardTitle className="text-2xl font-medium">Contact Us</CardTitle>
+              <CardDescription className="text-gray-600">
                 Fill out the form below and we'll get back to you as soon as possible
               </CardDescription>
             </CardHeader>

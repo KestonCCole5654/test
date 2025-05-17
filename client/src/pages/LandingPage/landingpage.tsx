@@ -28,45 +28,47 @@ export default function LandingPage() {
     }
   }
   return (
-    <div className="flex font-AfacadFlux min-h-screen flex-col bg-background text-foreground">
+    <div className="flex font-AfacadFlux min-h-screen flex-col">
       {/* Navigation */}
-      <header className="w-full border-b bg-white dark:bg-gray-900 dark:border-gray-800">
+      <header className="w-full border-b bg-white">
         <div className="container max-w-6xl flex h-20 items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-2">
-            <h1 className="font-AfacadFlux text-green-600 dark:text-green-400 font-extrabold text-2xl">SHEETBILLS <span className="text-xs align-super">TM</span></h1>
+          <h1 className="font-AfacadFlux text-green-600 font-extrabold text-2xl">SHEETBILLS <span className="text-xs align-super">TM</span></h1>
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex gap-6">
-            <a href="#pricing" className="text-md text-gray-600 dark:text-gray-300 font-medium hover:underline underline-offset-4">
+            <a href="#pricing" className="text-md text-gray-600 font-medium hover:underline underline-offset-4">
               Pricing
             </a>
-            <a href="#pricing" className="text-md text-gray-600 dark:text-gray-300 font-medium hover:underline underline-offset-4">
+            <a href="#pricing" className="text-md text-gray-600 font-medium hover:underline underline-offset-4">
               Demo
             </a>
-            <a href="#pricing" className="text-md text-gray-600 dark:text-gray-300 font-medium hover:underline underline-offset-4">
+            <a href="#pricing" className="text-md text-gray-600 font-medium hover:underline underline-offset-4">
               Testimonials 
             </a>
-            <a href="#faq" className="text-md text-gray-600 dark:text-gray-300 font-medium hover:underline underline-offset-4">
+            <a href="#faq" className="text-md  text-gray-600 font-medium hover:underline underline-offset-4">
               FAQ
             </a>
           </nav>
 
           <div className="flex items-center gap-4">
+            
             <a href="/sign-in" className="hidden sm:inline-block">
-              <button className="h-9 rounded-md bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 px-4 text-sm font-medium text-white">
+              <button className="h-9 rounded-md bg-green-600 hover:bg-green-700 px-4 text-sm font-medium text-white">
                 Get Started
               </button>
             </a>
+
             {/* Hamburger Menu Button */}
             <button
               onClick={toggleMenu}
               className="md:hidden flex flex-col justify-center items-center w-10 h-10"
               aria-label="Toggle menu"
             >
-              <span className="w-6 h-0.5 bg-black dark:bg-white mb-1.5"></span>
-              <span className="w-6 h-0.5 bg-black dark:bg-white mb-1.5"></span>
-              <span className="w-6 h-0.5 bg-black dark:bg-white"></span>
+              <span className="w-6 h-0.5 bg-black mb-1.5"></span>
+              <span className="w-6 h-0.5 bg-black mb-1.5"></span>
+              <span className="w-6 h-0.5 bg-black"></span>
             </button>
           </div>
         </div>

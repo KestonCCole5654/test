@@ -1,9 +1,9 @@
 import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 
 const trendColors = {
-  up: "text-green-700 dark:text-green-400",
-  down: "text-red-600 dark:text-red-400",
-  neutral: "text-blue-700 dark:text-blue-400",
+  up: "text-green-700",
+  down: "text-red-600",
+  neutral: "text-blue-700",
 };
 
 export interface InvoiceStat {

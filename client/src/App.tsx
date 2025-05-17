@@ -182,7 +182,6 @@ function App() {
           <Route path="/" element={<Navigate to="/invoices" />} />
           <Route path="/invoices" element={<Dashboard />} />
           <Route path="/create-invoice" element={<InvoiceForm />} />
-          <Route path="/print-invoice/:invoiceId" element={<PrintInvoice />} />
           <Route path="/email-invoice/:invoiceId" element={<EmailInvoice />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/contact" element={<ContactPage />} />
@@ -190,6 +189,16 @@ function App() {
 
         {/* Public Invoice Route - must be after catch-all to take precedence */}
         <Route path="/invoice/shared/:token" element={<PublicInvoice />} />
+
+        {/* Add print-invoice route OUTSIDE the SidebarLayout group */}
+        <Route
+          path="/print-invoice/:invoiceId"
+          element={
+            <AuthenticatedRoute authenticated={!!user} isLoading={loading}>
+              <PrintInvoice />
+            </AuthenticatedRoute>
+          }
+        />
 
         {/* Catch all route - only for authenticated routes */}
         <Route path="*" element={

@@ -153,59 +153,55 @@ export default function PrintInvoice() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Non-printable content wrapper */}
-      <div className="no-print">
-        {/* Breadcrumb Navigation */}
-        <div className="w-full flex justify-center bg-white border-b mb-8 py-4 px-4 sm:px-8">
-          <div className="max-w-4xl w-full">
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Invoices</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-        </div>
-        
-        {/* Print controls */}
-        <div className="bg-white border-b p-4">
-          <div className="max-w-4xl mx-auto flex justify-between items-center">
-            <Button onClick={handleBack} variant="outline" size="sm">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
-            </Button>
-            <Button onClick={handlePrint} variant="default" size="sm">
-              <Printer className="mr-2 h-4 w-4" />
-              Print Invoice
-            </Button>
-          </div>
+      {/* Improved Breadcrumb Navigation - hide when printing */}
+      <div className="w-full flex justify-center bg-white border-b mb-8 py-4 px-4 sm:px-8 print:hidden">
+        <div className="max-w-4xl w-full">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Invoices</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
         </div>
       </div>
       
-      {/* Printable content wrapper */}
-      <div className="print-content">
-        <div className="max-w-4xl mx-auto p-8">
-          <div className="bg-white">
-            <InvoiceClassic
-              data={invoiceData}
-              businessData={businessData}
-              showShadow={false}
-            />
-          </div>
+      {/* Print-friendly header - only visible when not printing */}
+      <div className="print:hidden bg-white border-b p-4">
+        <div className="max-w-4xl mx-auto flex justify-between items-center">
+          <Button onClick={handleBack} variant="outline" size="sm">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
+          <Button onClick={handlePrint} variant="default" size="sm">
+            <Printer className="mr-2 h-4 w-4" />
+            Print Invoice
+          </Button>
         </div>
       </div>
       
-      {/* Footer */}
-      <footer className="no-print w-full font-inter text-center text-md text-gray-400 mt-10 mb-2">
+      {/* Invoice content - visible both on screen and when printing */}
+      <div className="print:p-0 max-w-4xl mx-auto p-8">
+       
+        <div className="bg-white print:shadow-none">
+          <InvoiceClassic
+            data={invoiceData}
+            businessData={businessData}
+            showShadow={false}
+          />
+        </div>
+      </div>
+      
+      {/* Footer - hide when printing */}
+      <footer className="w-full font-inter text-center text-md text-gray-400 mt-10 mb-2 print:hidden">
         Powered by <span className="font-inter font-medium text-green-800">SheetBills™</span>
       </footer>
       
-      {/* Simplified print styles */}
+      {/* Add print-specific styles */}
       <style>{`
         @media print {
           @page {
@@ -219,20 +215,30 @@ export default function PrintInvoice() {
             background: white !important;
           }
           
-          .no-print {
+          .print\\:hidden {
             display: none !important;
           }
-          
-          .print-content {
+
+          /* Ensure invoice fits on one page */
+          .bg-white {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            max-height: 100vh !important;
+            overflow: hidden !important;
+          }
+
+          /* Remove any extra spacing */
+          .max-w-4xl {
+            width: 100% !important;
+            max-width: none !important;
             margin: 0 !important;
             padding: 0 !important;
           }
-          
-          .print-content .max-w-4xl {
-            max-width: none !important;
-            width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
+
+          /* Ensure proper scaling */
+          html, body {
+            width: 210mm;
+            height: 297mm;
           }
         }
       `}</style>

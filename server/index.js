@@ -1373,7 +1373,7 @@ async function createBusinessSheet(accessToken, businessData) {
     throw new Error(`Failed to create business sheet: ${error.message}`);
   }
 }
-app.post('/api/create-business-sheet1', async (req, res) => {
+app.post('/api/create-business-sheet', async (req, res) => {
   console.log('[CREATE] Initiating business sheet creation request');
   
   try {
@@ -1624,7 +1624,7 @@ app.post('/auth/callback', async (req, res) => {
   }
 });
 
-app.post('/api/check-business-sheet2', async (req, res) => {
+app.post('/api/check-business-sheet', async (req, res) => {
   try {
     // 1. Validate request format
     if (!req.headers['content-type']?.includes('application/json')) {
@@ -2543,12 +2543,6 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
     throw new Error(`Failed to create unified business sheet: ${error.message}`);
   }
 }
-
-
-
-
-
-
 
 /**
  * Endpoint: Create a single spreadsheet with both tabs (Unified)

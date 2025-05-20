@@ -279,10 +279,10 @@ export default function InitializePage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-supabase-token": supabaseToken,
-          "Authorization": `Bearer ${googleAccessToken}`
+          "x-supabase-token": supabaseToken
         },
         body: JSON.stringify({
+          accessToken: googleAccessToken,
           businessData: businessData,
         }),
       })
@@ -592,10 +592,10 @@ export default function InitializePage() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-supabase-token": supabaseToken,
-            "Authorization": `Bearer ${googleAccessToken}`
+            "x-supabase-token": supabaseToken
           },
           body: JSON.stringify({
+            accessToken: googleAccessToken,
             businessData: businessData,
           }),
         })

@@ -1110,7 +1110,7 @@ ${businessData.phone}`
                     type="text"
                     value={shareableLink}
                     readOnly
-                    className="w-full sm:flex-1 p-2 border rounded text-sm font-mono"
+                    className="w-full sm:flex-1 p-2 border rounded text-sm font-cal-sans"
                   />
                   <Button
                     variant="outline"

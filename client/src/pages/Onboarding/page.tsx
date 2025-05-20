@@ -275,14 +275,14 @@ export default function InitializePage() {
       return
     }
     try {
-      const response = await fetch("https://sheetbills-server.vercel.app/api/create-business-sheet", {
+      const response = await fetch("/api/create-business-sheet", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "x-supabase-token": supabaseToken,
+          "Authorization": `Bearer ${googleAccessToken}`
         },
         body: JSON.stringify({
-          accessToken: googleAccessToken,
           businessData: businessData,
         }),
       })
@@ -588,14 +588,14 @@ export default function InitializePage() {
       setIsLoading(true);
       setError("");
       try {
-        const response = await fetch("https://sheetbills-server.vercel.app/api/create-business-sheet", {
+        const response = await fetch("/api/create-business-sheet", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "x-supabase-token": supabaseToken,
+            "Authorization": `Bearer ${googleAccessToken}`
           },
           body: JSON.stringify({
-            accessToken: googleAccessToken,
             businessData: businessData,
           }),
         })

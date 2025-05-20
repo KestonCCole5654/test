@@ -306,8 +306,16 @@ export default function InvoiceForm() {
   // Used to update Invoice Items
   const updateItem = (index: number, field: string, value: any) => {
     const updatedItems = [...invoiceData.items]
-    if (field === "price" && value === "") {
+    // Allow empty string for price, quantity, discount, and tax
+    if (["price", "quantity"].includes(field) && value === "") {
       updatedItems[index] = { ...updatedItems[index], [field]: "" }
+    } else if (field === "discount" || field === "tax") {
+      // Allow empty string for discount/tax value
+      if (value.value === "") {
+        updatedItems[index] = { ...updatedItems[index], [field]: { ...value, value: "" } }
+      } else {
+        updatedItems[index] = { ...updatedItems[index], [field]: value }
+      }
     } else {
       updatedItems[index] = { ...updatedItems[index], [field]: value }
     }
@@ -1333,7 +1341,10 @@ ${businessData.phone}`
                                 id={`item-quantity-${index}`}
                                 type="number"
                                 value={item.quantity}
-                                onChange={(e) => updateItem(index, "quantity", parseInt(e.target.value) || 0)}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  updateItem(index, "quantity", val === "" ? "" : parseInt(val));
+                                }}
                                 min="0"
                                 className="mt-1.5 font-inter font-light"
                               />
@@ -1344,7 +1355,10 @@ ${businessData.phone}`
                                 id={`item-price-${index}`}
                                 type="number"
                                 value={item.price}
-                                onChange={(e) => updateItem(index, "price", parseFloat(e.target.value) || 0)}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  updateItem(index, "price", val === "" ? "" : parseFloat(val));
+                                }}
                                 min="0"
                                 step="0.01"
                                 className="mt-1.5  font-inter font-light"
@@ -1373,7 +1387,10 @@ ${businessData.phone}`
                                   id={`item-discount-${index}`}
                                   type="number"
                                   value={item.discount.value}
-                                  onChange={(e) => updateItem(index, "discount", { ...item.discount, value: parseFloat(e.target.value) || 0 })}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    updateItem(index, "discount", { ...item.discount, value: val === "" ? "" : parseFloat(val) });
+                                  }}
                                   min="0"
                                   step="0.01"
                                   className="flex-1 font-inter font-light"
@@ -1401,7 +1418,10 @@ ${businessData.phone}`
                                   id={`item-tax-${index}`}
                                   type="number"
                                   value={item.tax.value}
-                                  onChange={(e) => updateItem(index, "tax", { ...item.tax, value: parseFloat(e.target.value) || 0 })}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    updateItem(index, "tax", { ...item.tax, value: val === "" ? "" : parseFloat(val) });
+                                  }}
                                   min="0"
                                   step="0.01"
                                   className="flex-1  font-inter font-light"

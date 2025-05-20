@@ -312,18 +312,26 @@ export default function InitializePage() {
       sessionStorage.setItem("spreadsheetUrl", data.spreadsheetUrl);
 
       // Update onboarding status
-      const { error: updateError } = await supabase
-        .from("onboarding_status")
-        .upsert({
-          user_id: session?.user?.id,
-          has_created_sheet: true,
-          spreadsheet_id: data.spreadsheetId,
-          spreadsheet_url: data.spreadsheetUrl,
-          updated_at: new Date().toISOString(),
-        });
+      try {
+        const { error: updateError } = await supabase
+          .from("onboarding_status")
+          .upsert({
+            user_id: session?.user?.id,
+            has_created_sheet: true,
+            spreadsheet_id: data.spreadsheetId,
+            spreadsheet_url: data.spreadsheetUrl,
+            updated_at: new Date().toISOString(),
+          });
 
-      if (updateError) {
-        console.error("Error updating onboarding status:", updateError);
+        if (updateError) {
+          console.error("Error updating onboarding status:", updateError);
+          // Don't throw error here, as the sheet was created successfully
+          // Just log the error and continue
+        }
+      } catch (dbError) {
+        console.error("Database error:", dbError);
+        // Don't throw error here, as the sheet was created successfully
+        // Just log the error and continue
       }
 
       setShowSuccess(true);

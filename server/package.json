@@ -1,0 +1,41 @@
+{
+  "type": "module",
+  "name": "sheetbills-backend",
+  "version": "1.0.0",
+  "description": "Backend for SheetBills application",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "google-sheets",
+    "invoicing",
+    "express"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@clerk/clerk-sdk-node": "^4.13.23",
+    "@cloudflare/workers-types": "^4.20250327.0",
+    "@supabase/supabase-js": "^2.49.4",
+    "axios": "^1.8.1",
+    "body-parser": "^1.20.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "google-auth-library": "^8.9.0",
+    "googleapis": "^118.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.10.1",
+    "punycode": "^2.3.1",
+    "resend": "^4.5.1",
+    "wrangler": "^4.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}

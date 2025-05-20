@@ -220,7 +220,7 @@ export default function SettingsPage() {
 
   if (isLoading) {
     return (
-      <div className="container max-w-4xl mx-auto py-12">
+      <div className="container max-w-3xl mx-auto py-12">
         <div className="flex flex-col justify-center items-center h-64 gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <p className="text-muted-foreground">Loading Account & Business Settings...</p>
@@ -230,10 +230,10 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="container max-w-3xl mx-auto px-4 py-8">
+    <div className="container max-w-7xl mx-auto px-4 py-8">
       {/* Profile Section */}
       <div className="mb-12">
-        <h2 className="text-lg font-bold text-gray-900 mb-1">Profile</h2>
+        <h2 className="text-lg font-bold text-gray-900 mb-1">Account Profile</h2>
         <p className="text-sm text-gray-400 mb-6">Manage your personal information and account details.</p>
         <div className="divide-y divide-gray-200 border-t border-b">
           <div className="flex items-center justify-between py-5">

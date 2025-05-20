@@ -313,10 +313,15 @@ export default function InitializePage() {
 
       // Update onboarding status
       try {
+        console.log("[Onboarding] Attempting upsert with user_id:", session?.user?.id);
+        if (!session?.user?.id) {
+          setError("User is not authenticated. Please log in again.");
+          return;
+        }
         const { error: updateError } = await supabase
           .from("onboarding_status")
           .upsert({
-            user_id: session?.user?.id,
+            user_id: session.user.id,
             has_created_sheet: true,
             spreadsheet_id: data.spreadsheetId,
             spreadsheet_url: data.spreadsheetUrl,
@@ -326,12 +331,10 @@ export default function InitializePage() {
         if (updateError) {
           console.error("Error updating onboarding status:", updateError);
           // Don't throw error here, as the sheet was created successfully
-          // Just log the error and continue
         }
       } catch (dbError) {
         console.error("Database error:", dbError);
         // Don't throw error here, as the sheet was created successfully
-        // Just log the error and continue
       }
 
       setShowSuccess(true);

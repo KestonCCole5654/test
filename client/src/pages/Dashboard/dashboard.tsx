@@ -797,6 +797,9 @@ export default function Dashboard() {
         </div>
       )}
 
+      {/* Stats Card */}
+      <InvoiceStats stats={stats} />
+
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
         <div className="flex bg-gray-100 border border-gray-200">

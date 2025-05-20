@@ -645,7 +645,7 @@ export default function InvoiceForm() {
         setShowSuccessModal(true)
         // Navigate back to dashboard after successful update
         setTimeout(() => {
-          navigate('/dashboard')
+          navigate('/dashboard', { state: { refresh: true } })
         }, 2000)
       } else {
         alert("Failed to update invoice")
@@ -709,7 +709,7 @@ export default function InvoiceForm() {
         setShowSuccessModal(true)
         // Navigate back to dashboard after successful save
         setTimeout(() => {
-          navigate('/dashboard')
+          navigate('/dashboard', { state: { refresh: true } })
         }, 2000)
       } else {
         alert("Failed to save invoice")

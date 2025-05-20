@@ -304,6 +304,19 @@ export default function Dashboard() {
     }
   }, [invoices])
 
+  // Add this useEffect after your other useEffects
+  useEffect(() => {
+    if (location.state?.refresh && selectedSpreadsheetUrl) {
+      // Clear cache and force fetch
+      localStorage.removeItem("cachedInvoices");
+      localStorage.removeItem("lastFetchTime");
+      setLastFetchTime(0);
+      fetchInvoices(selectedSpreadsheetUrl);
+      // Remove the flag so it doesn't keep refreshing
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, selectedSpreadsheetUrl, navigate, location.pathname]);
+
   // =====================
   // Utility Functions
   // =====================

@@ -74,16 +74,16 @@ const Header = () => {
   }
 
   return (
-    <header className="sticky no-print top-0 font-inter z-50 border-b border-gray-50 bg-gray-800 shadow-xs">
+    <header className="sticky no-print top-0 font-cal-sans z-50 bg-gray-800 shadow-xs">
       <div className="container max-w-8xl mx-auto sm:px-6">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
               <div className="h-8 w-8 rounded bg-green-800 flex items-center justify-center">
-                <span className="text-white font-medium text-md">$</span>
+                <span className="text-white font-medium text-md">SB</span>
               </div>
-              <span className="text-xl font-light text-green-700">SheetBills ™</span>
+              <span className="text-xl font-normal text-green-700">SheetBills ™</span>
             </Link>
           </div>
 
@@ -93,21 +93,21 @@ const Header = () => {
               <>
                 <Link
                   to="/invoices"
-                  className="px-3 py-2 rounded-md text-slate-200 hover:text-slate-300 transition-colors"
+                  className="px-3 py-2 rounded-md font-normal text-slate-200 hover:text-slate-300 transition-colors"
                   onClick={handleNavigation}
                 >
                  Invoices
                 </Link>
                 <Link
                   to="/settings"
-                  className="px-3 py-2 rounded-md text-slate-200 hover:text-slate-300  transition-colors"
+                  className="px-3 py-2 rounded-md font-normal text-slate-200 hover:text-slate-300  transition-colors"
                   onClick={handleNavigation}
                 >
                   Account & Settings
                 </Link>
                 <Link
                   to="/contact"
-                  className="px-3 py-2 rounded-md text-slate-200 hover:text-slate-300  transition-colors"
+                  className="px-3 py-2 rounded-md font-normal text-slate-200 hover:text-slate-300  transition-colors"
                   onClick={handleNavigation}
                 >
                   Contact & Support
@@ -117,7 +117,7 @@ const Header = () => {
           </nav>
 
           {/* User profile section - desktop */}
-          <div className="hidden md:flex items-center space-x-2">
+          <div className="hidden md:flex font-normal items-center space-x-2">
             {user ? (
               <>
                 <DropdownMenu>

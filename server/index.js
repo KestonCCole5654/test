@@ -2243,5 +2243,76 @@ app.post('/api/create-business-sheet', async (req, res) => {
   }
 });
 
+// ==========================
+// Business Sheet Endpoints
+// ==========================
+
+/**
+ * Creates a new unified business sheet with both invoice and business details tabs.
+ * @route POST /api/create-business-sheet
+ * @access Protected (Supabase + Google Auth)
+ */
+app.post('/api/create-business-sheet', async (req, res) => {
+  try {
+    // Verify Supabase session first
+    const supabaseToken = req.headers['x-supabase-token'];
+    if (!supabaseToken) {
+      return res.status(401).json({ error: 'Missing Supabase session token' });
+    }
+
+    // Validate Supabase user
+    const { data: { user }, error } = await supabase.auth.getUser(supabaseToken);
+    if (error || !user) {
+      return res.status(401).json({ error: 'Invalid Supabase session' });
+    }
+
+    // Get Google access token from headers
+    const accessToken = req.headers.authorization?.split(' ')[1];
+    if (!accessToken) {
+      return res.status(401).json({ error: 'Google access token required' });
+    }
+
+    // Get business data from request body
+    const { businessData } = req.body;
+    if (!businessData) {
+      return res.status(400).json({ error: 'Business data is required' });
+    }
+
+    // Create the unified business sheet
+    const unifiedSheet = await createUnifiedBusinessSheet(accessToken, businessData);
+
+    // Add to master sheet
+    const masterSheet = await getOrCreateMasterSheet(accessToken, user.id);
+    const sheets = google.sheets({ version: 'v4', auth: new google.auth.OAuth2().setCredentials({ access_token: accessToken }) });
+    
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: masterSheet.id,
+      range: 'My Sheets!A:E',
+      valueInputOption: 'RAW',
+      resource: {
+        values: [[
+          new Date().toISOString(), // Created At
+          'SheetBills Invoices',    // Sheet Name
+          'Business',               // Sheet Type
+          'Active',                 // Status
+          unifiedSheet.spreadsheetUrl // URL
+        ]]
+      }
+    });
+
+    res.json({
+      success: true,
+      businessSheetId: unifiedSheet.spreadsheetId,
+      spreadsheetUrl: unifiedSheet.spreadsheetUrl
+    });
+  } catch (error) {
+    console.error('Business sheet creation error:', error);
+    res.status(500).json({
+      error: 'Business sheet creation failed',
+      details: error.message
+    });
+  }
+});
+
 
 

@@ -1,10 +1,4 @@
-import { ArrowUpRight, ArrowDownRight } from "lucide-react";
-
-const trendColors = {
-  up: "text-green-700",
-  down: "text-red-600",
-  neutral: "text-blue-700",
-};
+import React from "react";
 
 export interface InvoiceStat {
   label: string;
@@ -15,20 +9,28 @@ export interface InvoiceStat {
 
 export function InvoiceStats({ stats }: { stats: InvoiceStat[] }) {
   return (
-    <div className="w-full bg-white border rounded-xl shadow-sm p-4 mb-8 flex flex-col sm:flex-row gap-4 justify-between">
+    <div className="w-full bg-white border rounded-xl p-0 mb-6 flex flex-row divide-x divide-gray-200 overflow-hidden">
       {stats.map((stat, idx) => (
-        <div key={idx} className="flex-1 flex flex-col items-center sm:items-start px-2 min-w-[120px]">
-          <div className="flex items-center gap-1 mb-1">
-            {stat.trend === "up" && <ArrowUpRight className={`w-4 h-4 ${trendColors.up}`} />}
-            {stat.trend === "down" && <ArrowDownRight className={`w-4 h-4 ${trendColors.down}`} />}
-            <span className={`text-xs font-semibold ${trendColors[stat.trend]}`}>
-              {stat.trend === "neutral" ? "" : (stat.trend === "up" ? "+" : "-")}
-              {stat.percent}%
+        <div
+          key={idx}
+          className="flex-1 flex flex-col justify-between px-8 py-6 min-w-[180px]"
+        >
+          <div className="flex items-start justify-between mb-6">
+            <span className="text-sm text-gray-500 font-medium">{stat.label}</span>
+            <span
+              className={`text-xs font-semibold ${
+                stat.percent > 0
+                  ? "text-green-600"
+                  : stat.percent < 0
+                  ? "text-red-500"
+                  : "text-gray-400"
+              }`}
+            >
+              {stat.percent > 0 ? "+" : stat.percent < 0 ? "-" : ""}
+              {Math.abs(stat.percent).toFixed(2)}%
             </span>
-            <span className="text-xs text-gray-400">/month</span>
           </div>
-          <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
-          <div className="text-sm text-gray-500 mt-1">{stat.label}</div>
+          <div className="text-3xl font-bold text-gray-900 tracking-tight">{stat.value}</div>
         </div>
       ))}
     </div>

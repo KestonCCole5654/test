@@ -215,8 +215,8 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
       {/* Notes */}
       {data.notes && (
         <div className="clear-both mt-4 pt-2 px-4">
-          <h2 className="text-xs font-semibold text-green-800 uppercase mb-1">Notes</h2>
-          <p className="text-gray-600 text-xs whitespace-pre-line">{data.notes}</p>
+          <h2 className="text-sm font-semibold text-green-800 uppercase mb-1">Notes</h2>
+          <p className="text-gray-600 text-sm whitespace-pre-line">{data.notes}</p>
         </div>
       )}
     </div>

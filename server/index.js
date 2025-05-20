@@ -1518,12 +1518,14 @@ app.put('/api/sheets/mark-as-paid', async (req, res) => {
 
     // Get sheet metadata to determine the sheet name
     const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId: sheetId });
+    const tabNames = spreadsheet.data.sheets.map(s => s.properties.title);
+    console.log('Available tab names:', tabNames);
     const invoiceSheet = spreadsheet.data.sheets.find(
       s => s.properties.title === "SheetBills Invoices"
     );
     if (!invoiceSheet) {
-      console.error("SheetBills Invoices tab not found in spreadsheet");
-      return res.status(404).json({ error: 'SheetBills Invoices tab not found' });
+      console.error("SheetBills Invoices tab not found in spreadsheet. Tabs found:", tabNames);
+      return res.status(404).json({ error: 'SheetBills Invoices tab not found', tabs: tabNames });
     }
     const sheetName = invoiceSheet.properties.title;
     console.log("Using sheet name:", sheetName);
@@ -1531,20 +1533,21 @@ app.put('/api/sheets/mark-as-paid', async (req, res) => {
     // Fetch data from sheet
     console.log('Fetching sheet data...');
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId,
+      spreadsheetId: sheetId,
       range: `${sheetName}!A2:M`,
     });
 
     const rows = response.data.values || [];
-    console.log(`Found ${rows.length} rows`);
+    const invoiceIds = rows.map(row => row[0]);
+    console.log(`Found ${rows.length} rows. Invoice IDs:`, invoiceIds);
 
     // Find invoice row
     const rowIndex = rows.findIndex(row => row[0] === invoiceId);
     console.log('Found row index:', rowIndex);
     
     if (rowIndex === -1) {
-      console.error('[ERROR] Invoice not found in sheet');
-      return res.status(404).json({ error: 'Invoice not found' });
+      console.error('[ERROR] Invoice not found in sheet. Invoice IDs present:', invoiceIds);
+      return res.status(404).json({ error: 'Invoice not found', invoiceIds });
     }
 
     // Update status
@@ -1552,7 +1555,7 @@ app.put('/api/sheets/mark-as-paid', async (req, res) => {
     console.log('Updating range:', updateRange);
     
     await sheets.spreadsheets.values.update({
-      spreadsheetId,
+      spreadsheetId: sheetId,
       range: updateRange,
       valueInputOption: 'RAW',
       requestBody: { values: [['Paid']] },
@@ -1562,14 +1565,12 @@ app.put('/api/sheets/mark-as-paid', async (req, res) => {
     res.json({ success: true });
     
   } catch (error) {
-    console.error('[ERROR]', {
-      message: error.message,
-      stack: error.stack,
-      response: error.response?.data
-    });
+    console.error('[ERROR] mark-as-paid failed:', error);
     res.status(500).json({ 
       error: 'Operation failed',
-      details: error.message 
+      details: error.message,
+      stack: error.stack,
+      googleError: error.response?.data || null
     });
   }
 });

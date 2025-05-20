@@ -1013,7 +1013,13 @@ export default function Dashboard() {
                                 )
                                 if (!response.ok) {
                                   const errorData = await response.json()
-                                  throw new Error(errorData.error || "Failed to mark invoice as paid")
+                                  console.error("Mark as paid error:", errorData)
+                                  toast({
+                                    title: "Error marking as paid",
+                                    description: errorData.error || errorData.details || "Failed to mark invoice as paid.",
+                                    variant: "destructive",
+                                  })
+                                  return
                                 }
                                 const updatedInvoices = invoices.map((inv) =>
                                   inv.id === invoice.id ? { ...inv, status: "Paid" as const } : inv,
@@ -1025,9 +1031,10 @@ export default function Dashboard() {
                                   description: "Invoice marked as paid successfully.",
                                 })
                               } catch (error) {
+                                console.error("Mark as paid error (catch):", error)
                                 toast({
-                                  title: "Error",
-                                  description: error instanceof Error ? error.message : "Failed to update invoice status",
+                                  title: "Error marking as paid",
+                                  description: error instanceof Error ? error.message : "Failed to update invoice status.",
                                   variant: "destructive",
                                 })
                               }

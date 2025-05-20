@@ -779,7 +779,7 @@ export default function Dashboard() {
       {showWelcome && (
         <div className="mb-6 text-center">
           <span className="text-lg font-cal-sans text-gray-800">
-            Welcome {user?.user_metadata?.name || user?.email?.split("@")[0] || "there"}, start by creating your first invoice by clicking the <span className="font-semibold text-green-800">New Invoice</span> button.
+            Welcome {user?.user_metadata?.name || user?.email?.split("@")[0] || "there"}, start by creating your first invoice by clicking the <span className="text-green-800">New Invoice</span> button.
           </span>
         </div>
       )}

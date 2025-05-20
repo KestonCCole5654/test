@@ -2076,7 +2076,7 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
     const spreadsheetId = spreadsheet.data.spreadsheetId;
     const spreadsheetUrl = spreadsheet.data.spreadsheetUrl;
 
-    // Add service account as editor (if configured)
+    // Add service account as editor if configured
     const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
     if (serviceAccountEmail) {
       try {
@@ -2113,10 +2113,11 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
     const businessDetails = [
       ['Company Name', businessData.companyName, now],
       ['Business Email', businessData.email, now],
-      ['Phone Number', businessData.phone, now],
-      ['Address', businessData.address, now],
+      ['Phone Number', businessData.phone || '', now],
+      ['Address', businessData.address || '', now],
       ['Created At', now, now]
     ];
+
     await sheets.spreadsheets.values.batchUpdate({
       spreadsheetId,
       requestBody: {
@@ -2131,6 +2132,7 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
     // Format headers for both tabs
     const invoiceSheetId = spreadsheet.data.sheets[0].properties.sheetId;
     const businessSheetId = spreadsheet.data.sheets[1].properties.sheetId;
+
     await sheets.spreadsheets.batchUpdate({
       spreadsheetId,
       requestBody: {
@@ -2177,47 +2179,67 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
 app.post('/api/create-business-sheet', async (req, res) => {
   console.log('[CREATE] Initiating unified business sheet creation request');
   try {
+    // 1. Validate request content type
     if (!req.headers['content-type']?.includes('application/json')) {
       return res.status(415).json({ success: false, error: 'Invalid content type - requires JSON' });
     }
+
     // 2. Validate tokens
     const supabaseToken = req.headers['x-supabase-token'];
     const { accessToken, businessData } = req.body;
-    if (!supabaseToken?.startsWith('eyJ')) {
-      return res.status(400).json({ success: false, error: 'Invalid Supabase token format' });
+
+    if (!supabaseToken) {
+      console.error('[CREATE] Missing Supabase token');
+      return res.status(401).json({ success: false, error: 'Missing Supabase token' });
     }
-    if (!accessToken?.startsWith('ya29.')) {
-      return res.status(400).json({ success: false, error: 'Invalid Google token format' });
+
+    if (!accessToken) {
+      console.error('[CREATE] Missing Google access token');
+      return res.status(401).json({ success: false, error: 'Missing Google access token' });
     }
+
     // 3. Verify Supabase session
     const { data: { user }, error: supabaseError } = await supabase.auth.getUser(supabaseToken);
     if (supabaseError || !user) {
+      console.error('[CREATE] Supabase auth error:', supabaseError);
       return res.status(401).json({ success: false, error: 'Invalid Supabase session' });
     }
-    // 4. Verify Google scopes
-    const tokenInfo = await axios.get('https://www.googleapis.com/oauth2/v3/tokeninfo', { params: { access_token: accessToken } });
-    const requiredScopes = [
-      'https://www.googleapis.com/auth/drive',
-      'https://www.googleapis.com/auth/spreadsheets'
-    ];
-    if (!requiredScopes.every(scope => tokenInfo.data.scope?.includes(scope))) {
-      return res.status(403).json({ success: false, error: 'Missing required Google Drive & Sheets permissions' });
-    }
-    // 5. Get Google user ID
-    const userInfo = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: `Bearer ${accessToken}` }, timeout: 5000 });
-    if (!userInfo.data.sub) {
-      return res.status(400).json({ success: false, error: 'Failed to retrieve Google user ID' });
-    }
-    // 6. Validate business data
+
+    // 4. Validate business data
     if (!businessData?.companyName || !businessData?.email) {
-      return res.status(400).json({ success: false, error: 'Missing required business details (companyName and email are required)' });
+      console.error('[CREATE] Missing required business details');
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Missing required business details (companyName and email are required)' 
+      });
     }
-    // 7. Create unified business sheet (one spreadsheet, two tabs)
-    const unifiedSheet = await createUnifiedBusinessSheet(accessToken, businessData);
-    // 8. Register the sheet in the master sheet
-    const masterSheet = await getOrCreateMasterSheet(accessToken, userInfo.data.sub);
-    await google.sheets({ version: 'v4', auth: new google.auth.OAuth2().setCredentials({ access_token: accessToken }) })
-      .spreadsheets.values.append({
+
+    // 5. Initialize Google auth
+    const auth = new google.auth.OAuth2();
+    auth.setCredentials({ access_token: accessToken });
+
+    // 6. Get Google user info
+    try {
+      const userInfo = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+
+      if (!userInfo.data.sub) {
+        console.error('[CREATE] Failed to retrieve Google user ID');
+        return res.status(400).json({ success: false, error: 'Failed to retrieve Google user ID' });
+      }
+
+      // 7. Create unified business sheet
+      const unifiedSheet = await createUnifiedBusinessSheet(accessToken, businessData);
+      console.log('[CREATE] Unified sheet created:', unifiedSheet);
+
+      // 8. Get or create master sheet
+      const masterSheet = await getOrCreateMasterSheet(accessToken, userInfo.data.sub);
+      console.log('[CREATE] Master sheet retrieved:', masterSheet);
+
+      // 9. Add to master sheet
+      const sheets = google.sheets({ version: 'v4', auth });
+      await sheets.spreadsheets.values.append({
         spreadsheetId: masterSheet.id,
         range: 'My Sheets!A:E',
         valueInputOption: 'USER_ENTERED',
@@ -2231,15 +2253,31 @@ app.post('/api/create-business-sheet', async (req, res) => {
           ]]
         }
       });
-    // 9. Respond with the spreadsheet info
-    return res.json({
-      success: true,
-      spreadsheetId: unifiedSheet.spreadsheetId,
-      spreadsheetUrl: unifiedSheet.spreadsheetUrl
+
+      console.log('[CREATE] Added to master sheet successfully');
+
+      // 10. Return success response
+      return res.json({
+        success: true,
+        spreadsheetId: unifiedSheet.spreadsheetId,
+        spreadsheetUrl: unifiedSheet.spreadsheetUrl
+      });
+
+    } catch (googleError) {
+      console.error('[CREATE] Google API error:', googleError);
+      if (googleError.response?.status === 401) {
+        return res.status(401).json({ success: false, error: 'Invalid Google token' });
+      }
+      throw googleError;
+    }
+
+  } catch (error) {
+    console.error('[CREATE] Error:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: error.message || 'Failed to create business sheet',
+      details: error.response?.data || null
     });
-    } catch (error) {
-    console.error('[CREATE] Unified business sheet creation failed:', error);
-    return res.status(500).json({ success: false, error: error.message });
   }
 });
 

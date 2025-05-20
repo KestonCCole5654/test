@@ -31,6 +31,7 @@ import {
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb"
 import supabase from "../../components/Auth/supabaseClient"
+import { useSession } from '@supabase/auth-helpers-react'
 
 
 
@@ -265,51 +266,74 @@ export default function InitializePage() {
     }
   }
 
-  const handleSubmit = async () => {
-    setIsSubmitting(true)
-    setError("")
-    // Check for required tokens AFTER user clicks submit
+  const session = useSession()
+
+  const createBusinessSheet = async () => {
     if (!supabaseToken || !googleAccessToken) {
-      setError("Authentication Required: Please sign in and connect your Google account to continue.")
-      setIsSubmitting(false)
-      return
+      setError("Missing authentication tokens. Please try logging in again.");
+      return;
     }
+
+    setIsSubmitting(true);
+    setError("");
+
     try {
       const response = await fetch("https://sheetbills-server.vercel.app/api/create-business-sheet", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-supabase-token": supabaseToken
+          "x-supabase-token": supabaseToken,
         },
         body: JSON.stringify({
           accessToken: googleAccessToken,
           businessData: businessData,
         }),
-      })
-      const data = await response.json()
+      });
+
+      const data = await response.json();
+
       if (!response.ok) {
-        console.error("Server error:", data)
-        throw new Error(data.error || data.details || "Failed to set up your business")
+        console.error("Server error:", data);
+        if (response.status === 401) {
+          throw new Error("Authentication failed. Please try logging in again.");
+        } else if (response.status === 400) {
+          throw new Error(data.error || "Invalid business data provided");
+        } else {
+          throw new Error(data.error || "Failed to create business sheet");
+        }
       }
-      // Store the spreadsheet ID and URL for future use
-      if (data.spreadsheetId) {
-        localStorage.setItem("business_sheet_id", data.spreadsheetId)
+
+      if (!data.success) {
+        throw new Error(data.error || "Failed to create business sheet");
       }
-      if (data.spreadsheetUrl) {
-        localStorage.setItem("business_sheet_url", data.spreadsheetUrl)
+
+      // Store the spreadsheet ID and URL
+      sessionStorage.setItem("spreadsheetId", data.spreadsheetId);
+      sessionStorage.setItem("spreadsheetUrl", data.spreadsheetUrl);
+
+      // Update onboarding status
+      const { error: updateError } = await supabase
+        .from("onboarding_status")
+        .upsert({
+          user_id: session?.user?.id,
+          has_created_sheet: true,
+          spreadsheet_id: data.spreadsheetId,
+          spreadsheet_url: data.spreadsheetUrl,
+          updated_at: new Date().toISOString(),
+        });
+
+      if (updateError) {
+        console.error("Error updating onboarding status:", updateError);
       }
-      // Trigger confetti
-      triggerConfetti()
-      // Show success state
-      setShowSuccess(true)
-    } catch (err) {
-      console.error("Setup error:", err)
-      const errorMessage = err instanceof Error ? err.message : "An unknown error occurred"
-      setError(errorMessage || "Failed to save your business details. Please try again.")
-    } finally {
-      setIsSubmitting(false)
+
+      setShowSuccess(true);
+      setIsSubmitting(false);
+    } catch (error: unknown) {
+      console.error("Setup error:", error);
+      setError(error instanceof Error ? error.message : "Failed to create business sheet. Please try again.");
+      setIsSubmitting(false);
     }
-  }
+  };
 
   // Floating elements for visual interest
   const FloatingElements = () => {
@@ -563,7 +587,7 @@ export default function InitializePage() {
 
           <Button
             className="flex-1 bg-green-600 hover:bg-green-700"
-            onClick={handleSubmit}
+            onClick={createBusinessSheet}
             disabled={isSubmitting}
           >
             {isSubmitting ? (

@@ -748,10 +748,9 @@ export default function Dashboard() {
     .reduce((sum, inv) => sum + (inv.amount || 0), 0);
 
   const stats: InvoiceStat[] = [
-    { label: "Total Invoices", value: `$${totalAmount.toLocaleString()}`, percent: 0, trend: "neutral" },
-    { label: "Paid", value: `$${paidAmount.toLocaleString()}`, percent: 0, trend: "neutral" },
-    { label: "Unpaid", value: `$${unpaidAmount.toLocaleString()}`, percent: 0, trend: "neutral" },
-    { label: "Overdue", value: `$${overdueAmount.toLocaleString()}`, percent: 0, trend: "neutral" },
+    { label: "Revenue", value: `$${totalAmount.toLocaleString()}`, percent: 4.75, trend: "up" },
+    { label: "Overdue invoices", value: `$${paidAmount.toLocaleString()}`, percent: 54.02, trend: "up" },
+    { label: "Outstanding invoices", value: `$${unpaidAmount.toLocaleString()}`, percent: -1.39, trend: "down" }
   ];
 
   return (

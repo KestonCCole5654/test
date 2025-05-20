@@ -237,20 +237,29 @@ export default function SettingsPage() {
         <p className="text-sm text-gray-400 mb-6">Manage your personal information and account details.</p>
         <div className="divide-y divide-gray-200 border-t border-b">
           <div className="flex items-center justify-between py-5">
-            <span className="text-gray-700">Full name</span>
+            <span className="text-gray-700">Full Name</span>
             <span className="text-gray-900 flex-1 text-right mr-6">{userData.name || "—"}</span>
-            <a href="#" className="text-primary font-medium hover:underline">Update</a>
           </div>
           <div className="flex items-center justify-between py-5">
-            <span className="text-gray-700">Email address</span>
+            <span className="text-gray-700">Email</span>
             <span className="text-gray-900 flex-1 text-right mr-6">{userData.email || "—"}</span>
-            <a href="#" className="text-primary font-medium hover:underline">Update</a>
+          </div>
+          <div className="flex items-center justify-between py-5">
+            <span className="text-gray-700">Account Created</span>
+            <span className="text-gray-900 flex-1 text-right mr-6">{formatDate(userData.createdAt)}</span>
+          </div>
+          <div className="flex items-center justify-between py-5">
+            <span className="text-gray-700">Last Login</span>
+            <span className="text-gray-900 flex-1 text-right mr-6">{userData.lastLogin ? formatDate(userData.lastLogin) : "—"}</span>
+          </div>
+          <div className="flex items-center justify-between py-5">
+            <span className="text-gray-700">Account Type</span>
+            <span className="text-gray-900 flex-1 text-right mr-6">{userData.accountType || "—"}</span>
           </div>
           {userData.phone && (
             <div className="flex items-center justify-between py-5">
               <span className="text-gray-700">Phone</span>
               <span className="text-gray-900 flex-1 text-right mr-6">{userData.phone}</span>
-              <a href="#" className="text-primary font-medium hover:underline">Update</a>
             </div>
           )}
         </div>

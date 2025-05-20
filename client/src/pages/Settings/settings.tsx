@@ -231,6 +231,22 @@ export default function SettingsPage() {
 
   return (
     <div className="container max-w-7xl mx-auto px-4 py-8">
+      {/* Breadcrumb Navigation and Page Title */}
+      <div className="mb-8">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Settings</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <h1 className="text-2xl font-bold text-gray-900 mt-4">Settings Page</h1>
+      </div>
+
       {/* Profile Section */}
       <div className="mb-12">
         <h2 className="text-lg font-bold text-gray-900 mb-1">Account Profile</h2>
@@ -270,26 +286,100 @@ export default function SettingsPage() {
         <h2 className="text-lg font-bold text-gray-900 mb-1">Business Information</h2>
         <p className="text-sm text-gray-400 mb-6">These details appear on your invoices and documents.</p>
         <div className="divide-y divide-gray-200 border-t border-b">
-          <div className="flex items-center justify-between py-5">
-            <span className="text-gray-700">Company Name</span>
-            <span className="text-gray-900 flex-1 text-right mr-6">{businessData.companyName || "—"}</span>
-            <a href="#" className="text-primary font-medium hover:underline">Edit</a>
-          </div>
-          <div className="flex items-center justify-between py-5">
-            <span className="text-gray-700">Business Email</span>
-            <span className="text-gray-900 flex-1 text-right mr-6">{businessData.email || "—"}</span>
-            <a href="#" className="text-primary font-medium hover:underline">Edit</a>
-          </div>
-          <div className="flex items-center justify-between py-5">
-            <span className="text-gray-700">Phone Number</span>
-            <span className="text-gray-900 flex-1 text-right mr-6">{businessData.phone || "—"}</span>
-            <a href="#" className="text-primary font-medium hover:underline">Edit</a>
-          </div>
-          <div className="flex items-center justify-between py-5">
-            <span className="text-gray-700">Address</span>
-            <span className="text-gray-900 flex-1 text-right mr-6">{businessData.address || "—"}</span>
-            <a href="#" className="text-primary font-medium hover:underline">Edit</a>
-          </div>
+          {!isEditing ? (
+            <>
+              <div className="flex items-center justify-between py-5">
+                <span className="text-gray-700">Company Name</span>
+                <span className="text-gray-900 flex-1 text-right mr-6">{businessData.companyName || "—"}</span>
+                <button onClick={() => setIsEditing(true)} className="text-primary font-medium hover:underline">Edit</button>
+              </div>
+              <div className="flex items-center justify-between py-5">
+                <span className="text-gray-700">Business Email</span>
+                <span className="text-gray-900 flex-1 text-right mr-6">{businessData.email || "—"}</span>
+                <button onClick={() => setIsEditing(true)} className="text-primary font-medium hover:underline">Edit</button>
+              </div>
+              <div className="flex items-center justify-between py-5">
+                <span className="text-gray-700">Phone Number</span>
+                <span className="text-gray-900 flex-1 text-right mr-6">{businessData.phone || "—"}</span>
+                <button onClick={() => setIsEditing(true)} className="text-primary font-medium hover:underline">Edit</button>
+              </div>
+              <div className="flex items-center justify-between py-5">
+                <span className="text-gray-700">Address</span>
+                <span className="text-gray-900 flex-1 text-right mr-6">{businessData.address || "—"}</span>
+                <button onClick={() => setIsEditing(true)} className="text-primary font-medium hover:underline">Edit</button>
+              </div>
+            </>
+          ) : (
+            <form onSubmit={handleBusinessUpdate} className="space-y-6 px-4 py-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="companyName">Company Name *</Label>
+                  <Input
+                    id="companyName"
+                    required
+                    value={businessData.companyName}
+                    onChange={(e) => setBusinessData(prev => ({ ...prev, companyName: e.target.value }))}
+                    placeholder="Your company name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Business Email *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    required
+                    value={businessData.email}
+                    onChange={(e) => setBusinessData(prev => ({ ...prev, email: e.target.value }))}
+                    placeholder="contact@example.com"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    value={businessData.phone}
+                    onChange={(e) => setBusinessData(prev => ({ ...prev, phone: e.target.value }))}
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="address">Address</Label>
+                  <Input
+                    id="address"
+                    value={businessData.address}
+                    onChange={(e) => setBusinessData(prev => ({ ...prev, address: e.target.value }))}
+                    placeholder="123 Business St, Suite 100, City, State, ZIP"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditing(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isUpdatingBusiness}
+                  className="min-w-[120px]"
+                >
+                  {isUpdatingBusiness ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 mr-2" />
+                      Save Changes
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          )}
         </div>
       </div>
 

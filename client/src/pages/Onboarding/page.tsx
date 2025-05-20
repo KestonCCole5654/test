@@ -268,6 +268,31 @@ export default function InitializePage() {
 
   const session = useSession()
 
+  const [isOnboarded, setIsOnboarded] = useState<boolean | null>(null);
+
+  // Check onboarding status on mount
+  useEffect(() => {
+    async function checkOnboarding() {
+      if (!googleAccessToken) return;
+      try {
+        const response = await fetch("https://sheetbills-server.vercel.app/api/check-master-sheet", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ accessToken: googleAccessToken }),
+        });
+        const data = await response.json();
+        setIsOnboarded(data.onboarded);
+        if (data.onboarded) {
+          // Optionally, redirect to dashboard or show a message
+          navigate('/invoices');
+        }
+      } catch (err) {
+        console.error("Failed to check onboarding status", err);
+      }
+    }
+    checkOnboarding();
+  }, [googleAccessToken, navigate]);
+
   const createBusinessSheet = async () => {
     if (!supabaseToken || !googleAccessToken) {
       setError("Missing authentication tokens. Please try logging in again.");
@@ -310,32 +335,6 @@ export default function InitializePage() {
       // Store the spreadsheet ID and URL
       sessionStorage.setItem("spreadsheetId", data.spreadsheetId);
       sessionStorage.setItem("spreadsheetUrl", data.spreadsheetUrl);
-
-      // Update onboarding status
-      try {
-        console.log("[Onboarding] Attempting upsert with user_id:", session?.user?.id);
-        if (!session?.user?.id) {
-          setError("User is not authenticated. Please log in again.");
-          return;
-        }
-        const { error: updateError } = await supabase
-          .from("onboarding_status")
-          .upsert({
-            user_id: session.user.id,
-            has_created_sheet: true,
-            spreadsheet_id: data.spreadsheetId,
-            spreadsheet_url: data.spreadsheetUrl,
-            updated_at: new Date().toISOString(),
-          });
-
-        if (updateError) {
-          console.error("Error updating onboarding status:", updateError);
-          // Don't throw error here, as the sheet was created successfully
-        }
-      } catch (dbError) {
-        console.error("Database error:", dbError);
-        // Don't throw error here, as the sheet was created successfully
-      }
 
       setShowSuccess(true);
       setIsSubmitting(false);

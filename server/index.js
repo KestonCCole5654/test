@@ -2352,5 +2352,31 @@ app.post('/api/create-business-sheet', async (req, res) => {
   }
 });
 
+app.post('/api/check-master-sheet', async (req, res) => {
+  const { accessToken } = req.body;
+  if (!accessToken) return res.status(400).json({ error: 'Missing Google access token' });
+
+  const auth = new google.auth.OAuth2();
+  auth.setCredentials({ access_token: accessToken });
+  const drive = google.drive({ version: 'v3', auth });
+
+  try {
+    const { data } = await drive.files.list({
+      q: "name = 'SheetBills Master' and mimeType = 'application/vnd.google-apps.spreadsheet' and trashed = false",
+      fields: 'files(id, name)',
+      pageSize: 1,
+    });
+
+    if (data.files && data.files.length > 0) {
+      return res.json({ onboarded: true, masterSheetId: data.files[0].id });
+    } else {
+      return res.json({ onboarded: false });
+    }
+  } catch (error) {
+    console.error('Error checking master sheet:', error);
+    return res.status(500).json({ error: 'Failed to check master sheet' });
+  }
+});
+
 
 

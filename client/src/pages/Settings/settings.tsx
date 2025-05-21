@@ -234,11 +234,12 @@ export default function SettingsPage() {
 
   // Delete account handler
   const handleDeleteAccount = async () => {
-    setIsDeleting(true)
+    setIsDeleting(true);
     try {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       if (sessionError || !session) throw new Error("Authentication required");
-      await axios.delete("https://sheetbills-server.vercel.app/api/delete-account", {
+
+      const response = await axios.delete("https://sheetbills-server.vercel.app/api/delete-account", {
         headers: {
           Authorization: `Bearer ${session.provider_token}`,
           "X-Supabase-Token": session.access_token
@@ -248,16 +249,33 @@ export default function SettingsPage() {
           sheetUrl: sheetUrl || undefined
         }
       });
-      await supabase.auth.signOut();
-      toast({ title: "Account Deleted", description: "Your account and all data have been deleted." });
-      navigate("/login");
+
+      // Check for success explicitly based on backend response
+      if (response.data.success) {
+        // Sign out from Supabase on the client side
+        await supabase.auth.signOut();
+        // Navigate to the new status page with success state
+        navigate("/account-status", { state: { success: true, message: response.data.message } });
+      } else {
+        // If backend indicates failure but no error was thrown
+        navigate("/account-status", { state: { success: false, message: response.data.message || "Account deletion failed." } });
+      }
+
     } catch (error) {
-      toast({ title: "Delete Failed", description: error instanceof Error ? error.message : "Failed to delete account.", variant: "destructive" });
+      console.error("Delete account error:", error);
+      // Navigate to the new status page with error state
+      navigate("/account-status", {
+        state: {
+          success: false,
+          message: error instanceof Error ? error.message : "An unexpected error occurred.",
+          errorDetails: axios.isAxiosError(error) ? error.response?.data?.details || error.response?.data?.error : undefined
+        }
+      });
     } finally {
-      setIsDeleting(false)
-      setShowDeleteModal(false)
-      setDeletePhrase("")
-      setDeleteInvoices(false)
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+      setDeletePhrase("");
+      setDeleteInvoices(false);
     }
   };
 

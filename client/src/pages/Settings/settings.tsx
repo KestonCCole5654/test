@@ -318,7 +318,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Profile Section */}
-      <div className="mb-12">
+      <div className="mb-12 pl-8 pr-8">
         <h2 className="text-2xl font-cal-sans font-medium text-gray-900 mb-1 flex items-center gap-2">
           Account Profile
           {/* Google Icon */}
@@ -355,7 +355,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Business Information Section */}
-      <div className="mb-12">
+      <div className="mb-12 pl-8 pr-8">
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-2xl font-normal text-gray-900 flex items-center gap-2">
             Business Information
@@ -461,10 +461,10 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Legal Section */}
-      <div className="mb-12">
+      {/* Terms & Privacy Policy Section */}
+      <div className="mb-12 pl-8 pr-8">
         <h2 className="text-2xl font-cal-sans font-medium text-gray-900 mb-1 flex items-center gap-2">
-          Legal
+          Terms & Privacy Policy
         </h2>
         <p className="text-sm font-cal-sans font-normal text-gray-400 mb-6">View our Terms of Service and Privacy Policy.</p>
         <div className="divide-y divide-gray-200 border-t border-b">
@@ -494,7 +494,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Logout & Delete Account Section */}
-      <div className="mb-12">
+      <div className="mb-12 pl-8 pr-8">
         <h2 className="text-lg font-medium text-gray-900 mb-1">Logout & Delete Account</h2>
         <p className="text-sm text-gray-400 mb-6">You can log out of your account or permanently delete your account and all associated data.</p>
         <div className="flex gap-4">

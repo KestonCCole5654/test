@@ -27,12 +27,12 @@ export default function LegalPage() {
     <div className="container max-w-4xl mx-auto px-4 py-8">
       {/* Back Button */}
       <button
-        onClick={() => window.location.href = '/login'}
+        onClick={() => window.history.back()}
         className="mb-8 flex items-center text-green-700 hover:text-green-900 font-cal-sans text-sm focus:outline-none"
-        aria-label="Back to Login"
+        aria-label="Go back"
       >
         <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
-        Back to Login
+        Back
       </button>
 
       {/* Page Title */}

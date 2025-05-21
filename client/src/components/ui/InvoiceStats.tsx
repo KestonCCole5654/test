@@ -9,7 +9,7 @@ export interface InvoiceStat {
 
 export function InvoiceStats({ stats }: { stats: InvoiceStat[] }) {
   return (
-    <div className="w-full bg-transparent border-0 p-0 mb-6 flex flex-row divide-x divide-gray-200 overflow-hidden rounded-none border-b border-gray-200 pb-6">
+    <div className="w-full bg-transparent border-0 p-0 mb-6 flex flex-row divide-x divide-gray-200 overflow-hidden rounded-none border-b border-t border-gray-200 pb-6">
       {stats.map((stat, idx) => (
         <div
           key={idx}

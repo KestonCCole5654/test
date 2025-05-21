@@ -470,16 +470,6 @@ export default function InitializePage() {
             </Button>
           )}
 
-          {!currentQ.required && (
-            <Button
-              variant="ghost"
-              className="flex-1 text-gray-500 font-cal-sans hover:text-gray-700"
-              onClick={handleSkip}
-            >
-              Skip
-            </Button>
-          )}
-
           <Button
             className={`flex-1 ${
               currentQuestion === 0 && !value

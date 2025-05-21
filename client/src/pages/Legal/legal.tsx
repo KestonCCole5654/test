@@ -25,20 +25,15 @@ export default function LegalPage() {
 
   return (
     <div className="container max-w-4xl mx-auto px-4 py-8">
-      {/* Breadcrumb Navigation */}
-      <div className="mb-8">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Legal</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-      </div>
+      {/* Back Button */}
+      <button
+        onClick={() => window.location.href = '/login'}
+        className="mb-8 flex items-center text-green-700 hover:text-green-900 font-cal-sans text-sm focus:outline-none"
+        aria-label="Back to Login"
+      >
+        <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+        Back to Login
+      </button>
 
       {/* Page Title */}
       <h1 className="text-3xl font-cal-sans font-medium text-gray-900 mb-8">Legal Information</h1>

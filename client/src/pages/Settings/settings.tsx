@@ -10,8 +10,6 @@ import { Label } from "../../components/ui/label"
 import { useToast } from "../../components/ui/use-toast"
 import { Loader2, Edit, Save, X, Info, Calendar, Mail, User } from "lucide-react"
 import axios from "axios"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar"
 import supabase from "../../components/Auth/supabaseClient"
 import {
   Breadcrumb,
@@ -21,6 +19,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb"
+import { LoadingSpinner } from "../../components/ui/loadingSpinner"
 
 interface UserData {
   name: string
@@ -59,9 +58,7 @@ export default function SettingsPage() {
   const fetchData = async () => {
     try {
       setIsLoading(true);
-
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
       if (sessionError || !session) {
         navigate("/sign-in");
         return;
@@ -222,7 +219,7 @@ export default function SettingsPage() {
     return (
       <div className="container max-w-3xl mx-auto py-12">
         <div className="flex flex-col justify-center items-center h-64 gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <LoadingSpinner />
           <p className="text-muted-foreground">Loading Account & Business Settings...</p>
         </div>
       </div>
@@ -248,7 +245,7 @@ export default function SettingsPage() {
 
       {/* Profile Section */}
       <div className="mb-12">
-        <h2 className="text-xl font-cal-sans font-bold text-gray-900 mb-1">Account Profile</h2>
+        <h2 className="text-2xl font-cal-sans font-medium text-gray-900 mb-1">Account Profile</h2>
         <p className="text-sm font-cal-sans font-normal text-gray-400 mb-6">Manage your personal information and account details.</p>
         <div className="divide-y divide-gray-200 border-t border-b">
           <div className="flex items-center justify-between py-5">
@@ -283,9 +280,9 @@ export default function SettingsPage() {
       {/* Business Information Section */}
       <div className="mb-12">
         <div className="flex items-center justify-between mb-1">
-          <h2 className="text-lg font-bold text-gray-900">Business Information</h2>
+          <h2 className="text-lg font-medium text-gray-900">Business Information</h2>
           {!isEditing && (
-            <button onClick={() => setIsEditing(true)} className="text-primary font-medium hover:underline">Edit</button>
+            <Button variant="outline" onClick={() => setIsEditing(true)} className="text-primary font-medium hover:underline">Edit</button>
           )}
         </div>
         <p className="text-sm text-gray-400 mb-6">These details appear on your invoices and documents.</p>

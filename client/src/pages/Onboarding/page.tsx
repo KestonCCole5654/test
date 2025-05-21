@@ -32,6 +32,7 @@ import {
 } from "../../components/ui/breadcrumb"
 import supabase from "../../components/Auth/supabaseClient"
 import { useSession } from '@supabase/auth-helpers-react'
+import { LoadingSpinner } from "../../components/ui/loadingSpinner"
 
 
 
@@ -601,7 +602,7 @@ export default function InitializePage() {
             disabled={isSubmitting}
           >
             {isSubmitting ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              <LoadingSpinner />
             ) : (
               <CheckCircle2 className="h-4 w-4 mr-2" />
             )}
@@ -668,7 +669,7 @@ export default function InitializePage() {
             className="flex flex-col items-center justify-center max-w-md mx-auto"
           >
             <div className="relative mb-8">
-              <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+              <LoadingSpinner />
             </div>
             <motion.h2
               initial={{ y: 20, opacity: 0 }}

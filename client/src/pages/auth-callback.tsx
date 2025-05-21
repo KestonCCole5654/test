@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 import supabase from '../components/Auth/supabaseClient'
+import { LoadingSpinner } from '../components/ui/loadingSpinner'
 
 export default function AuthCallback() {
   const [error, setError] = useState<string | null>(null)
@@ -106,7 +107,7 @@ export default function AuthCallback() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
       <div className="text-center">
-        <Loader2 className="h-8 w-8 animate-spin text-green-600 mx-auto" />
+        <LoadingSpinner />
         <p className="mt-4 text-slate-600 text-sm font-medium">
           Setting up your account...
         </p>

@@ -6,6 +6,7 @@ import { Button } from "../../components/ui/button"
 import { Card, CardContent } from "../../components/ui/card"
 import { Loader2, Shield } from "lucide-react"
 import supabase from "./supabaseClient"
+import { LoadingSpinner } from "../../components/ui/loadingSpinner"
 
 
 export default function LoginPage() {
@@ -53,7 +54,7 @@ export default function LoginPage() {
     return (
       <div className="min-h-screen font-cal-sans flex items-center justify-center bg-gradient-to-b from-white to-gray-50">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 font-cal-sans animate-spin text-emerald-600 mx-auto" />
+          <LoadingSpinner />
           <p className="mt-4 text-slate-600 font-cal-sans text-sm font-medium">
             {loading ? "Connecting to Google..." : "Loading..."}
           </p>

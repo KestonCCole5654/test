@@ -789,13 +789,18 @@ export default function Dashboard() {
           ))}
         </div>
         <div className="flex gap-3 w-full md:w-auto">
-          <Input
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full md:w-96 lg:w-[32rem] border-gray-200"
-            disabled={isStateLoading}
-          />
+          <div className="relative w-full md:w-96 lg:w-[32rem]">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+            </span>
+            <Input
+              placeholder="Search for Invoices ..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 w-full md:w-96 lg:w-[32rem] border-gray-200"
+              disabled={isStateLoading}
+            />
+          </div>
           <Button
             onClick={handleRefresh}
             className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 shadow-none"

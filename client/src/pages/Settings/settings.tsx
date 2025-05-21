@@ -20,6 +20,8 @@ import {
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb"
 import { LoadingSpinner } from "../../components/ui/loadingSpinner"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog'
+import { Checkbox } from '../../components/ui/checkbox'
 
 interface UserData {
   name: string
@@ -53,7 +55,11 @@ export default function SettingsPage() {
   })
   const [isUpdatingBusiness, setIsUpdatingBusiness] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
-
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deleteInvoices, setDeleteInvoices] = useState(false)
+  const [deletePhrase, setDeletePhrase] = useState("")
+  const [isDeleting, setIsDeleting] = useState(false)
+  const sheetUrl = typeof window !== 'undefined' ? localStorage.getItem("defaultSheetUrl") : ""
 
   const fetchData = async () => {
     try {
@@ -86,7 +92,6 @@ export default function SettingsPage() {
 
       // Fetch business details
       // Always pass the current invoice spreadsheet URL as sheetUrl
-      const sheetUrl = localStorage.getItem("defaultSheetUrl") || "";
       if (!sheetUrl) {
         throw new Error("No invoice spreadsheet selected")
       }
@@ -229,16 +234,18 @@ export default function SettingsPage() {
 
   // Delete account handler
   const handleDeleteAccount = async () => {
-    if (!window.confirm("Are you sure you want to permanently delete your account? This action cannot be undone.")) return;
+    setIsDeleting(true)
     try {
-      setIsLoading(true);
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       if (sessionError || !session) throw new Error("Authentication required");
-      // Call backend to delete user
       await axios.delete("https://sheetbills-server.vercel.app/api/delete-account", {
         headers: {
           Authorization: `Bearer ${session.provider_token}`,
           "X-Supabase-Token": session.access_token
+        },
+        data: {
+          deleteInvoices: deleteInvoices,
+          sheetUrl: sheetUrl || undefined
         }
       });
       await supabase.auth.signOut();
@@ -247,7 +254,10 @@ export default function SettingsPage() {
     } catch (error) {
       toast({ title: "Delete Failed", description: error instanceof Error ? error.message : "Failed to delete account.", variant: "destructive" });
     } finally {
-      setIsLoading(false);
+      setIsDeleting(false)
+      setShowDeleteModal(false)
+      setDeletePhrase("")
+      setDeleteInvoices(false)
     }
   };
 
@@ -473,10 +483,48 @@ export default function SettingsPage() {
         <h2 className="text-lg font-medium text-gray-900 mb-1">Logout & Delete Account</h2>
         <p className="text-sm text-gray-400 mb-6">You can log out of your account or permanently delete your account and all associated data.</p>
         <div className="flex gap-4">
-          <Button  onClick={handleLogout} className="border border-gray-300 text-white bg-green-800 hover:bg-green-900 shadow-none">Logout</Button>
-          <Button variant="destructive" onClick={handleDeleteAccount} className="font-medium">Delete Account</Button>
+          <Button onClick={handleLogout} className="border border-gray-300 text-white bg-green-800 hover:bg-green-900 shadow-none">Logout</Button>
+          <Button variant="destructive" onClick={() => setShowDeleteModal(true)} className="font-medium">Delete Account</Button>
         </div>
       </div>
+
+      {/* Delete Account Modal */}
+      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Account</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-red-700 font-semibold">This action is irreversible. Your account and all associated data will be permanently deleted.</p>
+            <Checkbox id="delete-invoices" checked={deleteInvoices} onCheckedChange={setDeleteInvoices} />
+            <label htmlFor="delete-invoices" className="ml-2 text-gray-700">Also delete all my invoices stored in Google Sheets</label>
+            {sheetUrl && (
+              <div className="mt-2">
+                <span className="text-gray-700">Your SheetBills Invoices Sheet: </span>
+                <a href={sheetUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline break-all">{sheetUrl}</a>
+              </div>
+            )}
+            <div className="mt-4">
+              <label htmlFor="delete-phrase" className="block text-gray-700 mb-1">Type <span className="font-bold">DELETE</span> to confirm:</label>
+              <Input
+                id="delete-phrase"
+                value={deletePhrase}
+                onChange={e => setDeletePhrase(e.target.value)}
+                placeholder="DELETE"
+                className="w-full"
+                autoFocus
+              />
+            </div>
+          </div>
+          <DialogFooter className="mt-6 flex gap-2">
+            <Button variant="outline" onClick={() => setShowDeleteModal(false)} disabled={isDeleting}>Cancel</Button>
+            <Button variant="destructive" onClick={handleDeleteAccount} disabled={deletePhrase !== "DELETE" || isDeleting}>
+              {isDeleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Delete Account
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
     </div>
   )

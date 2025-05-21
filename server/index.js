@@ -2379,5 +2379,89 @@ app.post('/api/check-master-sheet', async (req, res) => {
   }
 });
 
+app.delete('/api/delete-account', async (req, res) => {
+  try {
+    // Parse body (for DELETE, express.json() must be enabled, which you have)
+    const { deleteInvoices, sheetUrl } = req.body;
+
+    // Validate tokens
+    const supabaseToken = req.headers['x-supabase-token'];
+    const googleToken = req.headers.authorization?.split(' ')[1];
+    if (!supabaseToken || !googleToken) {
+      return res.status(401).json({ error: 'Authentication tokens required' });
+    }
+
+    // Validate Supabase session
+    const { data: { user }, error } = await supabase.auth.getUser(supabaseToken);
+    if (error || !user) {
+      return res.status(401).json({ error: 'Invalid Supabase session' });
+    }
+
+    // Optionally delete all invoices from the user's Google Sheet
+    if (deleteInvoices && sheetUrl) {
+      const spreadsheetId = extractSheetIdFromUrl(sheetUrl);
+      if (!spreadsheetId) {
+        return res.status(400).json({ error: 'Invalid sheetUrl format' });
+      }
+
+      // Google Sheets API setup
+      const auth = new google.auth.OAuth2();
+      auth.setCredentials({ access_token: googleToken });
+      const sheets = google.sheets({ version: 'v4', auth });
+
+      // Find the SheetBills Invoices tab
+      const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
+      const invoiceSheet = spreadsheet.data.sheets.find(
+        s => s.properties.title === "SheetBills Invoices"
+      );
+      if (!invoiceSheet) {
+        return res.status(404).json({ error: 'SheetBills Invoices tab not found' });
+      }
+      const sheetId = invoiceSheet.properties.sheetId;
+      const sheetName = invoiceSheet.properties.title;
+
+      // Get all invoice rows (excluding header)
+      const valuesResponse = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: `${sheetName}!A2:A`,
+      });
+      const rows = valuesResponse.data.values || [];
+      const numRows = rows.length;
+
+      if (numRows > 0) {
+        // Delete all rows in one batch request
+        await sheets.spreadsheets.batchUpdate({
+          spreadsheetId,
+          requestBody: {
+            requests: [
+              {
+                deleteDimension: {
+                  range: {
+                    sheetId,
+                    dimension: 'ROWS',
+                    startIndex: 1, // skip header row
+                    endIndex: numRows + 1,
+                  },
+                },
+              },
+            ],
+          },
+        });
+      }
+    }
+
+    // Delete user from Supabase
+    const { error: deleteError } = await supabase.auth.admin.deleteUser(user.id);
+    if (deleteError) {
+      return res.status(500).json({ error: 'Failed to delete user from Supabase', details: deleteError.message });
+    }
+
+    return res.json({ success: true, message: 'Account and data deleted successfully' });
+  } catch (error) {
+    console.error('Delete account error:', error);
+    res.status(500).json({ error: 'Failed to delete account', details: error.message });
+  }
+});
+
 
 

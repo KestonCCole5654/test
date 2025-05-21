@@ -793,7 +793,7 @@ export default function Dashboard() {
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="max-w-md  border-gray-200"
+            className="w-full md:w-96 lg:w-[32rem] border-gray-200"
             disabled={isStateLoading}
           />
           <Button

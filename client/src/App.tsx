@@ -25,6 +25,7 @@ import PrintInvoice from './pages/PrintInvoice/print-invoice';
 import EmailInvoice from './pages/EmailInvoice/email-invoice';
 import LegalPage from './pages/Legal/legal';
 import LandingPage from './pages/LandingPage/landingpage';
+import AccountStatus from './pages/AccountStatus/AccountStatus';
 // import TemplateDesignerPage from './components/TemplateDesigner/TemplateDesignerPage';
 // SidebarLayout already includes the Outlet component
 
@@ -162,6 +163,7 @@ function App() {
         <Route path="/auth-callback" element={<AuthCallback />} />
         <Route path="/legal" element={<LegalPage />} />
         <Route path="/landingpage" element={<LandingPage />} />
+        <Route path="/account-status" element={<AccountStatus />} />
     
         {/* Onboarding Route */}
         <Route

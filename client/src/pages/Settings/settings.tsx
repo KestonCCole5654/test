@@ -255,10 +255,21 @@ export default function SettingsPage() {
         // Sign out from Supabase on the client side
         await supabase.auth.signOut();
         // Navigate to the new status page with success state
-        navigate("/account-status", { state: { success: true, message: response.data.message } });
+        navigate("/account-status", { 
+          state: { 
+            success: true, 
+            message: response.data.message || "Your account has been successfully deleted." 
+          } 
+        });
       } else {
         // If backend indicates failure but no error was thrown
-        navigate("/account-status", { state: { success: false, message: response.data.message || "Account deletion failed." } });
+        navigate("/account-status", { 
+          state: { 
+            success: false, 
+            message: response.data.error || "Account deletion failed.",
+            errorDetails: response.data.details
+          } 
+        });
       }
 
     } catch (error) {

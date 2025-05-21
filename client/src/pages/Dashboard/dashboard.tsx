@@ -605,76 +605,7 @@ export default function Dashboard() {
     }
   }
 
-  // =====================
-  // Partial Payment Logic
-  // =====================
-  // Handle partial payment modal actions
-  const handlePartialPayment = async () => {
-    if (!selectedInvoice) return
-    try {
-      const amount = Number.parseFloat(partialPaymentAmount)
-      if (isNaN(amount) || amount <= 0 || amount >= selectedInvoice.amount) {
-        toast({
-          title: "Invalid Amount",
-          description: "Please enter a valid partial payment amount.",
-          variant: "destructive",
-        })
-        return
-      }
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession()
-      if (sessionError) {
-        throw new Error(sessionError.message)
-      }
-      const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/partial-payment", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.provider_token}`,
-          "X-Supabase-Token": session?.access_token || "",
-        },
-        body: JSON.stringify({
-          invoiceId: selectedInvoice.id,
-          amount: amount,
-          paymentDate: paymentDate.toISOString(),
-          sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
-        }),
-      })
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || "Failed to process partial payment")
-      }
-      // Update local state with proper typing
-      const updatedInvoices = invoices.map((inv) =>
-        inv.id === selectedInvoice.id
-          ? ({
-              ...inv,
-              status: amount === inv.amount ? "Paid" : "Partially Paid",
-              paidAmount: amount,
-              lastPaymentDate: paymentDate.toISOString(),
-            } as Invoice)
-          : inv,
-      )
-      setInvoices(updatedInvoices)
-      if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
-      toast({
-        title: "Payment Recorded",
-        description: "Partial payment has been recorded successfully.",
-      })
-      setIsPartialPaymentModalOpen(false)
-      setSelectedInvoice(null)
-      setPartialPaymentAmount("")
-      setPaymentDate(new Date())
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to process payment",
-        variant: "destructive",
-      })
-    }
-  }
+
 
   // =====================
   // Table Rendering & UI
@@ -976,12 +907,13 @@ export default function Dashboard() {
                             onClick={(e) => e.stopPropagation()}
                             className="w-[56px] px-6 py-4 align-middle text-center border-r border-gray-200"
                           >
-                            <Checkbox
-                              checked={selectedInvoices.has(invoice.id)}
-                              onCheckedChange={() => handleSelectInvoice(invoice.id)}
-                              aria-label={`Select invoice ${invoice.id}`}
-                              className="mx-auto"
-                            />
+                            <div className="flex items-center justify-center h-full min-h-[40px]">
+                              <span
+                                className="inline-flex items-center justify-center cursor-grab text-gray-400 hover:text-gray-600 active:text-gray-800"
+                              >
+                                <GripVertical className="h-6 w-6" />
+                              </span>
+                            </div>
                           </TableCell>
                           <TableCell className="px-6 py-4 whitespace-nowrap border-r border-gray-200">{invoice.id}</TableCell>
                           <TableCell className="px-6 py-4 border-r border-gray-200">
@@ -1333,14 +1265,16 @@ function SortableTableRow({ id, children, invoice, spreadsheets, ...props }: Sor
       className="hover:bg-slate-50"
       {...props}
     >
-      <td className="w-8 px-2 align-middle text-center cursor-grab" style={{ verticalAlign: "middle" }}>
-        <span
-          {...attributes}
-          {...listeners}
-          className="inline-flex items-center justify-center cursor-grab text-gray-400 hover:text-gray-600 active:text-gray-800"
-        >
-          <GripVertical className="h-6 w-6" />
-        </span>
+      <td className="w-8 px-4 align-middle text-center border-r border-gray-200" style={{ verticalAlign: "middle" }}>
+        <div className="flex items-center justify-center h-full min-h-[40px]">
+          <span
+            {...attributes}
+            {...listeners}
+            className="inline-flex items-center justify-center cursor-grab text-gray-400 hover:text-gray-600 active:text-gray-800"
+          >
+            <GripVertical className="h-6 w-6" />
+          </span>
+        </div>
       </td>
       {children}
     </tr>

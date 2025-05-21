@@ -555,6 +555,8 @@ export default function Dashboard() {
       if (sessionError) {
         throw new Error(sessionError.message)
       }
+      localStorage.removeItem("cachedInvoices");
+      localStorage.removeItem("lastFetchTime");
       const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/bulk-delete", {
         method: "DELETE",
         headers: {
@@ -1170,6 +1172,8 @@ export default function Dashboard() {
                   if (sessionError) {
                     throw new Error(sessionError.message)
                   }
+                  localStorage.removeItem("cachedInvoices");
+                  localStorage.removeItem("lastFetchTime");
                   const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/delete-invoice", {
                     method: "DELETE",
                     headers: {

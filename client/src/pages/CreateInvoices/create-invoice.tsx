@@ -644,9 +644,7 @@ export default function InvoiceForm() {
       if (updateResponse.data.success) {
         setShowSuccessModal(true)
         // Navigate back to dashboard after successful update
-        setTimeout(() => {
-          navigate('/dashboard', { state: { refresh: true } })
-        }, 2000)
+        navigate('/dashboard', { state: { refresh: true } })
       } else {
         alert("Failed to update invoice")
       }
@@ -708,9 +706,7 @@ export default function InvoiceForm() {
       if (saveResponse.data.success) {
         setShowSuccessModal(true)
         // Navigate back to dashboard after successful save
-        setTimeout(() => {
-          navigate('/dashboard', { state: { refresh: true } })
-        }, 2000)
+        navigate('/dashboard', { state: { refresh: true } })
       } else {
         alert("Failed to save invoice")
       }

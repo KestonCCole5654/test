@@ -135,7 +135,7 @@ const Header = () => {
                           {user.email?.charAt(0).toUpperCase() || "U"}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="text-slate-200 font-medium hidden sm:inline-block max-w-[120px] truncate">
+                      <span className="text-slate-200 font-normal font-md hidden sm:inline-block max-w-[120px] truncate">
                         {user.email?.split("@")[0] || "User"}
                       </span>
                       <ChevronDown size={16} className="text-slate-200" />

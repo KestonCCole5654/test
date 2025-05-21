@@ -809,7 +809,7 @@ export default function Dashboard() {
       <InvoiceStats stats={stats} />
 
         {/* Tips Section */}
-        <div className="mb-6 p-4 bg-green-50 border border-green-200">
+        {/* <div className="mb-6 p-4 bg-green-50 border border-green-200">
         <div className="flex items-start gap-3">
           <div className="flex-shrink-0 mt-1">
             <svg className="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -823,7 +823,7 @@ export default function Dashboard() {
             </p>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">

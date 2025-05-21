@@ -87,14 +87,7 @@ export default function ContactPage() {
         <div className="max-w-md w-full bg-white rounded-lg shadow p-8 text-center">
           <h2 className="text-2xl font-semibold mb-4">Message Sent!</h2>
           <p className="mb-2">Thank you for contacting us. Our support team will get back to you soon.</p>
-          <div className="text-left mt-6">
-            <h3 className="font-medium mb-2">Summary:</h3>
-            <p><strong>Email:</strong> {sentData.email}</p>
-            <p><strong>Subject:</strong> {sentData.subject}</p>
-            <p><strong>Message:</strong></p>
-            <div className="bg-gray-100 rounded p-2 whitespace-pre-line">{sentData.message}</div>
-          </div>
-          <Button className="mt-6 w-full" onClick={() => setShowSummary(false)}>
+          <Button className="mt-6 border border-gray-300 text-white bg-green-800 hover:bg-green-900 shadow-none"  onClick={() => setShowSummary(false)}>
             Send Another Message
           </Button>
         </div>

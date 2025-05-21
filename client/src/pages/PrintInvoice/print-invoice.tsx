@@ -127,7 +127,7 @@ export default function PrintInvoice() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="flex items-center justify-center gap-3">
+        <div className="flex flex-col items-center justify-center gap-3">
           <div className="relative h-8 w-8">
             <div className="absolute inset-0 rounded bg-green-700/20 animate-ping"></div>
             <div className="relative h-full w-full rounded bg-green-700 flex items-center justify-center animate-pulse">

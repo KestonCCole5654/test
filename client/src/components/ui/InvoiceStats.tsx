@@ -19,7 +19,7 @@ export function InvoiceStats({ stats }: { stats: InvoiceStat[] }) {
           <div className="flex items-start justify-between mb-6">
             <span className="text-sm text-gray-500 font-medium">{stat.label}</span>
             {typeof stat.count === 'number' && (
-              <span className="ml-2 px-2 py-0.5 rounded-full bg-gray-100 text-xs text-gray-600 font-semibold align-top">{stat.count}</span>
+              <span className="ml-2 px-2 py-0.5 text-md text-green-800 font-normal align-top">{stat.count}</span>
             )}
           </div>
           <div className="text-2xl font-normal text-black tracking-tight">{stat.value}</div>

@@ -80,8 +80,8 @@ const Header = () => {
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded bg-green-800 flex items-center justify-center">
-                <span className="text-white font-medium text-md">SB</span>
+              <div className="h-10 w-10 rounded bg-green-800 flex items-center justify-center">
+                <span className="text-white font-normal text-md">SB</span>
               </div>
               <span className="text-lg font-normal text-slate-200">SheetBills ™</span>
             </Link>

@@ -19,18 +19,7 @@ export function InvoiceStats({ stats }: { stats: InvoiceStat[] }) {
         >
           <div className="flex items-start justify-between mb-6">
             <span className="text-sm text-gray-500 font-medium">{stat.label}</span>
-            <span
-              className={`text-xs font-normal ${
-                stat.percent > 0
-                  ? "text-green-600"
-                  : stat.percent < 0
-                  ? "text-red-500"
-                  : "text-gray-400"
-              }`}
-            >
-              {stat.percent > 0 ? "+" : stat.percent < 0 ? "-" : ""}
-              {Math.abs(stat.percent).toFixed(2)}%
-            </span>
+            
           </div>
           <div className="text-3xl font-normal text-black tracking-tight">{stat.value}</div>
         </div>

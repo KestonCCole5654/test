@@ -1262,7 +1262,7 @@ function SortableTableRow({ id, children, invoice, spreadsheets, ...props }: Sor
       ref={setNodeRef}
       style={style}
       onClick={handleRowClick}
-      className="hover:bg-slate-50"
+      className="hover:bg-slate-50 border-b border-gray-200"
       {...props}
     >
       <td className="w-8 px-4 align-middle text-center border-r border-gray-200" style={{ verticalAlign: "middle" }}>

@@ -444,6 +444,30 @@ export default function SettingsPage() {
         </div>
       </div>
 
+      {/* Legal Section */}
+      <div className="mb-12">
+        <h2 className="text-2xl font-cal-sans font-medium text-gray-900 mb-1 flex items-center gap-2">
+          Legal
+        </h2>
+        <p className="text-sm font-cal-sans font-normal text-gray-400 mb-6">View our Terms of Service and Privacy Policy.</p>
+        <div className="flex gap-4">
+          <Button
+            variant="outline"
+            onClick={() => window.open('/legal?tab=terms', '_blank')}
+            className="font-cal-sans"
+          >
+            View Terms of Service
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => window.open('/legal?tab=privacy', '_blank')}
+            className="font-cal-sans"
+          >
+            View Privacy Policy
+          </Button>
+        </div>
+      </div>
+
       {/* Logout & Delete Account Section */}
       <div className="mb-12">
         <h2 className="text-lg font-medium text-gray-900 mb-1">Logout & Delete Account</h2>

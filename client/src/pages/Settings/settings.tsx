@@ -282,30 +282,31 @@ export default function SettingsPage() {
 
       {/* Business Information Section */}
       <div className="mb-12">
-        <h2 className="text-xl font-cal-sans font-bold text-gray-900 mb-1">Business Information</h2>
-        <p className="text-sm font-cal-sans font-normal text-gray-400 mb-6">These details appear on your invoices and documents.</p>
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="text-lg font-bold text-gray-900">Business Information</h2>
+          {!isEditing && (
+            <button onClick={() => setIsEditing(true)} className="text-primary font-medium hover:underline">Edit</button>
+          )}
+        </div>
+        <p className="text-sm text-gray-400 mb-6">These details appear on your invoices and documents.</p>
         <div className="divide-y divide-gray-200 border-t border-b">
           {!isEditing ? (
             <>
               <div className="flex items-center justify-between py-5">
                 <span className="text-gray-700">Company Name</span>
                 <span className="text-gray-900 flex-1 text-right mr-6">{businessData.companyName || "—"}</span>
-                <button onClick={() => setIsEditing(true)} className="text-primary font-medium hover:underline">Edit</button>
               </div>
               <div className="flex items-center justify-between py-5">
                 <span className="text-gray-700">Business Email</span>
                 <span className="text-gray-900 flex-1 text-right mr-6">{businessData.email || "—"}</span>
-                <button onClick={() => setIsEditing(true)} className="text-primary font-medium hover:underline">Edit</button>
               </div>
               <div className="flex items-center justify-between py-5">
                 <span className="text-gray-700">Phone Number</span>
                 <span className="text-gray-900 flex-1 text-right mr-6">{businessData.phone || "—"}</span>
-                <button onClick={() => setIsEditing(true)} className="text-primary font-medium hover:underline">Edit</button>
               </div>
               <div className="flex items-center justify-between py-5">
                 <span className="text-gray-700">Address</span>
                 <span className="text-gray-900 flex-1 text-right mr-6">{businessData.address || "—"}</span>
-                <button onClick={() => setIsEditing(true)} className="text-primary font-medium hover:underline">Edit</button>
               </div>
             </>
           ) : (

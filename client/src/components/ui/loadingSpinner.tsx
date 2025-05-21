@@ -7,6 +7,7 @@ export const LoadingSpinner = () => (
           <span className="text-white font-bold text-lg">SB</span>
         </div>
       </div>
+      <span className="text-gray-500">Just a moment ...</span>
     </div>
   </div>
 );

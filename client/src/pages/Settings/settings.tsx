@@ -215,6 +215,42 @@ export default function SettingsPage() {
     })
   }
 
+  // Logout handler
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      toast({ title: "Logged out", description: "You have been logged out successfully." });
+      navigate("/login");
+    } catch (error) {
+      toast({ title: "Logout Failed", description: error instanceof Error ? error.message : "Failed to log out.", variant: "destructive" });
+    }
+  };
+
+  // Delete account handler
+  const handleDeleteAccount = async () => {
+    if (!window.confirm("Are you sure you want to permanently delete your account? This action cannot be undone.")) return;
+    try {
+      setIsLoading(true);
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) throw new Error("Authentication required");
+      // Call backend to delete user
+      await axios.delete("https://sheetbills-server.vercel.app/api/delete-account", {
+        headers: {
+          Authorization: `Bearer ${session.provider_token}`,
+          "X-Supabase-Token": session.access_token
+        }
+      });
+      await supabase.auth.signOut();
+      toast({ title: "Account Deleted", description: "Your account and all data have been deleted." });
+      navigate("/login");
+    } catch (error) {
+      toast({ title: "Delete Failed", description: error instanceof Error ? error.message : "Failed to delete account.", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="container max-w-3xl mx-auto py-12">
@@ -245,7 +281,13 @@ export default function SettingsPage() {
 
       {/* Profile Section */}
       <div className="mb-12">
-        <h2 className="text-2xl font-cal-sans font-medium text-gray-900 mb-1">Account Profile</h2>
+        <h2 className="text-2xl font-cal-sans font-medium text-gray-900 mb-1 flex items-center gap-2">
+          Account Profile
+          {/* Google Icon */}
+          <span title="Signed in with Google" className="ml-2">
+            <svg width="22" height="22" viewBox="0 0 48 48"><g><path fill="#4285F4" d="M43.6 20.5H42V20.4H24v7.2h11.2C33.7 32.1 29.3 35 24 35c-6.1 0-11-4.9-11-11s4.9-11 11-11c2.6 0 5 .9 6.9 2.4l5.8-5.8C33.5 6.2 28.1 4 22 4 12.1 4 4 12.1 4 22s8.1 18 18 18c8.9 0 17.3-6.4 17.3-18 0-1.2-.1-2.1-.3-3.5z"/><path fill="#34A853" d="M6.3 14.7l5.9 4.3C14 16.1 18.6 13 24 13c2.6 0 5 .9 6.9 2.4l5.8-5.8C33.5 6.2 28.1 4 22 4 12.1 4 4 12.1 4 22c0 3.1.8 6 2.3 8.5z"/><path fill="#FBBC05" d="M24 44c5.3 0 10.2-1.8 13.9-4.9l-6.4-5.2C29.3 35 24 35 18.8 33.8l-6.4 5.2C13.8 42.2 18.7 44 24 44z"/><path fill="#EA4335" d="M43.6 20.5H42V20.4H24v7.2h11.2C33.7 32.1 29.3 35 24 35c-6.1 0-11-4.9-11-11s4.9-11 11-11c2.6 0 5 .9 6.9 2.4l5.8-5.8C33.5 6.2 28.1 4 22 4 12.1 4 4 12.1 4 22s8.1 18 18 18c8.9 0 17.3-6.4 17.3-18 0-1.2-.1-2.1-.3-3.5z"/></g></svg>
+          </span>
+        </h2>
         <p className="text-sm font-cal-sans font-normal text-gray-400 mb-6">Manage your personal information and account details.</p>
         <div className="divide-y divide-gray-200 border-t border-b">
           <div className="flex items-center justify-between py-5">
@@ -280,7 +322,13 @@ export default function SettingsPage() {
       {/* Business Information Section */}
       <div className="mb-12">
         <div className="flex items-center justify-between mb-1">
-          <h2 className="text-lg font-medium text-gray-900">Business Information</h2>
+          <h2 className="text-lg font-medium text-gray-900 flex items-center gap-2">
+            Business Information
+            {/* Google Sheets Icon */}
+            <span title="Stored in Google Sheets" className="ml-2">
+              <svg width="20" height="20" viewBox="0 0 48 48"><g><rect width="34" height="40" x="7" y="4" fill="#0F9D58" rx="3"/><rect width="26" height="32" x="11" y="8" fill="#FFF" rx="2"/><rect width="18" height="6" x="15" y="12" fill="#34A853"/><rect width="18" height="6" x="15" y="22" fill="#34A853"/><rect width="18" height="6" x="15" y="32" fill="#34A853"/></g></svg>
+            </span>
+          </h2>
           {!isEditing && (
             <Button variant="outline" onClick={() => setIsEditing(true)} className="text-primary font-medium hover:underline">Edit</Button>
           )}
@@ -377,6 +425,16 @@ export default function SettingsPage() {
               </div>
             </form>
           )}
+        </div>
+      </div>
+
+      {/* Logout & Delete Account Section */}
+      <div className="mb-12">
+        <h2 className="text-lg font-medium text-gray-900 mb-1">Logout & Delete Account</h2>
+        <p className="text-sm text-gray-400 mb-6">You can log out of your account or permanently delete your account and all associated data.</p>
+        <div className="flex gap-4">
+          <Button variant="outline" onClick={handleLogout} className="text-primary font-medium">Logout</Button>
+          <Button variant="destructive" onClick={handleDeleteAccount} className="font-medium">Delete Account</Button>
         </div>
       </div>
 

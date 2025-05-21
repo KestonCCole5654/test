@@ -301,7 +301,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="container max-w-6xl mx-auto px-4 py-8">
+    <div className="container max-w-7xl mx-auto px-4 py-8">
       {/* Breadcrumb Navigation and Page Title */}
       <div className="mb-8">
         <Breadcrumb>

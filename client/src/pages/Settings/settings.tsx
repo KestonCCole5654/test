@@ -282,7 +282,7 @@ export default function SettingsPage() {
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-lg font-medium text-gray-900">Business Information</h2>
           {!isEditing && (
-            <Button variant="outline" onClick={() => setIsEditing(true)} className="text-primary font-medium hover:underline">Edit</button>
+            <Button variant="outline" onClick={() => setIsEditing(true)} className="text-primary font-medium hover:underline">Edit</Button>
           )}
         </div>
         <p className="text-sm text-gray-400 mb-6">These details appear on your invoices and documents.</p>

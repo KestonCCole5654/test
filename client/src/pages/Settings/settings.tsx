@@ -346,7 +346,7 @@ export default function SettingsPage() {
             </span>
           </h2>
           {!isEditing && (
-            <Button variant="default" onClick={() => setIsEditing(true)} className="text-primary font-medium hover:underline">Edit</Button>
+            <Button onClick={() => setIsEditing(true)} className="border border-gray-300 text-white bg-green-800 hover:bg-green-900 shadow-none">Edit</Button>
           )}
         </div>
         <p className="text-sm text-gray-400 mb-6">These details appear on your invoices and documents.</p>
@@ -473,7 +473,7 @@ export default function SettingsPage() {
         <h2 className="text-lg font-medium text-gray-900 mb-1">Logout & Delete Account</h2>
         <p className="text-sm text-gray-400 mb-6">You can log out of your account or permanently delete your account and all associated data.</p>
         <div className="flex gap-4">
-          <Button variant="default" onClick={handleLogout} className="text-primary font-medium">Logout</Button>
+          <Button  onClick={handleLogout} className="border border-gray-300 text-white bg-green-800 hover:bg-green-900 shadow-none">Logout</Button>
           <Button variant="destructive" onClick={handleDeleteAccount} className="font-medium">Delete Account</Button>
         </div>
       </div>

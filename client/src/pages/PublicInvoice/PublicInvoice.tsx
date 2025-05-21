@@ -55,7 +55,7 @@ export default function PublicInvoice() {
     <div className="min-h-screen flex flex-col items-center font-cal-sans justify-center bg-gray-50 py-8 px-2">
       <Card className="w-full max-w-4xl">
         
-        {loading && <div className="text-center text-gray-500">Loading invoice from link ...</div>}
+        {loading && <div className="text-center text-gray-500">Loading Invoice from link ...</div>}
         {error && (
           <div className="text-center text-red-600 mb-4">{error}</div>
         )}

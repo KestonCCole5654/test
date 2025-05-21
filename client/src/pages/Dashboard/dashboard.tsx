@@ -693,31 +693,33 @@ export default function Dashboard() {
   const unpaidInvoicesTotal = invoices
     .filter(inv => inv.status === "Pending")
     .reduce((sum, inv) => sum + (inv.amount || 0), 0);
+  const paidInvoicesCount = invoices.filter(inv => inv.status === "Paid").length;
+  const unpaidInvoicesCount = invoices.filter(inv => inv.status === "Pending").length;
 
   const stats: InvoiceStat[] = [
-    { 
-      label: "Revenue", 
-      value: `$${totalAmount.toLocaleString()}`, 
-      percent: 4.75, 
-      trend: "up" 
+    {
+      label: "Revenue",
+      value: `$${totalAmount.toLocaleString()}`,
+      percent: 4.75,
+      trend: "up"
     },
-    { 
-      label: "Total Invoices", 
-      value: totalInvoices.toString(), 
-      percent: 54.02, 
-      trend: "up" 
+    {
+      label: "Total Invoices",
+      value: totalInvoices.toString(),
+      percent: 54.02,
+      trend: "up"
     },
-    { 
-      label: "Paid Invoices Total", 
-      value: `$${paidInvoicesTotal.toLocaleString()}`, 
-      percent: 54.02, 
-      trend: "up" 
+    {
+      label: "Paid Invoices",
+      value: `${paidInvoicesCount} ($${paidInvoicesTotal.toLocaleString()})`,
+      percent: 54.02,
+      trend: "up"
     },
-    { 
-      label: "Unpaid Invoices Total", 
-      value: `$${unpaidInvoicesTotal.toLocaleString()}`, 
-      percent: -1.39, 
-      trend: "down" 
+    {
+      label: "Unpaid Invoices",
+      value: `${unpaidInvoicesCount} ($${unpaidInvoicesTotal.toLocaleString()})`,
+      percent: -1.39,
+      trend: "down"
     }
   ];
 

@@ -306,16 +306,30 @@ export default function Dashboard() {
 
   // Add this useEffect after your other useEffects
   useEffect(() => {
-    if (location.state?.refresh && selectedSpreadsheetUrl) {
-      // Clear cache and force fetch
-      localStorage.removeItem("cachedInvoices");
-      localStorage.removeItem("lastFetchTime");
-      setLastFetchTime(0);
-      fetchInvoices(selectedSpreadsheetUrl);
+    const handleRefresh = async () => {
+      if (selectedSpreadsheetUrl) {
+        // Clear cache and force fetch
+        localStorage.removeItem("cachedInvoices");
+        localStorage.removeItem("lastFetchTime");
+        setLastFetchTime(0);
+        await fetchInvoices(selectedSpreadsheetUrl);
+      }
+    };
+
+    // Check for refresh flag in location state
+    if (location.state?.refresh) {
+      handleRefresh();
       // Remove the flag so it doesn't keep refreshing
       navigate(location.pathname, { replace: true, state: {} });
     }
   }, [location.state, selectedSpreadsheetUrl, navigate, location.pathname]);
+
+  // Add a new effect to handle initial load and spreadsheet changes
+  useEffect(() => {
+    if (selectedSpreadsheetUrl) {
+      fetchInvoices(selectedSpreadsheetUrl);
+    }
+  }, [selectedSpreadsheetUrl]);
 
   // =====================
   // Utility Functions

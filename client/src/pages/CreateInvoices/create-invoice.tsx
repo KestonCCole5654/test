@@ -643,7 +643,9 @@ export default function InvoiceForm() {
 
       if (updateResponse.data.success) {
         setShowSuccessModal(true)
-        // Navigate back to dashboard after successful update
+        // Clear cache and navigate back to dashboard with refresh flag
+        localStorage.removeItem("cachedInvoices")
+        localStorage.removeItem("lastFetchTime")
         navigate('/dashboard', { state: { refresh: true } })
       } else {
         alert("Failed to update invoice")
@@ -705,7 +707,9 @@ export default function InvoiceForm() {
 
       if (saveResponse.data.success) {
         setShowSuccessModal(true)
-        // Navigate back to dashboard after successful save
+        // Clear cache and navigate back to dashboard with refresh flag
+        localStorage.removeItem("cachedInvoices")
+        localStorage.removeItem("lastFetchTime")
         navigate('/dashboard', { state: { refresh: true } })
       } else {
         alert("Failed to save invoice")

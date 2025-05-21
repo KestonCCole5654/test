@@ -977,7 +977,7 @@ export default function Dashboard() {
                           </span>
                         )}
                       </TableCell>
-                      <TableCell className="text-right px-6 py-4">{formatCurrency(invoice.amount)}</TableCell>
+                      <TableCell className="text-right font-normal font-cal-sans  text-md px-6 py-4">{formatCurrency(invoice.amount)}</TableCell>
                       <TableCell className="text-center px-6 py-4">
                         <div className="flex justify-center gap-2">
                           <Button

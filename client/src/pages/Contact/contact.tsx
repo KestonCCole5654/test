@@ -85,7 +85,7 @@ export default function ContactPage() {
     return (
       <div className="min-h-screen w-full bg-gray-50 flex items-center justify-center">
         <div className="max-w-md w-full bg-white rounded-lg shadow p-8 text-center">
-          <h2 className="text-2xl font-semibold mb-4">Message Sent!</h2>
+          <h2 className="text-2xl font-normal  mb-4">Message Sent!</h2>
           <p className="mb-2">Thank you for contacting us. Our support team will get back to you soon.</p>
           <Button className="mt-6 border border-gray-300 text-white bg-green-800 hover:bg-green-900 shadow-none"  onClick={() => setShowSummary(false)}>
             Send Another Message

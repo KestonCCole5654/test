@@ -12,7 +12,10 @@ import {
   HelpCircle, 
   ChevronRight, 
   ChevronLeft, 
-  Archive
+  Archive,
+  Plus,
+  Mail,
+  Scale
 } from "lucide-react"
 import supabase from "../Auth/supabaseClient"
 import { Button } from "../ui/button"
@@ -159,6 +162,21 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
             >
               <HelpCircle size={20} className="flex-shrink-0" />
               {!collapsed && <span className="ml-3">Support</span>}
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/legal"
+              className={cn(
+                "flex items-center px-3 py-2 rounded-md transition-colors",
+                isActive("/legal") 
+                  ? "bg-green-100 text-green-800" 
+                  : "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
+                collapsed && "justify-center"
+              )}
+            >
+              <Scale size={20} className="flex-shrink-0" />
+              {!collapsed && <span className="ml-3">Legal</span>}
             </Link>
           </li>
         </ul>

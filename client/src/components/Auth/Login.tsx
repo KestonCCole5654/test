@@ -83,8 +83,8 @@ export default function LoginPage() {
           <Card className="border-0 shadow-lg overflow-hidden">
             <div className="bg-emerald-600 h-1.5 w-full"></div>
             <CardContent className="p-8">
-              <h1 className="text-2xl font-cal-sans text-gray-900 mb-2 text-center">Welcome to <span className=" font-cal-sans font-medium text-green-800">SheetBills™</span></h1>
-              <p className="text-gray-600 font-cal-sans text-center text-sm mb-6">
+              <h1 className="text-2xl font-normal font-cal-sans text-gray-900 mb-2 text-center">Welcome to <span className=" font-cal-sans font-normal text-green-800">SheetBills™</span></h1>
+              <p className="text-gray-600 font-normal font-cal-sans text-center text-sm mb-6">
                 Your professional invoicing platform with seamless Google Sheets integration
               </p>
 
@@ -118,20 +118,20 @@ export default function LoginPage() {
                     fill="#EA4335"
                   />
                 </svg>
-                <span className="font-medium font-cal-sans">Continue with Google</span>
+                <span className="font-normal font-cal-sans">Continue with Google</span>
               </Button>
 
             </CardContent>
           </Card>
 
           <div className="mt-4 text-center">
-            <p className="text-xs text-slate-500 font-cal-sans">
+            <p className="text-sm text-slate-500 font-normal font-cal-sans">
               By signing in, you agree to our{" "}
-              <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium font-cal-sans ">
+              <a href="#" className="text-emerald-600 hover:text-emerald-700 font-normal font-cal-sans ">
                 Terms
               </a>{" "}
               and{" "}
-              <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium font-cal-sans">
+              <a href="#" className="text-emerald-600 hover:text-emerald-700 font-normal font-cal-sans">
                 Privacy Policy
               </a>
               .

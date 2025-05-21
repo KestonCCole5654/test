@@ -693,8 +693,8 @@ export default function Dashboard() {
   const unpaidInvoicesTotal = invoices
     .filter(inv => inv.status === "Pending")
     .reduce((sum, inv) => sum + (inv.amount || 0), 0);
-  const paidInvoicesCount = invoices.filter(inv => inv.status === "Paid").length;
-  const unpaidInvoicesCount = invoices.filter(inv => inv.status === "Pending").length;
+  const paidInvoicesCount = invoices.filter(inv => inv.status?.toLowerCase() === "paid").length;
+  const unpaidInvoicesCount = invoices.filter(inv => inv.status?.toLowerCase() === "pending").length;
 
   const stats: InvoiceStat[] = [
     {

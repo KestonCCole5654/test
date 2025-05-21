@@ -115,7 +115,7 @@ export default function SettingsPage() {
         return;
       }
 
-     
+
     } finally {
       setIsLoading(false);
     }
@@ -285,7 +285,24 @@ export default function SettingsPage() {
           Account Profile
           {/* Google Icon */}
           <span title="Signed in with Google" className="ml-2">
-            <svg width="22" height="22" viewBox="0 0 48 48"><g><path fill="#4285F4" d="M43.6 20.5H42V20.4H24v7.2h11.2C33.7 32.1 29.3 35 24 35c-6.1 0-11-4.9-11-11s4.9-11 11-11c2.6 0 5 .9 6.9 2.4l5.8-5.8C33.5 6.2 28.1 4 22 4 12.1 4 4 12.1 4 22s8.1 18 18 18c8.9 0 17.3-6.4 17.3-18 0-1.2-.1-2.1-.3-3.5z"/><path fill="#34A853" d="M6.3 14.7l5.9 4.3C14 16.1 18.6 13 24 13c2.6 0 5 .9 6.9 2.4l5.8-5.8C33.5 6.2 28.1 4 22 4 12.1 4 4 12.1 4 22c0 3.1.8 6 2.3 8.5z"/><path fill="#FBBC05" d="M24 44c5.3 0 10.2-1.8 13.9-4.9l-6.4-5.2C29.3 35 24 35 18.8 33.8l-6.4 5.2C13.8 42.2 18.7 44 24 44z"/><path fill="#EA4335" d="M43.6 20.5H42V20.4H24v7.2h11.2C33.7 32.1 29.3 35 24 35c-6.1 0-11-4.9-11-11s4.9-11 11-11c2.6 0 5 .9 6.9 2.4l5.8-5.8C33.5 6.2 28.1 4 22 4 12.1 4 4 12.1 4 22s8.1 18 18 18c8.9 0 17.3-6.4 17.3-18 0-1.2-.1-2.1-.3-3.5z"/></g></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24">
+              <path
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                fill="#4285F4"
+              />
+              <path
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                fill="#34A853"
+              />
+              <path
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                fill="#FBBC05"
+              />
+              <path
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                fill="#EA4335"
+              />
+            </svg>
           </span>
         </h2>
         <p className="text-sm font-cal-sans font-normal text-gray-400 mb-6">Manage your personal information and account details.</p>
@@ -322,11 +339,11 @@ export default function SettingsPage() {
       {/* Business Information Section */}
       <div className="mb-12">
         <div className="flex items-center justify-between mb-1">
-          <h2 className="text-lg font-medium text-gray-900 flex items-center gap-2">
+          <h2 className="text-2xl font-normal text-gray-900 flex items-center gap-2">
             Business Information
             {/* Google Sheets Icon */}
             <span title="Stored in Google Sheets" className="ml-2">
-              <svg width="20" height="20" viewBox="0 0 48 48"><g><rect width="34" height="40" x="7" y="4" fill="#0F9D58" rx="3"/><rect width="26" height="32" x="11" y="8" fill="#FFF" rx="2"/><rect width="18" height="6" x="15" y="12" fill="#34A853"/><rect width="18" height="6" x="15" y="22" fill="#34A853"/><rect width="18" height="6" x="15" y="32" fill="#34A853"/></g></svg>
+              <svg width="20" height="20" viewBox="0 0 48 48"><g><rect width="34" height="40" x="7" y="4" fill="#0F9D58" rx="3" /><rect width="26" height="32" x="11" y="8" fill="#FFF" rx="2" /><rect width="18" height="6" x="15" y="12" fill="#34A853" /><rect width="18" height="6" x="15" y="22" fill="#34A853" /><rect width="18" height="6" x="15" y="32" fill="#34A853" /></g></svg>
             </span>
           </h2>
           {!isEditing && (

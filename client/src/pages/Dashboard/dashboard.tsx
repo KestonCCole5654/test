@@ -770,8 +770,6 @@ export default function Dashboard() {
         </Breadcrumb>
       </div>
 
-    
-
       {/* Welcome message for newly onboarded users only */}
       {showWelcome && (
         <div className="mb-6 text-center">
@@ -951,30 +949,30 @@ export default function Dashboard() {
                       <TableCell className="px-6 py-4 whitespace-nowrap">{invoice.id}</TableCell>
                       <TableCell className="px-6 py-4">
                         <div className="flex flex-col">
-                          <span className="font-medium font-">
+                          <span className="font-normal font-cal-sans">
                             {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}
                           </span>
-                          <span className="text-xs text-gray-400">
+                          <span className="text-sm font-cal-sans font-normal text-gray-400">
                             {typeof invoice.customer === "object" ? invoice.customer.email : ""}
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell className="px-6 py-4 whitespace-nowrap">{formatDate(invoice.dueDate)}</TableCell>
+                      <TableCell className="px-6 py-4 whitespace-nowrap font-cal-sans font-normal">{formatDate(invoice.dueDate)}</TableCell>
                       <TableCell className="px-6 py-4">
                         {invoice.status === "Paid" ? (
-                              <span className="inline-block px-3 py-1 rounded-md border border-green-200 bg-green-50 text-green-700 text-xs font-medium font-">
+                              <span className="inline-block px-3 py-1 font-cal-sans font-normal rounded-md border border-green-200 bg-green-50 text-green-700 text-sm">
                             Paid
                           </span>
                             ) : invoice.status === "Pending" && getOverdueDays(invoice.dueDate) > 0 ? (
-                              <span className="inline-block px-3 py-1 rounded-md border border-amber-200 bg-amber-50 text-amber-700 text-xs font-medium font-">
+                              <span className="inline-block px-3 py-1 font-cal-sans font-normal rounded-md border border-amber-200 bg-amber-50 text-amber-700 text-sm ">
                                 Pending
                           </span>
                         ) : invoice.status === "Pending" ? (
-                              <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium font-">
+                              <span className="inline-block px-3 py-1 font-cal-sans font-normal rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-sm">
                             Pending
                           </span>
                         ) : (
-                          <span className="inline-block px-3 py-1 rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-xs font-medium font-">
+                          <span className="inline-block px-3 py-1 font-cal-sans font-normal rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-sm">
                             {invoice.status}
                           </span>
                         )}

@@ -230,7 +230,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="container max-w-7xl mx-auto px-4 py-8">
+    <div className="container max-w-5xl mx-auto px-4 py-8">
       {/* Breadcrumb Navigation and Page Title */}
       <div className="mb-8">
         <Breadcrumb>
@@ -244,13 +244,12 @@ export default function SettingsPage() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <h1 className="text-2xl font-bold text-gray-900 mt-4">Settings Page</h1>
       </div>
 
       {/* Profile Section */}
       <div className="mb-12">
-        <h2 className="text-lg font-bold text-gray-900 mb-1">Account Profile</h2>
-        <p className="text-sm text-gray-400 mb-6">Manage your personal information and account details.</p>
+        <h2 className="text-xl font-cal-sans font-bold text-gray-900 mb-1">Account Profile</h2>
+        <p className="text-sm font-cal-sans font-normal text-gray-400 mb-6">Manage your personal information and account details.</p>
         <div className="divide-y divide-gray-200 border-t border-b">
           <div className="flex items-center justify-between py-5">
             <span className="text-gray-700">Full Name</span>
@@ -283,8 +282,8 @@ export default function SettingsPage() {
 
       {/* Business Information Section */}
       <div className="mb-12">
-        <h2 className="text-lg font-bold text-gray-900 mb-1">Business Information</h2>
-        <p className="text-sm text-gray-400 mb-6">These details appear on your invoices and documents.</p>
+        <h2 className="text-xl font-cal-sans font-bold text-gray-900 mb-1">Business Information</h2>
+        <p className="text-sm font-cal-sans font-normal text-gray-400 mb-6">These details appear on your invoices and documents.</p>
         <div className="divide-y divide-gray-200 border-t border-b">
           {!isEditing ? (
             <>
@@ -383,7 +382,6 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Add more sections here as needed, following the same concept */}
     </div>
   )
 }

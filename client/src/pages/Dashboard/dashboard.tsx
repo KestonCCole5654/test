@@ -902,10 +902,17 @@ export default function Dashboard() {
                       const invoice = currentItems.find((inv) => inv.id === id)
                       if (!invoice) return null
                       return (
-                        <SortableTableRow key={invoice.id} id={invoice.id} invoice={invoice} spreadsheets={spreadsheets}>
+                        <SortableTableRow
+                          key={invoice.id}
+                          id={invoice.id}
+                          invoice={invoice}
+                          spreadsheets={spreadsheets}
+                          selectedInvoices={selectedInvoices}
+                          handleSelectInvoice={handleSelectInvoice}
+                        >
                           <TableCell
                             onClick={(e) => e.stopPropagation()}
-                            className="w-[56px] px-6 py-4 align-middle text-center border-r border-gray-200"
+                            className="w-8 px-4 align-middle text-center border-r border-gray-200"
                           >
                             <div className="flex items-center justify-center h-full min-h-[40px]">
                               <span
@@ -913,6 +920,16 @@ export default function Dashboard() {
                               >
                                 <GripVertical className="h-6 w-6" />
                               </span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="w-[56px] px-6 py-4 align-middle text-center border-r border-gray-200" style={{ verticalAlign: "middle" }}>
+                            <div className="flex items-center justify-center h-full min-h-[40px]">
+                              <Checkbox
+                                checked={selectedInvoices.has(invoice.id)}
+                                onCheckedChange={() => handleSelectInvoice(invoice.id)}
+                                aria-label={`Select invoice ${invoice.id}`}
+                                className="mx-auto"
+                              />
                             </div>
                           </TableCell>
                           <TableCell className="px-6 py-4 whitespace-nowrap border-r border-gray-200">{invoice.id}</TableCell>
@@ -1218,10 +1235,12 @@ interface SortableTableRowProps {
   children: React.ReactNode
   invoice: Invoice
   spreadsheets: Spreadsheet[]
+  selectedInvoices: Set<string>
+  handleSelectInvoice: (id: string) => void
   [key: string]: any
 }
 
-function SortableTableRow({ id, children, invoice, spreadsheets, ...props }: SortableTableRowProps) {
+function SortableTableRow({ id, children, invoice, spreadsheets, selectedInvoices, handleSelectInvoice, ...props }: SortableTableRowProps) {
   const {
     attributes,
     listeners,
@@ -1274,6 +1293,16 @@ function SortableTableRow({ id, children, invoice, spreadsheets, ...props }: Sor
           >
             <GripVertical className="h-6 w-6" />
           </span>
+        </div>
+      </td>
+      <td className="w-[56px] px-6 py-4 align-middle text-center border-r border-gray-200" style={{ verticalAlign: "middle" }}>
+        <div className="flex items-center justify-center h-full min-h-[40px]">
+          <Checkbox
+            checked={selectedInvoices.has(invoice.id)}
+            onCheckedChange={() => handleSelectInvoice(invoice.id)}
+            aria-label={`Select invoice ${invoice.id}`}
+            className="mx-auto"
+          />
         </div>
       </td>
       {children}

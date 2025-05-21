@@ -711,13 +711,15 @@ export default function Dashboard() {
     },
     {
       label: "Paid Invoices",
-      value: `${paidInvoicesCount} ($${paidInvoicesTotal.toLocaleString()})`,
+      value: `$${paidInvoicesTotal.toLocaleString()}`,
+      count: paidInvoicesCount,
       percent: 54.02,
       trend: "up"
     },
     {
       label: "Unpaid Invoices",
-      value: `${unpaidInvoicesCount} ($${unpaidInvoicesTotal.toLocaleString()})`,
+      value: `$${unpaidInvoicesTotal.toLocaleString()}`,
+      count: unpaidInvoicesCount,
       percent: -1.39,
       trend: "down"
     }

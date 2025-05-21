@@ -755,18 +755,28 @@ export default function Dashboard() {
   // Calculate stats from invoices
   const now = new Date();
   const totalAmount = invoices.reduce((sum, inv) => sum + (inv.amount || 0), 0);
-  const paidAmount = invoices.filter(inv => inv.status === "Paid").reduce((sum, inv) => sum + (inv.amount || 0), 0);
-  const overdueAmount = invoices
-    .filter(inv => inv.status === "Pending" && new Date(inv.dueDate) < now)
-    .reduce((sum, inv) => sum + (inv.amount || 0), 0);
-  const unpaidAmount = invoices
-    .filter(inv => inv.status === "Pending" && new Date(inv.dueDate) >= now)
-    .reduce((sum, inv) => sum + (inv.amount || 0), 0);
+  const paidInvoices = invoices.filter(inv => inv.status === "Paid").length;
+  const pendingInvoices = invoices.filter(inv => inv.status === "Pending").length;
 
   const stats: InvoiceStat[] = [
-    { label: "Revenue", value: `$${totalAmount.toLocaleString()}`, percent: 4.75, trend: "up" },
-    { label: "Overdue invoices", value: `$${paidAmount.toLocaleString()}`, percent: 54.02, trend: "up" },
-    { label: "Outstanding invoices", value: `$${unpaidAmount.toLocaleString()}`, percent: -1.39, trend: "down" }
+    { 
+      label: "Revenue", 
+      value: `$${totalAmount.toLocaleString()}`, 
+      percent: 4.75, 
+      trend: "up" 
+    },
+    { 
+      label: "Paid Invoices", 
+      value: paidInvoices.toString(), 
+      percent: 54.02, 
+      trend: "up" 
+    },
+    { 
+      label: "Pending Invoices", 
+      value: pendingInvoices.toString(), 
+      percent: -1.39, 
+      trend: "down" 
+    }
   ];
 
   return (

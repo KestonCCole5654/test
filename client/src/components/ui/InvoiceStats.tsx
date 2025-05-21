@@ -19,7 +19,6 @@ export function InvoiceStats({ stats }: { stats: InvoiceStat[] }) {
         >
           <div className="flex items-start justify-between mb-6">
             <span className="text-sm text-gray-500 font-medium">{stat.label}</span>
-            
           </div>
           <div className="text-3xl font-normal text-black tracking-tight">{stat.value}</div>
         </div>

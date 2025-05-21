@@ -445,7 +445,7 @@ export default function SettingsPage() {
               href="/legal?tab=terms"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 font-medium hover:underline flex-1 text-right mr-6"
+              className="text-green-800 font-medium hover:underline flex-1 text-right mr-6"
             >
               View Terms of Service
             </a>
@@ -456,7 +456,7 @@ export default function SettingsPage() {
               href="/legal?tab=privacy"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 font-medium hover:underline flex-1 text-right mr-6"
+              className="text-green-800 font-medium hover:underline flex-1 text-right mr-6"
             >
               View Privacy Policy
             </a>
@@ -491,7 +491,7 @@ export default function SettingsPage() {
               </div>
             )}
             <div className="mt-4">
-              <label htmlFor="delete-phrase" className="block text-gray-700 mb-1">Type <span className="font-bold">DELETE</span> to confirm:</label>
+              <label htmlFor="delete-phrase" className="block text-gray-700 mb-1">Type <span className="font-normal text-black">DELETE</span> to confirm:</label>
               <Input
                 id="delete-phrase"
                 value={deletePhrase}

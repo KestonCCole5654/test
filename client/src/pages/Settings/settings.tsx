@@ -496,7 +496,7 @@ export default function SettingsPage() {
           </DialogHeader>
           <div className="space-y-4">
             <p className="text-red-700 font-semibold">This action is irreversible. Your account and all associated data will be permanently deleted.</p>
-            <Checkbox id="delete-invoices" checked={deleteInvoices} onCheckedChange={setDeleteInvoices} />
+            <Checkbox id="delete-invoices" checked={deleteInvoices} onCheckedChange={checked => setDeleteInvoices(checked === true)} />
             <label htmlFor="delete-invoices" className="ml-2 text-gray-700">Also delete all my invoices stored in Google Sheets</label>
             {sheetUrl && (
               <div className="mt-2">

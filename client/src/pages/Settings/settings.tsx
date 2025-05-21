@@ -256,7 +256,6 @@ export default function SettingsPage() {
       <div className="container max-w-3xl mx-auto py-12">
         <div className="flex flex-col justify-center items-center h-64 gap-4">
           <LoadingSpinner />
-          <p className="text-muted-foreground">Loading Account & Business Settings...</p>
         </div>
       </div>
     )

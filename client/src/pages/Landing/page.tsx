@@ -14,7 +14,7 @@ export default function LandingPage() {
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded bg-green-800 flex items-center justify-center">
-                <span className="text-white font-normal text-md">SB</span>
+                <span className="text-white font-normal text-lg">SB</span>
               </div>
               <span className="text-xl font-extralight text-green-800">SheetBills ™</span>
             </div>
@@ -175,8 +175,8 @@ export default function LandingPage() {
             <div className="w-[400px] h-[300px] bg-gray-100 rounded-lg howItWorks1:w-[350px] howItWorks3:w-[320px] howItWorks4:w-full howItWorks4:max-w-[90vw]"></div>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-0">
-                <span className="text-[6rem] leading-[5rem] opacity-[0.5] font-normal text-green-800">01</span>
-                <h3 className="text-md leading-tight text-green-800 font-normal pb-2 tracking-tight">Quick Sign-Up</h3>
+                <span className="text-[6rem] leading-[5rem] opacity-[0.5] pb-2 font-normal text-green-800">01</span>
+                <h3 className="text-lg leading-tight text-green-800 font-normal pb-2 tracking-tight">Quick Sign-Up</h3>
               </div>
               <p className="text-gray-600 w-[400px] leading-[1.86rem] howItWorks2:w-[350px] howItWorks4:w-full howItWorks4:max-w-[90vw]">
                 Sign up with your Google account to access the SheetBills dashboard. The process is quick and easy, getting you started right away.
@@ -188,8 +188,8 @@ export default function LandingPage() {
           <div className="flex items-center gap-16 w-full justify-between howItWorks3:gap-5 howItWorks4:flex-col howItWorks4:gap-10">
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-0">
-                <span className="text-[6rem] leading-[5rem] opacity-[0.5] font-normal text-green-800">02</span>
-                <h3 className="text-md leading-tight text-green-800 font-normal pb-2 tracking-tight">Connect Your Sheet</h3>
+                <span className="text-[6rem] leading-[5rem] opacity-[0.5] pb-2 font-normal text-green-800">02</span>
+                <h3 className="text-lg leading-tight text-green-800 font-normal pb-2 tracking-tight">Connect Your Sheet</h3>
               </div>
               <p className="text-gray-600 w-[400px] leading-[1.86rem] howItWorks2:w-[350px] howItWorks4:w-full howItWorks4:max-w-[90vw]">
                 Connect your Google Sheet or let us create one for you. SheetBills will set up the perfect structure for your invoices.
@@ -203,8 +203,8 @@ export default function LandingPage() {
             <div className="w-[400px] h-[300px] bg-gray-100 rounded-lg howItWorks1:w-[350px] howItWorks3:w-[320px] howItWorks4:w-full howItWorks4:max-w-[90vw]"></div>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-0">
-                <span className="text-[6rem] leading-[5rem] opacity-[0.5] font-normal text-green-800">03</span>
-                <h3 className="text-md leading-tight text-green-800 font-normal pb-2 tracking-tight">Add Business Details</h3>
+                <span className="text-[6rem] leading-[5rem] opacity-[0.5] pb-2 font-normal text-green-800">03</span>
+                <h3 className="text-lg leading-tight text-green-800 font-normal pb-2 tracking-tight">Add Business Details</h3>
               </div>
               <p className="text-gray-600 w-[400px] leading-[1.86rem] howItWorks2:w-[350px] howItWorks4:w-full howItWorks4:max-w-[90vw]">
                 Enter your business information once, and it will automatically appear on all your invoices. Update it anytime, and changes reflect everywhere.
@@ -216,8 +216,8 @@ export default function LandingPage() {
           <div className="flex items-center gap-16 w-full justify-between howItWorks3:gap-5 howItWorks4:flex-col howItWorks4:gap-10">
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-0">
-                <span className="text-[6rem] leading-[5rem] opacity-[0.5] font-normal text-green-800">04</span>
-                <h3 className="text-md leading-tight text-green-800 font-normal pb-2 tracking-tight">Start Creating Invoices</h3>
+                <span className="text-[6rem] leading-[5rem] opacity-[0.5] font-normal pb-2 text-green-800">04</span>
+                <h3 className="text-lg leading-tight text-green-800 font-normal pb-2 tracking-tight">Start Creating Invoices</h3>
               </div>
               <p className="text-gray-600 w-[400px] leading-[1.86rem] howItWorks2:w-[350px] howItWorks4:w-full howItWorks4:max-w-[90vw]">
                 Begin creating professional invoices instantly. Our system automatically syncs with your Google Sheet, keeping everything organized.

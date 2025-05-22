@@ -58,7 +58,7 @@ export default function LandingPage() {
             <div className="flex justify-center space-x-4">
               <Button
                 onClick={() => navigate("/login")}
-                className="bg-green-800 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
+                className="bg-green-800 text-white px-6 py-3 font-normal rounded-lg hover:bg-green-700 transition-colors"
               >
                 Try SheetBills for Free
               </Button>

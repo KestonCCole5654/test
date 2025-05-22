@@ -141,7 +141,7 @@ export default function LandingPage() {
             </h2>
           </div>
           {/* Right column */}
-          <div className="flex flex-col gap-6 w-full lg:w-1/2 items-end lg:items-end text-right lg:text-right items-center text-center lg:text-right">
+          <div className="flex flex-col gap-6 w-full lg:w-1/2 items-center lg:items-end text-center lg:text-right">
             <p className="text-gray-600 max-w-xl leading-8">
               SheetBills makes creating and managing invoices easy with a simple, streamlined process that takes you from sign-up to sending professional invoices in just a few steps.
             </p>

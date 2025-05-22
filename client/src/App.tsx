@@ -158,9 +158,11 @@ function App() {
   return (
     <HelmetProvider>
       <Routes>
-        {/* Public Routes */}
+        {/* Public Routes
         <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
+        */}
+        
+        <Route path="/" element={<Login />} />
         <Route path="/auth-callback" element={<AuthCallback />} />
         <Route path="/legal" element={<LegalPage />} />
         <Route path="/account-status" element={<AccountStatus />} />

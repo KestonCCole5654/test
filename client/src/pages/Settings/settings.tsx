@@ -55,7 +55,7 @@ export default function SettingsPage() {
   })
   const [isUpdatingBusiness, setIsUpdatingBusiness] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  //const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleteInvoices, setDeleteInvoices] = useState(false)
   const [deletePhrase, setDeletePhrase] = useState("")
   const [isDeleting, setIsDeleting] = useState(false)
@@ -284,7 +284,7 @@ export default function SettingsPage() {
       });
     } finally {
       setIsDeleting(false);
-      setShowDeleteModal(false);
+      //setShowDeleteModal(false);
       setDeletePhrase("");
       setDeleteInvoices(false);
     }
@@ -499,12 +499,12 @@ export default function SettingsPage() {
         <p className="text-sm text-gray-400 mb-6">You can log out of your account or permanently delete your account and all associated data.</p>
         <div className="flex gap-4">
           <Button onClick={handleLogout} className="border border-gray-300 text-white bg-green-800 hover:bg-green-900 shadow-none">Logout</Button>
-          <Button variant="destructive" onClick={() => setShowDeleteModal(true)} className="font-medium">Delete Account</Button>
+          {/* <Button variant="destructive" onClick={() => setShowDeleteModal(true)} className="font-medium">Delete Account</Button> */}
         </div>
       </div>
 
       {/* Delete Account Modal */}
-      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+      {/* <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Account</DialogTitle>
@@ -539,7 +539,7 @@ export default function SettingsPage() {
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
 
     </div>
   )

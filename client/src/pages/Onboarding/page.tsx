@@ -592,11 +592,13 @@ export default function InitializePage() {
             disabled={isSubmitting}
           >
             {isSubmitting ? (
-              <LoadingSpinner />
+              "Completing setup..."
             ) : (
-              <CheckCircle2 className="h-4 w-4 mr-2" />
+              <>
+                <CheckCircle2 className="h-4 w-4 mr-2" />
+                Complete Setup
+              </>
             )}
-            {isSubmitting ? "Setting Up..." : "Complete Setup"}
           </Button>
         </motion.div>
       </div>

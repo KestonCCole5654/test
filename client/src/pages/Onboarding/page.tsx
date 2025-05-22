@@ -65,9 +65,9 @@ const WelcomeScreen = ({ onStart }: { onStart: () => void }) => {
     transition={{ duration: 0.5 }}
       className="w-full max-w-md mx-auto text-center"
     >
-      <h1 className="text-3xl font-cal-sans font-semibold mb-4">Let's Get Started</h1>
+      <h1 className="text-3xl font-cal-sans font-normal mb-4">Let's Get Started</h1>
       <p className="text-gray-600 font-cal-sans dark:text-gray-400 mb-8">
-        Set up your <span className="font-bold text-green-800 text-md">SheetBills™</span> account to start managing your invoices efficiently.
+        Set up your <span className="font-normal text-green-800 text-lg">SheetBills ™</span> account to start managing your invoices efficiently.
       </p>
       <Button
         onClick={onStart}
@@ -406,7 +406,7 @@ export default function InitializePage() {
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="text-2xl font-cal-sans font-semibold text-center mb-2"
+            className="text-2xl font-cal-sans font-normal text-center mb-2"
           >
             {currentQ.question}
           </motion.h2>

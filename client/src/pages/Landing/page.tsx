@@ -130,17 +130,19 @@ export default function LandingPage() {
 
       {/* How It Works Section */}
       <section className="flex flex-col items-center mx-auto max-w-5xl px-6 lg:px-8 justify-center pt-32 scroll-mt-[3.2rem]" id="how-it-works">
-        <div className="flex items-center justify-between max-w-5xl howItWorks3:flex-col howItWorks3:items-start howItWorks3:gap-3">
-          <div className="flex flex-col items-start gap-3">
+        <div className="flex flex-col lg:flex-row items-center justify-between w-full gap-8 lg:gap-0">
+          {/* Left column */}
+          <div className="flex flex-col items-start gap-3 w-full lg:w-1/2">
             <div className="flex items-center justify-center gap-2 border rounded-full bg-green-50 border-green-200 px-5 py-0.5 font-medium w-max text-green-800">
-              How It Works ? 
+              How It Works ?
             </div>
-            <h2 className="text-5xl font-normal text-green-800 pr-6">
+            <h2 className="text-5xl font-bold text-green-800 leading-tight">
               Built For Freelancers <br /> & Small Businesses
             </h2>
           </div>
-          <div className="flex flex-col gap-6">
-            <p className="text-gray-600 w-[35rem] leading-8 max-w-[90vw] howItWorks2:w-[32rem]">
+          {/* Right column */}
+          <div className="flex flex-col gap-6 w-full lg:w-1/2 items-end lg:items-end text-right lg:text-right items-center text-center lg:text-right">
+            <p className="text-gray-600 max-w-xl leading-8">
               SheetBills makes creating and managing invoices easy with a simple, streamlined process that takes you from sign-up to sending professional invoices in just a few steps.
             </p>
             <Button

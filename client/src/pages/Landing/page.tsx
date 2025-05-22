@@ -19,7 +19,7 @@ export default function LandingPage() {
             {/* Centered Navigation Links */}
             <div className="hidden md:flex items-center justify-center space-x-8">
               <a href="#why-codeguide" className="text-gray-600 hover:text-gray-900 font-medium">
-                Why CodeGuide?
+                Why SheetBills?
               </a>
               <a href="#how-it-works" className="text-gray-600 hover:text-gray-900 font-medium">
                 How It Works
@@ -48,6 +48,34 @@ export default function LandingPage() {
           </div>
         </div>
       </nav>
+
+      {/* Powered by Google Sheets Banner */}
+      <div className="flex justify-center py-2 bg-gray-50 border-b">
+        <a 
+          href="https://sheets.google.com" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="flex items-center justify-center gap-2 border rounded-full border-black/10 px-4 py-1 font-medium group hover:bg-gray-100 transition-colors"
+        >
+          <span>📊</span>
+          <span className="text-gray-700">Powered by Google Sheets</span>
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            width="24" 
+            height="24" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            className="lucide lucide-arrow-right transition-all duration-300 group-hover:-rotate-45 stroke-gray-700 h-5 w-5"
+          >
+            <path d="M5 12h14"></path>
+            <path d="m12 5 7 7-7 7"></path>
+          </svg>
+        </a>
+      </div>
 
       {/* Hero Section */}
       <section className="pt-32 pb-16">

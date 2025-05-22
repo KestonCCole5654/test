@@ -232,6 +232,112 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* FAQs Section */}
+      <div className="py-24 px-8 max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row gap-12">
+          <div className="flex flex-col text-left basis-1/2">
+            <p className="inline-block font-semibold text-green-800 mb-4">FAQ</p>
+            <p className="text-3xl md:text-4xl font-extrabold text-gray-900">Frequently Asked Questions</p>
+          </div>
+          <ul className="basis-1/2">
+            <li>
+              <button className="relative flex gap-2 items-center w-full py-5 text-base font-semibold text-left border-t md:text-lg border-gray-200" aria-expanded="false">
+                <span className="flex-1 text-gray-900">What is SheetBills?</span>
+                <svg className="flex-shrink-0 w-4 h-4 ml-auto fill-current" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                  <rect y="7" width="16" height="2" rx="1" className="transform origin-center transition duration-200 ease-out"></rect>
+                  <rect y="7" width="16" height="2" rx="1" className="transform origin-center rotate-90 transition duration-200 ease-out"></rect>
+                </svg>
+              </button>
+              <div className="transition-all duration-300 ease-in-out opacity-80 overflow-hidden" style={{ maxHeight: "0", opacity: 0 }}>
+                <div className="pb-5 leading-relaxed">
+                  <div className="space-y-2 leading-relaxed">
+                    <p>SheetBills is a powerful invoice management system that integrates with Google Sheets. It helps you create, manage, and track invoices efficiently while maintaining all your data in a familiar spreadsheet format.</p>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li>
+              <button className="relative flex gap-2 items-center w-full py-5 text-base font-semibold text-left border-t md:text-lg border-gray-200" aria-expanded="false">
+                <span className="flex-1 text-gray-900">Do I need to be tech-savvy to use SheetBills?</span>
+                <svg className="flex-shrink-0 w-4 h-4 ml-auto fill-current" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                  <rect y="7" width="16" height="2" rx="1" className="transform origin-center transition duration-200 ease-out"></rect>
+                  <rect y="7" width="16" height="2" rx="1" className="transform origin-center rotate-90 transition duration-200 ease-out"></rect>
+                </svg>
+              </button>
+              <div className="transition-all duration-300 ease-in-out opacity-80 overflow-hidden" style={{ maxHeight: "0", opacity: 0 }}>
+                <div className="pb-5 leading-relaxed">
+                  <p>Not at all! SheetBills is designed to be user-friendly. If you can use Google Sheets, you can use SheetBills. We provide a simple interface for creating and managing invoices, while handling all the technical details in the background.</p>
+                </div>
+              </div>
+            </li>
+            <li>
+              <button className="relative flex gap-2 items-center w-full py-5 text-base font-semibold text-left border-t md:text-lg border-gray-200" aria-expanded="false">
+                <span className="flex-1 text-gray-900">Can I customize my invoices?</span>
+                <svg className="flex-shrink-0 w-4 h-4 ml-auto fill-current" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                  <rect y="7" width="16" height="2" rx="1" className="transform origin-center transition duration-200 ease-out"></rect>
+                  <rect y="7" width="16" height="2" rx="1" className="transform origin-center rotate-90 transition duration-200 ease-out"></rect>
+                </svg>
+              </button>
+              <div className="transition-all duration-300 ease-in-out opacity-80 overflow-hidden" style={{ maxHeight: "0", opacity: 0 }}>
+                <div className="pb-5 leading-relaxed">
+                  <p>Yes! You can customize your business details, invoice templates, and add your logo. SheetBills provides professional templates that you can personalize to match your brand identity.</p>
+                </div>
+              </div>
+            </li>
+            <li>
+              <button className="relative flex gap-2 items-center w-full py-5 text-base font-semibold text-left border-t md:text-lg border-gray-200" aria-expanded="false">
+                <span className="flex-1 text-gray-900">Is my data secure?</span>
+                <svg className="flex-shrink-0 w-4 h-4 ml-auto fill-current" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                  <rect y="7" width="16" height="2" rx="1" className="transform origin-center transition duration-200 ease-out"></rect>
+                  <rect y="7" width="16" height="2" rx="1" className="transform origin-center rotate-90 transition duration-200 ease-out"></rect>
+                </svg>
+              </button>
+              <div className="transition-all duration-300 ease-in-out opacity-80 overflow-hidden" style={{ maxHeight: "0", opacity: 0 }}>
+                <div className="pb-5 leading-relaxed">
+                  <p>Absolutely. SheetBills uses Google's secure authentication and data storage. Your data is stored in your own Google Sheet, and we only access it with your explicit permission. We never store your sensitive business information on our servers.</p>
+                </div>
+              </div>
+            </li>
+            <li>
+              <button className="relative flex gap-2 items-center w-full py-5 text-base font-semibold text-left border-t md:text-lg border-gray-200" aria-expanded="false">
+                <span className="flex-1 text-gray-900">Can I track invoice status?</span>
+                <svg className="flex-shrink-0 w-4 h-4 ml-auto fill-current" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                  <rect y="7" width="16" height="2" rx="1" className="transform origin-center transition duration-200 ease-out"></rect>
+                  <rect y="7" width="16" height="2" rx="1" className="transform origin-center rotate-90 transition duration-200 ease-out"></rect>
+                </svg>
+              </button>
+              <div className="transition-all duration-300 ease-in-out opacity-80 overflow-hidden" style={{ maxHeight: "0", opacity: 0 }}>
+                <div className="pb-5 leading-relaxed">
+                  <p>Yes, SheetBills provides a comprehensive dashboard where you can track all your invoices, their status (paid, pending, overdue), and payment history. You can also filter and search through your invoices easily.</p>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Testimonial Section */}
+      <div className="space-y-4 md:space-y-6 max-w-md mx-auto mt-16 md:mt-24">
+        <div className="rating !flex justify-center">
+          {[...Array(5)].map((_, i) => (
+            <svg key={i} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-yellow-500">
+              <path fillRule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z" clipRule="evenodd" />
+            </svg>
+          ))}
+        </div>
+        <div className="text-base leading-relaxed space-y-2 max-w-md mx-auto text-center">
+          <p>SheetBills has transformed how I manage my invoices. The Google Sheets integration makes it incredibly easy to keep track of everything.</p>
+          <p>I've saved countless hours that I used to spend on manual invoice management <span className="bg-yellow-100/80 px-1">and my clients love the professional look</span> of the generated invoices.</p>
+        </div>
+        <div className="flex justify-center items-center gap-3 md:gap-4">
+          <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gray-200"></div>
+          <div>
+            <p className="font-semibold">Sarah M.</p>
+            <p className="text-gray-600 text-sm">Small Business Owner</p>
+          </div>
+        </div>
+      </div>
+
       {/* Footer */}
       <footer className="bg-white">
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 md:flex md:items-center md:justify-between lg:px-8">

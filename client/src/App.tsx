@@ -159,10 +159,10 @@ function App() {
     <HelmetProvider>
       <Routes>
         {/* Public Routes */}
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/auth-callback" element={<AuthCallback />} />
         <Route path="/legal" element={<LegalPage />} />
-        <Route path="/landingpage" element={<LandingPage />} />
         <Route path="/account-status" element={<AccountStatus />} />
     
         {/* Onboarding Route */}
@@ -183,7 +183,6 @@ function App() {
             </AuthenticatedRoute>
           }
         >
-          <Route path="/" element={<Navigate to="/invoices" />} />
           <Route path="/invoices" element={<Dashboard />} />
           <Route path="/create-invoice" element={<InvoiceForm />} />
           <Route path="/email-invoice/:invoiceId" element={<EmailInvoice />} />
@@ -204,9 +203,9 @@ function App() {
           }
         />
 
-        {/* Catch all route - only for authenticated routes */}
+        {/* Catch all route - redirect to landing page for unauthenticated users */}
         <Route path="*" element={
-          <Navigate to={user ? "/invoices" : "/login"} />
+          <Navigate to={user ? "/invoices" : "/"} />
         } />
       </Routes>
     </HelmetProvider>

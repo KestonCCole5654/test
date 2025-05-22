@@ -129,13 +129,13 @@ export default function LandingPage() {
       </div>
 
       {/* How It Works Section */}
-      <section className="flex flex-col items-center w-max mx-auto justify-center pt-32 scroll-mt-[3.2rem]" id="how-it-works">
+      <section className="flex flex-col items-center mx-auto max-w-7xl px-6 lg:px-8 justify-center pt-32 scroll-mt-[3.2rem]" id="how-it-works">
         <div className="flex items-center justify-between w-full howItWorks3:flex-col howItWorks3:items-start howItWorks3:gap-3">
           <div className="flex flex-col items-start gap-3">
             <div className="flex items-center justify-center gap-2 border rounded-full bg-green-50 border-green-200 px-5 py-0.5 font-medium w-max text-green-800">
               How It Works
             </div>
-            <h2 className="text-[4rem] font-semibold text-green-800 leading-[1.15] tracking-[-0.2rem] pb-1 headline1:text-[3.2rem] headline1:leading-[1.2] pr-1">
+            <h2 className=" font-normal text-green-800 leading-[1.15] tracking-[-0.2rem] pb-1 headline1:text-[3.2rem] headline1:leading-[1.2] pr-1">
               Built For Freelancers <br /> & Small Businesses
             </h2>
           </div>
@@ -158,8 +158,8 @@ export default function LandingPage() {
             <div className="w-[42rem] h-[32rem] bg-gray-100 rounded-lg howItWorks1:w-[35rem] howItWorks3:w-[32rem] howItWorks4:w-[55rem] howItWorks4:max-w-[90vw]"></div>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-0">
-                <span className="text-[8rem] leading-[7rem] opacity-[0.5] font-semibold text-green-800">01</span>
-                <h3 className="text-[2.6rem] leading-[1.15] text-green-800 font-semibold pb-2 tracking-[-0.16rem]">Quick Sign-Up</h3>
+                <span className="text-[8rem] leading-[7rem] opacity-[0.5] font-normal text-green-800">01</span>
+                <h3 className="text-[2.6rem] leading-[1.15] text-green-800 font-normal pb-2 tracking-[-0.16rem]">Quick Sign-Up</h3>
               </div>
               <p className="text-gray-600 w-[35rem] leading-[1.86rem] howItWorks2:w-[30rem] howItWorks4:w-[55rem] howItWorks4:max-w-[90vw]">
                 Sign up with your Google account to access the SheetBills dashboard. The process is quick and easy, getting you started right away.
@@ -171,8 +171,8 @@ export default function LandingPage() {
           <div className="flex items-center gap-24 w-full justify-between howItWorks3:gap-5 howItWorks4:flex-col howItWorks4:gap-10">
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-0">
-                <span className="text-[8rem] leading-[7rem] opacity-[0.5] font-semibold text-green-800">02</span>
-                <h3 className="text-[2.6rem] leading-[1.15] text-green-800 font-semibold pb-2 tracking-[-0.16rem]">Connect Your Sheet</h3>
+                <span className="text-[8rem] leading-[7rem] opacity-[0.5] font-normal text-green-800">02</span>
+                <h3 className="text-[2.6rem] leading-[1.15] text-green-800 font-normal pb-2 tracking-[-0.16rem]">Connect Your Sheet</h3>
               </div>
               <p className="text-gray-600 w-[35rem] leading-[1.86rem] howItWorks2:w-[30rem] howItWorks4:w-[55rem] howItWorks4:max-w-[90vw]">
                 Connect your Google Sheet or let us create one for you. SheetBills will set up the perfect structure for your invoices.
@@ -186,8 +186,8 @@ export default function LandingPage() {
             <div className="w-[42rem] h-[32rem] bg-gray-100 rounded-lg howItWorks1:w-[35rem] howItWorks3:w-[32rem] howItWorks4:w-[55rem] howItWorks4:max-w-[90vw]"></div>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-0">
-                <span className="text-[8rem] leading-[7rem] opacity-[0.5] font-semibold text-green-800">03</span>
-                <h3 className="text-[2.6rem] leading-[1.15] text-green-800 font-semibold pb-2 tracking-[-0.16rem]">Add Business Details</h3>
+                <span className="text-[8rem] leading-[7rem] opacity-[0.5] font-normal text-green-800">03</span>
+                <h3 className="text-[2.6rem] leading-[1.15] text-green-800 font-normal pb-2 tracking-[-0.16rem]">Add Business Details</h3>
               </div>
               <p className="text-gray-600 w-[35rem] leading-[1.86rem] howItWorks2:w-[30rem] howItWorks4:w-[55rem] howItWorks4:max-w-[90vw]">
                 Enter your business information once, and it will automatically appear on all your invoices. Update it anytime, and changes reflect everywhere.
@@ -199,8 +199,8 @@ export default function LandingPage() {
           <div className="flex items-center gap-24 w-full justify-between howItWorks3:gap-5 howItWorks4:flex-col howItWorks4:gap-10">
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-0">
-                <span className="text-[8rem] leading-[7rem] opacity-[0.5] font-semibold text-green-800">04</span>
-                <h3 className="text-[2.6rem] leading-[1.15] text-green-800 font-semibold pb-2 tracking-[-0.16rem]">Create Invoices</h3>
+                <span className="text-[8rem] leading-[7rem] opacity-[0.5] font-normal text-green-800">04</span>
+                <h3 className="text-[2.6rem] leading-[1.15] text-green-800 font-normal pb-2 tracking-[-0.16rem]">Create Invoices</h3>
               </div>
               <p className="text-gray-600 w-[35rem] leading-[1.86rem] howItWorks2:w-[30rem] howItWorks4:w-[55rem] howItWorks4:max-w-[90vw]">
                 Create professional invoices with our easy-to-use interface. Add items, calculate totals, and customize the design to match your brand.
@@ -214,8 +214,8 @@ export default function LandingPage() {
             <div className="w-[42rem] h-[32rem] bg-gray-100 rounded-lg howItWorks1:w-[35rem] howItWorks3:w-[32rem] howItWorks4:w-[55rem] howItWorks4:max-w-[90vw]"></div>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-0">
-                <span className="text-[8rem] leading-[7rem] opacity-[0.5] font-semibold text-green-800">05</span>
-                <h3 className="text-[2.6rem] leading-[1.15] text-green-800 font-semibold pb-2 tracking-[-0.16rem]">Share & Track</h3>
+                <span className="text-[8rem] leading-[7rem] opacity-[0.5] font-normal text-green-800">05</span>
+                <h3 className="text-[2.6rem] leading-[1.15] text-green-800 font-normal pb-2 tracking-[-0.16rem]">Share & Track</h3>
               </div>
               <p className="text-gray-600 w-[35rem] leading-[1.86rem] howItWorks2:w-[30rem] howItWorks4:w-[55rem] howItWorks4:max-w-[90vw]">
                 Send invoices via email, share links, or download PDFs. Track payment status and manage your invoices all in one place.

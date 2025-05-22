@@ -12,9 +12,10 @@ export default function LandingPage() {
       <nav className="border-b">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <div className="flex-shrink-0 flex items-center">
-              <span className="text-2xl font-normal text-green-800">SheetBills</span>
-            </div>
+          <div className="h-10 w-10 rounded bg-green-800 flex items-center justify-center">
+                <span className="text-white font-normal text-md">SB</span>
+              </div>
+              <span className="text-2xl font-extralight text-slate-200">SheetBills ™</span>
             
             {/* Centered Navigation Links */}
             <div className="hidden md:flex items-center justify-center space-x-8">

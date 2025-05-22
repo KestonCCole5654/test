@@ -47,13 +47,9 @@ export default function LoginPage() {
           scopes: "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets",
           queryParams: {
             access_type: 'offline',
-            prompt: 'consent',
-            // Add state parameter to track the auth flow
-            state: JSON.stringify({
-              timestamp: Date.now(),
-              redirectTo: location.state?.from || '/invoices'
-            })
-          }
+            prompt: 'consent'
+          },
+          skipBrowserRedirect: true
         },
       })
 
@@ -62,8 +58,12 @@ export default function LoginPage() {
         throw error
       }
 
-      // If we get here, the OAuth flow has started
-      console.log("OAuth flow started:", data)
+      if (data?.url) {
+        // Store the intended redirect path in sessionStorage
+        sessionStorage.setItem('auth_redirect', location.state?.from || '/invoices')
+        // Redirect to the OAuth URL
+        window.location.href = data.url
+      }
     } catch (err: any) {
       console.error("Login error:", err)
       setError(err.message || "Login failed. Please try again.")

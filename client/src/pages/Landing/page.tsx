@@ -14,9 +14,9 @@ export default function LandingPage() {
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded bg-green-800 flex items-center justify-center">
-                <span className="text-white font-normal text-lg">SB</span>
+                <span className="text-white font-normal text-md">SB</span>
               </div>
-              <span className="text-2xl font-extralight text-green-800">SheetBills ™</span>
+              <span className="text-xl font-extralight text-green-800">SheetBills ™</span>
             </div>
 
             {/* Centered Navigation Links */}
@@ -50,7 +50,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-normal text-gray-900 mb-6">
-              Tired of Wrestling with Invoices in Google Sheets?
+              Tired of <span className="text-green-800">Wrestling</span> with <span className="text-green-800">Invoices</span> in <span className="text-green-800">Google Sheets</span>?
             </h1>
             <p className="text-xl text-gray-600 mb-8">
               Ditch the templates, formulas, and frustration. SheetBills makes invoicing in Google Sheets fast, simple, and professional.
@@ -60,7 +60,7 @@ export default function LandingPage() {
                 onClick={() => navigate("/login")}
                 className="bg-green-800 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
               >
-                Join Waitlist
+                Try SheetBills for Free
               </Button>
 
             </div>
@@ -122,7 +122,7 @@ export default function LandingPage() {
                 </dt>
                 <dd className="mt-2 text-base/7 text-gray-600">Quickly update name, and, contact details — reflected on all your invoices automatically.</dd>
               </div>
-              <div className="relative pl-16">
+              <div className="relative pl-16 flex flex-col items-center text-center">
                 <dt className="text-base/7 font-normal text-gray-900">
                   <div className="absolute top-0 left-0 flex size-10 items-center justify-center rounded-lg bg-green-600">
                     <svg className="size-6 text-white" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
@@ -145,7 +145,7 @@ export default function LandingPage() {
             <div className="flex items-center justify-center gap-2 border rounded-full bg-green-50 border-green-200 px-5 py-0.5 font-medium w-max text-green-800">
               How It Works
             </div>
-            <h2 className=" text-[4rem] font-normal text-green-800 leading-[1.15] tracking-[-0.2rem] pb-1 headline1:text-[3.2rem] headline1:leading-[1.2] pr-1">
+            <h2 className="text-[3rem] font-normal text-green-800 leading-[1.15] tracking-[-0.2rem] pb-1 headline1:text-[2.4rem] headline1:leading-[1.2] pr-1">
               Built For Freelancers <br /> & Small Businesses
             </h2>
           </div>
@@ -164,7 +164,7 @@ export default function LandingPage() {
 
         <div className="flex flex-col gap-16 w-full max-w-[900px] mx-auto px-4 py-16">
           <div className="flex flex-col gap-4">
-            <h2 className="text-[2.6rem] leading-[1.15] text-green-800 font-normal pb-2 tracking-[-0.16rem]">How It Works</h2>
+            <h2 className="text-2xl leading-tight text-green-800 font-normal pb-2 tracking-tight">How It Works</h2>
             <p className="text-gray-600 w-full leading-[1.86rem]">
               Get started with SheetBills in just a few simple steps. Our intuitive process makes invoice management effortless.
             </p>
@@ -176,7 +176,7 @@ export default function LandingPage() {
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-0">
                 <span className="text-[6rem] leading-[5rem] opacity-[0.5] font-normal text-green-800">01</span>
-                <h3 className="text-[2rem] leading-[1.15] text-green-800 font-normal pb-2 tracking-[-0.16rem]">Quick Sign-Up</h3>
+                <h3 className="text-md leading-tight text-green-800 font-normal pb-2 tracking-tight">Quick Sign-Up</h3>
               </div>
               <p className="text-gray-600 w-[400px] leading-[1.86rem] howItWorks2:w-[350px] howItWorks4:w-full howItWorks4:max-w-[90vw]">
                 Sign up with your Google account to access the SheetBills dashboard. The process is quick and easy, getting you started right away.
@@ -189,7 +189,7 @@ export default function LandingPage() {
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-0">
                 <span className="text-[6rem] leading-[5rem] opacity-[0.5] font-normal text-green-800">02</span>
-                <h3 className="text-[2rem] leading-[1.15] text-green-800 font-normal pb-2 tracking-[-0.16rem]">Connect Your Sheet</h3>
+                <h3 className="text-md leading-tight text-green-800 font-normal pb-2 tracking-tight">Connect Your Sheet</h3>
               </div>
               <p className="text-gray-600 w-[400px] leading-[1.86rem] howItWorks2:w-[350px] howItWorks4:w-full howItWorks4:max-w-[90vw]">
                 Connect your Google Sheet or let us create one for you. SheetBills will set up the perfect structure for your invoices.
@@ -204,7 +204,7 @@ export default function LandingPage() {
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-0">
                 <span className="text-[6rem] leading-[5rem] opacity-[0.5] font-normal text-green-800">03</span>
-                <h3 className="text-[2rem] leading-[1.15] text-green-800 font-normal pb-2 tracking-[-0.16rem]">Add Business Details</h3>
+                <h3 className="text-md leading-tight text-green-800 font-normal pb-2 tracking-tight">Add Business Details</h3>
               </div>
               <p className="text-gray-600 w-[400px] leading-[1.86rem] howItWorks2:w-[350px] howItWorks4:w-full howItWorks4:max-w-[90vw]">
                 Enter your business information once, and it will automatically appear on all your invoices. Update it anytime, and changes reflect everywhere.
@@ -217,7 +217,7 @@ export default function LandingPage() {
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-0">
                 <span className="text-[6rem] leading-[5rem] opacity-[0.5] font-normal text-green-800">04</span>
-                <h3 className="text-[2rem] leading-[1.15] text-green-800 font-normal pb-2 tracking-[-0.16rem]">Start Creating Invoices</h3>
+                <h3 className="text-md leading-tight text-green-800 font-normal pb-2 tracking-tight">Start Creating Invoices</h3>
               </div>
               <p className="text-gray-600 w-[400px] leading-[1.86rem] howItWorks2:w-[350px] howItWorks4:w-full howItWorks4:max-w-[90vw]">
                 Begin creating professional invoices instantly. Our system automatically syncs with your Google Sheet, keeping everything organized.

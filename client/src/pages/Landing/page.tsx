@@ -220,7 +220,7 @@ export default function LandingPage() {
 
       {/* FAQs Section */}
       <div className="py-24 px-8 max-w-4xl mx-auto">
-        <div className="flex flex-col md:flex-row gap-12">
+        <div className="flex flex-row md:flex-row gap-12">
           <div className="flex flex-col text-left basis-1/2">
             <p className="inline-block font-normal text-green-800 mb-4">FAQ</p>
             <p className="text-3xl md:text-4xl font-normal text-gray-900">Frequently Asked Questions</p>

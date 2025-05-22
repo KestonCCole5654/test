@@ -24,7 +24,7 @@ import PublicInvoice from "./pages/PublicInvoice/PublicInvoice";
 import PrintInvoice from './pages/PrintInvoice/print-invoice';
 import EmailInvoice from './pages/EmailInvoice/email-invoice';
 import LegalPage from './pages/Legal/legal';
-import LandingPage from './pages/LandingPage/landingpage';
+import LandingPage from './pages/Landing/page';
 import AccountStatus from './pages/AccountStatus/AccountStatus';
 // import TemplateDesignerPage from './components/TemplateDesigner/TemplateDesignerPage';
 // SidebarLayout already includes the Outlet component

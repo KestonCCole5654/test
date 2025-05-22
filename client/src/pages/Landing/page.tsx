@@ -54,34 +54,33 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <div className="relative z-10 pb-8 bg-white sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
-            <main className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
-              <div className="sm:text-center lg:text-left">
-                <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                  <span className="block">Invoice Management</span>
-                  <span className="block text-green-800">Made Simple</span>
-                </h1>
-                <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                  Create, manage, and track your invoices all in one place. Perfect for freelancers, small businesses, and entrepreneurs.
-                </p>
-                <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-                  <div className="rounded-md shadow">
-                    <Button
-                      onClick={() => navigate("/login")}
-                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-800 hover:bg-green-900 md:py-4 md:text-lg md:px-10"
-                    >
-                      Get Started
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </main>
+      <section className="pt-32 pb-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center">
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+              Tired of Wrestling with Invoices in Google Sheets?
+            </h1>
+            <p className="text-xl text-gray-600 mb-8">
+              Ditch the templates, formulas, and frustration. SheetBills makes invoicing in Google Sheets fast, simple, and professional.
+            </p>
+            <div className="flex justify-center space-x-4">
+              <Button
+                onClick={() => navigate("/login")}
+                className="bg-green-800 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
+              >
+                Join Waitlist
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                See how it works →
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Features Section */}
       <div className="py-12 bg-gray-50">

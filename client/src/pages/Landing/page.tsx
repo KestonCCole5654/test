@@ -256,7 +256,7 @@ export default function LandingPage() {
       </section>
 
       {/* FAQs Section */}
-      <div className="py-24 px-8 max-w-7xl mx-auto">
+      <div className="py-24 px-8 max-w-5xl mx-auto">
         <div className="flex flex-col md:flex-row gap-12">
           <div className="flex flex-col text-left basis-1/2">
             <p className="inline-block font-semibold text-green-800 mb-4">FAQ</p>
@@ -339,7 +339,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Testimonial Section */}
+      {/* Testimonial Section - Commented Out
       <div className="space-y-4 md:space-y-6 max-w-md mx-auto mt-16 md:mt-24">
         <div className="rating !flex justify-center">
           {[...Array(5)].map((_, i) => (
@@ -360,6 +360,7 @@ export default function LandingPage() {
           </div>
         </div>
       </div>
+      */}
 
       {/* Footer */}
       <footer className="bg-white">

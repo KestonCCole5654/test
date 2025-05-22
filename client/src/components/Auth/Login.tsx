@@ -8,7 +8,6 @@ import { Loader2, Shield } from "lucide-react"
 import supabase from "./supabaseClient"
 import { LoadingSpinner } from "../../components/ui/loadingSpinner"
 
-
 export default function LoginPage() {
   const [error, setError] = useState<string>("")
   const [loading, setLoading] = useState<boolean>(false)
@@ -20,35 +19,58 @@ export default function LoginPage() {
     setMounted(true)
     // Check if user is already logged in
     const checkUser = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      if (session) {
-        const from = (location.state as { from?: string })?.from || "/invoices"
-        navigate(from)
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
+        if (session) {
+          const from = (location.state as { from?: string })?.from || "/invoices"
+          navigate(from)
+        }
+      } catch (err) {
+        console.error("Session check error:", err)
       }
     }
     checkUser()
-  }, [navigate])
+  }, [navigate, location])
 
   const handleGoogleLogin = useCallback(async () => {
     try {
       setLoading(true)
       setError("")
+      
+      // Configure OAuth with additional security parameters
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth-callback`,
           scopes: "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets",
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+            // Add state parameter to track the auth flow
+            state: JSON.stringify({
+              timestamp: Date.now(),
+              redirectTo: location.state?.from || '/invoices'
+            })
+          }
         },
       })
-      if (error) throw error
+
+      if (error) {
+        console.error("OAuth error:", error)
+        throw error
+      }
+
+      // If we get here, the OAuth flow has started
+      console.log("OAuth flow started:", data)
     } catch (err: any) {
-      setError(err.message || "Login failed")
+      console.error("Login error:", err)
+      setError(err.message || "Login failed. Please try again.")
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [location.state])
 
   if (!mounted || loading) {
     return (
@@ -65,25 +87,23 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen font-cal-sans flex flex-col bg-gradient-to-b from-white to-gray-50">
-      
-       <div className="flex items-center mb-4 p-10">
-          <a href="/" className="flex items-center space-x-2">
-            <div className="h-8 w-8 rounded bg-green-800 flex items-center justify-center">
-              <span className="text-white font-medium text-md">SB</span>
-            </div>
-            <span className="text-lg font-medium text-green-800">SheetBills ™</span>
-          </a>
-        </div>
+      <div className="flex items-center mb-4 p-10">
+        <a href="/" className="flex items-center space-x-2">
+          <div className="h-8 w-8 rounded bg-green-800 flex items-center justify-center">
+            <span className="text-white font-medium text-md">SB</span>
+          </div>
+          <span className="text-lg font-medium text-green-800">SheetBills ™</span>
+        </a>
+      </div>
 
- 
-
-   
       <div className="flex flex-1 flex-col items-center justify-center px-4 py-8">
         <div className="max-w-md w-full mx-auto">
           <Card className="border-0 shadow-lg overflow-hidden">
             <div className="bg-emerald-600 h-1.5 w-full"></div>
             <CardContent className="p-8">
-              <h1 className="text-2xl font-normal font-cal-sans text-gray-900 mb-2 text-center">Welcome to <span className=" font-cal-sans font-normal text-green-800">SheetBills™</span></h1>
+              <h1 className="text-2xl font-normal font-cal-sans text-gray-900 mb-2 text-center">
+                Welcome to <span className="font-cal-sans font-normal text-green-800">SheetBills™</span>
+              </h1>
               <p className="text-gray-600 font-normal font-cal-sans text-center text-sm mb-6">
                 Your professional invoicing platform with seamless Google Sheets integration
               </p>
@@ -121,22 +141,21 @@ export default function LoginPage() {
                 <span className="font-normal font-cal-sans">Continue with Google</span>
               </Button>
 
+              <div className="mt-4 text-center">
+                <p className="text-sm text-slate-500 font-normal font-cal-sans">
+                  By signing in, you agree to our{" "}
+                  <a href="#" className="text-emerald-600 hover:text-emerald-700 font-normal font-cal-sans">
+                    Terms
+                  </a>{" "}
+                  and{" "}
+                  <a href="#" className="text-emerald-600 hover:text-emerald-700 font-normal font-cal-sans">
+                    Privacy Policy
+                  </a>
+                  .
+                </p>
+              </div>
             </CardContent>
           </Card>
-
-          <div className="mt-4 text-center">
-            <p className="text-sm text-slate-500 font-normal font-cal-sans">
-              By signing in, you agree to our{" "}
-              <a href="#" className="text-emerald-600 hover:text-emerald-700 font-normal font-cal-sans ">
-                Terms
-              </a>{" "}
-              and{" "}
-              <a href="#" className="text-emerald-600 hover:text-emerald-700 font-normal font-cal-sans">
-                Privacy Policy
-              </a>
-              .
-            </p>
-          </div>
         </div>
       </div>
     </div>

@@ -74,21 +74,10 @@ export default function AuthCallback() {
       try {
         console.log('Starting auth callback handling')
         
-        // Get the state parameter from the URL
-        const params = new URLSearchParams(location.search)
-        const stateParam = params.get('state')
-        let redirectTo = '/invoices'
-        
-        if (stateParam) {
-          try {
-            const state = JSON.parse(stateParam)
-            if (state.redirectTo) {
-              redirectTo = state.redirectTo
-            }
-          } catch (e) {
-            console.warn('Failed to parse state parameter:', e)
-          }
-        }
+        // Get the redirect path from sessionStorage
+        const redirectPath = sessionStorage.getItem('auth_redirect') || '/invoices'
+        // Clear the stored redirect path
+        sessionStorage.removeItem('auth_redirect')
 
         // Wait for session to be established
         let retryCount = 0
@@ -138,8 +127,8 @@ export default function AuthCallback() {
             console.log('Redirecting to onboarding')
             navigate('/Onboarding', { replace: true })
           } else {
-            console.log('Redirecting to:', redirectTo)
-            navigate(redirectTo, { replace: true })
+            console.log('Redirecting to:', redirectPath)
+            navigate(redirectPath, { replace: true })
           }
         } catch (onboardingError) {
           console.error('Onboarding check failed:', onboardingError)

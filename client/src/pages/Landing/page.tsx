@@ -130,7 +130,7 @@ export default function LandingPage() {
 
       {/* How It Works Section */}
       <section className="flex flex-col items-center mx-auto max-w-5xl px-6 lg:px-8 justify-center pt-32 scroll-mt-[3.2rem]" id="how-it-works">
-        <div className="flex items-center justify-between w-full howItWorks3:flex-col howItWorks3:items-start howItWorks3:gap-3">
+        <div className="flex items-center justify-between max-w-5xl howItWorks3:flex-col howItWorks3:items-start howItWorks3:gap-3">
           <div className="flex flex-col items-start gap-3">
             <div className="flex items-center justify-center gap-2 border rounded-full bg-green-50 border-green-200 px-5 py-0.5 font-medium w-max text-green-800">
               How It Works ? 

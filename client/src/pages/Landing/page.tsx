@@ -15,6 +15,20 @@ export default function LandingPage() {
             <div className="flex-shrink-0 flex items-center">
               <span className="text-2xl font-normal text-green-800">SheetBills</span>
             </div>
+            
+            {/* Centered Navigation Links */}
+            <div className="hidden md:flex items-center justify-center space-x-8">
+              <a href="#why-codeguide" className="text-gray-600 hover:text-gray-900 font-medium">
+                Why CodeGuide?
+              </a>
+              <a href="#how-it-works" className="text-gray-600 hover:text-gray-900 font-medium">
+                How It Works
+              </a>
+              <a href="#faqs" className="text-gray-600 hover:text-gray-900 font-medium">
+                FAQs
+              </a>
+            </div>
+
             <div className="flex items-center space-x-4">
               <Button
                 variant="ghost"

@@ -1247,7 +1247,16 @@ function SortableTableRow({ id, children, invoice, spreadsheets, selectedInvoice
 
   const navigate = useNavigate()
 
-  const handleRowClick = () => {
+  const handleRowClick = (e: React.MouseEvent) => {
+    // Don't navigate if clicking on the checkbox or drag handle
+    if (e.target instanceof HTMLElement) {
+      const isCheckbox = e.target.closest('[role="checkbox"]')
+      const isDragHandle = e.target.closest('[data-draggable]')
+      if (isCheckbox || isDragHandle) {
+        return
+      }
+    }
+
     if (invoice) {
       const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
       const invoicesSheetUrl = invoicesSheet?.sheetUrl
@@ -1276,6 +1285,7 @@ function SortableTableRow({ id, children, invoice, spreadsheets, selectedInvoice
           <span
             {...attributes}
             {...listeners}
+            data-draggable="true"
             className="inline-flex items-center justify-center cursor-grab text-gray-400 hover:text-gray-600 active:text-gray-800"
           >
             <GripVertical className="h-6 w-6" />
@@ -1289,6 +1299,7 @@ function SortableTableRow({ id, children, invoice, spreadsheets, selectedInvoice
             onCheckedChange={() => handleSelectInvoice(invoice.id)}
             aria-label={`Select invoice ${invoice.id}`}
             className="mx-auto"
+            onClick={(e) => e.stopPropagation()}
           />
         </div>
       </td>

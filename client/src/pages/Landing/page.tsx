@@ -122,18 +122,19 @@ export default function LandingPage() {
                 </dt>
                 <dd className="mt-2 text-base/7 text-gray-600">Quickly update name, and, contact details — reflected on all your invoices automatically.</dd>
               </div>
-              <div className="relative pl-16 flex flex-col items-center text-center">
-                <dt className="text-base/7 font-normal text-gray-900">
-                  <div className="absolute top-0 left-0 flex size-10 items-center justify-center rounded-lg bg-green-600">
-                    <svg className="size-6 text-white" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-                    </svg>
-                  </div>
-                  Lightweight, simple, and fast
-                </dt>
-                <dd className="mt-2 text-base/7 text-gray-600">No need to learn complex tools. Ideal for freelancers, consultants, and small businesses already using Google Sheets.</dd>
-              </div>
             </dl>
+            {/* Centered last feature */}
+            <div className="flex justify-center items-center mt-12">
+              <div className="flex flex-col items-center text-center max-w-md">
+                <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-green-600 mb-4">
+                  <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                  </svg>
+                </div>
+                <dt className="text-lg font-semibold text-gray-900 mb-2">Lightweight, simple, and fast</dt>
+                <dd className="text-base text-gray-600">No need to learn complex tools. Ideal for freelancers, consultants, and small businesses already using Google Sheets.</dd>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -143,9 +144,9 @@ export default function LandingPage() {
         <div className="flex items-center justify-between w-full howItWorks3:flex-col howItWorks3:items-start howItWorks3:gap-3">
           <div className="flex flex-col items-start gap-3">
             <div className="flex items-center justify-center gap-2 border rounded-full bg-green-50 border-green-200 px-5 py-0.5 font-medium w-max text-green-800">
-              How It Works
+              How It Works ? 
             </div>
-            <h2 className="text-2xl font-normal text-green-800 pr-1">
+            <h2 className="text-4xl font-normal text-green-800 pr-1">
               Built For Freelancers <br /> & Small Businesses
             </h2>
           </div>

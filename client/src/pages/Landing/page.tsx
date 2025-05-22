@@ -33,7 +33,7 @@ export default function LandingPage() {
           <div className="flex items-center space-x-12">
             <div className="flex items-center">
               <div className="w-10 h-10 bg-green-800 rounded-lg flex items-center justify-center">
-                <span className="text-white text-2xl font-bold">SB</span>
+                <span className="text-white text-2xl font-normal">SB</span>
               </div>
             </div>
             <div className="hidden md:flex space-x-8">
@@ -55,7 +55,7 @@ export default function LandingPage() {
       <section className="pt-32 pb-16">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+            <h1 className="text-4xl md:text-6xl font-normal text-gray-900 mb-6">
               Tired of Wrestling with Invoices in Google Sheets?
             </h1>
             <p className="text-xl text-gray-600 mb-8">

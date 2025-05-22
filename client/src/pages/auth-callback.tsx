@@ -90,15 +90,27 @@ export default function AuthCallback() {
           }
         }
 
-        const { data: { session }, error } = await supabase.auth.getSession()
-        
-        if (error) {
-          console.error('Session error:', error)
-          throw error
+        // Wait for session to be established
+        let retryCount = 0
+        const maxRetries = 3
+        let session = null
+
+        while (retryCount < maxRetries) {
+          const { data, error } = await supabase.auth.getSession()
+          if (error) {
+            console.error('Session error:', error)
+            throw error
+          }
+          if (data.session) {
+            session = data.session
+            break
+          }
+          retryCount++
+          await new Promise(resolve => setTimeout(resolve, 1000)) // Wait 1 second between retries
         }
 
         if (!session) {
-          console.log('No session found, redirecting to login')
+          console.log('No session found after retries, redirecting to login')
           navigate('/login', { 
             replace: true,
             state: { error: 'Authentication failed. Please try again.' }

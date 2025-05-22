@@ -31,19 +31,13 @@ export default function LandingPage() {
             </div>
 
             <div className="flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                onClick={() => navigate("/login")}
-                className="text-gray-600 hover:text-gray-900"
-              >
-                Login
-              </Button>
+             
               <Button
                 onClick={() => navigate("/login")}
                 className="bg-green-800 hover:bg-green-900 text-white"
               >
                 Get Started
-                <ArrowRight className="ml-2 h-4 w-4" />
+              
               </Button>
             </div>
           </div>

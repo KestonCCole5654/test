@@ -129,6 +129,7 @@ export default function Dashboard() {
   // Bulk selection
   const [selectedInvoices, setSelectedInvoices] = useState<Set<string>>(new Set())
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const headerCheckboxRef = useRef<HTMLInputElement>(null)
   const [bulkDeleteMessage, setBulkDeleteMessage] = useState<string | null>(null)
   // Row order for drag-and-drop
@@ -562,6 +563,7 @@ export default function Dashboard() {
   // Bulk delete selected invoices
   const handleBulkDelete = async () => {
     try {
+      setIsDeleting(true)
       const {
         data: { session },
         error: sessionError,
@@ -602,6 +604,8 @@ export default function Dashboard() {
         description: error instanceof Error ? error.message : "Failed to delete invoices",
         variant: "destructive",
       })
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -852,11 +856,11 @@ export default function Dashboard() {
             variant="destructive"
             size="sm"
             onClick={() => setIsBulkDeleteDialogOpen(true)}
-            disabled={selectedInvoices.size === 0}
+            disabled={selectedInvoices.size === 0 || isDeleting}
             className="bg-red-100 text-red-700 border-red-200 hover:bg-red-200"
           >
             <Trash2 className="mr-2 h-4 w-4" />
-            Delete Selected
+            {isDeleting ? "Deleting..." : "Delete Selected"}
           </Button>
         </div>
         {bulkDeleteMessage && (
@@ -1199,8 +1203,12 @@ export default function Dashboard() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="font-cal-sans">Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleBulkDelete} className="bg-gray-800 font-cal-sans focus:ring-gray-800">
-              Delete
+            <AlertDialogAction 
+              onClick={handleBulkDelete} 
+              className="bg-gray-800 font-cal-sans focus:ring-gray-800"
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

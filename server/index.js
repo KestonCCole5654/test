@@ -2187,6 +2187,8 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
  */
 app.post('/api/create-business-sheet', async (req, res) => {
   console.log('[CREATE] ===== Business Sheet Creation Request Start =====');
+  let supabaseUser = null; // Declare user variable at the top level
+
   try {
     // 1. Log all incoming headers
     console.log('[CREATE] Request headers:', {
@@ -2247,6 +2249,8 @@ app.post('/api/create-business-sheet', async (req, res) => {
         });
         return res.status(401).json({ success: false, error: 'Invalid Supabase session' });
       }
+
+      supabaseUser = user; // Store the user for later use
     } catch (supabaseError) {
       console.error('[CREATE] Supabase verification failed:', {
         message: supabaseError.message,
@@ -2317,7 +2321,7 @@ app.post('/api/create-business-sheet', async (req, res) => {
 
     // Add to master sheet
     console.log('[CREATE] Adding to master sheet...');
-    const masterSheet = await getOrCreateMasterSheet(accessToken, user.id);
+    const masterSheet = await getOrCreateMasterSheet(accessToken, supabaseUser.id);
     const sheets = google.sheets({ version: 'v4', auth: new google.auth.OAuth2().setCredentials({ access_token: accessToken }) });
     await sheets.spreadsheets.values.append({
       spreadsheetId: masterSheet.id,
@@ -2336,7 +2340,7 @@ app.post('/api/create-business-sheet', async (req, res) => {
 
     console.log('[CREATE] Successfully completed business sheet creation:', {
       spreadsheetId: unifiedSheet.spreadsheetId,
-      userId: user.id,
+      userId: supabaseUser.id,
       masterSheetId: masterSheet.id
     });
 

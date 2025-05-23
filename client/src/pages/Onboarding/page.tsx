@@ -34,7 +34,31 @@ import supabase from "../../components/Auth/supabaseClient"
 import { useSession } from '@supabase/auth-helpers-react'
 import { LoadingSpinner } from "../../components/ui/loadingSpinner"
 
+const API_URL = "https://sheetbills-server.vercel.app/api"
 
+interface BusinessData {
+  companyName: string
+  email: string
+  phone: string
+  address: string
+  businessWebsite?: string
+  businessLogo?: string
+  businessDescription?: string
+  businessType?: string
+  businessIndustry?: string
+  businessSize?: string
+  businessFounded?: string
+  businessTaxId?: string
+  businessRegistrationNumber?: string
+  businessBankAccount?: string
+  businessPaymentTerms?: string
+  businessCurrency?: string
+  businessTimezone?: string
+  businessLanguage?: string
+  businessSocialMedia?: string
+  businessReferences?: string
+  businessNotes?: string
+}
 
 // Progress Dots Component
 const ProgressDots = ({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) => {
@@ -83,7 +107,7 @@ const WelcomeScreen = ({ onStart }: { onStart: () => void }) => {
 export default function InitializePage() {
   const navigate = useNavigate()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState("")
+  const [error, setError] = useState<string>("")
   const inputRef = useRef<HTMLInputElement>(null)
   const confettiCanvasRef = useRef<HTMLCanvasElement>(null)
   const [inputFocused, setInputFocused] = useState(false)
@@ -95,11 +119,11 @@ export default function InitializePage() {
   const [googleAccessToken, setGoogleAccessToken] = useState("")
 
   // Business details state
-  const [businessData, setBusinessData] = useState({
+  const [businessData, setBusinessData] = useState<BusinessData>({
     companyName: "",
     email: "",
     phone: "",
-    address: "",
+    address: ""
   })
 
   // Survey state
@@ -178,8 +202,17 @@ export default function InitializePage() {
         setSupabaseToken(session.access_token)
         if (session.provider_token) {
           setGoogleAccessToken(session.provider_token)
+          // Store Google token in both storages for redundancy
+          localStorage.setItem('google_access_token', session.provider_token)
+          sessionStorage.setItem('google_access_token', session.provider_token)
         } else {
-          setError("Google authentication required. Please sign in again.")
+          // Try to get Google token from storage as fallback
+          const storedGoogleToken = localStorage.getItem('google_access_token') || sessionStorage.getItem('google_access_token')
+          if (storedGoogleToken) {
+            setGoogleAccessToken(storedGoogleToken)
+          } else {
+            setError("Google authentication required. Please sign in again.")
+          }
         }
       } catch (error) {
         console.error("Error parsing auth session:", error)
@@ -194,12 +227,12 @@ export default function InitializePage() {
   useEffect(() => {
     const currentQ = questions[currentQuestion]
     const field = currentQ.field as keyof typeof businessData
-    const value = businessData[field]
+    const inputValue: string = businessData[field] || ""
 
-    if (value.trim() === "") {
+    if (inputValue.trim() === "") {
       setInputValid(null) // Not validated yet
     } else {
-      const validationError = currentQ.validate(value)
+      const validationError = currentQ.validate(inputValue)
       setInputValid(validationError === "")
     }
   }, [businessData, currentQuestion])
@@ -221,21 +254,47 @@ export default function InitializePage() {
 
   // Simple input change handler - no animations or complex logic
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target
-    const field = questions[currentQuestion].field as keyof typeof businessData
+    const { name, value } = e.target
+    if (value !== undefined) {
+      setBusinessData(prev => ({
+        ...prev,
+        [name]: value
+      }))
+    }
+  }
 
-    setBusinessData((prev) => ({
-      ...prev,
-      [field]: value,
-    }))
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (businessData.companyName && businessData.email && businessData.phone && businessData.address) {
+      await createBusinessSheet()
+    } else {
+      setError("Please fill in all required fields")
+    }
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        const result = reader.result
+        if (typeof result === 'string') {
+          setBusinessData(prev => ({
+            ...prev,
+            businessLogo: result
+          }))
+        }
+      }
+      reader.readAsDataURL(file)
+    }
   }
 
   const handleNext = () => {
     const currentQ = questions[currentQuestion]
     const field = currentQ.field as keyof typeof businessData
-    const value = businessData[field]
+    const inputValue: string = businessData[field] || ""
     // Validate current question
-    const validationError = currentQ.validate(value)
+    const validationError = currentQ.validate(inputValue)
     if (validationError) {
       setInputValid(false)
       setError(validationError)
@@ -298,61 +357,114 @@ export default function InitializePage() {
     checkOnboarding();
   }, [googleAccessToken, navigate]);
 
-  const createBusinessSheet = async () => {
-    if (!supabaseToken || !googleAccessToken) {
-      setError("Missing authentication tokens. Please try logging in again.");
-      return;
-    }
-
-    // Add debug logging for tokens
-    console.log("supabaseToken", supabaseToken);
-    console.log("googleAccessToken", googleAccessToken);
-
-    setIsSubmitting(true);
-    setError("");
-
+  // Add updateOnboardingStatus function
+  const updateOnboardingStatus = async (status: string) => {
     try {
-      const response = await fetch("https://sheetbills-server.vercel.app/api/create-business-sheet", {
+      const response = await fetch(`${API_URL}/update-onboarding-status`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-supabase-token": supabaseToken,
-          "Authorization": `Bearer ${googleAccessToken}`
+          "Authorization": `Bearer ${googleAccessToken}`,
+          "X-Supabase-Token": supabaseToken
+        },
+        body: JSON.stringify({ status })
+      })
+      
+      if (!response.ok) {
+        throw new Error("Failed to update onboarding status")
+      }
+    } catch (error) {
+      console.error("Error updating onboarding status:", error)
+    }
+  }
+
+  const createBusinessSheet = async () => {
+    try {
+      setIsSubmitting(true)
+      setError("")  // Fix: Use empty string instead of null
+
+      // Get the latest Google token
+      const currentGoogleToken = googleAccessToken || localStorage.getItem('google_access_token') || sessionStorage.getItem('google_access_token')
+      
+      if (!currentGoogleToken) {
+        throw new Error("Google authentication token not found")
+      }
+
+      // Get the latest Supabase token
+      const sessionString = localStorage.getItem("sb-auth-token") || sessionStorage.getItem("sb-auth-token")
+      if (!sessionString) {
+        throw new Error("Supabase authentication token not found")
+      }
+
+      const session = JSON.parse(sessionString)
+      const currentSupabaseToken = session.access_token
+
+      if (!currentSupabaseToken) {
+        throw new Error("Invalid Supabase session")
+      }
+
+      console.log("Creating business sheet with tokens:", {
+        supabaseToken: currentSupabaseToken ? "present" : "missing",
+        googleToken: currentGoogleToken ? "present" : "missing"
+      })
+
+      const response = await fetch(`${API_URL}/create-business-sheet`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${currentGoogleToken}`,
+          "X-Supabase-Token": currentSupabaseToken
         },
         body: JSON.stringify({
-          businessData: businessData,
-        }),
-      });
-
-      const data = await response.json();
+          businessData: {
+            businessName: businessData.companyName,
+            businessEmail: businessData.email,
+            businessPhone: businessData.phone,
+            businessAddress: businessData.address,
+            businessWebsite: businessData.businessWebsite,
+            businessLogo: businessData.businessLogo,
+            businessDescription: businessData.businessDescription,
+            businessType: businessData.businessType,
+            businessIndustry: businessData.businessIndustry,
+            businessSize: businessData.businessSize,
+            businessFounded: businessData.businessFounded,
+            businessTaxId: businessData.businessTaxId,
+            businessRegistrationNumber: businessData.businessRegistrationNumber,
+            businessBankAccount: businessData.businessBankAccount,
+            businessPaymentTerms: businessData.businessPaymentTerms,
+            businessCurrency: businessData.businessCurrency,
+            businessTimezone: businessData.businessTimezone,
+            businessLanguage: businessData.businessLanguage,
+            businessSocialMedia: businessData.businessSocialMedia,
+            businessReferences: businessData.businessReferences,
+            businessNotes: businessData.businessNotes
+          }
+        })
+      })
 
       if (!response.ok) {
-        console.error("Server error:", data);
-        if (response.status === 401) {
-          throw new Error("Authentication failed. Please try logging in again.");
-        } else if (response.status === 400) {
-          throw new Error(data.error || "Invalid business data provided");
-        } else {
-          throw new Error(data.error || "Failed to create business sheet");
-        }
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to create business sheet")
       }
 
-      if (!data.success) {
-        throw new Error(data.error || "Failed to create business sheet");
-      }
+      const data = await response.json()
+      console.log("Business sheet created successfully:", data)
 
-      // Store the spreadsheet ID and URL
-      sessionStorage.setItem("spreadsheetId", data.businessSheetId);
-      sessionStorage.setItem("spreadsheetUrl", data.spreadsheetUrl);
-
-      setShowSuccess(true);
-      setIsSubmitting(false);
-    } catch (error: unknown) {
-      console.error("Setup error:", error);
-      setError(error instanceof Error ? error.message : "Failed to create business sheet. Please try again.");
-      setIsSubmitting(false);
+      // Store the spreadsheet ID in session storage
+      sessionStorage.setItem("spreadsheetId", data.businessSheetId)
+      
+      // Update onboarding status
+      await updateOnboardingStatus("completed")
+      
+      // Move to success screen
+      setShowSuccess(true)
+    } catch (error: unknown) {  // Fix: Add type annotation
+      console.error("Error creating business sheet:", error)
+      setError(error instanceof Error ? error.message : "Failed to create business sheet")
+    } finally {
+      setIsSubmitting(false)
     }
-  };
+  }
 
   // Floating elements for visual interest
   const FloatingElements = () => {
@@ -396,7 +508,7 @@ export default function InitializePage() {
   const renderCurrentQuestion = () => {
     const currentQ = questions[currentQuestion]
     const field = currentQ.field as keyof typeof businessData
-    const value = businessData[field]
+    const inputValue: string = businessData[field] || ""
 
     let inputBorderClass = "border border-gray-200 dark:border-gray-700"
     if (inputValid === true) {
@@ -439,7 +551,7 @@ export default function InitializePage() {
             <Input
               ref={inputRef}
               type={currentQ.id === "email" ? "email" : "text"}
-              value={value}
+              value={inputValue}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               onFocus={() => setInputFocused(true)}
@@ -448,7 +560,7 @@ export default function InitializePage() {
               className={`w-full p-4 text-base font-cal-sans ${inputBorderClass} focus-visible:ring-0 focus-visible:ring-offset-0 transition-all duration-300`}
             />
 
-            {inputValid !== null && value.trim() !== "" && (
+            {inputValid !== null && inputValue.trim() !== "" && (
               <motion.div
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -480,12 +592,12 @@ export default function InitializePage() {
 
           <Button
             className={`flex-1 ${
-              currentQuestion === 0 && !value
+              currentQuestion === 0 && !inputValue
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-green-600 font-cal-sans hover:bg-green-700"
             }`}
             onClick={handleNext}
-            disabled={currentQ.required && !value}
+            disabled={currentQ.required && !inputValue}
           >
             Next
             <ArrowRight className="h-4 w-4 ml-2" />

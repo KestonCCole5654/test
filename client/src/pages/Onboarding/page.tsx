@@ -1,6 +1,3 @@
-
-        
-        
 "use client"
 
 import type React from "react"
@@ -260,8 +257,8 @@ export default function InitializePage() {
   }
 
   // SIMPLIFIED input change handler
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement> | string) => {
+    const value = typeof e === 'string' ? e : e.target.value
     const currentQ = questions[currentQuestion]
     const field = currentQ.field as keyof typeof businessData
     
@@ -513,7 +510,14 @@ export default function InitializePage() {
               ref={inputRef}
               type={currentQ.id === "email" ? "email" : "text"}
               value={value}
-              onChange={handleInputChange}
+              onChange={(e) => {
+                const newValue = e.target.value;
+                setBusinessData(prev => ({
+                  ...prev,
+                  [currentQ.field]: newValue
+                }));
+                if (error) setError("");
+              }}
               onKeyDown={handleKeyDown}
               placeholder={currentQ.placeholder}
               className={`w-full p-4 text-base font-cal-sans border ${getBorderClass()} focus-visible:ring-0 focus-visible:ring-offset-0 transition-all duration-200`}

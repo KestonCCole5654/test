@@ -90,6 +90,10 @@ export default function InitializePage() {
   const [inputValid, setInputValid] = useState<boolean | null>(null)
   const [showWelcome, setShowWelcome] = useState(true)
 
+  // Auth tokens state
+  const [supabaseToken, setSupabaseToken] = useState("")
+  const [googleAccessToken, setGoogleAccessToken] = useState("")
+
   // Business details state
   const [businessData, setBusinessData] = useState({
     companyName: "",
@@ -160,6 +164,31 @@ export default function InitializePage() {
     // Reset input validation state when question changes
     setInputValid(null)
   }, [currentQuestion])
+
+  // Get auth tokens on mount
+  useEffect(() => {
+    // Get the auth session from storage
+    const sessionString = localStorage.getItem("sb-auth-token") || sessionStorage.getItem("sb-auth-token")
+
+    if (sessionString) {
+      try {
+        const session = JSON.parse(sessionString)
+        
+        // Extract Supabase JWT (access_token) and Google token (provider_token)
+        setSupabaseToken(session.access_token)
+        if (session.provider_token) {
+          setGoogleAccessToken(session.provider_token)
+        } else {
+          setError("Google authentication required. Please sign in again.")
+        }
+      } catch (error) {
+        console.error("Error parsing auth session:", error)
+        setError("Invalid authentication data. Please sign in again.")
+      }
+    } else {
+      setError("Authentication required. Please sign in.")
+    }
+  }, [])
 
   // Validate current input whenever it changes
   useEffect(() => {
@@ -270,18 +299,15 @@ export default function InitializePage() {
   }, [googleAccessToken, navigate]);
 
   const createBusinessSheet = async () => {
-    // Always get the latest tokens from storage
-    const supabaseToken = localStorage.getItem("supabase_token") || sessionStorage.getItem("supabase_token");
-    const googleAccessToken = localStorage.getItem("google_access_token") || sessionStorage.getItem("google_access_token");
-
-    console.log('createBusinessSheet called');
-    console.log('supabaseToken:', supabaseToken);
-    console.log('googleAccessToken:', googleAccessToken);
-
     if (!supabaseToken || !googleAccessToken) {
       setError("Missing authentication tokens. Please try logging in again.");
       return;
     }
+
+    // Add debug logging for tokens
+    console.log("supabaseToken", supabaseToken);
+    console.log("googleAccessToken", googleAccessToken);
+
     setIsSubmitting(true);
     setError("");
 
@@ -570,7 +596,7 @@ export default function InitializePage() {
 
           <Button
             className="flex-1 bg-green-600 hover:bg-green-700"
-            onClick={() => { console.log('Complete Setup button clicked'); createBusinessSheet(); }}
+            onClick={createBusinessSheet}
             disabled={isSubmitting}
           >
             {isSubmitting ? (

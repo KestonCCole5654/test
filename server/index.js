@@ -2184,25 +2184,36 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
  * @access Protected (Supabase + Google Auth)
  */
 app.post('/api/create-business-sheet', async (req, res) => {
-  console.log('[CREATE] Initiating unified business sheet creation request');
+  console.log('[CREATE] ===== Business Sheet Creation Request Start =====');
   try {
-    // 1. Validate request content type
+    // 1. Log all incoming headers
+    console.log('[CREATE] Request headers:', {
+      contentType: req.headers['content-type'],
+      hasAuth: !!req.headers.authorization,
+      hasSupabaseToken: !!req.headers['x-supabase-token'],
+      allHeaders: Object.keys(req.headers)
+    });
+
+    // 2. Validate request content type
     if (!req.headers['content-type']?.includes('application/json')) {
-      console.error('[CREATE] Invalid content type');
+      console.error('[CREATE] Invalid content type:', req.headers['content-type']);
       return res.status(415).json({ success: false, error: 'Invalid content type - requires JSON' });
     }
 
-    // 2. Validate tokens
+    // 3. Validate tokens
     const supabaseToken = req.headers['x-supabase-token'];
-    const accessToken = req.headers.authorization?.split(' ')[1];
+    const authHeader = req.headers.authorization;
+    const accessToken = authHeader?.split(' ')[1];
     const { businessData } = req.body;
 
-    // Add debug logging for received tokens
+    // Log token details
     console.log('[CREATE] Token validation:', {
       hasSupabaseToken: !!supabaseToken,
+      hasAuthHeader: !!authHeader,
       hasGoogleToken: !!accessToken,
       supabaseTokenLength: supabaseToken?.length || 0,
-      googleTokenLength: accessToken?.length || 0
+      googleTokenLength: accessToken?.length || 0,
+      authHeaderFormat: authHeader?.startsWith('Bearer ') ? 'correct' : 'incorrect'
     });
 
     if (!supabaseToken) {
@@ -2215,16 +2226,27 @@ app.post('/api/create-business-sheet', async (req, res) => {
       return res.status(401).json({ success: false, error: 'Missing Google access token' });
     }
 
-    // 3. Verify Supabase session
+    // 4. Verify Supabase session
+    console.log('[CREATE] Verifying Supabase session...');
     const { data: { user }, error: supabaseError } = await supabase.auth.getUser(supabaseToken);
-    console.log('[CREATE] Supabase user:', user ? 'Found' : 'Not found', 'Error:', supabaseError);
+    console.log('[CREATE] Supabase verification result:', {
+      hasUser: !!user,
+      userId: user?.id,
+      error: supabaseError?.message,
+      errorCode: supabaseError?.code
+    });
     
     if (supabaseError || !user) {
-      console.error('[CREATE] Supabase auth error:', supabaseError);
+      console.error('[CREATE] Supabase auth error:', {
+        error: supabaseError?.message,
+        code: supabaseError?.code,
+        status: supabaseError?.status
+      });
       return res.status(401).json({ success: false, error: 'Invalid Supabase session' });
     }
 
-    // 4. Verify Google token
+    // 5. Verify Google token
+    console.log('[CREATE] Verifying Google token...');
     try {
       const oauth2Client = new google.auth.OAuth2();
       oauth2Client.setCredentials({ access_token: accessToken });
@@ -2232,23 +2254,43 @@ app.post('/api/create-business-sheet', async (req, res) => {
       console.log('[CREATE] Google token info:', {
         email: tokenInfo.email,
         scope: tokenInfo.scope,
-        expires_in: tokenInfo.expires_in
+        expires_in: tokenInfo.expires_in,
+        valid: true
       });
     } catch (googleError) {
-      console.error('[CREATE] Google token validation error:', googleError);
+      console.error('[CREATE] Google token validation error:', {
+        message: googleError.message,
+        code: googleError.code,
+        status: googleError.status,
+        response: googleError.response?.data
+      });
       return res.status(401).json({ success: false, error: 'Invalid Google token' });
     }
 
-    // 5. Validate business data
+    // 6. Validate business data
+    console.log('[CREATE] Validating business data...');
     if (!businessData) {
       console.error('[CREATE] Missing business data');
       return res.status(400).json({ error: 'Business data is required' });
     }
 
+    console.log('[CREATE] Business data validation:', {
+      hasCompanyName: !!businessData.companyName,
+      hasEmail: !!businessData.email,
+      hasPhone: !!businessData.phone,
+      hasAddress: !!businessData.address
+    });
+
     // Create the unified business sheet
+    console.log('[CREATE] Creating unified business sheet...');
     const unifiedSheet = await createUnifiedBusinessSheet(accessToken, businessData);
+    console.log('[CREATE] Unified sheet created:', {
+      spreadsheetId: unifiedSheet.spreadsheetId,
+      hasUrl: !!unifiedSheet.spreadsheetUrl
+    });
 
     // Add to master sheet
+    console.log('[CREATE] Adding to master sheet...');
     const masterSheet = await getOrCreateMasterSheet(accessToken, user.id);
     const sheets = google.sheets({ version: 'v4', auth: new google.auth.OAuth2().setCredentials({ access_token: accessToken }) });
     await sheets.spreadsheets.values.append({
@@ -2257,18 +2299,19 @@ app.post('/api/create-business-sheet', async (req, res) => {
       valueInputOption: 'RAW',
       resource: {
         values: [[
-          new Date().toISOString(), // Created At
-          'SheetBills Invoices',    // Sheet Name
-          'Business',               // Sheet Type
-          'Active',                 // Status
-          unifiedSheet.spreadsheetUrl // URL
+          new Date().toISOString(),
+          'SheetBills Invoices',
+          'Business',
+          'Active',
+          unifiedSheet.spreadsheetUrl
         ]]
       }
     });
 
-    console.log('[CREATE] Successfully created business sheet:', {
+    console.log('[CREATE] Successfully completed business sheet creation:', {
       spreadsheetId: unifiedSheet.spreadsheetId,
-      userId: user.id
+      userId: user.id,
+      masterSheetId: masterSheet.id
     });
 
     res.json({
@@ -2277,11 +2320,19 @@ app.post('/api/create-business-sheet', async (req, res) => {
       spreadsheetUrl: unifiedSheet.spreadsheetUrl
     });
   } catch (error) {
-    console.error('[CREATE] Business sheet creation error:', error);
+    console.error('[CREATE] Business sheet creation error:', {
+      message: error.message,
+      code: error.code,
+      status: error.status,
+      response: error.response?.data,
+      stack: error.stack
+    });
     res.status(500).json({
       error: 'Business sheet creation failed',
       details: error.message
     });
+  } finally {
+    console.log('[CREATE] ===== Business Sheet Creation Request End =====');
   }
 });
 
@@ -2308,79 +2359,6 @@ app.post('/api/check-master-sheet', async (req, res) => {
   } catch (error) {
     console.error('Error checking master sheet:', error);
     return res.status(500).json({ error: 'Failed to check master sheet' });
-  }
-});
-
-app.delete('/api/delete-account', async (req, res) => {
-  try {
-    // Parse body
-    const { deleteInvoices, sheetUrl } = req.body;
-
-    // Validate tokens
-    const supabaseToken = req.headers['x-supabase-token'];
-    const googleToken = req.headers.authorization?.split(' ')[1];
-    if (!supabaseToken || !googleToken) {
-      return res.status(401).json({ error: 'Authentication tokens required' });
-    }
-
-    // Validate Supabase session
-    const { data: { user }, error } = await supabase.auth.getUser(supabaseToken);
-    if (error || !user) {
-      return res.status(401).json({ error: 'Invalid Supabase session' });
-    }
-
-    // Initialize Google APIs
-    const auth = new google.auth.OAuth2();
-    auth.setCredentials({ access_token: googleToken });
-    const drive = google.drive({ version: 'v3', auth });
-    const sheets = google.sheets({ version: 'v4', auth });
-
-    // If deleteInvoices is true and sheetUrl is provided, delete the Google Sheet
-    if (deleteInvoices && sheetUrl) {
-      try {
-        const spreadsheetId = extractSheetIdFromUrl(sheetUrl);
-        if (!spreadsheetId) {
-          return res.status(400).json({ error: 'Invalid sheetUrl format' });
-        }
-
-        // Delete the entire spreadsheet from Google Drive
-        await drive.files.delete({
-          fileId: spreadsheetId
-        });
-      } catch (error) {
-        console.error('Error deleting Google Sheet:', error);
-        // Continue with account deletion even if sheet deletion fails
-      }
-    }
-
-    // Revoke Google OAuth token
-    try {
-      await auth.revokeToken(googleToken);
-    } catch (error) {
-      console.error('Error revoking Google token:', error);
-      // Continue with account deletion even if token revocation fails
-    }
-
-    // Delete user from Supabase
-    const { error: deleteError } = await supabase.auth.admin.deleteUser(user.id);
-    if (deleteError) {
-      console.error('Error deleting user from Supabase:', deleteError);
-      return res.status(500).json({ 
-        error: 'Failed to delete user from Supabase', 
-        details: deleteError.message 
-      });
-    }
-
-    return res.json({ 
-      success: true, 
-      message: 'Account and associated data deleted successfully' 
-    });
-  } catch (error) {
-    console.error('Delete account error:', error);
-    res.status(500).json({ 
-      error: 'Failed to delete account', 
-      details: error.message 
-    });
   }
 });
 

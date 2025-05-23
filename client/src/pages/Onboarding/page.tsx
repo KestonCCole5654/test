@@ -169,15 +169,15 @@ export default function InitializePage() {
   useEffect(() => {
     // Get the auth session from storage
     const sessionString = localStorage.getItem("sb-auth-token") || sessionStorage.getItem("sb-auth-token")
-    const googleToken = localStorage.getItem("google_access_token") || sessionStorage.getItem("google_access_token")
 
     if (sessionString) {
       try {
         const session = JSON.parse(sessionString)
-        setSupabaseToken(session.access_token)
         
-        if (googleToken) {
-          setGoogleAccessToken(googleToken)
+        // Extract Supabase JWT (access_token) and Google token (provider_token)
+        setSupabaseToken(session.access_token)
+        if (session.provider_token) {
+          setGoogleAccessToken(session.provider_token)
         } else {
           setError("Google authentication required. Please sign in again.")
         }

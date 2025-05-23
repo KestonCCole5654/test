@@ -227,12 +227,12 @@ export default function InitializePage() {
   useEffect(() => {
     const currentQ = questions[currentQuestion]
     const field = currentQ.field as keyof typeof businessData
-    const inputValue: string = businessData[field] || ""
+    const value = businessData[field] || ""
 
-    if (inputValue.trim() === "") {
+    if (value.trim() === "") {
       setInputValid(null) // Not validated yet
     } else {
-      const validationError = currentQ.validate(inputValue)
+      const validationError = currentQ.validate(value)
       setInputValid(validationError === "")
     }
   }, [businessData, currentQuestion])
@@ -254,13 +254,14 @@ export default function InitializePage() {
 
   // Simple input change handler - no animations or complex logic
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    if (value !== undefined) {
-      setBusinessData(prev => ({
-        ...prev,
-        [name]: value
-      }))
-    }
+    const { value } = e.target
+    const currentQ = questions[currentQuestion]
+    const field = currentQ.field as keyof typeof businessData
+    
+    setBusinessData(prev => ({
+      ...prev,
+      [field]: value
+    }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {

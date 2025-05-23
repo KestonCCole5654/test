@@ -189,21 +189,33 @@ export default function InitializePage() {
   // Get auth tokens on mount
   useEffect(() => {
     const sessionString = localStorage.getItem("sb-auth-token") || sessionStorage.getItem("sb-auth-token")
+    console.log("Found session string:", !!sessionString)
 
     if (sessionString) {
       try {
         const session = JSON.parse(sessionString)
+        console.log("Parsed session:", {
+          hasAccessToken: !!session.access_token,
+          hasProviderToken: !!session.provider_token,
+          accessTokenLength: session.access_token?.length || 0,
+          providerTokenLength: session.provider_token?.length || 0
+        })
+        
         setSupabaseToken(session.access_token)
         
         if (session.provider_token) {
+          console.log("Setting Google token from session")
           setGoogleAccessToken(session.provider_token)
           localStorage.setItem('google_access_token', session.provider_token)
           sessionStorage.setItem('google_access_token', session.provider_token)
         } else {
           const storedGoogleToken = localStorage.getItem('google_access_token') || sessionStorage.getItem('google_access_token')
+          console.log("Checking stored Google token:", !!storedGoogleToken)
           if (storedGoogleToken) {
+            console.log("Setting Google token from storage")
             setGoogleAccessToken(storedGoogleToken)
           } else {
+            console.error("No Google token found in session or storage")
             setError("Google authentication required. Please sign in again.")
           }
         }
@@ -212,6 +224,7 @@ export default function InitializePage() {
         setError("Invalid authentication data. Please sign in again.")
       }
     } else {
+      console.error("No session string found")
       setError("Authentication required. Please sign in.")
     }
   }, [])
@@ -369,12 +382,14 @@ export default function InitializePage() {
       // Get Google token from session
       const googleToken = session.provider_token
       console.log("Google token present:", !!googleToken)
+      console.log("Google token length:", googleToken?.length || 0)
       
       if (!googleToken) {
         // Try to get from storage as fallback
         const storedGoogleToken = localStorage.getItem('google_access_token') || sessionStorage.getItem('google_access_token')
         if (storedGoogleToken) {
           console.log("Using stored Google token")
+          console.log("Stored Google token length:", storedGoogleToken.length)
           setGoogleAccessToken(storedGoogleToken)
         } else {
           console.error("No Google token found in session or storage")
@@ -385,6 +400,7 @@ export default function InitializePage() {
       // Get Supabase token
       const supabaseToken = session.access_token
       console.log("Supabase token present:", !!supabaseToken)
+      console.log("Supabase token length:", supabaseToken?.length || 0)
       
       if (!supabaseToken) {
         console.error("No Supabase token found")
@@ -404,8 +420,9 @@ export default function InitializePage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${googleToken}`,
-          "x-supabase-token": supabaseToken
+          "Authorization": `Bearer ${googleToken || storedGoogleToken}`,
+          "x-supabase-token": supabaseToken,
+          "x-auth-token": supabaseToken
         },
         body: JSON.stringify({
           businessData: {
@@ -421,6 +438,8 @@ export default function InitializePage() {
       if (!response.ok) {
         const errorData = await response.json()
         console.error("Server response:", errorData)
+        console.error("Response status:", response.status)
+        console.error("Response headers:", Object.fromEntries(response.headers.entries()))
         
         // Handle specific error cases
         if (response.status === 401) {

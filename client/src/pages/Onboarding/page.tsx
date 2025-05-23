@@ -169,14 +169,18 @@ export default function InitializePage() {
   useEffect(() => {
     // Get the auth session from storage
     const sessionString = localStorage.getItem("sb-auth-token") || sessionStorage.getItem("sb-auth-token")
+    const googleToken = localStorage.getItem("google_access_token") || sessionStorage.getItem("google_access_token")
 
     if (sessionString) {
       try {
         const session = JSON.parse(sessionString)
-
-        // Extract Supabase JWT (access_token) and Google token (provider_token)
         setSupabaseToken(session.access_token)
-        setGoogleAccessToken(session.provider_token)
+        
+        if (googleToken) {
+          setGoogleAccessToken(googleToken)
+        } else {
+          setError("Google authentication required. Please sign in again.")
+        }
       } catch (error) {
         console.error("Error parsing auth session:", error)
         setError("Invalid authentication data. Please sign in again.")

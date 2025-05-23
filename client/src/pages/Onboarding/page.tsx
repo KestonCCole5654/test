@@ -372,11 +372,15 @@ export default function InitializePage() {
         throw new Error("Invalid Supabase session")
       }
 
+      // Log tokens for debugging (without exposing full values)
       console.log("Sending request with tokens:", {
         hasGoogleToken: !!googleToken,
-        hasSupabaseToken: !!supabaseToken
+        hasSupabaseToken: !!supabaseToken,
+        googleTokenLength: googleToken.length,
+        supabaseTokenLength: supabaseToken.length
       })
 
+      // Make the API request
       const response = await fetch(`${API_URL}/create-business-sheet`, {
         method: "POST",
         headers: {
@@ -394,17 +398,31 @@ export default function InitializePage() {
         })
       })
 
+      // Handle non-OK responses
       if (!response.ok) {
         const errorData = await response.json()
         console.error("Server response:", errorData)
-        throw new Error(errorData.error || "Failed to create business sheet")
+        
+        // Handle specific error cases
+        if (response.status === 401) {
+          throw new Error("Authentication failed. Please try logging in again.")
+        } else if (response.status === 500) {
+          throw new Error(errorData.error || "Server error occurred")
+        } else {
+          throw new Error(errorData.error || "Failed to create business sheet")
+        }
       }
 
       const data = await response.json()
       console.log("Success response:", data)
       
+      // Store the spreadsheet ID
       sessionStorage.setItem("spreadsheetId", data.businessSheetId)
+      
+      // Update onboarding status
       await updateOnboardingStatus("completed")
+      
+      // Show success screen
       setShowSuccess(true)
       
     } catch (error: unknown) {

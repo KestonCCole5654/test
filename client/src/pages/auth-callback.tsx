@@ -58,35 +58,60 @@ export default function AuthCallback() {
         
         console.log('Retrieved redirect path:', redirectPath)
 
-        // Get the session from the URL hash
+        // Get the session from the URL hash or search params
         const hashParams = new URLSearchParams(window.location.hash.substring(1))
-        const accessToken = hashParams.get('access_token')
-        const refreshToken = hashParams.get('refresh_token')
-
-        if (!accessToken) {
-          console.error('No access token found in URL')
-          throw new Error('No access token found')
-        }
-
-        console.log('Found access token in URL hash')
+        const searchParams = new URLSearchParams(window.location.search)
         
-        // Set the session using the tokens from the URL
-        const { data: { session }, error: sessionError } = await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken || ''
-        })
-
+        // Try to get the session from Supabase
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        
         if (sessionError) {
-          console.error('Error setting session:', sessionError)
+          console.error('Session error:', sessionError)
           throw sessionError
         }
 
         if (!session) {
-          console.error('No session after setting tokens')
-          throw new Error('Failed to establish session')
+          // If no session, try to get it from the URL
+          const accessToken = hashParams.get('access_token') || searchParams.get('access_token')
+          const refreshToken = hashParams.get('refresh_token') || searchParams.get('refresh_token')
+
+          if (!accessToken) {
+            console.error('No access token found in URL')
+            throw new Error('No access token found')
+          }
+
+          console.log('Found access token in URL')
+          
+          // Set the session using the tokens from the URL
+          const { data: { session: newSession }, error: setSessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken || ''
+          })
+
+          if (setSessionError) {
+            console.error('Error setting session:', setSessionError)
+            throw setSessionError
+          }
+
+          if (!newSession) {
+            console.error('No session after setting tokens')
+            throw new Error('Failed to establish session')
+          }
+
+          console.log('Session established successfully')
+        } else {
+          console.log('Existing session found')
         }
 
-        console.log('Session established successfully')
+        // Get the final session state
+        const { data: { session: finalSession }, error: finalSessionError } = await supabase.auth.getSession()
+        
+        if (finalSessionError || !finalSession) {
+          console.error('Final session check failed:', finalSessionError)
+          throw new Error('Failed to verify session')
+        }
+
+        console.log('Final session check successful')
 
         // Store tokens with fallback
         const storeToken = (key: string, value: string) => {
@@ -102,14 +127,14 @@ export default function AuthCallback() {
           }
         }
 
-        storeToken('supabase_token', session.access_token)
-        if (session.provider_token) {
-          storeToken('google_access_token', session.provider_token)
+        storeToken('supabase_token', finalSession.access_token)
+        if (finalSession.provider_token) {
+          storeToken('google_access_token', finalSession.provider_token)
         }
 
         try {
           // Check if user needs onboarding
-          const needsOnboarding = await checkUserOnboarding(session.user.id)
+          const needsOnboarding = await checkUserOnboarding(finalSession.user.id)
           console.log('Onboarding check result:', needsOnboarding)
           
           if (needsOnboarding) {

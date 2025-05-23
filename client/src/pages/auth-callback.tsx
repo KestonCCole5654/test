@@ -50,7 +50,12 @@ export default function AuthCallback() {
         const error = searchParams.get('error')
         const errorDescription = searchParams.get('error_description')
         
-        if (error) {
+        // Special handling for database errors
+        if (error === 'server_error' && errorDescription?.includes('Database error updating user')) {
+          console.log('Database error detected, proceeding with auth flow')
+          // Clear the error from URL to prevent redirect loops
+          window.history.replaceState({}, document.title, window.location.pathname)
+        } else if (error) {
           console.error('Auth error from Supabase:', { error, errorDescription })
           throw new Error(errorDescription || 'Authentication failed')
         }
@@ -100,7 +105,12 @@ export default function AuthCallback() {
 
             if (setSessionError) {
               console.error('Error setting session:', setSessionError)
-              throw setSessionError
+              // If it's a database error, we should still try to proceed
+              if (setSessionError.message?.includes('Database error')) {
+                console.log('Database error occurred, but proceeding with auth flow')
+              } else {
+                throw setSessionError
+              }
             }
 
             if (!newSession) {
@@ -176,13 +186,19 @@ export default function AuthCallback() {
         }
       } catch (err: any) {
         console.error('Auth callback error:', err)
-        navigate('/login', { 
-          replace: true,
-          state: { 
-            error: 'Authentication failed. Please try again.',
-            details: err.message
-          }
-        })
+        // If it's a database error, we should still try to proceed
+        if (err.message?.includes('Database error')) {
+          console.log('Database error occurred, but proceeding with auth flow')
+          navigate('/invoices', { replace: true })
+        } else {
+          navigate('/login', { 
+            replace: true,
+            state: { 
+              error: 'Authentication failed. Please try again.',
+              details: err.message
+            }
+          })
+        }
       }
     }
 

@@ -354,66 +354,63 @@ export default function InitializePage() {
       setIsSubmitting(true)
       setError("")
 
+      // Get Google token
       const currentGoogleToken = googleAccessToken || localStorage.getItem('google_access_token') || sessionStorage.getItem('google_access_token')
-      
       if (!currentGoogleToken) {
         throw new Error("Google authentication token not found")
       }
 
+      // Get Supabase token
       const sessionString = localStorage.getItem("sb-auth-token") || sessionStorage.getItem("sb-auth-token")
       if (!sessionString) {
         throw new Error("Supabase authentication token not found")
       }
 
-      const session = JSON.parse(sessionString)
-      const currentSupabaseToken = session.access_token
+      let currentSupabaseToken
+      try {
+        const session = JSON.parse(sessionString)
+        currentSupabaseToken = session.access_token
+      } catch (e) {
+        console.error("Error parsing session:", e)
+        throw new Error("Invalid session format")
+      }
 
       if (!currentSupabaseToken) {
         throw new Error("Invalid Supabase session")
       }
+
+      console.log("Sending request with tokens:", {
+        hasGoogleToken: !!currentGoogleToken,
+        hasSupabaseToken: !!currentSupabaseToken
+      })
 
       const response = await fetch(`${API_URL}/create-business-sheet`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${currentGoogleToken}`,
-          "X-Supabase-Token": currentSupabaseToken
+          "x-supabase-token": currentSupabaseToken
         },
         body: JSON.stringify({
           businessData: {
-            businessName: businessData.companyName,
-            businessEmail: businessData.email,
-            businessPhone: businessData.phone,
-            businessAddress: businessData.address,
-            businessWebsite: businessData.businessWebsite,
-            businessLogo: businessData.businessLogo,
-            businessDescription: businessData.businessDescription,
-            businessType: businessData.businessType,
-            businessIndustry: businessData.businessIndustry,
-            businessSize: businessData.businessSize,
-            businessFounded: businessData.businessFounded,
-            businessTaxId: businessData.businessTaxId,
-            businessRegistrationNumber: businessData.businessRegistrationNumber,
-            businessBankAccount: businessData.businessBankAccount,
-            businessPaymentTerms: businessData.businessPaymentTerms,
-            businessCurrency: businessData.businessCurrency,
-            businessTimezone: businessData.businessTimezone,
-            businessLanguage: businessData.businessLanguage,
-            businessSocialMedia: businessData.businessSocialMedia,
-            businessReferences: businessData.businessReferences,
-            businessNotes: businessData.businessNotes
+            companyName: businessData.companyName,
+            email: businessData.email,
+            phone: businessData.phone,
+            address: businessData.address
           }
         })
       })
 
       if (!response.ok) {
         const errorData = await response.json()
+        console.error("Server response:", errorData)
         throw new Error(errorData.error || "Failed to create business sheet")
       }
 
       const data = await response.json()
-      sessionStorage.setItem("spreadsheetId", data.businessSheetId)
+      console.log("Success response:", data)
       
+      sessionStorage.setItem("spreadsheetId", data.businessSheetId)
       await updateOnboardingStatus("completed")
       setShowSuccess(true)
       

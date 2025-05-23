@@ -65,7 +65,7 @@ const WelcomeScreen = ({ onStart }: { onStart: () => void }) => {
     transition={{ duration: 0.5 }}
       className="w-full max-w-md mx-auto text-center"
     >
-      <h1 className="text-3xl font-cal-sans font-normal mb-4">Let's Get Started</h1>
+      <h1 className="text-4xl font-cal-sans font-normal mb-4">Let's Get Started</h1>
       <p className="text-gray-600 font-cal-sans dark:text-gray-400 mb-8">
         Set up your <span className="font-normal text-green-800 text-lg">SheetBills ™</span> account to start managing your invoices efficiently.
       </p>

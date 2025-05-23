@@ -711,7 +711,7 @@ export default function InitializePage() {
           transition={{ duration: 0.5 }}
           className="text-center mb-8"
         >
-          <h2 className="text-3xl font-cal-sans font-medium mb-2">Great! You're Almost There</h2>
+          <h2 className="text-3xl font-cal-sans font-medium mb-2">Great! You're Almost There, Just Review</h2>
           <p className="text-gray-600 font-cal-sans dark:text-gray-400">
             Please review your business details before we set up your account.
           </p>

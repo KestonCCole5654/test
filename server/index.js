@@ -1272,6 +1272,7 @@ app.get('/api/user', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch user data' });
   }
 });
+
 // Vaildate User 
 app.post('/auth/callback', async (req, res) => {
   const { code } = req.body;
@@ -1358,6 +1359,8 @@ app.get('/api/test-service-account', async (req, res) => {
     });
   }
 });
+
+
 // Start the server
 app.listen(PORT, '0.0.0.0', (err) => {
   if (err) {
@@ -1366,7 +1369,8 @@ app.listen(PORT, '0.0.0.0', (err) => {
   }
   console.log(`Server running on port ${PORT}`);
 });
-// update invoice in Google Sheets
+
+
 app.post('/api/update-invoice', async (req, res) => {
   const { accessToken, invoiceData, invoiceId, sheetUrl } = req.body;
 
@@ -1476,6 +1480,7 @@ app.post('/api/update-invoice', async (req, res) => {
     });
   }
 });
+
 app.put('/api/sheets/mark-as-paid', async (req, res) => {
   console.log('[MARK-AS-PAID] Request received');
   try {
@@ -1574,6 +1579,7 @@ app.put('/api/sheets/mark-as-paid', async (req, res) => {
     });
   }
 });
+
 app.put('/api/sheets/mark-as-pending', async (req, res) => {
   console.log('[MARK-AS-PENDING] Request received');
   try {
@@ -1671,7 +1677,7 @@ app.put('/api/sheets/mark-as-pending', async (req, res) => {
     });
   }
 });
-// Add this near the other route handlers
+
 app.post("/api/contact", async (req, res) => {
   try {
     const { email, subject, message, userName } = req.body;
@@ -1735,9 +1741,11 @@ app.post("/api/contact", async (req, res) => {
     });
   }
 });
+
 app.get('/', (req, res) => {
   res.send('SheetBills API is running! Visit /health for status.');
 });
+
 app.delete('/api/sheets/bulk-delete', async (req, res) => {
   try {
     const { invoiceIds, sheetUrl } = req.body;
@@ -1815,6 +1823,7 @@ app.delete('/api/sheets/bulk-delete', async (req, res) => {
     });
   }
 });
+
 /**
  * Generate a shareable link for an invoice.
  * @route POST /api/invoices/shared/create-link
@@ -1847,6 +1856,7 @@ app.post('/api/invoices/shared/create-link', async (req, res) => {
     res.status(500).json({ error: 'Failed to generate shareable link' });
   }
 });
+
 /**
  * Public endpoint to view an invoice by share token
  * @route GET /api/invoices/shared/:token
@@ -1986,6 +1996,7 @@ app.get('/api/invoices/shared/:token', async (req, res) => {
     });
   }
 });
+
 /**
  * Checks if the user's Master Tracking Sheet exists (for onboarding status).
  * @route GET /api/onboarding/status
@@ -2030,10 +2041,6 @@ app.get('/api/onboarding/status', async (req, res) => {
     return res.status(500).json({ onboarded: false, error: error.message });
   }
 });
-
-// ==========================
-// Unified Business Sheet Creation
-// ==========================
 
 /**
  * Creates a single spreadsheet with both 'SheetBills Invoices' and 'Business Details' tabs.
@@ -2172,11 +2179,6 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
     throw new Error(`Failed to create unified business sheet: ${error.message}`);
   }
 }
-
-
-// ==========================
-// Business Sheet Endpoints
-// ==========================
 
 /**
  * Creates a new unified business sheet with both invoice and business details tabs.

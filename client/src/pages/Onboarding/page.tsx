@@ -167,26 +167,19 @@ export default function InitializePage() {
 
   // Get auth tokens on mount
   useEffect(() => {
-    // Get the auth session from storage
-    const sessionString = localStorage.getItem("sb-auth-token") || sessionStorage.getItem("sb-auth-token")
+    // Retrieve tokens using the correct keys set by auth-callback
+    const supabaseToken = localStorage.getItem("supabase_token") || sessionStorage.getItem("supabase_token");
+    const googleAccessToken = localStorage.getItem("google_access_token") || sessionStorage.getItem("google_access_token");
 
-    if (sessionString) {
-      try {
-        const session = JSON.parse(sessionString)
-        
-        // Extract Supabase JWT (access_token) and Google token (provider_token)
-        setSupabaseToken(session.access_token)
-        if (session.provider_token) {
-          setGoogleAccessToken(session.provider_token)
-        } else {
-          setError("Google authentication required. Please sign in again.")
-        }
-      } catch (error) {
-        console.error("Error parsing auth session:", error)
-        setError("Invalid authentication data. Please sign in again.")
-      }
+    if (supabaseToken) {
+      setSupabaseToken(supabaseToken);
     } else {
-      setError("Authentication required. Please sign in.")
+      setError("Authentication required. Please sign in.");
+    }
+    if (googleAccessToken) {
+      setGoogleAccessToken(googleAccessToken);
+    } else {
+      setError("Google authentication required. Please sign in again.");
     }
   }, [])
 

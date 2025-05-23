@@ -1,3 +1,6 @@
+
+        
+        
 "use client"
 
 import type React from "react"
@@ -86,7 +89,7 @@ const WelcomeScreen = ({ onStart }: { onStart: () => void }) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5 }}
+      transition={{ duration: 0.5 }}
       className="w-full max-w-md mx-auto text-center"
     >
       <h1 className="text-4xl font-cal-sans font-normal mb-4">Let's Get Started</h1>
@@ -110,15 +113,13 @@ export default function InitializePage() {
   const [error, setError] = useState<string>("")
   const inputRef = useRef<HTMLInputElement>(null)
   const confettiCanvasRef = useRef<HTMLCanvasElement>(null)
-  const [inputFocused, setInputFocused] = useState(false)
-  const [inputValid, setInputValid] = useState<boolean | null>(null)
   const [showWelcome, setShowWelcome] = useState(true)
 
   // Auth tokens state
   const [supabaseToken, setSupabaseToken] = useState("")
   const [googleAccessToken, setGoogleAccessToken] = useState("")
 
-  // Business details state
+  // Business details state - SIMPLIFIED
   const [businessData, setBusinessData] = useState<BusinessData>({
     companyName: "",
     email: "",
@@ -141,7 +142,7 @@ export default function InitializePage() {
       required: true,
       icon: <Building2 className="h-5 w-5" />,
       placeholder: "e.g. Acme Inc.",
-      validate: (value: string) => (value.trim() ? "" : "Company name is required"),
+      validate: (value: string) => value.trim().length > 0,
     },
     {
       id: "email",
@@ -152,9 +153,8 @@ export default function InitializePage() {
       icon: <Mail className="h-5 w-5" />,
       placeholder: "e.g. contact@yourcompany.com",
       validate: (value: string) => {
-        if (!value.trim()) return "Business email is required"
-        if (!/\S+@\S+\.\S+/.test(value)) return "Please enter a valid email address"
-        return ""
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        return value.trim().length > 0 && emailRegex.test(value)
       },
     },
     {
@@ -165,7 +165,7 @@ export default function InitializePage() {
       required: false,
       icon: <Phone className="h-5 w-5" />,
       placeholder: "e.g. (555) 123-4567",
-      validate: () => "",
+      validate: () => true, // Always valid since optional
     },
     {
       id: "address",
@@ -175,38 +175,34 @@ export default function InitializePage() {
       required: false,
       icon: <MapPin className="h-5 w-5" />,
       placeholder: "e.g. 123 Business St, City, State, ZIP",
-      validate: () => "",
+      validate: () => true, // Always valid since optional
     },
   ]
 
   // Focus input when current question changes
   useEffect(() => {
-    setTimeout(() => {
-      inputRef.current?.focus()
-    }, 500)
-
-    // Reset input validation state when question changes
-    setInputValid(null)
-  }, [currentQuestion])
+    if (!showWelcome && !showReview && !showSuccess) {
+      const timer = setTimeout(() => {
+        inputRef.current?.focus()
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [currentQuestion, showWelcome, showReview, showSuccess])
 
   // Get auth tokens on mount
   useEffect(() => {
-    // Get the auth session from storage
     const sessionString = localStorage.getItem("sb-auth-token") || sessionStorage.getItem("sb-auth-token")
 
     if (sessionString) {
       try {
         const session = JSON.parse(sessionString)
-        
-        // Extract Supabase JWT (access_token) and Google token (provider_token)
         setSupabaseToken(session.access_token)
+        
         if (session.provider_token) {
           setGoogleAccessToken(session.provider_token)
-          // Store Google token in both storages for redundancy
           localStorage.setItem('google_access_token', session.provider_token)
           sessionStorage.setItem('google_access_token', session.provider_token)
         } else {
-          // Try to get Google token from storage as fallback
           const storedGoogleToken = localStorage.getItem('google_access_token') || sessionStorage.getItem('google_access_token')
           if (storedGoogleToken) {
             setGoogleAccessToken(storedGoogleToken)
@@ -223,19 +219,30 @@ export default function InitializePage() {
     }
   }, [])
 
-  // Validate current input whenever it changes
-  useEffect(() => {
-    const currentQ = questions[currentQuestion]
-    const field = currentQ.field as keyof typeof businessData
-    const value = businessData[field] || ""
+  const session = useSession()
+  const [isOnboarded, setIsOnboarded] = useState<boolean | null>(null)
 
-    if (value.trim() === "") {
-      setInputValid(null) // Not validated yet
-    } else {
-      const validationError = currentQ.validate(value)
-      setInputValid(validationError === "")
+  // Check onboarding status on mount
+  useEffect(() => {
+    async function checkOnboarding() {
+      if (!googleAccessToken) return
+      try {
+        const response = await fetch("https://sheetbills-server.vercel.app/api/check-master-sheet", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ accessToken: googleAccessToken }),
+        })
+        const data = await response.json()
+        setIsOnboarded(data.onboarded)
+        if (data.onboarded) {
+          navigate('/invoices')
+        }
+      } catch (err) {
+        console.error("Failed to check onboarding status", err)
+      }
     }
-  }, [businessData, currentQuestion])
+    checkOnboarding()
+  }, [googleAccessToken, navigate])
 
   const triggerConfetti = () => {
     if (confettiCanvasRef.current) {
@@ -252,61 +259,48 @@ export default function InitializePage() {
     }
   }
 
-  // Simple input change handler - no animations or complex logic
+  // SIMPLIFIED input change handler
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target
     const currentQ = questions[currentQuestion]
     const field = currentQ.field as keyof typeof businessData
     
-    // Update the business data with the new value
     setBusinessData(prev => ({
       ...prev,
       [field]: value
     }))
-
-    // Validate the input
-    const validationError = currentQ.validate(value)
-    setInputValid(validationError === "")
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (businessData.companyName && businessData.email && businessData.phone && businessData.address) {
-      await createBusinessSheet()
-    } else {
-      setError("Please fill in all required fields")
+    
+    // Clear any previous errors
+    if (error) {
+      setError("")
     }
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        const result = reader.result
-        if (typeof result === 'string') {
-          setBusinessData(prev => ({
-            ...prev,
-            businessLogo: result
-          }))
-        }
-      }
-      reader.readAsDataURL(file)
-    }
+  // SIMPLIFIED validation check
+  const isCurrentQuestionValid = () => {
+    const currentQ = questions[currentQuestion]
+    const field = currentQ.field as keyof typeof businessData
+    const value = businessData[field] || ""
+    return currentQ.validate(value)
   }
 
   const handleNext = () => {
     const currentQ = questions[currentQuestion]
     const field = currentQ.field as keyof typeof businessData
-    const inputValue: string = businessData[field] || ""
-    // Validate current question
-    const validationError = currentQ.validate(inputValue)
-    if (validationError) {
-      setInputValid(false)
-      setError(validationError)
+    const value = businessData[field] || ""
+    
+    // Only validate required fields
+    if (currentQ.required && !currentQ.validate(value)) {
+      if (currentQ.id === "email") {
+        setError("Please enter a valid email address")
+      } else {
+        setError(`${currentQ.question.replace("What's your ", "").replace("?", "")} is required`)
+      }
       return
     }
-    // Move to next question or review
+    
+    setError("") // Clear errors
+    
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1)
     } else {
@@ -315,6 +309,7 @@ export default function InitializePage() {
   }
 
   const handlePrevious = () => {
+    setError("") // Clear errors
     if (showReview) {
       setShowReview(false)
     } else if (currentQuestion > 0) {
@@ -332,38 +327,11 @@ export default function InitializePage() {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
+      e.preventDefault()
       handleNext()
     }
   }
 
-  const session = useSession()
-
-  const [isOnboarded, setIsOnboarded] = useState<boolean | null>(null);
-
-  // Check onboarding status on mount
-  useEffect(() => {
-    async function checkOnboarding() {
-      if (!googleAccessToken) return;
-      try {
-        const response = await fetch("https://sheetbills-server.vercel.app/api/check-master-sheet", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ accessToken: googleAccessToken }),
-        });
-        const data = await response.json();
-        setIsOnboarded(data.onboarded);
-        if (data.onboarded) {
-          // Optionally, redirect to dashboard or show a message
-          navigate('/invoices');
-        }
-      } catch (err) {
-        console.error("Failed to check onboarding status", err);
-      }
-    }
-    checkOnboarding();
-  }, [googleAccessToken, navigate]);
-
-  // Add updateOnboardingStatus function
   const updateOnboardingStatus = async (status: string) => {
     try {
       const response = await fetch(`${API_URL}/update-onboarding-status`, {
@@ -387,16 +355,14 @@ export default function InitializePage() {
   const createBusinessSheet = async () => {
     try {
       setIsSubmitting(true)
-      setError("")  // Fix: Use empty string instead of null
+      setError("")
 
-      // Get the latest Google token
       const currentGoogleToken = googleAccessToken || localStorage.getItem('google_access_token') || sessionStorage.getItem('google_access_token')
       
       if (!currentGoogleToken) {
         throw new Error("Google authentication token not found")
       }
 
-      // Get the latest Supabase token
       const sessionString = localStorage.getItem("sb-auth-token") || sessionStorage.getItem("sb-auth-token")
       if (!sessionString) {
         throw new Error("Supabase authentication token not found")
@@ -408,11 +374,6 @@ export default function InitializePage() {
       if (!currentSupabaseToken) {
         throw new Error("Invalid Supabase session")
       }
-
-      console.log("Creating business sheet with tokens:", {
-        supabaseToken: currentSupabaseToken ? "present" : "missing",
-        googleToken: currentGoogleToken ? "present" : "missing"
-      })
 
       const response = await fetch(`${API_URL}/create-business-sheet`, {
         method: "POST",
@@ -454,17 +415,12 @@ export default function InitializePage() {
       }
 
       const data = await response.json()
-      console.log("Business sheet created successfully:", data)
-
-      // Store the spreadsheet ID in session storage
       sessionStorage.setItem("spreadsheetId", data.businessSheetId)
       
-      // Update onboarding status
       await updateOnboardingStatus("completed")
-      
-      // Move to success screen
       setShowSuccess(true)
-    } catch (error: unknown) {  // Fix: Add type annotation
+      
+    } catch (error: unknown) {
       console.error("Error creating business sheet:", error)
       setError(error instanceof Error ? error.message : "Failed to create business sheet")
     } finally {
@@ -515,14 +471,13 @@ export default function InitializePage() {
     const currentQ = questions[currentQuestion]
     const field = currentQ.field as keyof typeof businessData
     const value = businessData[field] || ""
-
-    let inputBorderClass = "border border-gray-200 dark:border-gray-700"
-    if (inputValid === true) {
-      inputBorderClass = "border border-green-500 dark:border-green-600"
-    } else if (inputValid === false) {
-      inputBorderClass = "border border-red-500 dark:border-red-600"
-    } else if (inputFocused) {
-      inputBorderClass = "border border-green-500 dark:border-green-600"
+    const isValid = isCurrentQuestionValid()
+    
+    // Simplified border logic
+    const getBorderClass = () => {
+      if (error) return "border-red-500 dark:border-red-600"
+      if (value && isValid) return "border-green-500 dark:border-green-600"
+      return "border-gray-200 dark:border-gray-700 focus:border-green-500 dark:focus:border-green-600"
     }
 
     return (
@@ -551,7 +506,7 @@ export default function InitializePage() {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="mb-8"
+          className="mb-4"
         >
           <div className="relative">
             <Input
@@ -560,52 +515,71 @@ export default function InitializePage() {
               value={value}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
-              onFocus={() => setInputFocused(true)}
-              onBlur={() => setInputFocused(false)}
               placeholder={currentQ.placeholder}
-              className={`w-full p-4 text-base font-cal-sans ${inputBorderClass} focus-visible:ring-0 focus-visible:ring-offset-0 transition-all duration-300`}
+              className={`w-full p-4 text-base font-cal-sans border ${getBorderClass()} focus-visible:ring-0 focus-visible:ring-offset-0 transition-all duration-200`}
             />
 
-            {inputValid !== null && value.trim() !== "" && (
+            {value && (
               <motion.div
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 className="absolute right-3 top-1/2 -translate-y-1/2"
               >
-                {inputValid ? (
-                  <CheckCircle className="h-5 w-5 font-cal-sans text-green-500" />
+                {isValid ? (
+                  <CheckCircle className="h-5 w-5 text-green-500" />
                 ) : (
-                  <X className="h-5 w-5 font-cal-sans text-red-500" />
+                  <X className="h-5 w-5 text-red-500" />
                 )}
               </motion.div>
             )}
           </div>
 
-          {currentQ.required ? (
-            <p className="text-sm text-gray-500 font-cal-sans mt-2">* Required field</p>
-          ) : (
-            <p className="text-sm text-gray-500 font-cal-sans mt-2">* Required field</p>
+          {error && (
+            <motion.p
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-sm text-red-600 mt-2 font-cal-sans"
+            >
+              {error}
+            </motion.p>
           )}
+
+          <p className="text-sm text-gray-500 font-cal-sans mt-2">
+            {currentQ.required ? "* Required field" : "Optional"}
+          </p>
         </motion.div>
 
         <div className="flex gap-3">
           {currentQuestion > 0 && (
-            <Button variant="outline" className="flex-1" onClick={handlePrevious}>
+            <Button 
+              variant="outline" 
+              className="flex-1 font-cal-sans" 
+              onClick={handlePrevious}
+              type="button"
+            >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back
             </Button>
           )}
 
+          {!currentQ.required && (
+            <Button
+              variant="ghost"
+              className="flex-1 font-cal-sans text-gray-500"
+              onClick={handleSkip}
+              type="button"
+            >
+              <SkipForward className="h-4 w-4 mr-2" />
+              Skip
+            </Button>
+          )}
+
           <Button
-            className={`flex-1 ${
-              currentQuestion === 0 && !value
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-green-600 font-cal-sans hover:bg-green-700"
-            }`}
+            className="flex-1 bg-green-600 font-cal-sans hover:bg-green-700"
             onClick={handleNext}
-            disabled={currentQ.required && !value}
+            type="button"
           >
-            Next
+            {currentQuestion === questions.length - 1 ? "Review" : "Next"}
             <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
         </div>
@@ -633,25 +607,25 @@ export default function InitializePage() {
           {[
             {
               id: "companyName",
-              icon: <Building2 className="h-5 w-5 font-cal-sans text-green-600 dark:text-green-400" />,
+              icon: <Building2 className="h-5 w-5 text-green-600 dark:text-green-400" />,
               label: "Company Name",
               color: "green",
             },
             {
               id: "email",
-              icon: <Mail className="h-5 w-5 font-cal-sans text-blue-600 dark:text-blue-400" />,
+              icon: <Mail className="h-5 w-5 text-blue-600 dark:text-blue-400" />,
               label: "Business Email",
               color: "blue",
             },
             {
               id: "phone",
-              icon: <Phone className="h-5 w-5 font-cal-sans text-purple-600 dark:text-purple-400" />,
+              icon: <Phone className="h-5 w-5 text-purple-600 dark:text-purple-400" />,
               label: "Phone Number",
               color: "purple",
             },
             {
               id: "address",
-              icon: <MapPin className="h-5 w-5 font-cal-sans text-orange-600 dark:text-orange-400" />,
+              icon: <MapPin className="h-5 w-5 text-orange-600 dark:text-orange-400" />,
               label: "Business Address",
               color: "orange",
             },
@@ -664,7 +638,7 @@ export default function InitializePage() {
               className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700"
             >
               <div className="flex items-center gap-3">
-                <div className={`bg-${item.color}-50 dark:bg-${item.color}-900/20 p-2 rounded-full`}>
+                <div className="bg-gray-50 dark:bg-gray-900/20 p-2 rounded-full">
                   {item.icon}
                 </div>
                 <div>
@@ -685,8 +659,8 @@ export default function InitializePage() {
           >
             <div className="flex items-center gap-3">
               <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded-full">
-                <CheckCircle className="h-5 w-5 font-cal-sans text-green-600 dark:text-green-400" />
-            </div>
+                <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+              </div>
               <div>
                 <h3 className="font-medium text-sm text-green-800 dark:text-green-300 font-cal-sans">Ready to Go!</h3>
                 <p className="text-green-700 dark:text-green-400 text-sm font-cal-sans">
@@ -697,6 +671,18 @@ export default function InitializePage() {
           </motion.div>
         </div>
 
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800 mb-4"
+          >
+            <p className="text-red-800 dark:text-red-300 text-sm font-cal-sans">
+              {error}
+            </p>
+          </motion.div>
+        )}
+
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -705,20 +691,26 @@ export default function InitializePage() {
         >
           <Button
             variant="outline"
-            className="flex-1"
+            className="flex-1 font-cal-sans"
             onClick={handlePrevious}
+            disabled={isSubmitting}
+            type="button"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
 
           <Button
-            className="flex-1 bg-green-600 hover:bg-green-700"
+            className="flex-1 bg-green-600 hover:bg-green-700 font-cal-sans"
             onClick={createBusinessSheet}
             disabled={isSubmitting}
+            type="button"
           >
             {isSubmitting ? (
-              "Completing setup..."
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Creating...
+              </>
             ) : (
               <>
                 <CheckCircle2 className="h-4 w-4 mr-2" />
@@ -733,45 +725,21 @@ export default function InitializePage() {
 
   // Render the success screen
   const SuccessScreen = () => {
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState("");
+    const [isLoading, setIsLoading] = useState(false)
+    const [successError, setSuccessError] = useState("")
 
-    // Handler for continue button: set just_onboarded flag and navigate
     const handleContinue = async () => {
-      setIsLoading(true);
-      setError("");
+      setIsLoading(true)
+      setSuccessError("")
+      
       try {
-        const response = await fetch("https://sheetbills-server.vercel.app/api/create-business-sheet", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-supabase-token": supabaseToken,
-            "Authorization": `Bearer ${googleAccessToken}`
-          },
-          body: JSON.stringify({
-            businessData: businessData,
-          }),
-        });
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.error || "Failed to set up your business");
-        }
-        // Store the spreadsheet ID and URL for future use
-        if (data.businessSheetId) {
-          localStorage.setItem("business_sheet_id", data.businessSheetId);
-        }
-        if (data.spreadsheetUrl) {
-          localStorage.setItem("business_sheet_url", data.spreadsheetUrl);
-        }
-        
-        // Set the just_onboarded flag and navigate
-        localStorage.setItem('just_onboarded', 'true');
-        navigate('/invoices');
+        localStorage.setItem('just_onboarded', 'true')
+        navigate('/invoices')
       } catch (error) {
-        setError(error instanceof Error ? error.message : 'An unexpected error occurred');
-        setIsLoading(false);
+        setSuccessError(error instanceof Error ? error.message : 'An unexpected error occurred')
+        setIsLoading(false)
       }
-    };
+    }
 
     return (
       <motion.div
@@ -797,19 +765,20 @@ export default function InitializePage() {
             >
               Redirecting to dashboard...
             </motion.h2>
-            {error && (
+            {successError && (
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 className="w-full bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800 mb-4"
               >
                 <p className="text-red-800 font-cal-sans dark:text-red-300 text-sm">
-                  {error}
+                  {successError}
                 </p>
               </motion.div>
             )}
           </motion.div>
-        ) : (
+        )
+        : (
           <>
             <div className="mb-6">
               <CheckCircle2 className="h-16 w-16 font-cal-sans text-green-800 mx-auto" />

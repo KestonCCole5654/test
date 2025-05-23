@@ -188,29 +188,41 @@ export default function InitializePage() {
 
   // Get auth tokens on mount
   useEffect(() => {
+    console.log("=== AUTH TOKEN INITIALIZATION START ===")
     const sessionString = localStorage.getItem("sb-auth-token") || sessionStorage.getItem("sb-auth-token")
-    console.log("Found session string:", !!sessionString)
+    console.log("Session string found:", {
+      exists: !!sessionString,
+      length: sessionString?.length || 0,
+      source: localStorage.getItem("sb-auth-token") ? "localStorage" : "sessionStorage"
+    })
 
     if (sessionString) {
       try {
         const session = JSON.parse(sessionString)
-        console.log("Parsed session:", {
+        console.log("Session parsed successfully:", {
           hasAccessToken: !!session.access_token,
           hasProviderToken: !!session.provider_token,
           accessTokenLength: session.access_token?.length || 0,
-          providerTokenLength: session.provider_token?.length || 0
+          providerTokenLength: session.provider_token?.length || 0,
+          sessionKeys: Object.keys(session)
         })
         
         setSupabaseToken(session.access_token)
+        console.log("Supabase token set in state")
         
         if (session.provider_token) {
-          console.log("Setting Google token from session")
+          console.log("Setting Google token from session provider_token")
           setGoogleAccessToken(session.provider_token)
           localStorage.setItem('google_access_token', session.provider_token)
           sessionStorage.setItem('google_access_token', session.provider_token)
+          console.log("Google token stored in localStorage and sessionStorage")
         } else {
           const storedGoogleToken = localStorage.getItem('google_access_token') || sessionStorage.getItem('google_access_token')
-          console.log("Checking stored Google token:", !!storedGoogleToken)
+          console.log("Checking stored Google token:", {
+            exists: !!storedGoogleToken,
+            length: storedGoogleToken?.length || 0,
+            source: localStorage.getItem('google_access_token') ? "localStorage" : "sessionStorage"
+          })
           if (storedGoogleToken) {
             console.log("Setting Google token from storage")
             setGoogleAccessToken(storedGoogleToken)
@@ -220,13 +232,17 @@ export default function InitializePage() {
           }
         }
       } catch (error) {
-        console.error("Error parsing auth session:", error)
+        console.error("Error parsing auth session:", {
+          error: error instanceof Error ? error.message : "Unknown error",
+          stack: error instanceof Error ? error.stack : undefined
+        })
         setError("Invalid authentication data. Please sign in again.")
       }
     } else {
-      console.error("No session string found")
+      console.error("No session string found in storage")
       setError("Authentication required. Please sign in.")
     }
+    console.log("=== AUTH TOKEN INITIALIZATION END ===")
   }, [])
 
   const session = useSession()
@@ -363,59 +379,94 @@ export default function InitializePage() {
   }
 
   const createBusinessSheet = async () => {
+    console.log("=== BUSINESS SHEET CREATION START ===")
     try {
       setIsSubmitting(true)
       setError("")
 
       // Get session from Supabase
+      console.log("Fetching Supabase session...")
       const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      
+      console.log("Supabase session fetch result:", {
+        hasSession: !!session,
+        hasError: !!sessionError,
+        errorMessage: sessionError?.message,
+        sessionKeys: session ? Object.keys(session) : []
+      })
+
       if (sessionError) {
-        console.error("Session error:", sessionError)
+        console.error("Session error:", {
+          message: sessionError.message,
+          status: sessionError.status,
+          name: sessionError.name
+        })
         throw new Error("Failed to get session: " + sessionError.message)
       }
       
       if (!session) {
-        console.error("No session found")
+        console.error("No session found in Supabase")
         throw new Error("No active session found")
       }
 
       // Get Google token from session
       const googleToken = session.provider_token
-      console.log("Google token present:", !!googleToken)
-      console.log("Google token length:", googleToken?.length || 0)
+      console.log("Google token from session:", {
+        exists: !!googleToken,
+        length: googleToken?.length || 0
+      })
       
-      if (!googleToken) {
-        // Try to get from storage as fallback
-        const storedGoogleToken = localStorage.getItem('google_access_token') || sessionStorage.getItem('google_access_token')
-        if (storedGoogleToken) {
-          console.log("Using stored Google token")
-          console.log("Stored Google token length:", storedGoogleToken.length)
-          setGoogleAccessToken(storedGoogleToken)
-        } else {
-          console.error("No Google token found in session or storage")
-          throw new Error("Google authentication required")
-        }
+      // Get stored Google token as fallback
+      const storedGoogleToken = localStorage.getItem('google_access_token') || sessionStorage.getItem('google_access_token')
+      console.log("Stored Google token:", {
+        exists: !!storedGoogleToken,
+        length: storedGoogleToken?.length || 0,
+        source: localStorage.getItem('google_access_token') ? "localStorage" : "sessionStorage"
+      })
+      
+      if (!googleToken && !storedGoogleToken) {
+        console.error("No Google token found in session or storage")
+        throw new Error("Google authentication required")
       }
 
       // Get Supabase token
       const supabaseToken = session.access_token
-      console.log("Supabase token present:", !!supabaseToken)
-      console.log("Supabase token length:", supabaseToken?.length || 0)
+      console.log("Supabase token:", {
+        exists: !!supabaseToken,
+        length: supabaseToken?.length || 0
+      })
       
       if (!supabaseToken) {
         console.error("No Supabase token found")
         throw new Error("Invalid Supabase session")
       }
 
-      // Log tokens for debugging (without exposing full values)
-      console.log("Sending request with tokens:", {
-        hasGoogleToken: !!googleToken,
-        hasSupabaseToken: !!supabaseToken,
-        googleTokenLength: googleToken?.length || 0,
-        supabaseTokenLength: supabaseToken?.length || 0
+      // Prepare request data
+      const requestData = {
+        businessData: {
+          companyName: businessData.companyName,
+          email: businessData.email,
+          phone: businessData.phone,
+          address: businessData.address
+        }
+      }
+      console.log("Request data prepared:", {
+        hasCompanyName: !!requestData.businessData.companyName,
+        hasEmail: !!requestData.businessData.email,
+        hasPhone: !!requestData.businessData.phone,
+        hasAddress: !!requestData.businessData.address
       })
 
       // Make the API request
+      console.log("Making API request to:", `${API_URL}/create-business-sheet`)
+      console.log("Request headers:", {
+        hasContentType: true,
+        hasAuthorization: !!(googleToken || storedGoogleToken),
+        hasSupabaseToken: !!supabaseToken,
+        authorizationLength: (googleToken || storedGoogleToken)?.length || 0,
+        supabaseTokenLength: supabaseToken?.length || 0
+      })
+
       const response = await fetch(`${API_URL}/create-business-sheet`, {
         method: "POST",
         headers: {
@@ -424,22 +475,24 @@ export default function InitializePage() {
           "x-supabase-token": supabaseToken,
           "x-auth-token": supabaseToken
         },
-        body: JSON.stringify({
-          businessData: {
-            companyName: businessData.companyName,
-            email: businessData.email,
-            phone: businessData.phone,
-            address: businessData.address
-          }
-        })
+        body: JSON.stringify(requestData)
+      })
+
+      console.log("Response received:", {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries())
       })
 
       // Handle non-OK responses
       if (!response.ok) {
         const errorData = await response.json()
-        console.error("Server response:", errorData)
-        console.error("Response status:", response.status)
-        console.error("Response headers:", Object.fromEntries(response.headers.entries()))
+        console.error("Error response data:", {
+          error: errorData.error,
+          details: errorData.details,
+          status: response.status,
+          statusText: response.statusText
+        })
         
         // Handle specific error cases
         if (response.status === 401) {
@@ -452,22 +505,33 @@ export default function InitializePage() {
       }
 
       const data = await response.json()
-      console.log("Success response:", data)
+      console.log("Success response data:", {
+        hasBusinessSheetId: !!data.businessSheetId,
+        businessSheetIdLength: data.businessSheetId?.length || 0
+      })
       
       // Store the spreadsheet ID
       sessionStorage.setItem("spreadsheetId", data.businessSheetId)
+      console.log("Spreadsheet ID stored in sessionStorage")
       
       // Update onboarding status
       await updateOnboardingStatus("completed")
+      console.log("Onboarding status updated to completed")
       
       // Show success screen
       setShowSuccess(true)
+      console.log("Success screen shown")
       
-    } catch (error: unknown) {
-      console.error("Error creating business sheet:", error)
+    } catch (error) {
+      console.error("Error in createBusinessSheet:", {
+        message: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : undefined,
+        type: error instanceof Error ? error.constructor.name : typeof error
+      })
       setError(error instanceof Error ? error.message : "Failed to create business sheet")
     } finally {
       setIsSubmitting(false)
+      console.log("=== BUSINESS SHEET CREATION END ===")
     }
   }
 

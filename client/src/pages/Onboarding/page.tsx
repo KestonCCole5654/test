@@ -472,8 +472,7 @@ export default function InitializePage() {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${googleToken || storedGoogleToken}`,
-          "x-supabase-token": supabaseToken,
-          "x-auth-token": supabaseToken
+          "x-supabase-token": supabaseToken
         },
         body: JSON.stringify(requestData)
       })

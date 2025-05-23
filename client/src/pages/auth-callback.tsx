@@ -90,6 +90,29 @@ export default function AuthCallback() {
           const refreshToken = hashParams.get('refresh_token')
 
           if (!accessToken) {
+            // If no access token in hash, try to get it from the error response
+            if (error === 'server_error' && errorDescription?.includes('Database error updating user')) {
+              console.log('Attempting to refresh session after database error')
+              const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession()
+              
+              if (refreshError) {
+                console.error('Error refreshing session:', refreshError)
+                throw refreshError
+              }
+
+              if (!refreshedSession) {
+                console.error('No session after refresh')
+                throw new Error('Failed to establish session')
+              }
+
+              console.log('Session refreshed successfully')
+              // Store tokens
+              storeTokens(refreshedSession)
+              // Proceed with navigation
+              await handleNavigation(refreshedSession, redirectPath)
+              return
+            }
+            
             console.error('No access token found in URL')
             throw new Error('No access token found')
           }
@@ -119,70 +142,46 @@ export default function AuthCallback() {
             }
 
             console.log('Session established successfully')
+            // Store tokens
+            storeTokens(newSession)
+            // Proceed with navigation
+            await handleNavigation(newSession, redirectPath)
+            return
           } catch (setSessionError: any) {
             console.error('Error setting session:', setSessionError)
             // If it's a database error, we should still try to proceed
             if (setSessionError.message?.includes('Database error')) {
               console.log('Database error occurred, but proceeding with auth flow')
+              // Try to refresh the session
+              const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession()
+              
+              if (refreshError) {
+                console.error('Error refreshing session:', refreshError)
+                throw refreshError
+              }
+
+              if (!refreshedSession) {
+                console.error('No session after refresh')
+                throw new Error('Failed to establish session')
+              }
+
+              console.log('Session refreshed successfully')
+              // Store tokens
+              storeTokens(refreshedSession)
+              // Proceed with navigation
+              await handleNavigation(refreshedSession, redirectPath)
+              return
             } else {
               throw setSessionError
             }
           }
         } else {
           console.log('Existing session found')
-        }
-
-        // Get the final session state
-        const { data: { session: finalSession }, error: finalSessionError } = await supabase.auth.getSession()
-        
-        if (finalSessionError) {
-          console.error('Final session check failed:', finalSessionError)
-          throw finalSessionError
-        }
-
-        if (!finalSession) {
-          console.error('No final session found')
-          throw new Error('Failed to verify session')
-        }
-
-        console.log('Final session check successful')
-
-        // Store tokens with fallback
-        const storeToken = (key: string, value: string) => {
-          try {
-            localStorage.setItem(key, value)
-          } catch (e) {
-            console.warn('localStorage failed:', e)
-            try {
-              sessionStorage.setItem(key, value)
-            } catch (e2) {
-              console.warn('sessionStorage failed:', e2)
-            }
-          }
-        }
-
-        storeToken('supabase_token', finalSession.access_token)
-        if (finalSession.provider_token) {
-          storeToken('google_access_token', finalSession.provider_token)
-        }
-
-        try {
-          // Check if user needs onboarding
-          const needsOnboarding = await checkUserOnboarding(finalSession.user.id)
-          console.log('Onboarding check result:', needsOnboarding)
-          
-          if (needsOnboarding) {
-            console.log('Redirecting to onboarding')
-            navigate('/Onboarding', { replace: true })
-          } else {
-            console.log('Redirecting to:', redirectPath)
-            navigate(redirectPath, { replace: true })
-          }
-        } catch (onboardingError) {
-          console.error('Onboarding check failed:', onboardingError)
-          // If onboarding check fails, still allow access but log the error
-          console.log('Proceeding to main app despite onboarding check failure')
-          navigate(redirectPath, { replace: true })
+          // Store tokens
+          storeTokens(session)
+          // Proceed with navigation
+          await handleNavigation(session, redirectPath)
+          return
         }
       } catch (err: any) {
         console.error('Auth callback error:', err)
@@ -199,6 +198,48 @@ export default function AuthCallback() {
             }
           })
         }
+      }
+    }
+
+    // Helper function to store tokens
+    const storeTokens = (session: any) => {
+      try {
+        localStorage.setItem('supabase_token', session.access_token)
+        if (session.provider_token) {
+          localStorage.setItem('google_access_token', session.provider_token)
+        }
+      } catch (e) {
+        console.warn('localStorage failed:', e)
+        try {
+          sessionStorage.setItem('supabase_token', session.access_token)
+          if (session.provider_token) {
+            sessionStorage.setItem('google_access_token', session.provider_token)
+          }
+        } catch (e2) {
+          console.warn('sessionStorage failed:', e2)
+        }
+      }
+    }
+
+    // Helper function to handle navigation
+    const handleNavigation = async (session: any, redirectPath: string) => {
+      try {
+        // Check if user needs onboarding
+        const needsOnboarding = await checkUserOnboarding(session.user.id)
+        console.log('Onboarding check result:', needsOnboarding)
+        
+        if (needsOnboarding) {
+          console.log('Redirecting to onboarding')
+          navigate('/Onboarding', { replace: true })
+        } else {
+          console.log('Redirecting to:', redirectPath)
+          navigate(redirectPath, { replace: true })
+        }
+      } catch (onboardingError) {
+        console.error('Onboarding check failed:', onboardingError)
+        // If onboarding check fails, still allow access but log the error
+        console.log('Proceeding to main app despite onboarding check failure')
+        navigate(redirectPath, { replace: true })
       }
     }
 

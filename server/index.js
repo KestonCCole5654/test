@@ -2230,21 +2230,30 @@ app.post('/api/create-business-sheet', async (req, res) => {
 
     // 4. Verify Supabase session
     console.log('[CREATE] Verifying Supabase session...');
-    const { data: { user }, error: supabaseError } = await supabase.auth.getUser(supabaseToken);
-    console.log('[CREATE] Supabase verification result:', {
-      hasUser: !!user,
-      userId: user?.id,
-      error: supabaseError?.message,
-      errorCode: supabaseError?.code
-    });
-    
-    if (supabaseError || !user) {
-      console.error('[CREATE] Supabase auth error:', {
+    try {
+      const { data: { user }, error: supabaseError } = await supabase.auth.getUser(supabaseToken);
+      console.log('[CREATE] Supabase verification result:', {
+        hasUser: !!user,
+        userId: user?.id,
         error: supabaseError?.message,
-        code: supabaseError?.code,
-        status: supabaseError?.status
+        errorCode: supabaseError?.code
       });
-      return res.status(401).json({ success: false, error: 'Invalid Supabase session' });
+      
+      if (supabaseError || !user) {
+        console.error('[CREATE] Supabase auth error:', {
+          error: supabaseError?.message,
+          code: supabaseError?.code,
+          status: supabaseError?.status
+        });
+        return res.status(401).json({ success: false, error: 'Invalid Supabase session' });
+      }
+    } catch (supabaseError) {
+      console.error('[CREATE] Supabase verification failed:', {
+        message: supabaseError.message,
+        code: supabaseError.code,
+        stack: supabaseError.stack
+      });
+      return res.status(401).json({ success: false, error: 'Failed to verify Supabase session' });
     }
 
     // 5. Verify Google token
@@ -2252,6 +2261,8 @@ app.post('/api/create-business-sheet', async (req, res) => {
     try {
       const oauth2Client = new google.auth.OAuth2();
       oauth2Client.setCredentials({ access_token: accessToken });
+      
+      // First try to get token info
       const tokenInfo = await oauth2Client.getTokenInfo(accessToken);
       console.log('[CREATE] Google token info:', {
         email: tokenInfo.email,
@@ -2259,14 +2270,27 @@ app.post('/api/create-business-sheet', async (req, res) => {
         expires_in: tokenInfo.expires_in,
         valid: true
       });
+
+      // Then try to make a test API call
+      const drive = google.drive({ version: 'v3', auth: oauth2Client });
+      await drive.files.list({
+        pageSize: 1,
+        fields: 'files(id, name)'
+      });
+      console.log('[CREATE] Google API test successful');
     } catch (googleError) {
       console.error('[CREATE] Google token validation error:', {
         message: googleError.message,
         code: googleError.code,
         status: googleError.status,
-        response: googleError.response?.data
+        response: googleError.response?.data,
+        stack: googleError.stack
       });
-      return res.status(401).json({ success: false, error: 'Invalid Google token' });
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Invalid Google token',
+        details: googleError.message
+      });
     }
 
     // 6. Validate business data

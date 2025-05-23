@@ -258,10 +258,15 @@ export default function InitializePage() {
     const currentQ = questions[currentQuestion]
     const field = currentQ.field as keyof typeof businessData
     
+    // Update the business data with the new value
     setBusinessData(prev => ({
       ...prev,
       [field]: value
     }))
+
+    // Validate the input
+    const validationError = currentQ.validate(value)
+    setInputValid(validationError === "")
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -509,7 +514,7 @@ export default function InitializePage() {
   const renderCurrentQuestion = () => {
     const currentQ = questions[currentQuestion]
     const field = currentQ.field as keyof typeof businessData
-    const inputValue: string = businessData[field] || ""
+    const value = businessData[field] || ""
 
     let inputBorderClass = "border border-gray-200 dark:border-gray-700"
     if (inputValid === true) {
@@ -552,7 +557,7 @@ export default function InitializePage() {
             <Input
               ref={inputRef}
               type={currentQ.id === "email" ? "email" : "text"}
-              value={inputValue}
+              value={value}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               onFocus={() => setInputFocused(true)}
@@ -561,7 +566,7 @@ export default function InitializePage() {
               className={`w-full p-4 text-base font-cal-sans ${inputBorderClass} focus-visible:ring-0 focus-visible:ring-offset-0 transition-all duration-300`}
             />
 
-            {inputValid !== null && inputValue.trim() !== "" && (
+            {inputValid !== null && value.trim() !== "" && (
               <motion.div
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -593,12 +598,12 @@ export default function InitializePage() {
 
           <Button
             className={`flex-1 ${
-              currentQuestion === 0 && !inputValue
+              currentQuestion === 0 && !value
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-green-600 font-cal-sans hover:bg-green-700"
             }`}
             onClick={handleNext}
-            disabled={currentQ.required && !inputValue}
+            disabled={currentQ.required && !value}
           >
             Next
             <ArrowRight className="h-4 w-4 ml-2" />

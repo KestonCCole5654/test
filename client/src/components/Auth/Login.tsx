@@ -39,35 +39,52 @@ export default function LoginPage() {
       setLoading(true)
       setError("")
       
-      // Configure OAuth with additional security parameters
+      console.log('Starting Google OAuth flow...')
+      
+      // Configure OAuth with more permissive settings
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth-callback`,
-          scopes: "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets",
+          scopes: [
+            "https://www.googleapis.com/auth/drive.file",
+            "https://www.googleapis.com/auth/spreadsheets",
+            "https://www.googleapis.com/auth/userinfo.email",
+            "https://www.googleapis.com/auth/userinfo.profile"
+          ].join(" "),
           queryParams: {
             access_type: 'offline',
-            prompt: 'consent'
+            prompt: 'consent',
+            include_granted_scopes: 'true'
           },
-          skipBrowserRedirect: true
+          skipBrowserRedirect: false // Changed to false to let Supabase handle the redirect
         },
       })
 
       if (error) {
         console.error("OAuth error:", error)
-        throw error
+        throw new Error(error.message || "Failed to initiate Google login")
       }
 
+      // Store the intended redirect path
+      const redirectPath = location.state?.from || '/invoices'
+      console.log('Storing redirect path:', redirectPath)
+      
+      // Try both storage methods
+      try {
+        sessionStorage.setItem('auth_redirect', redirectPath)
+      } catch (e) {
+        console.warn('sessionStorage not available, using localStorage')
+        localStorage.setItem('auth_redirect', redirectPath)
+      }
+
+      // Let Supabase handle the redirect
       if (data?.url) {
-        // Store the intended redirect path in sessionStorage
-        sessionStorage.setItem('auth_redirect', location.state?.from || '/invoices')
-        // Redirect to the OAuth URL
         window.location.href = data.url
       }
     } catch (err: any) {
       console.error("Login error:", err)
       setError(err.message || "Login failed. Please try again.")
-    } finally {
       setLoading(false)
     }
   }, [location.state])

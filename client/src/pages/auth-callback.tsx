@@ -74,47 +74,50 @@ export default function AuthCallback() {
       try {
         console.log('Starting auth callback handling')
         
-        // Get the redirect path from sessionStorage
-        const redirectPath = sessionStorage.getItem('auth_redirect') || '/invoices'
-        // Clear the stored redirect path
-        sessionStorage.removeItem('auth_redirect')
+        // Get the redirect path from storage (try both methods)
+        let redirectPath = '/invoices'
+        try {
+          redirectPath = sessionStorage.getItem('auth_redirect') || localStorage.getItem('auth_redirect') || '/invoices'
+          // Clear stored paths
+          sessionStorage.removeItem('auth_redirect')
+          localStorage.removeItem('auth_redirect')
+        } catch (e) {
+          console.warn('Storage access error:', e)
+        }
+        
+        console.log('Retrieved redirect path:', redirectPath)
 
-        // Wait for session to be established
-        let retryCount = 0
-        const maxRetries = 3
-        let session = null
-
-        while (retryCount < maxRetries) {
-          const { data, error } = await supabase.auth.getSession()
-          if (error) {
-            console.error('Session error:', error)
-            throw error
-          }
-          if (data.session) {
-            session = data.session
-            break
-          }
-          retryCount++
-          await new Promise(resolve => setTimeout(resolve, 1000)) // Wait 1 second between retries
+        // Get the session from the URL hash
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        
+        if (sessionError) {
+          console.error('Session error:', sessionError)
+          throw sessionError
         }
 
         if (!session) {
-          console.log('No session found after retries, redirecting to login')
-          navigate('/login', { 
-            replace: true,
-            state: { error: 'Authentication failed. Please try again.' }
-          })
-          return
+          console.error('No session found')
+          throw new Error('No session found')
         }
 
-        console.log('Session found, storing tokens')
-        // Store the session in both localStorage and sessionStorage for redundancy
-        localStorage.setItem('supabase_token', session.access_token)
-        sessionStorage.setItem('supabase_token', session.access_token)
-        
-        if (session.provider_token) {
-          localStorage.setItem('google_access_token', session.provider_token)
-          sessionStorage.setItem('google_access_token', session.provider_token)
+        console.log('Session found:', session)
+
+        // Store tokens
+        try {
+          localStorage.setItem('supabase_token', session.access_token)
+          if (session.provider_token) {
+            localStorage.setItem('google_access_token', session.provider_token)
+          }
+        } catch (e) {
+          console.warn('localStorage not available:', e)
+          try {
+            sessionStorage.setItem('supabase_token', session.access_token)
+            if (session.provider_token) {
+              sessionStorage.setItem('google_access_token', session.provider_token)
+            }
+          } catch (e2) {
+            console.warn('sessionStorage not available:', e2)
+          }
         }
 
         try {
@@ -122,7 +125,6 @@ export default function AuthCallback() {
           const needsOnboarding = await checkUserOnboarding(session.user.id)
           console.log('Onboarding check result:', needsOnboarding)
           
-          // Use React Router navigation instead of window.location
           if (needsOnboarding) {
             console.log('Redirecting to onboarding')
             navigate('/Onboarding', { replace: true })
@@ -132,27 +134,24 @@ export default function AuthCallback() {
           }
         } catch (onboardingError) {
           console.error('Onboarding check failed:', onboardingError)
-          // If onboarding check fails, redirect to login with error
-          navigate('/login', { 
-            replace: true,
-            state: { error: 'Failed to verify account status' }
-          })
+          // If onboarding check fails, still allow access but log the error
+          console.log('Proceeding to main app despite onboarding check failure')
+          navigate(redirectPath, { replace: true })
         }
       } catch (err: any) {
         console.error('Auth callback error:', err)
-        setError(err.message)
-        // Use React Router navigation with delay
-        setTimeout(() => {
-          navigate('/login', { 
-            replace: true,
-            state: { error: err.message }
-          })
-        }, 3000)
+        navigate('/login', { 
+          replace: true,
+          state: { 
+            error: 'Authentication failed. Please try again.',
+            details: err.message
+          }
+        })
       }
     }
 
     handleAuthCallback()
-  }, [navigate, location])
+  }, [navigate])
 
   if (error) {
     return (

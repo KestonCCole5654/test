@@ -57,13 +57,18 @@ export default function LoginPage() {
             prompt: 'consent',
             include_granted_scopes: 'true'
           },
-          skipBrowserRedirect: false // Let Supabase handle the redirect
+          skipBrowserRedirect: true // Changed to true to handle redirect manually
         },
       })
 
       if (error) {
         console.error("OAuth error:", error)
         throw new Error(error.message || "Failed to initiate Google login")
+      }
+
+      if (!data?.url) {
+        console.error("No OAuth URL returned")
+        throw new Error("Failed to get authentication URL")
       }
 
       // Store the intended redirect path
@@ -78,10 +83,9 @@ export default function LoginPage() {
         localStorage.setItem('auth_redirect', redirectPath)
       }
 
-      // Let Supabase handle the redirect
-      if (data?.url) {
-        window.location.href = data.url
-      }
+      // Redirect to the OAuth URL
+      console.log('Redirecting to Google OAuth...')
+      window.location.href = data.url
     } catch (err: any) {
       console.error("Login error:", err)
       setError(err.message || "Login failed. Please try again.")

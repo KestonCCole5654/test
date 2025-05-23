@@ -283,10 +283,10 @@ async function getDefaultSheetId(accessToken) {
     await sheets.spreadsheets.values.append({
       spreadsheetId: masterSheet.id,
       range: 'My Sheets!A:E',
-      valueInputOption: 'USER_ENTERED',
+      valueInputOption: 'RAW',
       resource: {
         values: [[
-          new Date().toISOString(),
+          new Date().toISOString(), // Created At
           'SheetBills Invoices',
           'Business',
           'Invoices',
@@ -2184,27 +2184,39 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
  * @access Protected (Supabase + Google Auth)
  */
 app.post('/api/create-business-sheet', async (req, res) => {
+  console.log('[CREATE] Initiating unified business sheet creation request');
   try {
-    // Verify Supabase session first
+    // 1. Validate request content type
+    if (!req.headers['content-type']?.includes('application/json')) {
+      return res.status(415).json({ success: false, error: 'Invalid content type - requires JSON' });
+    }
+
+    // 2. Validate tokens
     const supabaseToken = req.headers['x-supabase-token'];
+    const { accessToken, businessData } = req.body;
+
+    // Add debug logging for received token
+    console.log('Received x-supabase-token:', supabaseToken);
+
     if (!supabaseToken) {
-      return res.status(401).json({ error: 'Missing Supabase session token' });
+      console.error('[CREATE] Missing Supabase token');
+      return res.status(401).json({ success: false, error: 'Missing Supabase token' });
     }
 
-    // Validate Supabase user
-    const { data: { user }, error } = await supabase.auth.getUser(supabaseToken);
-    if (error || !user) {
-      return res.status(401).json({ error: 'Invalid Supabase session' });
-    }
-
-    // Get Google access token from headers
-    const accessToken = req.headers.authorization?.split(' ')[1];
     if (!accessToken) {
-      return res.status(401).json({ error: 'Google access token required' });
+      console.error('[CREATE] Missing Google access token');
+      return res.status(401).json({ success: false, error: 'Missing Google access token' });
     }
 
-    // Get business data from request body
-    const { businessData } = req.body;
+    // 3. Verify Supabase session
+    const { data: { user }, error: supabaseError } = await supabase.auth.getUser(supabaseToken);
+    console.log('Supabase user:', user, 'Error:', supabaseError);
+    if (supabaseError || !user) {
+      console.error('[CREATE] Supabase auth error:', supabaseError);
+      return res.status(401).json({ success: false, error: 'Invalid Supabase session' });
+    }
+
+    // 4. Validate business data
     if (!businessData) {
       return res.status(400).json({ error: 'Business data is required' });
     }
@@ -2215,7 +2227,6 @@ app.post('/api/create-business-sheet', async (req, res) => {
     // Add to master sheet
     const masterSheet = await getOrCreateMasterSheet(accessToken, user.id);
     const sheets = google.sheets({ version: 'v4', auth: new google.auth.OAuth2().setCredentials({ access_token: accessToken }) });
-    
     await sheets.spreadsheets.values.append({
       spreadsheetId: masterSheet.id,
       range: 'My Sheets!A:E',

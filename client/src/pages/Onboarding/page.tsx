@@ -300,6 +300,10 @@ export default function InitializePage() {
       return;
     }
 
+    // Add debug logging for tokens
+    console.log("supabaseToken", supabaseToken);
+    console.log("googleAccessToken", googleAccessToken);
+
     setIsSubmitting(true);
     setError("");
 

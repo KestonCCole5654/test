@@ -57,7 +57,7 @@ export default function LoginPage() {
             prompt: 'consent',
             include_granted_scopes: 'true'
           },
-          skipBrowserRedirect: false // Changed to false to let Supabase handle the redirect
+          skipBrowserRedirect: false // Let Supabase handle the redirect
         },
       })
 

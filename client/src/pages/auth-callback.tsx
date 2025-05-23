@@ -19,7 +19,7 @@ export default function AuthCallback() {
         .eq('user_id', userId)
         .single()
 
-      if (profileError && profileError.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+      if (profileError && profileError.code !== 'PGRST116') {
         console.error('Profile error:', profileError)
         throw profileError
       }
@@ -32,37 +32,8 @@ export default function AuthCallback() {
         return true
       }
 
-      // Check if we have any spreadsheets as a backup
-      const { data: spreadsheets, error: sheetsError } = await supabase
-        .from('spreadsheets')
-        .select('*')
-        .eq('user_id', userId)
-
-      if (sheetsError) {
-        console.error('Spreadsheets error:', sheetsError)
-        throw sheetsError
-      }
-
-      console.log('Spreadsheets check result:', { spreadsheets, sheetsError })
-
-      // If we have spreadsheets but no profile, create a profile
-      if (spreadsheets && spreadsheets.length > 0 && !profile) {
-        console.log('Creating profile for user with spreadsheets')
-        const { error: insertError } = await supabase
-          .from('business_profiles')
-          .insert({
-            user_id: userId,
-            onboarding_completed: true
-          })
-        
-        if (insertError) {
-          console.error('Error creating profile:', insertError)
-          throw insertError
-        }
-      }
-
       console.log('User does not need onboarding')
-      return false // Don't show onboarding if we have a completed profile
+      return false
     } catch (err) {
       console.error('Error checking onboarding status:', err)
       throw err
@@ -87,37 +58,75 @@ export default function AuthCallback() {
         
         console.log('Retrieved redirect path:', redirectPath)
 
-        // Get the session from the URL hash
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        // First, try to get the session from the URL hash
+        const hashParams = new URLSearchParams(window.location.hash.substring(1))
+        const accessToken = hashParams.get('access_token')
+        const refreshToken = hashParams.get('refresh_token')
+
+        if (accessToken) {
+          console.log('Found access token in URL hash')
+          // Set the session using the tokens from the URL
+          const { data: { session }, error: sessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken || ''
+          })
+
+          if (sessionError) {
+            console.error('Error setting session:', sessionError)
+            throw sessionError
+          }
+
+          if (!session) {
+            console.error('No session after setting tokens')
+            throw new Error('Failed to establish session')
+          }
+
+          console.log('Session established from URL tokens')
+        } else {
+          console.log('No tokens in URL hash, trying to get existing session')
+          // If no tokens in URL, try to get the existing session
+          const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+          
+          if (sessionError) {
+            console.error('Session error:', sessionError)
+            throw sessionError
+          }
+
+          if (!session) {
+            console.error('No existing session found')
+            throw new Error('No session found')
+          }
+
+          console.log('Retrieved existing session')
+        }
+
+        // Get the final session state
+        const { data: { session }, error: finalSessionError } = await supabase.auth.getSession()
         
-        if (sessionError) {
-          console.error('Session error:', sessionError)
-          throw sessionError
+        if (finalSessionError || !session) {
+          console.error('Final session check failed:', finalSessionError)
+          throw new Error('Failed to verify session')
         }
 
-        if (!session) {
-          console.error('No session found')
-          throw new Error('No session found')
-        }
+        console.log('Final session check successful')
 
-        console.log('Session found:', session)
-
-        // Store tokens
-        try {
-          localStorage.setItem('supabase_token', session.access_token)
-          if (session.provider_token) {
-            localStorage.setItem('google_access_token', session.provider_token)
-          }
-        } catch (e) {
-          console.warn('localStorage not available:', e)
+        // Store tokens with fallback
+        const storeToken = (key: string, value: string) => {
           try {
-            sessionStorage.setItem('supabase_token', session.access_token)
-            if (session.provider_token) {
-              sessionStorage.setItem('google_access_token', session.provider_token)
+            localStorage.setItem(key, value)
+          } catch (e) {
+            console.warn('localStorage failed:', e)
+            try {
+              sessionStorage.setItem(key, value)
+            } catch (e2) {
+              console.warn('sessionStorage failed:', e2)
             }
-          } catch (e2) {
-            console.warn('sessionStorage not available:', e2)
           }
+        }
+
+        storeToken('supabase_token', session.access_token)
+        if (session.provider_token) {
+          storeToken('google_access_token', session.provider_token)
         }
 
         try {

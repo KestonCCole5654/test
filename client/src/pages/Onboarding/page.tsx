@@ -292,6 +292,7 @@ export default function InitializePage() {
   }, [googleAccessToken, navigate]);
 
   const createBusinessSheet = async () => {
+    console.log('createBusinessSheet called');
     if (!supabaseToken || !googleAccessToken) {
       setError("Missing authentication tokens. Please try logging in again.");
       return;
@@ -589,7 +590,7 @@ export default function InitializePage() {
 
           <Button
             className="flex-1 bg-green-600 hover:bg-green-700"
-            onClick={createBusinessSheet}
+            onClick={() => { console.log('Complete Setup button clicked'); createBusinessSheet(); }}
             disabled={isSubmitting}
           >
             {isSubmitting ? (

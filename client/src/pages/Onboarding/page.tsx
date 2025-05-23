@@ -354,42 +354,35 @@ export default function InitializePage() {
       setIsSubmitting(true)
       setError("")
 
-      // Get Google token
-      const currentGoogleToken = googleAccessToken || localStorage.getItem('google_access_token') || sessionStorage.getItem('google_access_token')
-      if (!currentGoogleToken) {
-        throw new Error("Google authentication token not found")
+      // Get session from Supabase
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        throw new Error("No active session found")
+      }
+
+      // Get Google token from session
+      const googleToken = session.provider_token
+      if (!googleToken) {
+        throw new Error("Google authentication required")
       }
 
       // Get Supabase token
-      const sessionString = localStorage.getItem("sb-auth-token") || sessionStorage.getItem("sb-auth-token")
-      if (!sessionString) {
-        throw new Error("Supabase authentication token not found")
-      }
-
-      let currentSupabaseToken
-      try {
-        const session = JSON.parse(sessionString)
-        currentSupabaseToken = session.access_token
-      } catch (e) {
-        console.error("Error parsing session:", e)
-        throw new Error("Invalid session format")
-      }
-
-      if (!currentSupabaseToken) {
+      const supabaseToken = session.access_token
+      if (!supabaseToken) {
         throw new Error("Invalid Supabase session")
       }
 
       console.log("Sending request with tokens:", {
-        hasGoogleToken: !!currentGoogleToken,
-        hasSupabaseToken: !!currentSupabaseToken
+        hasGoogleToken: !!googleToken,
+        hasSupabaseToken: !!supabaseToken
       })
 
       const response = await fetch(`${API_URL}/create-business-sheet`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${currentGoogleToken}`,
-          "x-supabase-token": currentSupabaseToken
+          "Authorization": `Bearer ${googleToken}`,
+          "x-supabase-token": supabaseToken
         },
         body: JSON.stringify({
           businessData: {

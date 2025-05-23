@@ -171,17 +171,21 @@ export default function InitializePage() {
     const supabaseToken = localStorage.getItem("supabase_token") || sessionStorage.getItem("supabase_token");
     const googleAccessToken = localStorage.getItem("google_access_token") || sessionStorage.getItem("google_access_token");
 
+    let missing = false;
     if (supabaseToken) {
       setSupabaseToken(supabaseToken);
     } else {
       setError("Authentication required. Please sign in.");
+      missing = true;
     }
     if (googleAccessToken) {
       setGoogleAccessToken(googleAccessToken);
     } else {
       setError("Google authentication required. Please sign in again.");
+      missing = true;
     }
-  }, [])
+    if (missing) return;
+  }, []);
 
   // Validate current input whenever it changes
   useEffect(() => {
@@ -293,15 +297,12 @@ export default function InitializePage() {
 
   const createBusinessSheet = async () => {
     console.log('createBusinessSheet called');
+    console.log('supabaseToken:', supabaseToken);
+    console.log('googleAccessToken:', googleAccessToken);
     if (!supabaseToken || !googleAccessToken) {
       setError("Missing authentication tokens. Please try logging in again.");
       return;
     }
-
-    // Add debug logging for tokens
-    console.log("supabaseToken", supabaseToken);
-    console.log("googleAccessToken", googleAccessToken);
-
     setIsSubmitting(true);
     setError("");
 

@@ -317,9 +317,9 @@ export default function InitializePage() {
         headers: {
           "Content-Type": "application/json",
           "x-supabase-token": supabaseToken,
+          "Authorization": `Bearer ${googleAccessToken}`
         },
         body: JSON.stringify({
-          accessToken: googleAccessToken,
           businessData: businessData,
         }),
       });
@@ -342,7 +342,7 @@ export default function InitializePage() {
       }
 
       // Store the spreadsheet ID and URL
-      sessionStorage.setItem("spreadsheetId", data.spreadsheetId);
+      sessionStorage.setItem("spreadsheetId", data.businessSheetId);
       sessionStorage.setItem("spreadsheetUrl", data.spreadsheetUrl);
 
       setShowSuccess(true);
@@ -627,23 +627,23 @@ export default function InitializePage() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-supabase-token": supabaseToken
+            "x-supabase-token": supabaseToken,
+            "Authorization": `Bearer ${googleAccessToken}`
           },
           body: JSON.stringify({
-            accessToken: googleAccessToken,
             businessData: businessData,
           }),
-        })
-        const data = await response.json()
+        });
+        const data = await response.json();
         if (!response.ok) {
-          throw new Error(data.error || "Failed to set up your business")
+          throw new Error(data.error || "Failed to set up your business");
         }
         // Store the spreadsheet ID and URL for future use
         if (data.businessSheetId) {
-          localStorage.setItem("business_sheet_id", data.businessSheetId)
+          localStorage.setItem("business_sheet_id", data.businessSheetId);
         }
         if (data.spreadsheetUrl) {
-          localStorage.setItem("business_sheet_url", data.spreadsheetUrl)
+          localStorage.setItem("business_sheet_url", data.spreadsheetUrl);
         }
         
         // Set the just_onboarded flag and navigate

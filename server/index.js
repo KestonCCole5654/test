@@ -2193,7 +2193,8 @@ app.post('/api/create-business-sheet', async (req, res) => {
 
     // 2. Validate tokens
     const supabaseToken = req.headers['x-supabase-token'];
-    const { accessToken, businessData } = req.body;
+    const accessToken = req.headers.authorization?.split(' ')[1];
+    const { businessData } = req.body;
 
     // Add debug logging for received token
     console.log('Received x-supabase-token:', supabaseToken);

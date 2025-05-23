@@ -2188,6 +2188,7 @@ app.post('/api/create-business-sheet', async (req, res) => {
   try {
     // 1. Validate request content type
     if (!req.headers['content-type']?.includes('application/json')) {
+      console.error('[CREATE] Invalid content type');
       return res.status(415).json({ success: false, error: 'Invalid content type - requires JSON' });
     }
 
@@ -2196,8 +2197,13 @@ app.post('/api/create-business-sheet', async (req, res) => {
     const accessToken = req.headers.authorization?.split(' ')[1];
     const { businessData } = req.body;
 
-    // Add debug logging for received token
-    console.log('Received x-supabase-token:', supabaseToken);
+    // Add debug logging for received tokens
+    console.log('[CREATE] Token validation:', {
+      hasSupabaseToken: !!supabaseToken,
+      hasGoogleToken: !!accessToken,
+      supabaseTokenLength: supabaseToken?.length || 0,
+      googleTokenLength: accessToken?.length || 0
+    });
 
     if (!supabaseToken) {
       console.error('[CREATE] Missing Supabase token');
@@ -2211,14 +2217,31 @@ app.post('/api/create-business-sheet', async (req, res) => {
 
     // 3. Verify Supabase session
     const { data: { user }, error: supabaseError } = await supabase.auth.getUser(supabaseToken);
-    console.log('Supabase user:', user, 'Error:', supabaseError);
+    console.log('[CREATE] Supabase user:', user ? 'Found' : 'Not found', 'Error:', supabaseError);
+    
     if (supabaseError || !user) {
       console.error('[CREATE] Supabase auth error:', supabaseError);
       return res.status(401).json({ success: false, error: 'Invalid Supabase session' });
     }
 
-    // 4. Validate business data
+    // 4. Verify Google token
+    try {
+      const oauth2Client = new google.auth.OAuth2();
+      oauth2Client.setCredentials({ access_token: accessToken });
+      const tokenInfo = await oauth2Client.getTokenInfo(accessToken);
+      console.log('[CREATE] Google token info:', {
+        email: tokenInfo.email,
+        scope: tokenInfo.scope,
+        expires_in: tokenInfo.expires_in
+      });
+    } catch (googleError) {
+      console.error('[CREATE] Google token validation error:', googleError);
+      return res.status(401).json({ success: false, error: 'Invalid Google token' });
+    }
+
+    // 5. Validate business data
     if (!businessData) {
+      console.error('[CREATE] Missing business data');
       return res.status(400).json({ error: 'Business data is required' });
     }
 
@@ -2243,13 +2266,18 @@ app.post('/api/create-business-sheet', async (req, res) => {
       }
     });
 
+    console.log('[CREATE] Successfully created business sheet:', {
+      spreadsheetId: unifiedSheet.spreadsheetId,
+      userId: user.id
+    });
+
     res.json({
       success: true,
       businessSheetId: unifiedSheet.spreadsheetId,
       spreadsheetUrl: unifiedSheet.spreadsheetUrl
     });
   } catch (error) {
-    console.error('Business sheet creation error:', error);
+    console.error('[CREATE] Business sheet creation error:', error);
     res.status(500).json({
       error: 'Business sheet creation failed',
       details: error.message

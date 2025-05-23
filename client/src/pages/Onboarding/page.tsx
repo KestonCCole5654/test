@@ -355,20 +355,39 @@ export default function InitializePage() {
       setError("")
 
       // Get session from Supabase
-      const { data: { session } } = await supabase.auth.getSession()
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      if (sessionError) {
+        console.error("Session error:", sessionError)
+        throw new Error("Failed to get session: " + sessionError.message)
+      }
+      
       if (!session) {
+        console.error("No session found")
         throw new Error("No active session found")
       }
 
       // Get Google token from session
       const googleToken = session.provider_token
+      console.log("Google token present:", !!googleToken)
+      
       if (!googleToken) {
-        throw new Error("Google authentication required")
+        // Try to get from storage as fallback
+        const storedGoogleToken = localStorage.getItem('google_access_token') || sessionStorage.getItem('google_access_token')
+        if (storedGoogleToken) {
+          console.log("Using stored Google token")
+          setGoogleAccessToken(storedGoogleToken)
+        } else {
+          console.error("No Google token found in session or storage")
+          throw new Error("Google authentication required")
+        }
       }
 
       // Get Supabase token
       const supabaseToken = session.access_token
+      console.log("Supabase token present:", !!supabaseToken)
+      
       if (!supabaseToken) {
+        console.error("No Supabase token found")
         throw new Error("Invalid Supabase session")
       }
 
@@ -376,8 +395,8 @@ export default function InitializePage() {
       console.log("Sending request with tokens:", {
         hasGoogleToken: !!googleToken,
         hasSupabaseToken: !!supabaseToken,
-        googleTokenLength: googleToken.length,
-        supabaseTokenLength: supabaseToken.length
+        googleTokenLength: googleToken?.length || 0,
+        supabaseTokenLength: supabaseToken?.length || 0
       })
 
       // Make the API request

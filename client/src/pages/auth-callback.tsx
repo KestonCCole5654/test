@@ -45,6 +45,16 @@ export default function AuthCallback() {
       try {
         console.log('Starting auth callback handling')
         
+        // Check for error in URL first
+        const searchParams = new URLSearchParams(window.location.search)
+        const error = searchParams.get('error')
+        const errorDescription = searchParams.get('error_description')
+        
+        if (error) {
+          console.error('Auth error from Supabase:', { error, errorDescription })
+          throw new Error(errorDescription || 'Authentication failed')
+        }
+
         // Get the redirect path from storage (try both methods)
         let redirectPath = '/invoices'
         try {
@@ -60,7 +70,6 @@ export default function AuthCallback() {
 
         // Get the session from the URL hash or search params
         const hashParams = new URLSearchParams(window.location.hash.substring(1))
-        const searchParams = new URLSearchParams(window.location.search)
         
         // Try to get the session from Supabase
         const { data: { session }, error: sessionError } = await supabase.auth.getSession()
@@ -72,8 +81,8 @@ export default function AuthCallback() {
 
         if (!session) {
           // If no session, try to get it from the URL
-          const accessToken = hashParams.get('access_token') || searchParams.get('access_token')
-          const refreshToken = hashParams.get('refresh_token') || searchParams.get('refresh_token')
+          const accessToken = hashParams.get('access_token')
+          const refreshToken = hashParams.get('refresh_token')
 
           if (!accessToken) {
             console.error('No access token found in URL')
@@ -82,23 +91,33 @@ export default function AuthCallback() {
 
           console.log('Found access token in URL')
           
-          // Set the session using the tokens from the URL
-          const { data: { session: newSession }, error: setSessionError } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken || ''
-          })
+          try {
+            // Set the session using the tokens from the URL
+            const { data: { session: newSession }, error: setSessionError } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken || ''
+            })
 
-          if (setSessionError) {
+            if (setSessionError) {
+              console.error('Error setting session:', setSessionError)
+              throw setSessionError
+            }
+
+            if (!newSession) {
+              console.error('No session after setting tokens')
+              throw new Error('Failed to establish session')
+            }
+
+            console.log('Session established successfully')
+          } catch (setSessionError: any) {
             console.error('Error setting session:', setSessionError)
-            throw setSessionError
+            // If it's a database error, we should still try to proceed
+            if (setSessionError.message?.includes('Database error')) {
+              console.log('Database error occurred, but proceeding with auth flow')
+            } else {
+              throw setSessionError
+            }
           }
-
-          if (!newSession) {
-            console.error('No session after setting tokens')
-            throw new Error('Failed to establish session')
-          }
-
-          console.log('Session established successfully')
         } else {
           console.log('Existing session found')
         }
@@ -106,8 +125,13 @@ export default function AuthCallback() {
         // Get the final session state
         const { data: { session: finalSession }, error: finalSessionError } = await supabase.auth.getSession()
         
-        if (finalSessionError || !finalSession) {
+        if (finalSessionError) {
           console.error('Final session check failed:', finalSessionError)
+          throw finalSessionError
+        }
+
+        if (!finalSession) {
+          console.error('No final session found')
           throw new Error('Failed to verify session')
         }
 

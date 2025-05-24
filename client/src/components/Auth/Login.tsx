@@ -119,8 +119,8 @@ export default function LoginPage() {
 
       <div className="flex flex-1 flex-col items-center justify-center px-3 py-12">
         <div className="max-w-md w-full mx-auto ">
-          <div className="flex flex-col text-center justify-center items-center gap-3 mb-14">
-            <div className="h-12 w-12 rounded-sm bg-green-800 flex items-center justify-center">
+          <div className="flex flex-col text-center justify-center items-center gap-3 mb--12">
+            <div className="h-14 w-14 p-6 rounded-sm bg-green-800 flex items-center justify-center">
               <img src="/icon1.svg" alt="SheetBills Logo" className="h-12 w-auto" />
             </div>
             <div>

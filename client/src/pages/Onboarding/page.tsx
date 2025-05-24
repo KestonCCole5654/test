@@ -928,7 +928,7 @@ export default function InitializePage() {
         : (
           <>
             <div className="mb-6">
-              <CheckCircle2 className="h-16 w-16 font-cal-sans text-green-800 mx-auto" />
+              <img src="/icon.svg" alt="Success Icon" className="h-16 w-16 mx-auto" />
             </div>
             <motion.h2
               initial={{ y: 20, opacity: 0 }}
@@ -936,7 +936,7 @@ export default function InitializePage() {
               transition={{ delay: 0.4, duration: 0.5 }}
               className="text-2xl font-cal-sans font-medium mb-2"
             >
-              Welcome to <span className=" font-cal-sans font-medium text-green-800 text-3xl">SheetBills™</span>, <br /> Setup Complete!
+              Welcome to <span className=" font-cal-sans font-medium text-green-800 text-3xl">SheetBills</span>, <br /> Setup Complete!
             </motion.h2>
             <motion.p
               initial={{ y: 20, opacity: 0 }}

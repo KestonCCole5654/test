@@ -383,7 +383,7 @@ export default function InitializePage() {
     try {
       setIsSubmitting(true)
       setError("")
-
+  
       // Get session from Supabase
       console.log("Fetching Supabase session...")
       const { data: { session }, error: sessionError } = await supabase.auth.getSession()
@@ -394,7 +394,7 @@ export default function InitializePage() {
         errorMessage: sessionError?.message,
         sessionKeys: session ? Object.keys(session) : []
       })
-
+  
       if (sessionError) {
         console.error("Session error:", {
           message: sessionError.message,
@@ -408,12 +408,13 @@ export default function InitializePage() {
         console.error("No session found in Supabase")
         throw new Error("No active session found")
       }
-
+  
       // Get Google token from session
       const googleToken = session.provider_token
       console.log("Google token from session:", {
         exists: !!googleToken,
-        length: googleToken?.length || 0
+        length: googleToken?.length || 0,
+        preview: googleToken ? googleToken.substring(0, 20) + '...' : 'none'
       })
       
       // Get stored Google token as fallback
@@ -421,26 +422,61 @@ export default function InitializePage() {
       console.log("Stored Google token:", {
         exists: !!storedGoogleToken,
         length: storedGoogleToken?.length || 0,
-        source: localStorage.getItem('google_access_token') ? "localStorage" : "sessionStorage"
+        source: localStorage.getItem('google_access_token') ? "localStorage" : "sessionStorage",
+        preview: storedGoogleToken ? storedGoogleToken.substring(0, 20) + '...' : 'none'
       })
       
-      if (!googleToken && !storedGoogleToken) {
+      // Choose the right token
+      const tokenToUse = googleToken || storedGoogleToken
+      console.log("Token selection:", {
+        using: googleToken ? 'session' : 'stored',
+        tokenExists: !!tokenToUse,
+        tokenLength: tokenToUse?.length || 0
+      })
+      
+      if (!tokenToUse) {
         console.error("No Google token found in session or storage")
         throw new Error("Google authentication required")
       }
-
+  
+      // Test the Google token first
+      console.log("Testing Google token validity...")
+      try {
+        const tokenTestResponse = await fetch('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=' + tokenToUse)
+        if (tokenTestResponse.ok) {
+          const tokenInfo = await tokenTestResponse.json()
+          console.log("Google token test SUCCESS:", {
+            email: tokenInfo.email,
+            expires_in: tokenInfo.expires_in,
+            scope: tokenInfo.scope,
+            issued_to: tokenInfo.issued_to
+          })
+        } else {
+          const tokenError = await tokenTestResponse.text()
+          console.error("Google token test FAILED:", {
+            status: tokenTestResponse.status,
+            error: tokenError
+          })
+          throw new Error("Google token is invalid or expired")
+        }
+      } catch (tokenTestError) {
+        console.error("Token validation error:", tokenTestError)
+        //throw new Error("Failed to validate Google token: " + tokenTestError.message)
+      }
+  
       // Get Supabase token
       const supabaseToken = session.access_token
       console.log("Supabase token:", {
         exists: !!supabaseToken,
-        length: supabaseToken?.length || 0
+        length: supabaseToken?.length || 0,
+        preview: supabaseToken ? supabaseToken.substring(0, 20) + '...' : 'none'
       })
       
       if (!supabaseToken) {
         console.error("No Supabase token found")
         throw new Error("Invalid Supabase session")
       }
-
+  
       // Prepare request data
       const requestData = {
         businessData: {
@@ -456,33 +492,31 @@ export default function InitializePage() {
         hasPhone: !!requestData.businessData.phone,
         hasAddress: !!requestData.businessData.address
       })
-
+  
       // Make the API request
       console.log("Making API request to:", `${API_URL}/create-business-sheet`)
-      console.log("Request headers:", {
-        hasContentType: true,
-        hasAuthorization: !!(googleToken || storedGoogleToken),
-        hasSupabaseToken: !!supabaseToken,
-        authorizationLength: (googleToken || storedGoogleToken)?.length || 0,
-        supabaseTokenLength: supabaseToken?.length || 0
+      console.log("Request headers being sent:", {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${tokenToUse.substring(0, 20)}...`,
+        'x-supabase-token': `${supabaseToken.substring(0, 20)}...`
       })
-
+  
       const response = await fetch(`${API_URL}/create-business-sheet`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${googleToken || storedGoogleToken}`,
+          "Authorization": `Bearer ${tokenToUse}`,
           "x-supabase-token": supabaseToken
         },
         body: JSON.stringify(requestData)
       })
-
+  
       console.log("Response received:", {
         status: response.status,
         statusText: response.statusText,
         headers: Object.fromEntries(response.headers.entries())
       })
-
+  
       // Handle non-OK responses
       if (!response.ok) {
         const errorData = await response.json()
@@ -502,7 +536,7 @@ export default function InitializePage() {
           throw new Error(errorData.error || "Failed to create business sheet")
         }
       }
-
+  
       const data = await response.json()
       console.log("Success response data:", {
         hasBusinessSheetId: !!data.businessSheetId,

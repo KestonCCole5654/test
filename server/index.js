@@ -2185,9 +2185,14 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
  * @route POST /api/create-business-sheet
  * @access Protected (Supabase + Google Auth)
  */
+/**
+ * Creates a new unified business sheet with both invoice and business details tabs.
+ * @route POST /api/create-business-sheet
+ * @access Protected (Supabase + Google Auth)
+ */
 app.post('/api/create-business-sheet', async (req, res) => {
   console.log('[CREATE] ===== Business Sheet Creation Request Start =====');
-  let supabaseUser = null; // Declare user variable at the top level
+  let supabaseUser = null;
 
   try {
     // 1. Log all incoming headers
@@ -2195,7 +2200,9 @@ app.post('/api/create-business-sheet', async (req, res) => {
       contentType: req.headers['content-type'],
       hasAuth: !!req.headers.authorization,
       hasSupabaseToken: !!req.headers['x-supabase-token'],
-      allHeaders: Object.keys(req.headers)
+      allHeaders: Object.keys(req.headers),
+      authHeader: req.headers.authorization?.substring(0, 20) + '...',
+      supabaseToken: req.headers['x-supabase-token']?.substring(0, 20) + '...'
     });
 
     // 2. Validate request content type
@@ -2217,7 +2224,9 @@ app.post('/api/create-business-sheet', async (req, res) => {
       hasGoogleToken: !!accessToken,
       supabaseTokenLength: supabaseToken?.length || 0,
       googleTokenLength: accessToken?.length || 0,
-      authHeaderFormat: authHeader?.startsWith('Bearer ') ? 'correct' : 'incorrect'
+      authHeaderFormat: authHeader?.startsWith('Bearer ') ? 'correct' : 'incorrect',
+      supabaseTokenPrefix: supabaseToken?.substring(0, 20) + '...',
+      googleTokenPrefix: accessToken?.substring(0, 20) + '...'
     });
 
     if (!supabaseToken) {
@@ -2237,62 +2246,100 @@ app.post('/api/create-business-sheet', async (req, res) => {
       console.log('[CREATE] Supabase verification result:', {
         hasUser: !!user,
         userId: user?.id,
+        userEmail: user?.email,
         error: supabaseError?.message,
-        errorCode: supabaseError?.code
+        errorCode: supabaseError?.code,
+        errorStatus: supabaseError?.status
       });
       
       if (supabaseError || !user) {
         console.error('[CREATE] Supabase auth error:', {
           error: supabaseError?.message,
           code: supabaseError?.code,
-          status: supabaseError?.status
+          status: supabaseError?.status,
+          stack: supabaseError?.stack
         });
         return res.status(401).json({ success: false, error: 'Invalid Supabase session' });
       }
 
-      supabaseUser = user; // Store the user for later use
+      supabaseUser = user;
     } catch (supabaseError) {
       console.error('[CREATE] Supabase verification failed:', {
         message: supabaseError.message,
         code: supabaseError.code,
-        stack: supabaseError.stack
+        stack: supabaseError.stack,
+        response: supabaseError.response?.data
       });
       return res.status(401).json({ success: false, error: 'Failed to verify Supabase session' });
     }
 
-    // 5. Verify Google token
+    // 5. Verify Google token with enhanced error handling
     console.log('[CREATE] Verifying Google token...');
+    let oauth2Client;
     try {
-      const oauth2Client = new google.auth.OAuth2();
+      oauth2Client = new google.auth.OAuth2();
       oauth2Client.setCredentials({ access_token: accessToken });
       
-      // First try to get token info
-      const tokenInfo = await oauth2Client.getTokenInfo(accessToken);
+      // First try to get token info with direct HTTP call for better error details
+      console.log('[CREATE] Testing token with Google tokeninfo endpoint...');
+      const tokenInfoResponse = await fetch(`https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${accessToken}`);
+      
+      if (!tokenInfoResponse.ok) {
+        const tokenError = await tokenInfoResponse.text();
+        console.error('[CREATE] Google tokeninfo failed:', {
+          status: tokenInfoResponse.status,
+          statusText: tokenInfoResponse.statusText,
+          error: tokenError
+        });
+        return res.status(401).json({ 
+          success: false, 
+          error: 'Invalid Google token',
+          details: `Token validation failed: ${tokenError}`
+        });
+      }
+      
+      const tokenInfo = await tokenInfoResponse.json();
       console.log('[CREATE] Google token info:', {
         email: tokenInfo.email,
         scope: tokenInfo.scope,
         expires_in: tokenInfo.expires_in,
-        valid: true
+        issued_to: tokenInfo.issued_to
       });
 
       // Then try to make a test API call
+      console.log('[CREATE] Testing with Google Drive API...');
       const drive = google.drive({ version: 'v3', auth: oauth2Client });
-      await drive.files.list({
+      const testResponse = await drive.files.list({
         pageSize: 1,
         fields: 'files(id, name)'
       });
-      console.log('[CREATE] Google API test successful');
+      console.log('[CREATE] Google API test successful:', {
+        hasFiles: !!testResponse.data.files,
+        fileCount: testResponse.data.files?.length
+      });
     } catch (googleError) {
       console.error('[CREATE] Google token validation error:', {
         message: googleError.message,
         code: googleError.code,
         status: googleError.status,
         response: googleError.response?.data,
-        stack: googleError.stack
+        stack: googleError.stack,
+        errors: googleError.errors
       });
+      
+      // Provide more specific error messages
+      let errorMessage = 'Invalid Google token';
+      if (googleError.message?.includes('Login Required')) {
+        errorMessage = 'Google token expired - please re-authenticate';
+      } else if (googleError.message?.includes('insufficient authentication scopes')) {
+        errorMessage = 'Insufficient Google permissions - please re-authenticate with proper scopes';
+      } else if (googleError.message?.includes('Invalid Credentials')) {
+        errorMessage = 'Invalid Google credentials - please re-authenticate';
+      }
+      
       return res.status(401).json({ 
         success: false, 
-        error: 'Invalid Google token',
+        error: errorMessage,
         details: googleError.message
       });
     }
@@ -2322,7 +2369,7 @@ app.post('/api/create-business-sheet', async (req, res) => {
     // Add to master sheet
     console.log('[CREATE] Adding to master sheet...');
     const masterSheet = await getOrCreateMasterSheet(accessToken, supabaseUser.id);
-    const sheets = google.sheets({ version: 'v4', auth: new google.auth.OAuth2().setCredentials({ access_token: accessToken }) });
+    const sheets = google.sheets({ version: 'v4', auth: oauth2Client });
     await sheets.spreadsheets.values.append({
       spreadsheetId: masterSheet.id,
       range: 'My Sheets!A:E',

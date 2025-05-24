@@ -38,9 +38,9 @@ export default function LoginPage() {
     try {
       setLoading(true)
       setError("")
-      
+
       console.log('Starting Google OAuth flow...')
-      
+
       // Configure OAuth with more permissive settings
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
@@ -74,7 +74,7 @@ export default function LoginPage() {
       // Store the intended redirect path
       const redirectPath = location.state?.from || '/invoices'
       console.log('Storing redirect path:', redirectPath)
-      
+
       // Try both storage methods
       try {
         sessionStorage.setItem('auth_redirect', redirectPath)
@@ -119,19 +119,19 @@ export default function LoginPage() {
 
       <div className="flex flex-1 flex-col items-center justify-center px-3 py-12">
         <div className="max-w-md w-full mx-auto">
-        <div className="flex text-center justify-center items-center gap-3 mb-10">
-                  <div className="h-12 w-12 rounded-sm bg-green-800 flex items-center justify-center">
-                    <img src="/icon1.svg" alt="SheetBills Logo" className="h-12 w-auto" />
-                  </div>
-                  <h2 className="text-xl font-normal text-green-800">SheetBills</h2>
-                </div>
+          <div className="flex flex-row text-center justify-center items-center gap-3 mb-10">
+            <div className="h-12 w-12 rounded-sm bg-green-800 flex items-center justify-center">
+              <img src="/icon1.svg" alt="SheetBills Logo" className="h-12 w-auto" />
+            </div>
+            <h2 className="text-2xl font-normal text-green-800">SheetBills</h2>
+          </div>
           <Card className="border-0 overflow-hidden">
-           
-            
+
+
             <CardContent className="p-8">
-               
+
               <div className="flex flex-col mb-8">
-              
+
                 <p className="text-gray-600 font-normal text-left text-lg">
                   Transform Google Sheets into your invoice management system
                 </p>

@@ -121,26 +121,13 @@ export default function LandingPage() {
       {/* Hero Section - Upgraded for commercial look */}
       <section className="w-full py-20 bg-gradient-to-b from-white to-green-50 border-b">
         <div className="container px-4 md:px-6 flex flex-col items-center text-center">
-          {/* Logo and Brand Section */}
-          <div className="flex flex-col items-center mb-8">
-            <img src="/icon1.svg" alt="SheetBills Logo" className="h-24 w-24 mb-4" />
-            <h1 className="text-4xl md:text-5xl font-extrabold text-green-600 mb-2">
-              SheetBills <span className="text-xs align-super">™</span>
-            </h1>
-          </div>
-
-          {/* Welcome Statement */}
-          <div className="max-w-2xl mx-auto mb-8">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Welcome to the Future of Invoicing
-            </h2>
-            <p className="text-xl text-gray-600">
-              Create, track, and manage invoices with the power of Google Sheets. Secure, simple, and built for growth.
-            </p>
-          </div>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-4 tracking-tight leading-tight">
+            <span className="text-green-600">Effortless Invoicing</span> for Modern Businesses
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-2xl">
+            Create, track, and manage invoices with the power of Google Sheets. Secure, simple, and built for growth.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <a href="/sign-up" className="inline-flex items-center justify-center rounded-md bg-green-600 px-8 py-4 text-lg font-bold text-white shadow-lg hover:bg-green-700 transition">
               Start Free Trial
             </a>
@@ -148,7 +135,6 @@ export default function LandingPage() {
               Watch Demo
             </a>
           </div>
-
           {/* Value Propositions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-center items-start mt-4 w-full max-w-4xl mx-auto">
             <div className="flex flex-col items-center p-4">
@@ -167,6 +153,8 @@ export default function LandingPage() {
               <p className="text-gray-500 text-sm text-center">No setup headaches—just connect your account and start invoicing in minutes.</p>
             </div>
           </div>
+          {/* Testimonial Card */}
+          
         </div>
       </section>
 

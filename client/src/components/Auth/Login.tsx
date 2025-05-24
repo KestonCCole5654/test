@@ -111,7 +111,7 @@ export default function LoginPage() {
       <div className="flex items-center mb-4 p-10">
         <a href="/" className="flex items-center space-x-2">
           <div className="h-8 w-8 rounded bg-green-800 flex items-center justify-center">
-            <span className="text-white font-medium text-md">SB</span>
+            <img src="/icon.svg" alt="SheetBills Logo" className="h-6 w-auto" />
           </div>
           <span className="text-lg font-medium text-green-800">SheetBills ™</span>
         </a>

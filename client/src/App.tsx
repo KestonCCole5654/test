@@ -163,6 +163,7 @@ function App() {
         */}
         
         <Route path="/" element={<Login />} />
+        <Route path="/landingpage" element={<LandingPage />} />
         <Route path="/auth-callback" element={<AuthCallback />} />
         <Route path="/legal" element={<LegalPage />} />
         <Route path="/account-status" element={<AccountStatus />} />

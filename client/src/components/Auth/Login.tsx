@@ -128,13 +128,30 @@ export default function LoginPage() {
                 </div>
                 <h1 className="text-3xl font-medium text-green-800 mb-2">SheetBills™</h1>
                 <p className="text-gray-600 font-normal text-center text-lg">
-                  Welcome
+                  Transform Google Sheets into your invoice management system
                 </p>
               </div>
 
-              <p className="text-gray-600 font-normal text-center text-sm mb-6">
-                Your professional invoicing platform with seamless Google Sheets integration
-              </p>
+              <div className="space-y-3 mb-6">
+                <div className="flex items-center gap-3 text-gray-600">
+                  <svg className="h-5 w-5 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-sm">No more scattered files</span>
+                </div>
+                <div className="flex items-center gap-3 text-gray-600">
+                  <svg className="h-5 w-5 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-sm">No more formulas</span>
+                </div>
+                <div className="flex items-center gap-3 text-gray-600">
+                  <svg className="h-5 w-5 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-sm">No more copying and pasting</span>
+                </div>
+              </div>
 
               {error && (
                 <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100 flex items-center gap-2 mb-6">
@@ -172,11 +189,11 @@ export default function LoginPage() {
               <div className="mt-4 text-center">
                 <p className="text-sm text-slate-500">
                   By signing in, you agree to our{" "}
-                  <a href="#" className="text-emerald-600 hover:text-emerald-700">
+                  <a href="#" className="text-green-800 hover:text-emerald-700">
                     Terms
                   </a>{" "}
                   and{" "}
-                  <a href="#" className="text-emerald-600 hover:text-emerald-700">
+                  <a href="#" className="text-green-800 hover:text-emerald-700">
                     Privacy Policy
                   </a>
                   .

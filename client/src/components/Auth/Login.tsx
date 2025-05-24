@@ -124,10 +124,10 @@ export default function LoginPage() {
             <CardContent className="p-8">
               <div className="flex flex-col items-center mb-8">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="h-16 w-16 rounded-sm bg-green-800 flex items-center justify-center">
+                  <div className="h-12 w-12 rounded-sm bg-green-800 flex items-center justify-center">
                     <img src="/icon1.svg" alt="SheetBills Logo" className="h-12 w-auto" />
                   </div>
-                  <h2 className="text-2xl font-normal text-gray-800">SheetBills</h2>
+                  <h2 className="text-xl font-normal text-green-800">SheetBills</h2>
                 </div>
                 <p className="text-gray-600 font-normal text-center text-lg">
                   Transform Google Sheets into your invoice management system
@@ -135,19 +135,19 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-3 mb-6">
-                <div className="flex items-center gap-3 text-gray-600">
+                <div className="flex items-center justify-center gap-3 text-gray-600">
                   <svg className="h-5 w-5 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <span className="text-sm">No more scattered files</span>
                 </div>
-                <div className="flex items-center gap-3 text-gray-600">
+                <div className="flex items-center justify-center gap-3 text-gray-600">
                   <svg className="h-5 w-5 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <span className="text-sm">No more formulas</span>
                 </div>
-                <div className="flex items-center gap-3 text-gray-600">
+                <div className="flex items-center justify-center gap-3 text-gray-600">
                   <svg className="h-5 w-5 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>

@@ -108,14 +108,14 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen font-cal-sans flex flex-col bg-gradient-to-b from-white to-gray-50">
-      <div className="flex items-center mb-4 p-10">
+      {/* <div className="flex items-center mb-4 p-10">
         <a href="/" className="flex items-center space-x-2">
           <div className="h-8 w-8 rounded bg-green-800 flex items-center justify-center">
             <img src="/icon1.svg" alt="SheetBills Logo" className="h-6 w-auto" />
           </div>
           <span className="text-lg font-medium text-green-800">SheetBills</span>
         </a>
-      </div>
+      </div> */}
 
       <div className="flex flex-1 flex-col items-center justify-center px-4 py-8">
         <div className="max-w-md w-full mx-auto">
@@ -123,8 +123,11 @@ export default function LoginPage() {
             <div className="bg-emerald-600 h-1.5 w-full"></div>
             <CardContent className="p-8">
               <div className="flex flex-col items-center mb-8">
-                <div className="h-16 w-16 rounded-sm bg-green-800 flex items-center justify-center mb-4">
-                  <img src="/icon1.svg" alt="SheetBills Logo" className="h-12 w-auto" />
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="h-16 w-16 rounded-sm bg-green-800 flex items-center justify-center">
+                    <img src="/icon1.svg" alt="SheetBills Logo" className="h-12 w-auto" />
+                  </div>
+                  <h2 className="text-2xl font-normal text-gray-800">SheetBills</h2>
                 </div>
                 <p className="text-gray-600 font-normal text-center text-lg">
                   Transform Google Sheets into your invoice management system

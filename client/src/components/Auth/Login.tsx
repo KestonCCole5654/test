@@ -123,10 +123,9 @@ export default function LoginPage() {
             <div className="bg-emerald-600 h-1.5 w-full"></div>
             <CardContent className="p-8">
               <div className="flex flex-col items-center mb-8">
-                <div className="h-16 w-16 rounded-full bg-green-800 flex items-center justify-center mb-4">
+                <div className="h-16 w-16 rounded-sm bg-green-800 flex items-center justify-center mb-4">
                   <img src="/icon1.svg" alt="SheetBills Logo" className="h-12 w-auto" />
                 </div>
-                <h1 className="text-3xl font-medium text-green-800 mb-2">SheetBills™</h1>
                 <p className="text-gray-600 font-normal text-center text-lg">
                   Transform Google Sheets into your invoice management system
                 </p>

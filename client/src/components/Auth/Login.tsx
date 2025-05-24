@@ -123,7 +123,10 @@ export default function LoginPage() {
             <div className="h-12 w-12 rounded-sm bg-green-800 flex items-center justify-center">
               <img src="/icon1.svg" alt="SheetBills Logo" className="h-12 w-auto" />
             </div>
-            <h2 className="text-2xl font-normal text-green-800">SheetBills</h2>
+            <div className="flex">
+              <h2 className="text-2xl font-normal text-green-800">SheetBills</h2>
+            </div>
+           
           </div>
           <Card className="border-0 overflow-hidden">
 

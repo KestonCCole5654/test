@@ -122,10 +122,17 @@ export default function LoginPage() {
           <Card className="border-0 shadow-lg overflow-hidden">
             <div className="bg-emerald-600 h-1.5 w-full"></div>
             <CardContent className="p-8">
-              <h1 className="text-2xl font-normal font-cal-sans text-gray-900 mb-2 text-center">
-                Welcome to <span className="font-cal-sans font-normal text-green-800">SheetBills™</span>
-              </h1>
-              <p className="text-gray-600 font-normal font-cal-sans text-center text-sm mb-6">
+              <div className="flex flex-col items-center mb-8">
+                <div className="h-16 w-16 rounded-full bg-green-800 flex items-center justify-center mb-4">
+                  <img src="/icon1.svg" alt="SheetBills Logo" className="h-12 w-auto" />
+                </div>
+                <h1 className="text-3xl font-medium text-green-800 mb-2">SheetBills™</h1>
+                <p className="text-gray-600 font-normal text-center text-lg">
+                  Welcome
+                </p>
+              </div>
+
+              <p className="text-gray-600 font-normal text-center text-sm mb-6">
                 Your professional invoicing platform with seamless Google Sheets integration
               </p>
 
@@ -159,17 +166,17 @@ export default function LoginPage() {
                     fill="#EA4335"
                   />
                 </svg>
-                <span className="font-normal font-cal-sans">Continue with Google</span>
+                <span className="font-normal">Continue with Google</span>
               </Button>
 
               <div className="mt-4 text-center">
-                <p className="text-sm text-slate-500 font-normal font-cal-sans">
+                <p className="text-sm text-slate-500">
                   By signing in, you agree to our{" "}
-                  <a href="#" className="text-emerald-600 hover:text-emerald-700 font-normal font-cal-sans">
+                  <a href="#" className="text-emerald-600 hover:text-emerald-700">
                     Terms
                   </a>{" "}
                   and{" "}
-                  <a href="#" className="text-emerald-600 hover:text-emerald-700 font-normal font-cal-sans">
+                  <a href="#" className="text-emerald-600 hover:text-emerald-700">
                     Privacy Policy
                   </a>
                   .

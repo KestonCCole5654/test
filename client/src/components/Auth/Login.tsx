@@ -117,10 +117,10 @@ export default function LoginPage() {
         </a>
       </div> */}
 
-      <div className="flex flex-1 flex-col items-center justify-center px-4 py-8">
+      <div className="flex flex-1 flex-col items-center justify-center px-3 py-12">
         <div className="max-w-md w-full mx-auto">
           <Card className="border-0 shadow-lg overflow-hidden">
-            <div className="bg-emerald-600 h-1.5 w-full"></div>
+            <div className="bg-emerald-800 h-1.5 w-full"></div>
             <CardContent className="p-8">
               <div className="flex flex-col items-start mb-8">
                 <div className="flex items-center gap-3 mb-4">

@@ -129,7 +129,7 @@ export default function LoginPage() {
                   </div>
                   <h2 className="text-xl font-normal text-green-800">SheetBills</h2>
                 </div>
-                <p className="text-gray-600 font-normal text-center text-lg">
+                <p className="text-gray-600 font-normal text-left text-lg">
                   Transform Google Sheets into your invoice management system
                 </p>
               </div>

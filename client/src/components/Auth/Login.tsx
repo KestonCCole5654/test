@@ -119,16 +119,17 @@ export default function LoginPage() {
 
       <div className="flex flex-1 flex-col items-center justify-center px-3 py-12">
         <div className="max-w-md w-full mx-auto">
-          <Card className="border-0 shadow-lg overflow-hidden">
-            <div className="bg-emerald-800 h-1.5 w-full"></div>
-            
-            <CardContent className="p-8">
-            <div className="flex text-center justify-center items-center gap-3 mb-4">
+        <div className="flex text-center justify-center items-center gap-3 mb-10">
                   <div className="h-12 w-12 rounded-sm bg-green-800 flex items-center justify-center">
                     <img src="/icon1.svg" alt="SheetBills Logo" className="h-12 w-auto" />
                   </div>
                   <h2 className="text-xl font-normal text-green-800">SheetBills</h2>
                 </div>
+          <Card className="border-0 overflow-hidden">
+           
+            
+            <CardContent className="p-8">
+               
               <div className="flex flex-col mb-8">
               
                 <p className="text-gray-600 font-normal text-left text-lg">

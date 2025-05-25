@@ -123,7 +123,7 @@ function App() {
           const googleToken = session.provider_token;
           if (!googleToken) return;
           // Call backend onboarding status endpoint
-          const response = await fetch(`${process.env.REACT_APP_API_URL}api/onboarding/status`, {
+          const response = await fetch("https://sheetbills-server-git-development-keston-c-coles-projects.vercel.app/api/onboarding/status", {
             headers: {
               'Authorization': `Bearer ${googleToken}`,
             },

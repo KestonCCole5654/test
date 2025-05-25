@@ -216,7 +216,7 @@ export default function Dashboard() {
         if (error || !session) {
           throw new Error(error?.message || "Session validation failed")
         }
-        const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/spreadsheets", {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/sheets/spreadsheets`, {
           signal: abortController.signal,
           headers: { Authorization: `Bearer ${session.provider_token}` },
         })
@@ -426,7 +426,7 @@ export default function Dashboard() {
         return
       }
       const response = await fetch(
-        `https://sheetbills-server.vercel.app/api/sheets/data?sheetUrl=${encodeURIComponent(sheetUrl)}`,
+        `${process.env.REACT_APP_API_URL}/api/sheets/data?sheetUrl=${encodeURIComponent(sheetUrl)}`,
         {
           headers: {
             Authorization: `Bearer ${googleToken}`,
@@ -573,7 +573,7 @@ export default function Dashboard() {
       }
       localStorage.removeItem("cachedInvoices");
       localStorage.removeItem("lastFetchTime");
-      const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/bulk-delete", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/sheets/bulk-delete`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -976,7 +976,7 @@ export default function Dashboard() {
                                     }
 
                                     const response = await fetch(
-                                      "https://sheetbills-server.vercel.app/api/sheets/mark-as-paid",
+                                      `${process.env.REACT_APP_API_URL}/api/sheets/mark-as-paid`,
                                       {
                                         method: "PUT",
                                         headers: {
@@ -1036,7 +1036,7 @@ export default function Dashboard() {
                                       throw new Error(sessionError.message)
                                     }
                                     const response = await fetch(
-                                      "https://sheetbills-server.vercel.app/api/sheets/mark-as-pending",
+                                      `${process.env.REACT_APP_API_URL}/api/sheets/mark-as-pending`,
                                       {
                                         method: "PUT",
                                         headers: {
@@ -1149,7 +1149,7 @@ export default function Dashboard() {
                   }
                   localStorage.removeItem("cachedInvoices");
                   localStorage.removeItem("lastFetchTime");
-                  const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/delete-invoice", {
+                  const response = await fetch(`${process.env.REACT_APP_API_URL}/api/sheets/delete-invoice`, {
                     method: "DELETE",
                     headers: {
                       "Content-Type": "application/json",

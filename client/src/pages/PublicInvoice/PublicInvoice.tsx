@@ -31,7 +31,7 @@ export default function PublicInvoice() {
       }
       try {
         const res = await fetch(
-          `https://sheetbills-server.vercel.app/api/invoices/shared/${token}?sheetUrl=${encodeURIComponent(sheetUrl)}`
+          `${process.env.REACT_APP_API_URL}/api/invoices/shared/${token}?sheetUrl=${encodeURIComponent(sheetUrl)}`
         );
         if (!res.ok) {
           const data = await res.json();

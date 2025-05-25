@@ -46,7 +46,7 @@ export default function ContactPage() {
     try {
       setIsSubmitting(true)
 
-      const response = await fetch("https://sheetbills-server.vercel.app/api/contact", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/contact`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

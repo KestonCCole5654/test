@@ -52,7 +52,7 @@ export default function PrintInvoice() {
 
         // Fetch the invoice data
         const response = await axios.get(
-          `https://sheetbills-server.vercel.app/api/invoices/${invoiceId}`,
+          `${process.env.REACT_APP_API_URL}/api/invoices/${invoiceId}`,
           {
             headers: {
               Authorization: `Bearer ${session.provider_token}`,
@@ -73,7 +73,7 @@ export default function PrintInvoice() {
 
         // Fetch business details
         const businessResponse = await axios.get(
-          "https://sheetbills-server.vercel.app/api/business-details",
+          `${process.env.REACT_APP_API_URL}/api/business-details`,
           {
             headers: {
               Authorization: `Bearer ${session.provider_token}`,

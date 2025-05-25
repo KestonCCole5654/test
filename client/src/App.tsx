@@ -31,7 +31,7 @@ import AccountStatus from './pages/AccountStatus/AccountStatus';
 
 async function checkBusinessSheet(supabaseToken: string, googleToken: string) {
   try {
-    const response = await fetch("https://sheetbills-server.vercel.app/api/check-business-sheet", {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/check-business-sheet`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -123,7 +123,7 @@ function App() {
           const googleToken = session.provider_token;
           if (!googleToken) return;
           // Call backend onboarding status endpoint
-          const response = await fetch('https://sheetbills-server.vercel.app/api/onboarding/status', {
+          const response = await fetch(`${process.env.REACT_APP_API_URL}/api/onboarding/status`, {
             headers: {
               'Authorization': `Bearer ${googleToken}`,
             },

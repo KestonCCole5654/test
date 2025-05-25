@@ -427,7 +427,7 @@ export default function InvoiceForm() {
       }
 
       // Fetch business details from the correct spreadsheet
-      const response = await axios.get("https://sheetbills-server.vercel.app/api/business-details", {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/business-details`, {
         headers: {
           Authorization: `Bearer ${session.provider_token}`,
           "X-Supabase-Token": session.access_token,
@@ -501,7 +501,7 @@ export default function InvoiceForm() {
       // Get the SheetBills Invoices sheet URL if not available in location state
       let sheetUrl = selectedSpreadsheetUrl;
       if (!sheetUrl) {
-        const response = await axios.get("https://sheetbills-server.vercel.app/api/sheets/spreadsheets", {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/sheets/spreadsheets`, {
           headers: {
             Authorization: `Bearer ${session.provider_token}`,
             "X-Supabase-Token": session.access_token,
@@ -527,7 +527,7 @@ export default function InvoiceForm() {
       });
 
       // Create a shareable link for the invoice
-      const response = await fetch("https://sheetbills-server.vercel.app/api/invoices/shared/create-link", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/invoices/shared/create-link`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -591,16 +591,14 @@ export default function InvoiceForm() {
   const handleUpdate = async () => {
     try {
       setIsUpdating(true)
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
+      const { data: { session }, } = await supabase.auth.getSession()
       if (!session?.provider_token) {
         alert("Google authentication required")
         return
       }
 
       // Get the SheetBills Invoices sheet URL
-      const response = await axios.get("https://sheetbills-server.vercel.app/api/sheets/spreadsheets", {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/sheets/spreadsheets`, {
         headers: {
           Authorization: `Bearer ${session.provider_token}`,
           "X-Supabase-Token": session.access_token,
@@ -621,7 +619,7 @@ export default function InvoiceForm() {
 
       // Prepare the update request
       const updateResponse = await axios.post(
-        "https://sheetbills-server.vercel.app/api/update-invoice",
+        `${process.env.REACT_APP_API_URL}/api/update-invoice`,
         {
           accessToken: session.provider_token,
           invoiceData: {
@@ -661,16 +659,14 @@ export default function InvoiceForm() {
   const handleSave = async () => {
     try {
       setIsSaving(true)
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
+      const { data: { session }, } = await supabase.auth.getSession()
       if (!session?.provider_token) {
         alert("Google authentication required")
         return
       }
 
       // Get the SheetBills Invoices sheet URL
-      const response = await axios.get("https://sheetbills-server.vercel.app/api/sheets/spreadsheets", {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/sheets/spreadsheets`, {
         headers: {
           Authorization: `Bearer ${session.provider_token}`,
           "X-Supabase-Token": session.access_token,
@@ -688,7 +684,7 @@ export default function InvoiceForm() {
 
       // Prepare the save request
       const saveResponse = await axios.post(
-        "https://sheetbills-server.vercel.app/api/saveInvoice",
+        `${process.env.REACT_APP_API_URL}/api/saveInvoice`,
         {
           accessToken: session.provider_token,
           invoiceData: {
@@ -758,7 +754,7 @@ export default function InvoiceForm() {
       }
 
       // Create a shareable link for the invoice
-      const response = await fetch("https://sheetbills-server.vercel.app/api/invoices/shared/create-link", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/invoices/shared/create-link`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -34,7 +34,7 @@ import supabase from "../../components/Auth/supabaseClient"
 import { useSession } from '@supabase/auth-helpers-react'
 import { LoadingSpinner } from "../../components/ui/loadingSpinner"
 
-const API_URL = "https://sheetbills-server.vercel.app/api"
+const API_URL = `${process.env.REACT_APP_API_URL}/api`
 
 interface BusinessData {
   companyName: string
@@ -253,7 +253,7 @@ export default function InitializePage() {
     async function checkOnboarding() {
       if (!googleAccessToken) return
       try {
-        const response = await fetch("https://sheetbills-server.vercel.app/api/check-master-sheet", {
+        const response = await fetch(`${API_URL}/check-master-sheet`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ accessToken: googleAccessToken }),

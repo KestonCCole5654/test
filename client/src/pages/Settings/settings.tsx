@@ -77,7 +77,7 @@ export default function SettingsPage() {
       };
 
       // Fetch user data
-      const userResponse = await axios.get("https://sheetbills-server.vercel.app/api/user", { headers });
+      const userResponse = await axios.get(`${process.env.REACT_APP_API_URL}/api/user`, { headers });
       if (userResponse.data.user) {
         setUserData({
           name: userResponse.data.user.name,
@@ -95,7 +95,7 @@ export default function SettingsPage() {
       if (!sheetUrl) {
         throw new Error("No invoice spreadsheet selected")
       }
-      const businessResponse = await axios.get("https://sheetbills-server.vercel.app/api/business-details", {
+      const businessResponse = await axios.get(`${process.env.REACT_APP_API_URL}/api/business-details`, {
         headers,
         params: { sheetUrl }
       });
@@ -171,7 +171,7 @@ export default function SettingsPage() {
       }
 
       const response = await axios.put(
-        "https://sheetbills-server.vercel.app/api/update-business-details",
+        `${process.env.REACT_APP_API_URL}/api/update-business-details`,
         {
           companyName: businessData.companyName,
           email: businessData.email,
@@ -239,7 +239,7 @@ export default function SettingsPage() {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       if (sessionError || !session) throw new Error("Authentication required");
 
-      const response = await axios.delete("https://sheetbills-server.vercel.app/api/delete-account", {
+      const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/delete-account`, {
         headers: {
           Authorization: `Bearer ${session.provider_token}`,
           "X-Supabase-Token": session.access_token

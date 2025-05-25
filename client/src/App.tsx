@@ -119,57 +119,29 @@ function App() {
         try {
           // Get Supabase session for Google token
           const { data: { session } } = await supabase.auth.getSession();
-          if (!session) {
-            console.log('No session found');
-            return;
-          }
-
+          if (!session) return;
           const googleToken = session.provider_token;
-          if (!googleToken) {
-            console.log('No Google token found');
-            return;
-          }
-
+          if (!googleToken) return;
           // Call backend onboarding status endpoint
           const response = await fetch(`${process.env.REACT_APP_API_URL}/api/onboarding/status`, {
             headers: {
               'Authorization': `Bearer ${googleToken}`,
             },
           });
-
           const data = await response.json();
-          console.log('Onboarding status response:', data);
-
-          // Handle different response cases
-          if (data.requiresAuth) {
-            console.log('Authentication required');
-            // Redirect to login if authentication is required
-            navigate('/', { replace: true });
-            return;
+          // If not onboarded and not already on onboarding page, redirect
+          if (!data.onboarded && location.pathname !== '/Onboarding') {
+            navigate('/Onboarding', { replace: true });
           }
-
-          if (data.requiresOnboarding) {
-            console.log('Onboarding required');
-            // Only redirect if not already on onboarding page
-            if (location.pathname !== '/Onboarding') {
-              navigate('/Onboarding', { replace: true });
-            }
-          } else if (data.onboarded) {
-            console.log('User is onboarded');
-            // Only redirect if on onboarding page
-            if (location.pathname === '/Onboarding') {
-              navigate('/invoices', { replace: true });
-            }
+          // If onboarded and on onboarding page, redirect to dashboard
+          if (data.onboarded && location.pathname === '/Onboarding') {
+            navigate('/invoices', { replace: true });
           }
-
           setOnboardingChecked(true);
         } catch (error) {
           console.error('Onboarding status check failed:', error);
-          // Don't block the app on error, just log it
-          setOnboardingChecked(true);
         }
       };
-
       checkOnboardingStatus();
     }
   }, [user, loading, location.pathname, navigate]);

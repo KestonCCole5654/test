@@ -10,24 +10,6 @@ import { createClient } from '@supabase/supabase-js'; // Supabase client
 import { Resend } from 'resend';
 
 dotenv.config(); // Load environment variables
-
-// Validate required environment variables
-const requiredEnvVars = [
-  'SUPABASE_URL',
-  'SUPABASE_SERVICE_ROLE_KEY',
-  'GOOGLE_CLIENT_ID',
-  'GOOGLE_CLIENT_SECRET',
-  'GOOGLE_API_KEY',
-  'RESEND_API_KEY'
-];
-
-for (const envVar of requiredEnvVars) {
-  if (!process.env[envVar]) {
-    console.error(`Missing required environment variable: ${envVar}`);
-    process.exit(1);
-  }
-}
-
 const app = express(); // Create Express app
 const drive = google.drive('v3'); // Google Drive API
 
@@ -36,57 +18,24 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // ==========================
 // Middleware
 // ==========================
-// Improved CORS configuration
-const allowedOrigins = [
-  'https://sheetbills-client.vercel.app',
-  'https://sheetbills-client-git-development-keston-c-coles-projects.vercel.app',
-  'http://localhost:3000',
-  'http://localhost:5000'
-];
-
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: [
+    'https://sheetbills-client.vercel.app',
+    'https://sheetbills-client-git-development-keston-c-coles-projects.vercel.app/',
+    'http://localhost:3000',
+    'http://localhost:5000'
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
-  optionsSuccessStatus: 200,
-  preflightContinue: false,
-  maxAge: 86400 // 24 hours
+  optionsSuccessStatus: 200
 }));
-
-// Add OPTIONS handling for preflight requests
-app.options('*', cors());
-
 app.use(express.json()); // Parse JSON request bodies
-
-// Global error handling middleware
-app.use((err, req, res, next) => {
-  console.error('Global error handler:', err);
-  res.status(err.status || 500).json({
-    error: {
-      message: err.message || 'Internal server error',
-      code: err.code || 'INTERNAL_ERROR'
-    }
-  });
-});
-
 // ==========================
 // Supabase Client
 // ==========================
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  }
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
 // ==========================
@@ -2037,35 +1986,20 @@ app.get('/api/onboarding/status', async (req, res) => {
     // Get Google access token from headers
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.log('[ONBOARDING] Missing or invalid authorization header');
-      return res.status(200).json({ 
-        onboarded: false, 
-        error: 'Missing or invalid authorization header',
-        requiresAuth: true
-      });
+      return res.status(401).json({ onboarded: false, error: 'Missing or invalid authorization header' });
     }
-
     const accessToken = authHeader.split(' ')[1];
+
+    // Get user info to get Google user ID
+    const userInfo = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    const userId = userInfo.data.sub;
 
     // Initialize Google Drive API
     const auth = new google.auth.OAuth2();
     auth.setCredentials({ access_token: accessToken });
     const drive = google.drive({ version: 'v3', auth });
-
-    try {
-      // Verify token is valid by making a test API call
-      await drive.files.list({
-        pageSize: 1,
-        fields: 'files(id, name)'
-      });
-    } catch (error) {
-      console.error('[ONBOARDING] Google token validation failed:', error.message);
-      return res.status(200).json({ 
-        onboarded: false, 
-        error: 'Invalid or expired Google token',
-        requiresAuth: true
-      });
-    }
 
     // Search for Master Tracking Sheet by name and type
     const driveResponse = await drive.files.list({
@@ -2076,24 +2010,13 @@ app.get('/api/onboarding/status', async (req, res) => {
 
     // If found, user is onboarded
     if (driveResponse.data.files.length > 0) {
-      return res.json({ 
-        onboarded: true,
-        masterSheetId: driveResponse.data.files[0].id,
-        masterSheetUrl: driveResponse.data.files[0].webViewLink
-      });
+      return res.json({ onboarded: true });
     } else {
-      return res.json({ 
-        onboarded: false,
-        requiresOnboarding: true
-      });
+      return res.json({ onboarded: false });
     }
   } catch (error) {
     console.error('[ONBOARDING STATUS ERROR]', error);
-    return res.status(200).json({ 
-      onboarded: false, 
-      error: error.message,
-      requiresAuth: true
-    });
+    return res.status(500).json({ onboarded: false, error: error.message });
   }
 });
 /**

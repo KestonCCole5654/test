@@ -54,8 +54,13 @@ app.use(cors({
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  preflightContinue: false,
+  maxAge: 86400 // 24 hours
 }));
+
+// Add OPTIONS handling for preflight requests
+app.options('*', cors());
 
 app.use(express.json()); // Parse JSON request bodies
 
@@ -2032,20 +2037,35 @@ app.get('/api/onboarding/status', async (req, res) => {
     // Get Google access token from headers
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ onboarded: false, error: 'Missing or invalid authorization header' });
+      console.log('[ONBOARDING] Missing or invalid authorization header');
+      return res.status(200).json({ 
+        onboarded: false, 
+        error: 'Missing or invalid authorization header',
+        requiresAuth: true
+      });
     }
-    const accessToken = authHeader.split(' ')[1];
 
-    // Get user info to get Google user ID
-    const userInfo = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-    const userId = userInfo.data.sub;
+    const accessToken = authHeader.split(' ')[1];
 
     // Initialize Google Drive API
     const auth = new google.auth.OAuth2();
     auth.setCredentials({ access_token: accessToken });
     const drive = google.drive({ version: 'v3', auth });
+
+    try {
+      // Verify token is valid by making a test API call
+      await drive.files.list({
+        pageSize: 1,
+        fields: 'files(id, name)'
+      });
+    } catch (error) {
+      console.error('[ONBOARDING] Google token validation failed:', error.message);
+      return res.status(200).json({ 
+        onboarded: false, 
+        error: 'Invalid or expired Google token',
+        requiresAuth: true
+      });
+    }
 
     // Search for Master Tracking Sheet by name and type
     const driveResponse = await drive.files.list({
@@ -2056,13 +2076,24 @@ app.get('/api/onboarding/status', async (req, res) => {
 
     // If found, user is onboarded
     if (driveResponse.data.files.length > 0) {
-      return res.json({ onboarded: true });
+      return res.json({ 
+        onboarded: true,
+        masterSheetId: driveResponse.data.files[0].id,
+        masterSheetUrl: driveResponse.data.files[0].webViewLink
+      });
     } else {
-      return res.json({ onboarded: false });
+      return res.json({ 
+        onboarded: false,
+        requiresOnboarding: true
+      });
     }
   } catch (error) {
     console.error('[ONBOARDING STATUS ERROR]', error);
-    return res.status(500).json({ onboarded: false, error: error.message });
+    return res.status(200).json({ 
+      onboarded: false, 
+      error: error.message,
+      requiresAuth: true
+    });
   }
 });
 /**

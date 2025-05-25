@@ -21,7 +21,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 app.use(cors({
   origin: [
     'https://sheetbills-client.vercel.app',
-    'https://sheetbills-client-git-development-keston-c-coles-projects.vercel.app/',
+    'https://sheetbills-client-git-development-keston-c-coles-projects.vercel.app',
     'http://localhost:3000',
     'http://localhost:5000'
   ],

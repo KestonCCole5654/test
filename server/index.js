@@ -10,6 +10,24 @@ import { createClient } from '@supabase/supabase-js'; // Supabase client
 import { Resend } from 'resend';
 
 dotenv.config(); // Load environment variables
+
+// Validate required environment variables
+const requiredEnvVars = [
+  'SUPABASE_URL',
+  'SUPABASE_SERVICE_ROLE_KEY',
+  'GOOGLE_CLIENT_ID',
+  'GOOGLE_CLIENT_SECRET',
+  'GOOGLE_API_KEY',
+  'RESEND_API_KEY'
+];
+
+for (const envVar of requiredEnvVars) {
+  if (!process.env[envVar]) {
+    console.error(`Missing required environment variable: ${envVar}`);
+    process.exit(1);
+  }
+}
+
 const app = express(); // Create Express app
 const drive = google.drive('v3'); // Google Drive API
 
@@ -18,24 +36,52 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // ==========================
 // Middleware
 // ==========================
+// Improved CORS configuration
+const allowedOrigins = [
+  'https://sheetbills-client.vercel.app',
+  'https://sheetbills-client-git-development-keston-c-coles-projects.vercel.app',
+  'http://localhost:3000',
+  'http://localhost:5000'
+];
+
 app.use(cors({
-  origin: [
-    'https://sheetbills-client.vercel.app',
-    'https://sheetbills-client-git-development-keston-c-coles-projects.vercel.app/',
-    'http://localhost:3000',
-    'http://localhost:5000'
-  ],
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
   optionsSuccessStatus: 200
 }));
+
 app.use(express.json()); // Parse JSON request bodies
+
+// Global error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Global error handler:', err);
+  res.status(err.status || 500).json({
+    error: {
+      message: err.message || 'Internal server error',
+      code: err.code || 'INTERNAL_ERROR'
+    }
+  });
+});
+
 // ==========================
 // Supabase Client
 // ==========================
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
+  process.env.SUPABASE_SERVICE_ROLE_KEY,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }
 );
 
 // ==========================

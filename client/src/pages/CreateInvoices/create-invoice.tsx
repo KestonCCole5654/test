@@ -1042,7 +1042,7 @@ ${businessData.phone}`
     <>
       {/* Preview Mode - Cleaned up */}
       {!isFormExpanded && (
-        <div className="w-full max-w-5xl mx-auto mt-8">
+        <div className="w-full max-w-7xl mx-auto mt-5">
           {/* Breadcrumb Navigation */}
           <div className="mt-4 max-w-7xl mb-6">
             <Breadcrumb>
@@ -1129,7 +1129,7 @@ ${businessData.phone}`
             </div>
             {/* Right: Invoice Preview */}
             <div className="flex-1 min-w-0">
-              <div className="invoice-preview-print bg-white border border-gray-200 rounded-xl p-6">
+              <div className="invoice-preview-print bg-white border border-gray-200 p-4">
                 <div className="w-full overflow-auto">
                   <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
                 </div>

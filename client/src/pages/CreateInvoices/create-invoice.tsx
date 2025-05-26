@@ -1085,7 +1085,7 @@ ${businessData.phone}`
                 </Button>
                 <Button
                   variant="default"
-                  className="bg-green-800 hover:bg-green-900 text-white font-normal px-8 py-3 rounded-none shadow-md transition-all duration-150 w-full md:w-48"
+                  className="bg-green-800 hover:bg-green-900 text-white font-light px-8 py-3 rounded-none shadow-md transition-all duration-150 w-full md:w-48"
                   onClick={() => navigate(`/print-invoice/${invoiceToEdit?.id || invoiceData.invoiceNumber}`)}
                 >
                   Print Invoice

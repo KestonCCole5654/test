@@ -12,14 +12,7 @@ export interface InvoiceStat {
 
 export function InvoiceStats({ stats, lastUpdated }: { stats: InvoiceStat[]; lastUpdated?: string }) {
   return (
-    <div className="w-full bg-gray-50 border border-gray-200  p-0 mb-8 flex flex-col justify-between overflow-hidden ">
-      {/* Header */}
-      <div className="flex items-center justify-between px-6 pt-5 pb-2">
-        <div className="text-xs text-gray-400 font-normal">
-          {lastUpdated ? `Last updated ${lastUpdated}` : ""}
-        </div>
-      </div>
-
+    <div className="w-full bg-gray-50 border border-gray-200 p-0 mb-8 flex flex-col justify-between overflow-hidden">
       {/* Stats Row */}
       <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-gray-200 px-2 md:px-0 py-8">
         {stats.map((stat, idx) => (
@@ -35,11 +28,25 @@ export function InvoiceStats({ stats, lastUpdated }: { stats: InvoiceStat[]; las
               <span className="text-sm text-gray-500 font-medium flex items-center gap-1">
                 {stat.label}
               </span>
+            </div>
+            <div className="flex items-baseline gap-2">
+              <div className="text-2xl font-normal text-gray-900 tracking-tight">{stat.value}</div>
               {typeof stat.count === 'number' && (
-                <span className="ml-2 px-2 py-0.5 text-xs bg-green-50 rounded-full text-green-800 font-normal align-top">{stat.count}</span>
+                <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium
+                  ${stat.label === "Paid Invoices" 
+                    ? "bg-green-50 text-green-700 border border-green-100" 
+                    : stat.label === "Unpaid Invoices"
+                    ? "bg-amber-50 text-amber-700 border border-amber-100"
+                    : "bg-gray-50 text-gray-700 border border-gray-200"
+                  }`}
+                >
+                  {stat.count}
+                  <span className="text-[10px]">
+                    {stat.label === "Paid Invoices" ? "paid" : "unpaid"}
+                  </span>
+                </div>
               )}
             </div>
-            <div className="text-2xl font-normal text-gray-900 tracking-tight mb-0">{stat.value}</div>
             {stat.subLabel && (
               <div className="text-xs text-gray-400 mt-1">{stat.subLabel}</div>
             )}

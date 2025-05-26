@@ -375,14 +375,14 @@ export default function Dashboard() {
     today.setHours(0, 0, 0, 0) // Reset time to start of day
     const dueDate = new Date(dueDateString)
     dueDate.setHours(0, 0, 0, 0) // Reset time to start of day
-    
+
     // If due date is in the future, return 0
     if (dueDate > today) return 0
-    
+
     // Calculate the difference in days
     const diffTime = today.getTime() - dueDate.getTime()
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    
+
     return diffDays
   }
 
@@ -559,7 +559,7 @@ export default function Dashboard() {
       setSelectedInvoices(new Set(filteredInvoices.map((invoice) => invoice.id)))
     }
   }
-  
+
   // Bulk delete selected invoices
   const handleBulkDelete = async () => {
     try {
@@ -672,13 +672,13 @@ export default function Dashboard() {
 
   // Handle drag end
   const handleDragEnd = (event: any) => {
-                const { active, over } = event
-                if (active.id !== over?.id) {
-                  const oldIndex = rowOrder.indexOf(active.id)
-                  const newIndex = rowOrder.indexOf(over.id)
-                  const newOrder = arrayMove(rowOrder, oldIndex, newIndex)
-                  setRowOrder(newOrder)
-      
+    const { active, over } = event
+    if (active.id !== over?.id) {
+      const oldIndex = rowOrder.indexOf(active.id)
+      const newIndex = rowOrder.indexOf(over.id)
+      const newOrder = arrayMove(rowOrder, oldIndex, newIndex)
+      setRowOrder(newOrder)
+
       // Reorder the invoices array
       const reorderedInvoices = [...invoices]
       const [movedInvoice] = reorderedInvoices.splice(oldIndex, 1)
@@ -756,13 +756,13 @@ export default function Dashboard() {
         </div>
       )}
 
-    
+
 
       {/* Stats Card */}
       <InvoiceStats stats={stats} lastUpdated={now.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} />
 
-        {/* Tips Section */}
-        {/* <div className="mb-6 p-4 bg-green-50 border border-green-200">
+      {/* Tips Section */}
+      {/* <div className="mb-6 p-4 bg-green-50 border border-green-200">
         <div className="flex items-start gap-3">
           <div className="flex-shrink-0 mt-1">
             <svg className="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -778,8 +778,8 @@ export default function Dashboard() {
         </div>
       </div> */}
 
-          {/* Filter Tabs, Search, and Create Invoice Row */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
+      {/* Filter Tabs, Search, and Create Invoice Row */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
         <div className="flex bg-gray-100 border border-gray-200">
           {[
             { label: "All", value: "all" },
@@ -788,11 +788,10 @@ export default function Dashboard() {
           ].map((tab) => (
             <button
               key={tab.value}
-              className={`px-6 py-2 text-sm transition-colors border border-gray-200 focus:outline-none ${
-                statusFilter === tab.value
+              className={`px-6 py-2 text-sm transition-colors border border-gray-200 focus:outline-none ${statusFilter === tab.value
                   ? "text-gray-700 border-gray-300 bg-gray-200" // active
                   : "text-gray-600 border-gray-200 bg-gray-100 hover:bg-gray-200"
-              } `}
+                } `}
               onClick={() => setStatusFilter(tab.value)}
             >
               {tab.label}
@@ -839,7 +838,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-    
+
 
       {/* Table Card */}
       <div className="bg-white border border-gray-200 ">
@@ -880,15 +879,15 @@ export default function Dashboard() {
             </button>
           </div>
         )}
-        
+
         {/* Table */}
         <div className="overflow-x-auto">
           {filteredInvoices.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-             
+
               <h3 className="text-lg font-medium text-gray-900 mb-1 font-cal-sans">No invoices found</h3>
               <p className="text-sm text-gray-500 mb-6 font-cal-sans">Please refresh to see your invoices or create a new invoice.</p>
-             
+
             </div>
           ) : (
             <Table className="min-w-full text-sm">
@@ -1131,7 +1130,7 @@ export default function Dashboard() {
             </div>
           </div>
         )}
-        
+
       </div>
 
       {/* Delete Confirmation Dialog */}
@@ -1213,8 +1212,8 @@ export default function Dashboard() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="font-cal-sans">Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleBulkDelete} 
+            <AlertDialogAction
+              onClick={handleBulkDelete}
               className="bg-gray-800 font-cal-sans focus:ring-gray-800"
               disabled={isDeleting}
             >

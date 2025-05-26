@@ -90,14 +90,16 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
 
   // Format date to show month name, day and year
   const formatDate = (dateString: string) => {
-    if (!dateString) return "Not specified"
-    const date = new Date(dateString)
-    if (isNaN(date.getTime())) return "Invalid date"
+    if (!dateString) return "Not specified";
+    // Parse as local date (not UTC)
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    if (isNaN(date.getTime())) return "Invalid date";
     return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
-    })
+    });
   }
 
   // Format currency

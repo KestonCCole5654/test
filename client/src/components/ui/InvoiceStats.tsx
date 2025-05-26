@@ -29,7 +29,7 @@ export function InvoiceStats({ stats, lastUpdated }: { stats: InvoiceStat[]; las
             <div className="flex items-center gap-2 mt-1">
               <PercentPill percent={stat.percent} trend={stat.trend} />
               {typeof stat.count === 'number' && (
-                <span className="ml-2 px-2 py-0.5 text-xs bg-gray-100 rounded-full text-gray-700 font-normal align-top">{stat.count}</span>
+                <span className="ml-2 px-2 py-0.5 text-xs bg-gray-100 rounded-full text-gray-700 font-normal align-top">Total Invoices: {stat.count}</span>
               )}
             </div>
           </div>
@@ -50,7 +50,7 @@ function PercentPill({ percent, trend }: { percent: number; trend: "up" | "down"
     icon = <ArrowDownRight className="w-4 h-4 inline-block mr-0.5" />;
   }
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${color}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-normal ${color}`}>
       {icon}
       {percent > 0 ? `+${percent}%` : `${percent}%`}
     </span>

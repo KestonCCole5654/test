@@ -1042,7 +1042,7 @@ ${businessData.phone}`
     <>
       {/* Preview Mode - Cleaned up */}
       {!isFormExpanded && (
-        <div className="w-full max-w-3xl mx-auto mt-8">
+        <div className="w-full max-w-5xl mx-auto mt-8">
           {/* Breadcrumb Navigation */}
           <div className="mt-4 max-w-7xl mb-6">
             <Breadcrumb>
@@ -1061,75 +1061,75 @@ ${businessData.phone}`
               </BreadcrumbList>
             </Breadcrumb>
           </div>
-          {/* Modernized Invoice Summary Card */}
-          <div className="mb-6 bg-white border border-gray-200 rounded-none shadow-sm p-8 flex flex-col gap-8 relative">
-            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
-              {/* Left: Invoice Details */}
-              <div className="flex-1 min-w-0">
-                <div className="text-sm text-gray-500 font-normal mb-1">Invoice #:</div>
-                <div className="text-xl font-normal text-green-900 mb-4 break-all">{invoiceData.invoiceNumber}</div>
-                <div className="text-sm text-gray-500 font-normal mb-1">Billed To:</div>
-                <div className="text-lg font-normal text-gray-800 mb-4">{invoiceData.customer.name || 'Customer Name'}</div>
-                <div className="text-sm text-gray-500 font-normal mb-1">Amount Due:</div>
-                <div className="text-3xl font-extrabold text-green-800 mb-2">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
-              </div>
-
-              {/* Right: Action Buttons */}
-              <div className="flex flex-row md:flex-col gap-4 mt-6 md:items-center md:justify-end md:mt-8 pl-0 md:pl-12">
-                <Button
-                  variant="default"
-                  className="bg-green-800 hover:bg-green-900 text-white font-normal px-8 py-3 rounded-none shadow-md transition-all duration-150 w-full md:w-48"
-                  onClick={() => setIsFormExpanded(true)}
-                >
-                  Edit Invoice
-                </Button>
-                <Button
-                  variant="default"
-                  className="bg-green-800 hover:bg-green-900 text-white font-light px-8 py-3 rounded-none shadow-md transition-all duration-150 w-full md:w-48"
-                  onClick={() => navigate(`/print-invoice/${invoiceToEdit?.id || invoiceData.invoiceNumber}`)}
-                >
-                  Print Invoice
-                </Button>
-                <Button
-                  variant="default"
-                  className="bg-green-800 hover:bg-green-900 text-white font-normal px-8 py-3 rounded-none shadow-md transition-all duration-150 w-full md:w-48"
-                  onClick={handleGenerateInvoiceLink}
-                  disabled={isGeneratingLink}
-                >
-                  {isGeneratingLink ? "Generating Link ..." : "Generate Invoice Link"}
-                </Button>
+          {/* Two-column layout for preview mode */}
+          <div className="flex flex-col md:flex-row gap-8">
+            {/* Left: Invoice Summary Card */}
+            <div className="md:w-80 w-full flex-shrink-0">
+              <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col gap-6">
+                <div>
+                  <div className="text-xs text-gray-500 font-normal mb-1">Invoice #</div>
+                  <div className="text-lg font-semibold text-gray-900 mb-2 break-all">{invoiceData.invoiceNumber}</div>
+                  <div className="text-xs text-gray-500 font-normal mb-1">Billed To:</div>
+                  <div className="text-base font-medium text-gray-800 mb-2">{invoiceData.customer.name || 'Customer Name'}</div>
+                  <div className="text-xs text-gray-500 font-normal mb-1">Amount Due:</div>
+                  <div className="text-2xl font-bold text-green-800 mb-0">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
+                </div>
+                <div className="flex flex-col gap-3 mt-2">
+                  <Button
+                    variant="default"
+                    className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2 rounded-md shadow-sm transition-all duration-150 w-full"
+                    onClick={() => setIsFormExpanded(true)}
+                  >
+                    Edit Invoice
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="bg-gray-800 hover:bg-gray-900 text-white font-medium px-4 py-2 rounded-md shadow-sm transition-all duration-150 w-full"
+                    onClick={() => navigate(`/print-invoice/${invoiceToEdit?.id || invoiceData.invoiceNumber}`)}
+                  >
+                    Print Invoice
+                  </Button>
+                  <Button
+                    variant="default"
+                    className="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-md shadow-sm transition-all duration-150 w-full"
+                    onClick={handleGenerateInvoiceLink}
+                    disabled={isGeneratingLink}
+                  >
+                    {isGeneratingLink ? "Generating Link ..." : "Generate Invoice Link"}
+                  </Button>
+                </div>
+                {/* Shareable Link UI - shown directly under the three buttons */}
+                {shareableLink && (
+                  <div className="mt-2 p-2 bg-gray-50 rounded-md w-full border border-gray-200 flex flex-col gap-2">
+                    <p className="text-xs text-gray-600">Shareable Link:</p>
+                    <input
+                      type="text"
+                      value={shareableLink}
+                      readOnly
+                      className="w-full p-1 border rounded text-xs font-light font-cal-sans bg-white"
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full border-green-800 text-green-800 rounded"
+                      onClick={() => {
+                        navigator.clipboard.writeText(shareableLink)
+                        setCopied(true)
+                        setTimeout(() => setCopied(false), 2000)
+                      }}
+                    >
+                      {copied ? "Copied" : "Copy Link"}
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
-            {/* Shareable Link UI - shown directly under the three buttons */}
-            {shareableLink && (
-              <div className="mt-4 p-4 bg-gray-50 rounded-none w-full border border-gray-200 flex flex-col sm:flex-row sm:items-center gap-2">
-                <p className="text-sm text-gray-600 mb-2 sm:mb-0 sm:mr-2">Shareable Link:</p>
-                <input
-                  type="text"
-                  value={shareableLink}
-                  readOnly
-                  className="w-full sm:flex-1 p-2 border rounded-none text-sm  font-light font-cal-sans bg-white"
-                />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full sm:w-auto border-green-800 text-white rounded-none"
-                  onClick={() => {
-                    navigator.clipboard.writeText(shareableLink)
-                    setCopied(true)
-                    setTimeout(() => setCopied(false), 2000)
-                  }}
-                >
-                  {copied ? "Copied" : "Copy Link"}
-                </Button>
-              </div>
-            )}
-          </div>
-          {/* Invoice Preview - Modified print wrapper */}
-          <div className="invoice-preview-print" style={{ backgroundColor: 'white' }}>
-            <div className="bg-white border border-gray-200 rounded-none p-6">
-              <div className="w-full overflow-auto">
-                <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
+            {/* Right: Invoice Preview */}
+            <div className="flex-1 min-w-0">
+              <div className="invoice-preview-print bg-white border border-gray-200 rounded-xl p-6">
+                <div className="w-full overflow-auto">
+                  <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
+                </div>
               </div>
             </div>
           </div>

@@ -1181,7 +1181,7 @@ ${businessData.phone}`
                   <Button
                     type="button"
                     disabled
-                    className="bg-green-800 text-white px-7 py-2 font-medium cursor-default shadow-lg"
+                    className="bg-green-800 hover:bg-green-900 text-white px-7 py-2 font-medium cursor-default shadow-lg"
                   >
                     {invoiceToEdit.status}
                   </Button>
@@ -1189,7 +1189,7 @@ ${businessData.phone}`
                 <Button
                   variant="outline"
                   onClick={() => setIsFormExpanded(!isFormExpanded)}
-                  className="font-medium px-6 py-2"
+                  className="bg-green-800 hover:bg-green-900 text-white font-medium px-6 py-2"
                 >
                   {isFormExpanded ? "Hide Form" : "Show Form"}
                 </Button>
@@ -1457,7 +1457,7 @@ ${businessData.phone}`
                     <Button
                       variant="outline"
                       onClick={handleUpdate}
-                      className="font-inter font-light"
+                      className="bg-green-800 hover:bg-green-900 text-white font-inter font-light"
                       disabled={isUpdating}
                     >
                       {isUpdating ? "Updating Invoice..." : "Update Invoice"}
@@ -1466,7 +1466,7 @@ ${businessData.phone}`
                     <Button
                       variant="outline"
                       onClick={handleSave}
-                      className="font-inter font-light"
+                      className="bg-green-800 hover:bg-green-900 text-white font-inter font-light"
                       disabled={isSaving}
                     >
                       {isSaving ? "Saving Invoice..." : "Save Invoice"}

@@ -1323,7 +1323,7 @@ function SortableTableRow({ id, children, invoice, spreadsheets, selectedInvoice
 function ClientLogo({ domain }: { domain: string }) {
   const logoUrl = useBrandLogo(domain);
   return (
-    <div className="h-8 w-8 rounded-full bg-white border border-gray-200 flex items-center justify-center overflow-hidden">
+    <div className="h-8 w-8  bg-white flex items-center justify-center overflow-hidden">
       {domain === 'gmail.com' ? (
         <img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" alt="logo" className="w-full h-full object-contain p-1" />
       ) : logoUrl ? (

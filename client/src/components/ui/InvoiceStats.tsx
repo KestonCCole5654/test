@@ -29,7 +29,7 @@ export function InvoiceStats({ stats, lastUpdated }: { stats: InvoiceStat[]; las
             <div className="flex items-center gap-2 mt-1">
               <PercentPill percent={stat.percent} trend={stat.trend} />
               {typeof stat.count === 'number' && (
-                <span className="ml-2 px-2 py-0.5 text-xs bg-gray-100 rounded-full text-gray-700 font-normal align-top">Total Invoices: {stat.count}</span>
+                <span className="ml-2 px-2 py-0.5 text-xs bg-gray-100 rounded-full text-gray-700 font-normal align-top">Invoices: {stat.count}</span>
               )}
             </div>
           </div>

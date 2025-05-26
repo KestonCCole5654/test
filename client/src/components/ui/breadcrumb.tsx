@@ -13,7 +13,7 @@ const Breadcrumb = React.forwardRef<
   <nav 
     ref={ref} 
     aria-label="breadcrumb" 
-    className="bg-gray-800  text-slate-200 border p-2 border-gray-700"
+    className="bg-white border border-gray-200 rounded-lg shadow-sm px-6 py-3 my-2"
     {...props} 
   />
 ))
@@ -26,7 +26,7 @@ const BreadcrumbList = React.forwardRef<
   <ol
     ref={ref}
     className={cn(
-      "flex flex-wrap items-center gap-1.5 break-words text-sm text-gray-100 sm:gap-2.5 mt-0 mb-0",
+      "flex flex-wrap items-center gap-2 text-base text-gray-500 font-normal",
       className
     )}
     {...props}
@@ -40,7 +40,7 @@ const BreadcrumbItem = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <li
     ref={ref}
-    className={cn("inline-flex items-center gap-1.5", className)}
+    className={cn("inline-flex items-center gap-2", className)}
     {...props}
   />
 ))
@@ -58,7 +58,7 @@ const BreadcrumbLink = React.forwardRef<
     <Comp
       ref={ref}
       className={cn(
-        "transition-colors hover:text-gray-300 font-medium px-2 py-1 rounded focus:outline-none relative after:absolute after:left-0 after:bottom-0 after:w-full after:h-0.5 after:bg-gray-300 after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:origin-left",
+        "transition-colors hover:text-blue-600 font-medium px-2 py-1 rounded focus:outline-none text-gray-600",
         className
       )}
       {...props}
@@ -76,7 +76,7 @@ const BreadcrumbPage = React.forwardRef<
     role="link"
     aria-disabled="true"
     aria-current="page"
-    className={cn("font-medium text-gray-100 border-b-2 border-gray-300 pb-0.5", className)}
+    className={cn("font-semibold text-gray-900", className)}
     {...props}
   />
 ))
@@ -90,7 +90,7 @@ const BreadcrumbSeparator = ({
   <li
     role="presentation"
     aria-hidden="true"
-    className={cn("[&>svg]:w-3.5 [&>svg]:h-3.5 text-gray-400", className)}
+    className={cn("[&>svg]:w-4 [&>svg]:h-4 text-gray-300 mx-1", className)}
     {...props}
   >
     {children ?? <ChevronRight />}

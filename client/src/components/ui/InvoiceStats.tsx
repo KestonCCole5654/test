@@ -15,12 +15,7 @@ export function InvoiceStats({ stats, lastUpdated }: { stats: InvoiceStat[]; las
     <div className="w-full bg-gray-50 border border-gray-200  p-0 mb-8 flex flex-col justify-between overflow-hidden ">
       {/* Header */}
       <div className="flex items-center justify-between px-6 pt-5 pb-2">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-green-100 text-green-800 mr-2">
-            <Info className="h-5 w-5" />
-          </span>
-          <span className="text-xl font-normal text-gray-900">Invoices Overview</span>
-        </div>
+        
         <div className="text-xs text-gray-400 font-normal">
           {lastUpdated ? `Last updated ${lastUpdated}` : ""}
         </div>

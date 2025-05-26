@@ -7,12 +7,9 @@ const SidebarLayout = () => {
   const [collapsed, setCollapsed] = useState(false)
 
   return (
-    <div className="min-h-screen flex font-cal-sans bg-gray-50">
+    <div className="min-h-screen w-full flex font-cal-sans bg-gray-50 overflow-x-hidden">
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
-      <main className={cn(
-        "flex-1 transition-all duration-300",
-        collapsed ? "ml-[70px]" : "ml-[250px]"
-      )}>
+      <main className="flex-1 w-full overflow-x-auto">
         <Outlet />
       </main>
     </div>

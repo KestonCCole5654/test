@@ -19,14 +19,15 @@ export function InvoiceStats({ stats, lastUpdated }: { stats: InvoiceStat[]; las
           <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-green-100 text-green-800 mr-2">
             <Info className="h-5 w-5" />
           </span>
-          <span className="text-lg font-semibold text-gray-900">Dashboard Overview</span>
+          <span className="text-lg font-normal text-gray-900">Invoices Overview</span>
         </div>
         <div className="text-xs text-gray-400 font-normal">
           {lastUpdated ? `Last updated ${lastUpdated}` : ""}
         </div>
       </div>
+
       {/* Stats Row */}
-      <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-gray-200 px-2 md:px-0 pb-2 md:pb-0">
+      <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-gray-200 px-2 md:px-0 p-5 md:pb-0">
         {stats.map((stat, idx) => (
           <div
             key={idx}

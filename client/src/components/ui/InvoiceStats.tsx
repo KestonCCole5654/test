@@ -27,7 +27,7 @@ export function InvoiceStats({ stats, lastUpdated }: { stats: InvoiceStat[]; las
       </div>
 
       {/* Stats Row */}
-      <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-gray-200 px-2 md:px-0 p-5 md:pb-0">
+      <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-gray-200 px-2 md:px-0 py-5">
         {stats.map((stat, idx) => (
           <div
             key={idx}

@@ -1322,9 +1322,15 @@ function SortableTableRow({ id, children, invoice, spreadsheets, selectedInvoice
 // =====================
 function ClientLogo({ domain }: { domain: string }) {
   const logoUrl = useBrandLogo(domain);
-  return domain === 'gmail.com'
-    ? <img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" alt="logo" className="h-8 w-8 rounded-full bg-white border border-gray-200" />
-    : logoUrl
-      ? <img src={logoUrl} alt="logo" className="h-8 w-8 rounded-full bg-white border border-gray-200" />
-      : <span className="inline-block h-8 w-8 rounded-full bg-gray-200" />;
+  return (
+    <div className="h-8 w-8 rounded-full bg-white border border-gray-200 flex items-center justify-center overflow-hidden">
+      {domain === 'gmail.com' ? (
+        <img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" alt="logo" className="w-full h-full object-contain" />
+      ) : logoUrl ? (
+        <img src={logoUrl} alt="logo" className="w-full h-full object-contain" />
+      ) : (
+        <span className="inline-block w-full h-full rounded-full bg-gray-200" />
+      )}
+    </div>
+  );
 }

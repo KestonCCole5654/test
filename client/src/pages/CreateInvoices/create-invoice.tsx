@@ -1072,7 +1072,7 @@ ${businessData.phone}`
                     <div className="text-sm text-gray-500 mt-4 font-light">Billed To:</div>
                     <div className="text-gray-700 font-medium">{invoiceData.customer.name || 'Customer Name'}</div>
                     <div className="text-sm text-gray-500 mt-4 font-light">Amount Due:</div>
-                    <div className="text-2xl text-gray-900 font-bold">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
+                    <div className="text-2xl text-green-900 font-bold">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
                   </div>
                   <div className="flex flex-col items-start md:items-end justify-start md:justify-center gap-3">
                     <Button

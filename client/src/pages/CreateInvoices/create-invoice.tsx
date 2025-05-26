@@ -1133,7 +1133,7 @@ ${businessData.phone}`
             <Card className="invoice-preview-print border shadow-md" style={{ backgroundColor: 'white' }}>
               <CardContent className="p-6">
                 <div className="w-full overflow-auto">
-                  <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
+                  <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} formatDate={formatDate} />
                 </div>
               </CardContent>
             </Card>
@@ -1484,7 +1484,7 @@ ${businessData.phone}`
                 {/* Add a print-specific wrapper */}
                 <div className="invoice-preview-print" style={{ backgroundColor: 'white' }}>
                   <div className="bg-white border rounded-lg p-6">
-                    <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
+                    <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} formatDate={formatDate} />
                   </div>
                 </div>
               </div>

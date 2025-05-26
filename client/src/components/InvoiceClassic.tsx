@@ -44,9 +44,10 @@ interface InvoiceClassicProps {
   data: InvoiceData;
   businessData: BusinessData;
   showShadow?: boolean;
+  formatDate: (dateString: string) => string;
 }
 
-const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, showShadow = true }) => {
+const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, showShadow = true, formatDate }) => {
   // Calculate all amounts
   const calculateItemTotal = (item: InvoiceItem) => {
     const price = item.price === "" ? 0 : Number(item.price);
@@ -87,18 +88,6 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
   const totalDiscount = itemTotals.reduce((sum, item) => sum + item.discount, 0);
   const totalTax = itemTotals.reduce((sum, item) => sum + item.tax, 0);
   const total = subtotal - totalDiscount + totalTax;
-
-  // Format date to show month name, day and year
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "Not specified"
-    const date = new Date(dateString)
-    if (isNaN(date.getTime())) return "Invalid date"
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
-  }
 
   // Format currency
   function formatCurrency(amount: number): string {
@@ -151,7 +140,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
 
         <div className="mt-2 font-medium">
           <p className="text-xl text-green-800">
-            ${formatCurrency(total)} due <span className="pl-1">{formatDate(data.dueDate)}</span>
+            ${formatCurrency(total)} due <span className="pl-1">{data.dueDate}</span>
           </p>
         </div>
       </div>

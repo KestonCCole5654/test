@@ -1074,7 +1074,7 @@ ${businessData.phone}`
                 <div className="text-3xl font-extrabold text-green-800 mb-2">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
               </div>
               {/* Right: Action Buttons */}
-              <div className="flex flex-row md:flex-col gap-4 w-full md:w-auto mt-6 md:items-center md:justify-center flex-1 md:mt-20">
+              <div className="flex flex-row md:flex-col gap-4 w-full md:w-auto mt-6 md:items-center md:justify-center flex-1 md:mt-10">
                 <Button
                   variant="default"
                   className="bg-green-800 hover:bg-green-900 text-white font-normal px-8 py-3 rounded-none shadow-md transition-all duration-150 w-full md:w-48"

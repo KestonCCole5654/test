@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Info, DollarSign, Receipt, CheckCircle2, AlertCircle } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 
 export interface InvoiceStat {
   label: string;
@@ -12,48 +12,48 @@ export interface InvoiceStat {
 
 export function InvoiceStats({ stats, lastUpdated }: { stats: InvoiceStat[]; lastUpdated?: string }) {
   return (
-    <div className="w-full bg-gray-50 border border-gray-200 p-0 mb-8 flex flex-col justify-between overflow-hidden">
-      {/* Stats Row */}
-      <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-gray-200 px-2 md:px-0 py-8">
+    <div className="w-full bg-white border border-gray-200 rounded-xl p-0 mb-8 flex flex-col justify-between overflow-hidden">
+      <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-gray-200 px-2 md:px-0 py-6">
         {stats.map((stat, idx) => (
           <div
             key={idx}
-            className="flex-1 flex flex-col items-center justify-center px-6 py-5 min-w-[160px]"
+            className="flex-1 flex flex-col items-start justify-center px-6 py-4 min-w-[200px]"
           >
-            <div className="flex items-center gap-2 mb-1">
-              {stat.label === "Revenue" && <DollarSign className="h-4 w-4 text-gray-500" />}
-              {stat.label === "Total Invoices" && <Receipt className="h-4 w-4 text-gray-500" />}
-              {stat.label === "Paid Invoices" && <CheckCircle2 className="h-4 w-4 text-gray-500" />}
-              {stat.label === "Unpaid Invoices" && <AlertCircle className="h-4 w-4 text-gray-500" />}
-              <span className="text-sm text-gray-500 font-medium flex items-center gap-1">
-                {stat.label}
-              </span>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <div className="text-2xl font-normal text-gray-900 tracking-tight">{stat.value}</div>
-              {typeof stat.count === 'number' && (
-                <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium
-                  ${stat.label === "Paid Invoices" 
-                    ? "bg-green-50 text-green-700 border border-green-100" 
-                    : stat.label === "Unpaid Invoices"
-                    ? "bg-amber-50 text-amber-700 border border-amber-100"
-                    : "bg-gray-50 text-gray-700 border border-gray-200"
-                  }`}
-                >
-                  {stat.count}
-                  <span className="text-[10px]">
-                    {stat.label === "Paid Invoices" ? "paid" : "unpaid"}
-                  </span>
-                </div>
+            <div className="text-sm font-semibold text-gray-800 mb-2">{stat.label}</div>
+            <div className="flex items-baseline gap-2 mb-1">
+              <span className="text-3xl font-bold text-indigo-700 leading-tight">{stat.value}</span>
+              {stat.subLabel && (
+                <span className="text-sm text-gray-400 font-normal ml-1">from {stat.subLabel}</span>
               )}
             </div>
-            {stat.subLabel && (
-              <div className="text-xs text-gray-400 mt-1">{stat.subLabel}</div>
-            )}
+            <div className="flex items-center gap-2 mt-1">
+              <PercentPill percent={stat.percent} trend={stat.trend} />
+              {typeof stat.count === 'number' && (
+                <span className="ml-2 px-2 py-0.5 text-xs bg-gray-100 rounded-full text-gray-700 font-normal align-top">{stat.count}</span>
+              )}
+            </div>
           </div>
         ))}
       </div>
     </div>
+  );
+}
+
+function PercentPill({ percent, trend }: { percent: number; trend: "up" | "down" | "neutral" }) {
+  let color = "bg-gray-100 text-gray-600";
+  let icon = null;
+  if (trend === "up") {
+    color = "bg-green-100 text-green-700";
+    icon = <ArrowUpRight className="w-4 h-4 inline-block mr-0.5" />;
+  } else if (trend === "down") {
+    color = "bg-red-100 text-red-700";
+    icon = <ArrowDownRight className="w-4 h-4 inline-block mr-0.5" />;
+  }
+  return (
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${color}`}>
+      {icon}
+      {percent > 0 ? `+${percent}%` : `${percent}%`}
+    </span>
   );
 }
 

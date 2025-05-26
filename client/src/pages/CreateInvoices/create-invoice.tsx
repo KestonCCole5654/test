@@ -1073,8 +1073,9 @@ ${businessData.phone}`
                 <div className="text-sm text-gray-500 font-normal mb-1">Amount Due:</div>
                 <div className="text-3xl font-extrabold text-green-800 mb-2">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
               </div>
+
               {/* Right: Action Buttons */}
-              <div className="flex flex-row md:flex-col gap-4 mt-6 md:items-center md:justify-center md:mt-8 pl-0 md:pl-12">
+              <div className="flex flex-row md:flex-col gap-4 mt-6 md:items-center md:justify-end md:mt-8 pl-0 md:pl-12">
                 <Button
                   variant="default"
                   className="bg-green-800 hover:bg-green-900 text-white font-normal px-8 py-3 rounded-none shadow-md transition-all duration-150 w-full md:w-48"

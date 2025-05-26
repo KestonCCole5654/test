@@ -1063,8 +1063,8 @@ ${businessData.phone}`
               </Breadcrumb>
             </div>
 
-            <Card className="mb-6 border shadow-sm">
-              <CardContent className="p-6 max-w-5xl">
+            <Card className="mb-6 max-w-5xl border shadow-sm">
+              <CardContent className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <div className="text-sm text-gray-500 font-light">Invoice #:</div>
@@ -1130,7 +1130,7 @@ ${businessData.phone}`
             </Card>
 
             {/* Invoice Preview - Modified print wrapper */}
-            <Card className="invoice-preview-print border shadow-md" style={{ backgroundColor: 'white' }}>
+            <Card className="invoice-preview-print border max-w-5xl  shadow-md" style={{ backgroundColor: 'white' }}>
               <CardContent className="p-6">
                 <div className="w-full overflow-auto">
                   <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} formatDate={formatDate} />

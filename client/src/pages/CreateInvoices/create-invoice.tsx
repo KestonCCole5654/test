@@ -1062,45 +1062,42 @@ ${businessData.phone}`
             </Breadcrumb>
           </div>
           {/* Modernized Invoice Summary Card */}
-          <div className="mb-6 bg-white border border-gray-200 rounded-none shadow-lg p-8 flex flex-col gap-8 relative">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div className="mb-6 bg-white border border-gray-200 rounded-none shadow-sm p-8 flex flex-col gap-8 relative">
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
+              {/* Left: Invoice Details */}
               <div className="flex-1 min-w-0">
-                <div className="text-sm text-gray-500 font-medium mb-1">Invoice #:</div>
+                <div className="text-sm text-gray-500 font-normal mb-1">Invoice #:</div>
                 <div className="text-2xl font-bold text-green-900 mb-4 break-all">{invoiceData.invoiceNumber}</div>
-                <div className="text-sm text-gray-500 font-medium mb-1">Billed To:</div>
-                <div className="text-lg font-semibold text-gray-800 mb-4">{invoiceData.customer.name || 'Customer Name'}</div>
-                <div className="text-sm text-gray-500 font-medium mb-1">Amount Due:</div>
+                <div className="text-sm text-gray-500 font-normal mb-1">Billed To:</div>
+                <div className="text-lg font-normal text-gray-800 mb-4">{invoiceData.customer.name || 'Customer Name'}</div>
+                <div className="text-sm text-gray-500 font-normal mb-1">Amount Due:</div>
                 <div className="text-3xl font-extrabold text-green-800 mb-2">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
               </div>
-              <div className="flex flex-col items-end gap-2 md:gap-0 md:items-center md:justify-center">
+              {/* Right: Action Buttons */}
+              <div className="flex flex-row md:flex-col gap-3 md:items-end md:justify-start w-full md:w-auto mt-6 md:mt-0">
                 <Button
                   variant="default"
-                  className="bg-green-800 hover:bg-green-900 text-white font-semibold px-8 py-3 rounded-none shadow-md transition-all duration-150"
+                  className="bg-green-800 hover:bg-green-900 text-white font-semibold px-8 py-3 rounded-none shadow-md transition-all duration-150 w-full md:w-48"
                   onClick={() => setIsFormExpanded(true)}
-                  style={{ minWidth: 140 }}
                 >
                   Edit Invoice
                 </Button>
+                <Button
+                  variant="default"
+                  className="bg-green-800 hover:bg-green-900 text-white font-normal px-8 py-3 rounded-none shadow-md transition-all duration-150 w-full md:w-48"
+                  onClick={() => navigate(`/print-invoice/${invoiceToEdit?.id || invoiceData.invoiceNumber}`)}
+                >
+                  Print Invoice
+                </Button>
+                <Button
+                  variant="default"
+                  className="bg-green-800 hover:bg-green-900 text-white font-normal px-8 py-3 rounded-none shadow-md transition-all duration-150 w-full md:w-48"
+                  onClick={handleGenerateInvoiceLink}
+                  disabled={isGeneratingLink}
+                >
+                  {isGeneratingLink ? "Generating..." : "Generate Invoice Link"}
+                </Button>
               </div>
-            </div>
-            <div className="flex flex-col md:flex-row md:justify-center gap-4 mt-2">
-              <Button
-                variant="default"
-                className="bg-green-800 hover:bg-green-900 text-white font-semibold px-8 py-3 rounded-none shadow-md transition-all duration-150"
-                onClick={() => navigate(`/print-invoice/${invoiceToEdit?.id || invoiceData.invoiceNumber}`)}
-                style={{ minWidth: 180 }}
-              >
-                Print Invoice
-              </Button>
-              <Button
-                variant="default"
-                className="bg-green-800 hover:bg-green-900 text-white font-semibold px-8 py-3 rounded-none shadow-md transition-all duration-150"
-                onClick={handleGenerateInvoiceLink}
-                disabled={isGeneratingLink}
-                style={{ minWidth: 220 }}
-              >
-                {isGeneratingLink ? "Generating..." : "Generate Invoice Link"}
-              </Button>
             </div>
             {/* Shareable Link UI - shown directly under the three buttons */}
             {shareableLink && (

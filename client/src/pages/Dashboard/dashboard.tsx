@@ -929,19 +929,21 @@ export default function Dashboard() {
                         >
                           <TableCell className="px-6 py-4 whitespace-nowrap border-r border-gray-200">{invoice.id}</TableCell>
                           <TableCell className="px-6 py-4 border-r border-gray-200">
-                            <div className="flex items-center gap-3 min-h-[48px]">
+                            <div className="flex items-center gap-3">
                               {(() => {
                                 const email = typeof invoice.customer === "object" ? invoice.customer.email : "";
                                 const domain = email.split("@")[1] || "";
                                 return <ClientLogo domain={domain} />;
                               })()}
-                              <span className="font-normal font-cal-sans text-base">
-                                {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}
-                              </span>
+                              <div className="flex flex-col">
+                                <span className="font-medium text-gray-900">
+                                  {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}
+                                </span>
+                                <span className="text-sm text-gray-500">
+                                  {typeof invoice.customer === "object" ? invoice.customer.email : ""}
+                                </span>
+                              </div>
                             </div>
-                            <span className="text-sm font-cal-sans font-normal text-gray-400">
-                              {typeof invoice.customer === "object" ? invoice.customer.email : ""}
-                            </span>
                           </TableCell>
                           <TableCell className="px-6 py-4 whitespace-nowrap font-cal-sans font-normal border-r border-gray-200">{formatDate(invoice.dueDate)}</TableCell>
                           <TableCell className="px-6 py-4 border-r border-gray-200">
@@ -1327,13 +1329,17 @@ function SortableTableRow({ id, children, invoice, spreadsheets, selectedInvoice
 function ClientLogo({ domain }: { domain: string }) {
   const logoUrl = useBrandLogo(domain);
   return (
-    <div className="h-8 w-8  bg-white flex items-center justify-center overflow-hidden">
+    <div className="h-10 w-10 rounded-md border border-gray-200 bg-white flex items-center justify-center overflow-hidden shadow-sm">
       {domain === 'gmail.com' ? (
-        <img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" alt="logo" className="w-full h-full object-contain p-1" />
+        <img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" alt="logo" className="w-6 h-6 object-contain" />
       ) : logoUrl ? (
-        <img src={logoUrl} alt="logo" className="w-full h-full object-contain" />
+        <img src={logoUrl} alt="logo" className="w-6 h-6 object-contain" />
       ) : (
-        <span className="inline-block w-full h-full rounded-full bg-gray-200" />
+        <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
+          <span className="text-xs font-medium text-gray-400">
+            {domain ? domain.charAt(0).toUpperCase() : '?'}
+          </span>
+        </div>
       )}
     </div>
   );

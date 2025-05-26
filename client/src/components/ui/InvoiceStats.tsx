@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Info } from "lucide-react";
+import { Info, DollarSign, Receipt, CheckCircle2, AlertCircle } from "lucide-react";
 
 export interface InvoiceStat {
   label: string;
@@ -15,7 +15,6 @@ export function InvoiceStats({ stats, lastUpdated }: { stats: InvoiceStat[]; las
     <div className="w-full bg-gray-50 border border-gray-200  p-0 mb-8 flex flex-col justify-between overflow-hidden ">
       {/* Header */}
       <div className="flex items-center justify-between px-6 pt-5 pb-2">
-        
         <div className="text-xs text-gray-400 font-normal">
           {lastUpdated ? `Last updated ${lastUpdated}` : ""}
         </div>
@@ -29,6 +28,10 @@ export function InvoiceStats({ stats, lastUpdated }: { stats: InvoiceStat[]; las
             className="flex-1 flex flex-col items-center justify-center px-6 py-5 min-w-[160px]"
           >
             <div className="flex items-center gap-2 mb-1">
+              {stat.label === "Revenue" && <DollarSign className="h-4 w-4 text-gray-500" />}
+              {stat.label === "Total Invoices" && <Receipt className="h-4 w-4 text-gray-500" />}
+              {stat.label === "Paid Invoices" && <CheckCircle2 className="h-4 w-4 text-gray-500" />}
+              {stat.label === "Unpaid Invoices" && <AlertCircle className="h-4 w-4 text-gray-500" />}
               <span className="text-sm text-gray-500 font-medium flex items-center gap-1">
                 {stat.label}
               </span>

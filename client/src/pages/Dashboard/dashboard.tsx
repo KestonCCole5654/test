@@ -730,7 +730,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="container bg-transparent max-w-7xl mx-auto px-4">
+    <div className="container bg-gray-50/50 max-w-7xl mx-auto px-4">
       {/* Breadcrumb Navigation */}
       <div className="mt-4 mb-6">
         <Breadcrumb>
@@ -908,7 +908,7 @@ export default function Dashboard() {
                   <TableHead className="px-6 py-4 border-r border-gray-200">Client</TableHead>
                   <TableHead className="px-6 py-4 border-r border-gray-200">Due Date</TableHead>
                   <TableHead className="px-6 py-4 border-r border-gray-200">Status</TableHead>
-                  <TableHead className="px-6 py-4 text-right border-r border-gray-200">Total</TableHead>
+                  <TableHead className="px-6 py-4 border-r border-gray-200">Total</TableHead>
                   <TableHead className="px-6 py-4 text-center">Actions</TableHead>
                 </TableRow>
               </TableHeader>

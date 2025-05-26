@@ -469,12 +469,14 @@ export default function InvoiceForm() {
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   // Format date to show month name, day and year for email body
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
+    const [year, month, day] = dateString.split('-').map(Number);
+    // Month is 0-indexed in Date constructor, so subtract 1 from the month
+    const date = new Date(year, month - 1, day);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
-    })
+    });
   }
 
   const [shareableLink, setShareableLink] = useState<string>("")

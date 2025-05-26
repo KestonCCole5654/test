@@ -65,6 +65,10 @@ export default function SettingsPage() {
   const stripeLogo = useBrandLogo("stripe.com", "https://upload.wikimedia.org/wikipedia/commons/4/4e/Stripe_Logo%2C_revised_2016.svg");
   const paypalLogo = useBrandLogo("paypal.com", "https://www.paypalobjects.com/webstatic/icon/pp258.png");
 
+  // Brand logo for business (using business email domain)
+  const businessDomain = businessData.email?.split("@")[1] || "";
+  const businessLogo = useBrandLogo(businessDomain);
+
   const fetchData = async () => {
     try {
       setIsLoading(true);
@@ -375,7 +379,12 @@ export default function SettingsPage() {
           {!isEditing ? (
             <>
               <div className="flex items-center justify-between py-5">
-                <span className="text-gray-700">Company Name</span>
+                <span className="text-gray-700 flex items-center gap-3">
+                  {businessLogo && (
+                    <img src={businessLogo} alt="Brand Logo" className="h-8 w-8 rounded-full bg-white border border-gray-200" />
+                  )}
+                  Company Name
+                </span>
                 <span className="text-gray-900 flex-1 text-right mr-6">{businessData.companyName || "—"}</span>
               </div>
               <div className="flex items-center justify-between py-5">
@@ -395,7 +404,12 @@ export default function SettingsPage() {
             <form onSubmit={handleBusinessUpdate} className="space-y-6 px-4 py-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="companyName">Company Name *</Label>
+                  <Label htmlFor="companyName" className="flex items-center gap-3">
+                    {businessLogo && (
+                      <img src={businessLogo} alt="Brand Logo" className="h-8 w-8 rounded-full bg-white border border-gray-200" />
+                    )}
+                    Company Name *
+                  </Label>
                   <Input
                     id="companyName"
                     required

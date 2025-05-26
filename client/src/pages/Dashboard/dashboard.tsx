@@ -35,7 +35,7 @@ import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from 
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { Sheet, SheetContent, SheetHeader, SheetFooter, SheetTitle, SheetDescription } from "../../components/ui/sheet"
-import { InvoiceStats, InvoiceStat } from "../../components/ui/InvoiceStats"
+import { InvoiceStats, InvoiceStat, useBrandLogo } from "../../components/ui/InvoiceStats"
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -756,7 +756,7 @@ export default function Dashboard() {
       )}
 
       {/* Stats Card */}
-      <InvoiceStats stats={stats} />
+      <InvoiceStats stats={stats} lastUpdated={now.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} />
 
         {/* Tips Section */}
         {/* <div className="mb-6 p-4 bg-green-50 border border-green-200">
@@ -925,14 +925,29 @@ export default function Dashboard() {
                         >
                           <TableCell className="px-6 py-4 whitespace-nowrap border-r border-gray-200">{invoice.id}</TableCell>
                           <TableCell className="px-6 py-4 border-r border-gray-200">
-                            <div className="flex flex-col">
+                            <div className="flex items-center gap-2">
+                              {(() => {
+                                const email = typeof invoice.customer === "object" ? invoice.customer.email : "";
+                                const domain = email.split("@")[1] || "";
+                                let logoUrl = null;
+                                if (domain === "gmail.com") {
+                                  logoUrl = "https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico";
+                                } else if (domain) {
+                                  logoUrl = useBrandLogo(domain);
+                                }
+                                return logoUrl ? (
+                                  <img src={logoUrl} alt="logo" className="h-6 w-6 rounded-full bg-white border border-gray-200" />
+                                ) : (
+                                  <span className="inline-block h-6 w-6 rounded-full bg-gray-200" />
+                                );
+                              })()}
                               <span className="font-normal font-cal-sans">
                                 {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}
                               </span>
-                              <span className="text-sm font-cal-sans font-normal text-gray-400">
-                                {typeof invoice.customer === "object" ? invoice.customer.email : ""}
-                              </span>
                             </div>
+                            <span className="text-sm font-cal-sans font-normal text-gray-400">
+                              {typeof invoice.customer === "object" ? invoice.customer.email : ""}
+                            </span>
                           </TableCell>
                           <TableCell className="px-6 py-4 whitespace-nowrap font-cal-sans font-normal border-r border-gray-200">{formatDate(invoice.dueDate)}</TableCell>
                           <TableCell className="px-6 py-4 border-r border-gray-200">

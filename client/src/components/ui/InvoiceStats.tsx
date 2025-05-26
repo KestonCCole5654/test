@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Info } from "lucide-react";
 
 export interface InvoiceStat {
   label: string;
@@ -6,25 +7,68 @@ export interface InvoiceStat {
   percent: number;
   trend: "up" | "down" | "neutral";
   count?: number; // Optional count for badge
+  subLabel?: string; // Optional sub-label (e.g., "this month")
 }
 
-export function InvoiceStats({ stats }: { stats: InvoiceStat[] }) {
+export function InvoiceStats({ stats, lastUpdated }: { stats: InvoiceStat[]; lastUpdated?: string }) {
   return (
-    <div className="w-full bg-transparent border-0 p-0 mb-6 flex flex-row divide-x divide-gray-200 overflow-hidden rounded-none border-b border-t border-gray-200 pb-4 pt-4">
-      {stats.map((stat, idx) => (
-        <div
-          key={idx}
-          className="flex-1 flex flex-col justify-between px-6 py-6 min-w-[200px]"
-        >
-          <div className="flex items-start justify-between mb-6">
-            <span className="text-sm text-gray-500 font-medium">{stat.label}</span>
-            {typeof stat.count === 'number' && (
-              <span className="ml-2 px-2 py-0.5 text-xs bg-green-50 rounded-full p-3 text-green-800 font-normal align-top">{stat.count}</span>
+    <div className="w-full bg-gray-50 border border-gray-200 shadow-sm p-0 mb-8 flex flex-col justify-between overflow-hidden rounded-xl">
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 pt-5 pb-2">
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-green-100 text-green-800 mr-2">
+            <Info className="h-5 w-5" />
+          </span>
+          <span className="text-lg font-semibold text-gray-900">Dashboard Overview</span>
+        </div>
+        <div className="text-xs text-gray-400 font-normal">
+          {lastUpdated ? `Last updated ${lastUpdated}` : ""}
+        </div>
+      </div>
+      {/* Stats Row */}
+      <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-gray-200 px-2 md:px-0 pb-2 md:pb-0">
+        {stats.map((stat, idx) => (
+          <div
+            key={idx}
+            className="flex-1 flex flex-col items-center justify-center px-6 py-5 min-w-[160px]"
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-sm text-gray-500 font-medium flex items-center gap-1">
+                {stat.label}
+                <span className="ml-1 text-gray-300" title="Info">
+                  <Info className="h-4 w-4 inline-block align-middle" />
+                </span>
+              </span>
+              {typeof stat.count === 'number' && (
+                <span className="ml-2 px-2 py-0.5 text-xs bg-green-50 rounded-full text-green-800 font-normal align-top">{stat.count}</span>
+              )}
+            </div>
+            <div className="text-2xl font-bold text-gray-900 tracking-tight mb-0">{stat.value}</div>
+            {stat.subLabel && (
+              <div className="text-xs text-gray-400 mt-1">{stat.subLabel}</div>
             )}
           </div>
-          <div className="text-2xl font-normal text-black tracking-tight">{stat.value}</div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
+}
+
+// Brandfetch logo hook
+export function useBrandLogo(domain: string, fallback?: string) {
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!domain) return;
+    const apiKey = "YOUR_BRANDFETCH_API_KEY"; // Replace with your key or use env
+    fetch(`https://api.brandfetch.io/v2/brands/${domain}`, {
+      headers: { 'Authorization': `Bearer ${apiKey}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        const logo = data.logos?.[0]?.formats?.find((f: any) => f.format === 'svg' || f.format === 'png');
+        setLogoUrl(logo?.src || fallback || null);
+      })
+      .catch(() => setLogoUrl(fallback || null));
+  }, [domain, fallback]);
+  return logoUrl;
 } 

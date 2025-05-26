@@ -22,6 +22,7 @@ import {
 import { LoadingSpinner } from "../../components/ui/loadingSpinner"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog'
 import { Checkbox } from '../../components/ui/checkbox'
+import { useBrandLogo } from "../../components/ui/InvoiceStats"
 
 interface UserData {
   name: string
@@ -469,23 +470,33 @@ export default function SettingsPage() {
         <p className="text-sm font-cal-sans font-normal text-gray-400 mb-6">Connect your payment providers to enable online payments on your invoices.</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Stripe Card */}
-          <div className="border border-gray-200 bg-white p-6 flex flex-col items-start gap-4 shadow-sm">
-            <div className="flex items-center gap-3">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Stripe_Logo%2C_revised_2016.svg" alt="Stripe Logo" className="h-8" />
-              <span className="text-lg font-semibold text-gray-900">Stripe</span>
-            </div>
-            <p className="text-sm text-gray-600">Accept credit card payments directly on your invoices with Stripe.</p>
-            <Button className="bg-green-800 hover:bg-green-900 text-white font-normal px-6 py-2 rounded-none shadow-sm transition-all duration-150">Connect</Button>
-          </div>
+          {(() => {
+            const stripeLogo = useBrandLogo("stripe.com", "https://upload.wikimedia.org/wikipedia/commons/4/4e/Stripe_Logo%2C_revised_2016.svg");
+            return (
+              <div className="border border-gray-200 bg-white p-6 flex flex-col items-start gap-4 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <img src={stripeLogo || "https://upload.wikimedia.org/wikipedia/commons/4/4e/Stripe_Logo%2C_revised_2016.svg"} alt="Stripe Logo" className="h-8" />
+                  <span className="text-lg font-semibold text-gray-900">Stripe</span>
+                </div>
+                <p className="text-sm text-gray-600">Accept credit card payments directly on your invoices with Stripe.</p>
+                <Button className="bg-green-800 hover:bg-green-900 text-white font-normal px-6 py-2 rounded-none shadow-sm transition-all duration-150">Connect</Button>
+              </div>
+            );
+          })()}
           {/* PayPal Card */}
-          <div className="border border-gray-200 bg-white p-6 flex flex-col items-start gap-4 shadow-sm">
-            <div className="flex items-center gap-3">
-              <img src="https://www.paypalobjects.com/webstatic/icon/pp258.png" alt="PayPal Logo" className="h-8" />
-              <span className="text-lg font-semibold text-gray-900">PayPal</span>
-            </div>
-            <p className="text-sm text-gray-600">Let your customers pay securely using their PayPal account or credit card.</p>
-            <Button className="bg-green-800 hover:bg-green-900 text-white font-normal px-6 py-2 rounded-none shadow-sm transition-all duration-150">Connect</Button>
-          </div>
+          {(() => {
+            const paypalLogo = useBrandLogo("paypal.com", "https://www.paypalobjects.com/webstatic/icon/pp258.png");
+            return (
+              <div className="border border-gray-200 bg-white p-6 flex flex-col items-start gap-4 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <img src={paypalLogo || "https://www.paypalobjects.com/webstatic/icon/pp258.png"} alt="PayPal Logo" className="h-8" />
+                  <span className="text-lg font-semibold text-gray-900">PayPal</span>
+                </div>
+                <p className="text-sm text-gray-600">Let your customers pay securely using their PayPal account or credit card.</p>
+                <Button className="bg-green-800 hover:bg-green-900 text-white font-normal px-6 py-2 rounded-none shadow-sm transition-all duration-150">Connect</Button>
+              </div>
+            );
+          })()}
         </div>
       </div>
 

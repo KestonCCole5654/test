@@ -31,7 +31,6 @@ export function InvoiceStats({ stats, lastUpdated }: { stats: InvoiceStat[]; las
             <div className="flex items-center gap-2 mb-1">
               <span className="text-sm text-gray-500 font-medium flex items-center gap-1">
                 {stat.label}
-                {stat.trend === 'up' && <span className="ml-2 px-2 py-0.5 text-xs bg-green-50 rounded-full text-green-800 font-normal align-top">{stat.trend}</span>}
               </span>
               {typeof stat.count === 'number' && (
                 <span className="ml-2 px-2 py-0.5 text-xs bg-green-50 rounded-full text-green-800 font-normal align-top">{stat.count}</span>

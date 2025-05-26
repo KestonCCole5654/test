@@ -756,8 +756,30 @@ export default function Dashboard() {
         </div>
       )}
 
-        {/* Filter Tabs, Search, and Create Invoice Row */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
+    
+
+      {/* Stats Card */}
+      <InvoiceStats stats={stats} lastUpdated={now.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} />
+
+        {/* Tips Section */}
+        {/* <div className="mb-6 p-4 bg-green-50 border border-green-200">
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0 mt-1">
+            <svg className="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div >
+            <h3 className="text-2xl font-medium text-green-800 mb-1">Important Tip</h3>
+            <p className="text-md text-red-700">
+              When you Save/Update an invoice, ensure you click the refresh button to see your changes.
+            </p>
+          </div>
+        </div>
+      </div> */}
+
+          {/* Filter Tabs, Search, and Create Invoice Row */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
         <div className="flex bg-gray-100 border border-gray-200">
           {[
             { label: "All", value: "all" },
@@ -816,26 +838,6 @@ export default function Dashboard() {
           </Button>
         </div>
       </div>
-
-      {/* Stats Card */}
-      <InvoiceStats stats={stats} lastUpdated={now.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} />
-
-        {/* Tips Section */}
-        {/* <div className="mb-6 p-4 bg-green-50 border border-green-200">
-        <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 mt-1">
-            <svg className="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div >
-            <h3 className="text-2xl font-medium text-green-800 mb-1">Important Tip</h3>
-            <p className="text-md text-red-700">
-              When you Save/Update an invoice, ensure you click the refresh button to see your changes.
-            </p>
-          </div>
-        </div>
-      </div> */}
 
     
 

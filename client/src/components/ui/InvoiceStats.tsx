@@ -13,15 +13,15 @@ export interface InvoiceStat {
 export function InvoiceStats({ stats, lastUpdated }: { stats: InvoiceStat[]; lastUpdated?: string }) {
   return (
     <div className="w-full bg-white border border-gray-200 rounded-xl p-0 mb-8 flex flex-col justify-between overflow-hidden">
-      <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-gray-200 px-2 md:px-0 py-6">
+      <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-gray-200 px-2 md:px-0 ">
         {stats.map((stat, idx) => (
           <div
             key={idx}
             className="flex-1 flex flex-col items-start justify-center px-6 py-4 min-w-[200px]"
           >
-            <div className="text-sm font-semibold text-gray-800 mb-2">{stat.label}</div>
+            <div className="text-sm font-normal text-gray-800 mb-2">{stat.label}</div>
             <div className="flex items-baseline gap-2 mb-1">
-              <span className="text-3xl font-bold text-indigo-700 leading-tight">{stat.value}</span>
+              <span className="text-3xl font-bold text-green-800 leading-tight">{stat.value}</span>
               {stat.subLabel && (
                 <span className="text-sm text-gray-400 font-normal ml-1">from {stat.subLabel}</span>
               )}

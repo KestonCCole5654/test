@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
-import { ChevronRight, MoreHorizontal } from "lucide-react"
+import { ChevronRight, MoreHorizontal, Home } from "lucide-react"
 
 import { cn } from "../lib/utils"
 
@@ -13,7 +13,7 @@ const Breadcrumb = React.forwardRef<
   <nav 
     ref={ref} 
     aria-label="breadcrumb" 
-    className="bg-white border border-gray-200 rounded-lg shadow-sm px-6 py-3 my-2"
+    className="bg-white border border-gray-200 rounded-xl shadow-sm px-8 py-4 my-4"
     {...props} 
   />
 ))
@@ -58,7 +58,7 @@ const BreadcrumbLink = React.forwardRef<
     <Comp
       ref={ref}
       className={cn(
-        "transition-colors hover:text-blue-600 font-medium px-2 py-1 rounded focus:outline-none text-gray-600",
+        "transition-colors hover:text-green-800 font-medium px-2 py-1 rounded focus:outline-none text-gray-500",
         className
       )}
       {...props}
@@ -66,6 +66,28 @@ const BreadcrumbLink = React.forwardRef<
   )
 })
 BreadcrumbLink.displayName = "BreadcrumbLink"
+
+const BreadcrumbHome = React.forwardRef<
+  HTMLAnchorElement,
+  React.ComponentPropsWithoutRef<"a"> & {
+    asChild?: boolean
+  }
+>(({ asChild, className, ...props }, ref) => {
+  const Comp = asChild ? Slot : "a"
+  return (
+    <Comp
+      ref={ref}
+      className={cn(
+        "inline-flex items-center justify-center w-7 h-7 rounded-md bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-green-800 transition-colors",
+        className
+      )}
+      {...props}
+    >
+      <Home className="w-5 h-5" />
+    </Comp>
+  )
+})
+BreadcrumbHome.displayName = "BreadcrumbHome"
 
 const BreadcrumbPage = React.forwardRef<
   HTMLSpanElement,
@@ -119,6 +141,7 @@ export {
   BreadcrumbList,
   BreadcrumbItem,
   BreadcrumbLink,
+  BreadcrumbHome,
   BreadcrumbPage,
   BreadcrumbSeparator,
   BreadcrumbEllipsis,

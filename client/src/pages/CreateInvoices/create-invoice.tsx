@@ -1042,9 +1042,10 @@ ${businessData.phone}`
     <>
       {/* Preview Mode - Cleaned up */}
       {!isFormExpanded && (
-        <div className=" w-full max-w-3xl mx-auto mt-8">
+        <div className="min-h-screen w-full bg-gray-50">
+          <div className="container max-w-7xl mx-auto px-4 py-8">
            {/* Breadcrumb Navigation */}
-           <div className="mt-4 max-w-7xl mb-6">
+           <div className="mb-6">
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem>
@@ -1061,83 +1062,81 @@ ${businessData.phone}`
                 </BreadcrumbList>
               </Breadcrumb>
             </div>
-          <div className="grid grid-cols-2 gap-4 mb-6 bg-white border rounded-lg p-6">
-            <div className="space-y-1">
-              <div className="text-sm text-gray-500 font-light">Invoice #:</div>
-              <div className="text-lg text-gray-800 font-medium">{invoiceData.invoiceNumber}</div>
-              <div className="text-sm text-gray-500 mt-2 font-light">Billed To:</div>
-              <div className="text-gray-700 font-medium">{invoiceData.customer.name || 'Customer Name'}</div>
-              <div className="text-sm text-gray-500 mt-2 font-light">Amount Due:</div>
-              <div className="text-xl text-gray-900 font-medium">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
-            </div>
-            <div className="flex flex-col items-end justify-center gap-4">
-              <Button
-                variant="outline"
-                className="font-light"
-                onClick={() => setIsFormExpanded(true)}
-              >
-                Edit Invoice
-              </Button>
-            </div>
-            <div className="col-span-2 flex justify-center mt-4">
-              {/* <Button 
-                variant="outline" 
-                className="font-light mx-2" 
-                onClick={() => navigate(`/email-invoice/${invoiceToEdit?.id || invoiceData.invoiceNumber}`)}
-              >
-                Email Invoice
-              </Button> */}
-              <Button 
-                variant="outline" 
-                className="font-light mx-2" 
-                onClick={() => navigate(`/print-invoice/${invoiceToEdit?.id || invoiceData.invoiceNumber}`)}
-              >
-                Print Invoice
-              </Button>
-              <Button 
-                variant="outline" 
-                className="font-light mx-2" 
-                onClick={handleGenerateInvoiceLink}
-                disabled={isGeneratingLink}
-              >
-                {isGeneratingLink ? "Generating..." : "Generate Invoice Link"}
-              </Button>
-            </div>
-            {/* Shareable Link UI - shown directly under the three buttons */}
-            {shareableLink && (
-              <div className="col-span-2 mt-4 p-4 bg-gray-50 rounded-lg w-full">
-                <p className="text-sm text-gray-600 mb-2">Shareable Link:</p>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
-                  <input
-                    type="text"
-                    value={shareableLink}
-                    readOnly
-                    className="w-full sm:flex-1 p-2 border rounded text-sm font-cal-sans"
-                  />
+
+            <Card className="mb-6 border shadow-sm">
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <div className="text-sm text-gray-500 font-light">Invoice #:</div>
+                  <div className="text-lg text-gray-800 font-semibold">{invoiceData.invoiceNumber}</div>
+                  <div className="text-sm text-gray-500 mt-4 font-light">Billed To:</div>
+                  <div className="text-gray-700 font-medium">{invoiceData.customer.name || 'Customer Name'}</div>
+                  <div className="text-sm text-gray-500 mt-4 font-light">Amount Due:</div>
+                  <div className="text-2xl text-gray-900 font-bold">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
+                </div>
+                <div className="flex flex-col items-start md:items-end justify-start md:justify-center gap-3">
                   <Button
                     variant="outline"
-                    size="sm"
-                    className="w-full sm:w-auto"
-                    onClick={() => {
-                      navigator.clipboard.writeText(shareableLink)
-                      setCopied(true)
-                      setTimeout(() => setCopied(false), 2000)
-                    }}
+                    onClick={() => setIsFormExpanded(true)}
+                    className="font-medium w-full md:w-auto"
                   >
-                    {copied ? "Copied" : "Copy"}
+                    Edit Invoice
+                  </Button>
+                   <Button
+                    variant="outline"
+                    className="font-medium w-full md:w-auto"
+                    onClick={() => navigate(`/print-invoice/${invoiceToEdit?.id || invoiceData.invoiceNumber}`)}
+                  >
+                    Print Invoice
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="font-medium w-full md:w-auto"
+                    onClick={handleGenerateInvoiceLink}
+                    disabled={isGeneratingLink}
+                  >
+                    {isGeneratingLink ? "Generating..." : "Generate Invoice Link"}
                   </Button>
                 </div>
               </div>
-            )}
-          </div>
+
+               {/* Shareable Link UI - shown directly under the three buttons */}
+              {shareableLink && (
+                <div className="col-span-2 mt-6 p-4 bg-gray-100 rounded-md w-full">
+                  <p className="text-sm text-gray-700 mb-2 font-medium">Shareable Link:</p>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
+                    <input
+                      type="text"
+                      value={shareableLink}
+                      readOnly
+                      className="w-full sm:flex-1 p-2 border border-gray-300 rounded-md text-sm font-mono bg-white truncate"
+                    />
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="w-full sm:w-auto"
+                      onClick={() => {
+                        navigator.clipboard.writeText(shareableLink);
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                      }}
+                    >
+                      {copied ? "Copied!" : "Copy Link"}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+            </Card>
 
           {/* Invoice Preview - Modified print wrapper */}
-          <div className="invoice-preview-print" style={{ backgroundColor: 'white' }}>
-          <div className="bg-white border rounded-lg p-6">
+          <Card className="invoice-preview-print border shadow-md" style={{ backgroundColor: 'white' }}>
+          <CardContent className="p-6">
             <div className="w-full overflow-auto">
               <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
               </div>
-            </div>
+            </CardContent>
+          </Card>
           </div>
         </div>
       )}

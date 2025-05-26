@@ -1096,7 +1096,7 @@ ${businessData.phone}`
                   onClick={handleGenerateInvoiceLink}
                   disabled={isGeneratingLink}
                 >
-                  {isGeneratingLink ? "Generating..." : "Generate Invoice Link"}
+                  {isGeneratingLink ? "Generating Link ..." : "Generate Invoice Link"}
                 </Button>
               </div>
             </div>
@@ -1108,19 +1108,19 @@ ${businessData.phone}`
                   type="text"
                   value={shareableLink}
                   readOnly
-                  className="w-full sm:flex-1 p-2 border rounded-none text-sm font-cal-sans bg-white"
+                  className="w-full sm:flex-1 p-2 border rounded-none text-sm  font-light font-cal-sans bg-white"
                 />
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto border-green-800 text-green-800 hover:bg-green-50 hover:border-green-900 rounded-none"
+                  className="w-full sm:w-auto border-green-800 text-white rounded-none"
                   onClick={() => {
                     navigator.clipboard.writeText(shareableLink)
                     setCopied(true)
                     setTimeout(() => setCopied(false), 2000)
                   }}
                 >
-                  {copied ? "Copied" : "Copy"}
+                  {copied ? "Copied" : "Copy Link"}
                 </Button>
               </div>
             )}

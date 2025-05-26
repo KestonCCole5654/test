@@ -12,6 +12,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb"
+import Footer from '../../components/ui/Footer'
 
 export default function LandingPage() {
   const betaFeatures = [
@@ -690,37 +691,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer - Simplified */}
-      <footer className="w-full border-t py-8 bg-gray-50">
-        <div className="container px-4 md:px-6 mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          {/* Brand & Description */}
-          <div className="flex flex-col items-center md:items-start">
-            <h3 className="text-xl font-extrabold text-green-600">
-              SHEETBILLS <span className="text-xs align-super">TM</span>
-            </h3>
-            <p className="text-xs text-gray-500 mt-1 text-center md:text-left">
-              Simple, secure invoicing with Google Sheets.
-            </p>
-          </div>
-          {/* Essential Links */}
-          <div className="flex flex-wrap gap-4 justify-center">
-            <a href="#pricing" className="text-sm text-gray-600 hover:text-green-600 transition-colors">Pricing</a>
-            <a href="#benefits" className="text-sm text-gray-600 hover:text-green-600 transition-colors">Demo</a>
-            <a href="#testimonials" className="text-sm text-gray-600 hover:text-green-600 transition-colors">Testimonials</a>
-            <a href="#faq" className="text-sm text-gray-600 hover:text-green-600 transition-colors">FAQ</a>
-            <a href="/sign-up" className="text-sm text-gray-600 hover:text-green-600 transition-colors">Get Started</a>
-          </div>
-          {/* Contact */}
-          <div className="flex flex-col items-center md:items-end">
-            <a href="mailto:support@sheetbills.com" className="text-sm text-gray-600 hover:text-green-600 transition-colors">
-              support@sheetbills.com
-            </a>
-            <p className="text-xs text-gray-400 mt-1">&copy; 2025 SheetBills</p>
-          </div>
-        </div>
-      </footer>
-
-
+      <Footer />
     </div>
   )
 }

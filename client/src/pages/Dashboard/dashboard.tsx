@@ -914,6 +914,16 @@ export default function Dashboard() {
                     {rowOrder.map((id) => {
                       const invoice = currentItems.find((inv) => inv.id === id)
                       if (!invoice) return null
+                      let clientEmail = '';
+                      if (invoice && typeof invoice.customer === 'object') {
+                        clientEmail = invoice.customer.email || '';
+                      }
+                      const clientDomain = clientEmail.split('@')[1] || '';
+                      const clientLogoUrl = clientDomain === 'gmail.com'
+                        ? 'https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico'
+                        : clientDomain
+                          ? useBrandLogo(clientDomain)
+                          : null;
                       return (
                         <SortableTableRow
                           key={invoice.id}
@@ -926,21 +936,11 @@ export default function Dashboard() {
                           <TableCell className="px-6 py-4 whitespace-nowrap border-r border-gray-200">{invoice.id}</TableCell>
                           <TableCell className="px-6 py-4 border-r border-gray-200">
                             <div className="flex items-center gap-2">
-                              {(() => {
-                                const email = typeof invoice.customer === "object" ? invoice.customer.email : "";
-                                const domain = email.split("@")[1] || "";
-                                let logoUrl = null;
-                                if (domain === "gmail.com") {
-                                  logoUrl = "https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico";
-                                } else if (domain) {
-                                  logoUrl = useBrandLogo(domain);
-                                }
-                                return logoUrl ? (
-                                  <img src={logoUrl} alt="logo" className="h-6 w-6 rounded-full bg-white border border-gray-200" />
-                                ) : (
-                                  <span className="inline-block h-6 w-6 rounded-full bg-gray-200" />
-                                );
-                              })()}
+                              {clientLogoUrl ? (
+                                <img src={clientLogoUrl} alt="logo" className="h-6 w-6 rounded-full bg-white border border-gray-200" />
+                              ) : (
+                                <span className="inline-block h-6 w-6 rounded-full bg-gray-200" />
+                              )}
                               <span className="font-normal font-cal-sans">
                                 {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}
                               </span>

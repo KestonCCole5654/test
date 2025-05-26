@@ -39,7 +39,7 @@ const OnboardingPage: React.FC = () => {
   // Define the onboarding steps and their fields
   const steps = [
     {
-      title: 'Welcome to SheetBills',
+      title: 'Hey, Welcome to SheetBills',
       description: "Let's get your business set up in just a few steps.",
       fields: [],
     },

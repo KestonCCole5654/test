@@ -1067,17 +1067,17 @@ ${businessData.phone}`
               {/* Left: Invoice Details */}
               <div className="flex-1 min-w-0">
                 <div className="text-sm text-gray-500 font-normal mb-1">Invoice #:</div>
-                <div className="text-2xl font-bold text-green-900 mb-4 break-all">{invoiceData.invoiceNumber}</div>
+                <div className="text-xl font-normal text-green-900 mb-4 break-all">{invoiceData.invoiceNumber}</div>
                 <div className="text-sm text-gray-500 font-normal mb-1">Billed To:</div>
                 <div className="text-lg font-normal text-gray-800 mb-4">{invoiceData.customer.name || 'Customer Name'}</div>
                 <div className="text-sm text-gray-500 font-normal mb-1">Amount Due:</div>
                 <div className="text-3xl font-extrabold text-green-800 mb-2">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
               </div>
               {/* Right: Action Buttons */}
-              <div className="flex flex-row md:flex-col gap-3 md:items-end md:justify-start w-full md:w-auto mt-6 md:mt-0">
+              <div className="flex flex-row md:flex-col gap-3 w-full md:w-auto mt-6 md:mt-0 md:items-center md:justify-center flex-1">
                 <Button
                   variant="default"
-                  className="bg-green-800 hover:bg-green-900 text-white font-semibold px-8 py-3 rounded-none shadow-md transition-all duration-150 w-full md:w-48"
+                  className="bg-green-800 hover:bg-green-900 text-white font-normal px-8 py-3 rounded-none shadow-md transition-all duration-150 w-full md:w-48"
                   onClick={() => setIsFormExpanded(true)}
                 >
                   Edit Invoice
@@ -1126,7 +1126,7 @@ ${businessData.phone}`
           </div>
           {/* Invoice Preview - Modified print wrapper */}
           <div className="invoice-preview-print" style={{ backgroundColor: 'white' }}>
-            <div className="bg-white border rounded-lg p-6">
+            <div className="bg-white border border-gray-200 rounded-none p-6">
               <div className="w-full overflow-auto">
                 <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
               </div>

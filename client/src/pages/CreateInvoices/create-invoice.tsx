@@ -1064,7 +1064,7 @@ ${businessData.phone}`
             </div>
 
             <Card className="mb-6 border shadow-sm">
-            <CardContent className="p-6">
+            <CardContent className="p-6 max-w-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <div className="text-sm text-gray-500 font-light">Invoice #:</div>

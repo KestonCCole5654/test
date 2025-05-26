@@ -6,7 +6,7 @@ import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Textarea } from "../../components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
-import { Trash2, Plus, Download, ChevronDown, ArrowLeft, CheckCircle, Clock, Mail } from "lucide-react"
+import { Trash2, Plus, Download, ChevronDown, ArrowLeft, CheckCircle, Clock, Mail, Pencil, Printer, Link2 } from "lucide-react"
 import html2canvas from "html2canvas"
 import jsPDF from "jspdf"
 import { Collapsible, CollapsibleContent } from "../../components/ui/collapsible"
@@ -1077,24 +1077,27 @@ ${businessData.phone}`
                 <div className="flex flex-col gap-3 mt-2">
                   <Button
                     variant="default"
-                    className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2 rounded-md shadow-sm transition-all duration-150 w-full"
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2 rounded-md shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
                     onClick={() => setIsFormExpanded(true)}
                   >
+                    <Pencil className="w-4 h-4 mr-2" />
                     Edit Invoice
                   </Button>
                   <Button
                     variant="outline"
-                    className="bg-gray-800 hover:bg-gray-900 text-white font-medium px-4 py-2 rounded-md shadow-sm transition-all duration-150 w-full"
+                    className="bg-gray-600 hover:bg-gray-700 text-white font-medium px-4 py-2 rounded-md shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
                     onClick={() => navigate(`/print-invoice/${invoiceToEdit?.id || invoiceData.invoiceNumber}`)}
                   >
+                    <Printer className="w-4 h-4 mr-2" />
                     Print Invoice
                   </Button>
                   <Button
                     variant="default"
-                    className="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-md shadow-sm transition-all duration-150 w-full"
+                    className="bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-2 rounded-md shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
                     onClick={handleGenerateInvoiceLink}
                     disabled={isGeneratingLink}
                   >
+                    <Link2 className="w-4 h-4 mr-2" />
                     {isGeneratingLink ? "Generating Link ..." : "Generate Invoice Link"}
                   </Button>
                 </div>

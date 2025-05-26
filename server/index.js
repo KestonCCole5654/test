@@ -21,6 +21,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 app.use(cors({
   origin: [
     'https://sheetbills-client.vercel.app',
+    'https://sheetbills-client-git-development-keston-c-coles-projects.vercel.app',
     'http://localhost:3000',
     'http://localhost:5000'
   ],
@@ -28,8 +29,8 @@ app.use(cors({
   credentials: true,
   optionsSuccessStatus: 200
 }));
-app.use(express.json()); // Parse JSON request bodies
 
+app.use(express.json()); // Parse JSON request bodies
 // ==========================
 // Supabase Client
 // ==========================
@@ -37,11 +38,9 @@ const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
-
 // ==========================
 // Helper Functions
 // ==========================
-
 /**
  * Extracts the Google Sheet ID from a full URL.
  * @param {string} url - The Google Sheet URL.
@@ -60,7 +59,6 @@ function extractSheetIdFromUrl(url) {
     return null;
   }
 }
-
 /**
  * Gets or creates the master tracking sheet for a user.
  * @param {string} accessToken - Google OAuth access token.
@@ -191,7 +189,6 @@ async function getOrCreateMasterSheet(accessToken, userId) {
     throw new Error(`Master sheet initialization failed: ${error.message}`);
   }
 }
-
 // Helper function to get or create default sheet
 async function getDefaultSheetId(accessToken) {
   const auth = new google.auth.OAuth2();
@@ -307,7 +304,6 @@ async function getDefaultSheetId(accessToken) {
 // ==========================
 // Calculation Utilities
 // ==========================
-
 /**
  * Calculates the subtotal for invoice items.
  * @param {Array} items - Array of invoice items.
@@ -319,7 +315,6 @@ function calculateSubtotal(items) {
     return total + item.quantity * price;
   }, 0);
 }
-
 /**
  * Calculates the total discount for invoice items.
  * @param {Array} items - Array of invoice items.
@@ -339,7 +334,6 @@ function calculateDiscount(items) {
     }
   }, 0);
 }
-
 /**
  * Calculates the total tax for invoice items.
  * @param {Array} items - Array of invoice items.
@@ -1103,7 +1097,6 @@ app.post('/api/saveInvoice', async (req, res) => {
     });
   }
 });
-
 ////////////////////////////////////////////////////////////////////
 {/*Methods to Hanlde Business Details Logic*/}
 ////////////////////////////////////////////////////////////////////
@@ -1226,8 +1219,6 @@ app.put('/api/update-business-details', async (req, res) => {
     });
   }
 });
-
-
 ////////////////////////////////////////////////////////////////////
 {/*Method to Hanlde Getting User Data Logic*/}
 ////////////////////////////////////////////////////////////////////
@@ -1272,7 +1263,6 @@ app.get('/api/user', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch user data' });
   }
 });
-
 // Vaildate User 
 app.post('/auth/callback', async (req, res) => {
   const { code } = req.body;
@@ -1359,8 +1349,6 @@ app.get('/api/test-service-account', async (req, res) => {
     });
   }
 });
-
-
 // Start the server
 app.listen(PORT, '0.0.0.0', (err) => {
   if (err) {
@@ -1369,8 +1357,6 @@ app.listen(PORT, '0.0.0.0', (err) => {
   }
   console.log(`Server running on port ${PORT}`);
 });
-
-
 app.post('/api/update-invoice', async (req, res) => {
   const { accessToken, invoiceData, invoiceId, sheetUrl } = req.body;
 
@@ -1480,7 +1466,6 @@ app.post('/api/update-invoice', async (req, res) => {
     });
   }
 });
-
 app.put('/api/sheets/mark-as-paid', async (req, res) => {
   console.log('[MARK-AS-PAID] Request received');
   try {
@@ -1579,7 +1564,6 @@ app.put('/api/sheets/mark-as-paid', async (req, res) => {
     });
   }
 });
-
 app.put('/api/sheets/mark-as-pending', async (req, res) => {
   console.log('[MARK-AS-PENDING] Request received');
   try {
@@ -1677,7 +1661,6 @@ app.put('/api/sheets/mark-as-pending', async (req, res) => {
     });
   }
 });
-
 app.post("/api/contact", async (req, res) => {
   try {
     const { email, subject, message, userName } = req.body;
@@ -1741,11 +1724,9 @@ app.post("/api/contact", async (req, res) => {
     });
   }
 });
-
 app.get('/', (req, res) => {
   res.send('SheetBills API is running! Visit /health for status.');
 });
-
 app.delete('/api/sheets/bulk-delete', async (req, res) => {
   try {
     const { invoiceIds, sheetUrl } = req.body;
@@ -1823,7 +1804,6 @@ app.delete('/api/sheets/bulk-delete', async (req, res) => {
     });
   }
 });
-
 /**
  * Generate a shareable link for an invoice.
  * @route POST /api/invoices/shared/create-link
@@ -1856,7 +1836,6 @@ app.post('/api/invoices/shared/create-link', async (req, res) => {
     res.status(500).json({ error: 'Failed to generate shareable link' });
   }
 });
-
 /**
  * Public endpoint to view an invoice by share token
  * @route GET /api/invoices/shared/:token
@@ -1996,7 +1975,6 @@ app.get('/api/invoices/shared/:token', async (req, res) => {
     });
   }
 });
-
 /**
  * Checks if the user's Master Tracking Sheet exists (for onboarding status).
  * @route GET /api/onboarding/status
@@ -2041,7 +2019,6 @@ app.get('/api/onboarding/status', async (req, res) => {
     return res.status(500).json({ onboarded: false, error: error.message });
   }
 });
-
 /**
  * Creates a single spreadsheet with both 'SheetBills Invoices' and 'Business Details' tabs.
  * @param {string} accessToken - Google OAuth access token.
@@ -2179,7 +2156,6 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
     throw new Error(`Failed to create unified business sheet: ${error.message}`);
   }
 }
-
 /**
  * Creates a new unified business sheet with both invoice and business details tabs.
  * @route POST /api/create-business-sheet
@@ -2412,7 +2388,6 @@ app.post('/api/create-business-sheet', async (req, res) => {
     console.log('[CREATE] ===== Business Sheet Creation Request End =====');
   }
 });
-
 app.post('/api/check-master-sheet', async (req, res) => {
   const { accessToken } = req.body;
   if (!accessToken) return res.status(400).json({ error: 'Missing Google access token' });

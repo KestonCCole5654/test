@@ -925,13 +925,13 @@ export default function Dashboard() {
                         >
                           <TableCell className="px-6 py-4 whitespace-nowrap border-r border-gray-200">{invoice.id}</TableCell>
                           <TableCell className="px-6 py-4 border-r border-gray-200">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-3 min-h-[48px]">
                               {(() => {
                                 const email = typeof invoice.customer === "object" ? invoice.customer.email : "";
                                 const domain = email.split("@")[1] || "";
                                 return <ClientLogo domain={domain} />;
                               })()}
-                              <span className="font-normal font-cal-sans">
+                              <span className="font-normal font-cal-sans text-base">
                                 {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}
                               </span>
                             </div>
@@ -1323,8 +1323,8 @@ function SortableTableRow({ id, children, invoice, spreadsheets, selectedInvoice
 function ClientLogo({ domain }: { domain: string }) {
   const logoUrl = useBrandLogo(domain);
   return domain === 'gmail.com'
-    ? <img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" alt="logo" className="h-6 w-6 rounded-full bg-white border border-gray-200" />
+    ? <img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" alt="logo" className="h-8 w-8 rounded-full bg-white border border-gray-200" />
     : logoUrl
-      ? <img src={logoUrl} alt="logo" className="h-6 w-6 rounded-full bg-white border border-gray-200" />
-      : <span className="inline-block h-6 w-6 rounded-full bg-gray-200" />;
+      ? <img src={logoUrl} alt="logo" className="h-8 w-8 rounded-full bg-white border border-gray-200" />
+      : <span className="inline-block h-8 w-8 rounded-full bg-gray-200" />;
 }

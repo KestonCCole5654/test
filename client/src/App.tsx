@@ -26,7 +26,6 @@ import EmailInvoice from './pages/EmailInvoice/email-invoice';
 import LegalPage from './pages/Legal/legal';
 import LandingPage from './pages/Landing/page';
 import AccountStatus from './pages/AccountStatus/AccountStatus';
-import TemplateGallery from './pages/Templates/TemplateGallery';
 // import TemplateDesignerPage from './components/TemplateDesigner/TemplateDesignerPage';
 // SidebarLayout already includes the Outlet component
 
@@ -211,8 +210,6 @@ function App() {
         <Route path="*" element={
           <Navigate to={user ? "/invoices" : "/"} />
         } />
-
-        <Route path="/templates" element={<TemplateGallery />} />
       </Routes>
     </HelmetProvider>
   );

@@ -80,10 +80,10 @@ const Header = () => {
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded flex items-center justify-center">
+              <div className="h-7 w-8 rounded flex items-center justify-center">
                 <img src="/sheetbills-logo.svg" alt="SheetBills Logo" className="h-12 w-auto" />
               </div>
-              {/* <span className="text-xl font-normal text-slate-200">SheetBills </span> */}
+              <span className="text-md font-normal text-green-900">SheetBills </span> 
             </Link>
           </div>
 
@@ -96,7 +96,14 @@ const Header = () => {
                   className="px-3 py-2 rounded-md font-normal text-slate-200 hover:text-slate-300 transition-colors"
                   onClick={handleNavigation}
                 >
-                 Invoices
+                  Invoices
+                </Link>
+                <Link
+                  to="/templates"
+                  className="px-3 py-2 rounded-md font-normal text-slate-200 hover:text-slate-300 transition-colors"
+                  onClick={handleNavigation}
+                >
+                  Templates
                 </Link>
                 <Link
                   to="/settings"
@@ -197,7 +204,14 @@ const Header = () => {
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:text-slate-900 transition-colors"
                   onClick={handleNavigation}
                 >
-                 Invoices
+                  Invoices
+                </Link>
+                <Link
+                  to="/templates"
+                  className="px-3 py-2.5 rounded-md text-slate-700 hover:text-slate-900 transition-colors"
+                  onClick={handleNavigation}
+                >
+                  Templates
                 </Link>
                 <Link
                   to="/settings"

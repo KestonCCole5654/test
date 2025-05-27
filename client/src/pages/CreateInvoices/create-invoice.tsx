@@ -22,6 +22,7 @@ import {
   BreadcrumbLink,
   BreadcrumbPage,
   BreadcrumbSeparator,
+  BreadcrumbHome,
 } from "../../components/ui/breadcrumb"
 import InvoiceClassic from "../../components/InvoiceClassic"
 
@@ -1048,7 +1049,8 @@ ${businessData.phone}`
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="/dashboard">Dashboard </BreadcrumbLink>
+                  <BreadcrumbHome href="/dashboard" />
+                  <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
@@ -1068,7 +1070,7 @@ ${businessData.phone}`
               <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col gap-6">
                 <div>
                   <div className="text-xs text-gray-500 font-normal mb-1">Invoice #</div>
-                  <div className="text-lg font-semibold text-gray-900 mb-2 break-all">{invoiceData.invoiceNumber}</div>
+                  <div className="text-lg font-semibold text-gray-800 mb-2 break-all">{invoiceData.invoiceNumber}</div>
                   <div className="text-xs text-gray-500 font-normal mb-1">Billed To:</div>
                   <div className="text-base font-medium text-gray-800 mb-2">{invoiceData.customer.name || 'Customer Name'}</div>
                   <div className="text-xs text-gray-500 font-normal mb-1">Amount Due:</div>
@@ -1077,7 +1079,7 @@ ${businessData.phone}`
                 <div className="flex flex-col gap-3 mt-2">
                   <Button
                     variant="default"
-                    className="bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2 rounded-md shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
+                    className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2 rounded-md shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
                     onClick={() => setIsFormExpanded(true)}
                   >
                     <Pencil className="w-4 h-4 mr-2" />
@@ -1085,7 +1087,7 @@ ${businessData.phone}`
                   </Button>
                   <Button
                     variant="outline"
-                    className="bg-gray-600 hover:bg-gray-700 text-white font-medium px-4 py-2 rounded-md shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
+                    className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2 rounded-md shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
                     onClick={() => navigate(`/print-invoice/${invoiceToEdit?.id || invoiceData.invoiceNumber}`)}
                   >
                     <Printer className="w-4 h-4 mr-2" />
@@ -1093,7 +1095,7 @@ ${businessData.phone}`
                   </Button>
                   <Button
                     variant="default"
-                    className="bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-2 rounded-md shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
+                    className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2 rounded-md shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
                     onClick={handleGenerateInvoiceLink}
                     disabled={isGeneratingLink}
                   >
@@ -1109,12 +1111,12 @@ ${businessData.phone}`
                       type="text"
                       value={shareableLink}
                       readOnly
-                      className="w-full p-1 border rounded text-xs font-light font-cal-sans bg-white"
+                      className="w-full p-1 border rounded text-xs font-extralight font-cal-sans bg-white"
                     />
                     <Button
                       variant="outline"
                       size="sm"
-                      className="w-full border-green-800 text-green-800 rounded"
+                      className="w-full border-green-800 text-white rounded"
                       onClick={() => {
                         navigator.clipboard.writeText(shareableLink)
                         setCopied(true)
@@ -1149,6 +1151,7 @@ ${businessData.phone}`
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem>
+                    <BreadcrumbHome href="/dashboard" />
                     <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />

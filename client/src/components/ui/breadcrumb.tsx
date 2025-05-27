@@ -51,18 +51,23 @@ const BreadcrumbLink = React.forwardRef<
   React.ComponentPropsWithoutRef<"a"> & {
     asChild?: boolean
   }
->(({ asChild, className, ...props }, ref) => {
+>(({ asChild, className, href, ...props }, ref) => {
   const Comp = asChild ? Slot : "a"
+  const isDashboard = href === "/dashboard"
 
   return (
     <Comp
       ref={ref}
+      href={href}
       className={cn(
-        "transition-colors hover:text-green-800 font-medium px-2 py-1 rounded focus:outline-none text-gray-500",
+        "transition-colors hover:text-green-800 font-medium px-2 py-1 rounded focus:outline-none text-gray-500 inline-flex items-center gap-2",
         className
       )}
       {...props}
-    />
+    >
+      {isDashboard && <Home className="w-4 h-4" />}
+      {props.children}
+    </Comp>
   )
 })
 BreadcrumbLink.displayName = "BreadcrumbLink"

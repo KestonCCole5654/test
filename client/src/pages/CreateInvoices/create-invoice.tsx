@@ -22,7 +22,6 @@ import {
   BreadcrumbLink,
   BreadcrumbPage,
   BreadcrumbSeparator,
-  BreadcrumbHome,
 } from "../../components/ui/breadcrumb"
 import InvoiceClassic from "../../components/InvoiceClassic"
 
@@ -1049,7 +1048,6 @@ ${businessData.phone}`
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbHome href="/dashboard" />
                   <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
@@ -1151,7 +1149,6 @@ ${businessData.phone}`
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem>
-                    <BreadcrumbHome href="/dashboard" />
                     <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />

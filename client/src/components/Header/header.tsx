@@ -79,11 +79,11 @@ const Header = () => {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded flex items-center justify-center mr-1">
+            <Link to="/" className="flex items-center ">
+              <div className="h-8 w-8 rounded flex items-center justify-center">
                 <img src="/sheetbills-logo.svg" alt="SheetBills Logo" className="h-8 w-auto" />
               </div>
-              <span className="text-md font-normal text-green-800">SheetBills </span> 
+              <span className="text-lg font-normal text-green-800">SheetBills </span> 
             </Link>
           </div>
 

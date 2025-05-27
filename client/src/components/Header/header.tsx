@@ -80,10 +80,10 @@ const Header = () => {
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="h-8 w-9 rounded flex items-center justify-center">
-                <img src="/sheetbills-logo.svg" alt="SheetBills Logo" className="h-6 w-auto" />
+              <div className="h-8 w-8 rounded flex items-center justify-center">
+                <img src="/sheetbills-logo.svg" alt="SheetBills Logo" className="h-12 w-auto" />
               </div>
-              <span className="text-xl font-normal text-slate-200">SheetBills </span>
+              {/* <span className="text-xl font-normal text-slate-200">SheetBills </span> */}
             </Link>
           </div>
 

@@ -1143,9 +1143,8 @@ ${businessData.phone}`
       {isFormExpanded && (
         <div className=" mt-0 max-w-7xl font-inter py-4 sm:py-8 px-4 mx-auto rounded-b-3xl mb-10">
           <div className="mb-8">
-           
             {/* Breadcrumb Navigation */}
-            <div className="mt-2 mb-6">
+            <div className="mt-0 mb-6">
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem>

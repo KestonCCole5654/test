@@ -1141,7 +1141,7 @@ ${businessData.phone}`
 
       {/* Edit Mode (Form) */}
       {isFormExpanded && (
-        <div className=" mt-0 max-w-7xl font-inter w-full py-4 sm:py-8 px-4 mx-auto rounded-b-3xl mb-10">
+        <div className=" mt-0 max-w-7xl font-inter py-4 sm:py-8 px-4 mx-auto rounded-b-3xl mb-10">
           <div className="mb-8">
            
             {/* Breadcrumb Navigation */}
@@ -1502,9 +1502,7 @@ ${businessData.phone}`
         </div>
       )}
 
-      <div className="w-full font-inter text-center text-md text-gray-400 mt-10 mb-2">
-        Powered by <span className="font-inter font-medium text-green-800">SheetBills™</span>
-      </div>
+      
       
     </>
   )

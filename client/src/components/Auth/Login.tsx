@@ -124,7 +124,7 @@ export default function LoginPage() {
               <img src="/sheetbills-logo.svg" alt="SheetBills Logo" className="h-15 w-auto" />
             </div>
             <div>
-              <h2 className="text-2xl font-normal text-green-800">Hello, welcome to SheetBills.</h2>
+              <h2 className="text-2xl font-normal text-green-800">Hello, Welcome to SheetBills.</h2>
             </div>
           </div>
           

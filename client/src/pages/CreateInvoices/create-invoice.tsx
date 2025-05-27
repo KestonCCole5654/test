@@ -1501,9 +1501,11 @@ ${businessData.phone}`
           </div>
         </div>
       )}
+
       <div className="w-full font-inter text-center text-md text-gray-400 mt-10 mb-2">
         Powered by <span className="font-inter font-medium text-green-800">SheetBills™</span>
       </div>
+      
     </>
   )
 }

@@ -121,7 +121,7 @@ export default function LoginPage() {
         <div className="max-w-md w-full mx-auto ">
           <div className="flex flex-col text-center justify-center items-center gap-3 mb--12">
             <div className="h-14 w-14 p-2 rounded-sm  flex items-center justify-center">
-              <img src="/icon4.svg" alt="SheetBills Logo" className="h-10 w-auto" />
+              <img src="/sheetbills-logo.svg" alt="SheetBills Logo" className="h-10 w-auto" />
             </div>
             <div>
               <h2 className="text-2xl font-normal text-green-800">SheetBills</h2>

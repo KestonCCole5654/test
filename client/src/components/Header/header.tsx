@@ -83,7 +83,7 @@ const Header = () => {
               <div className="h-8 w-8 rounded flex items-center justify-center">
                 <img src="/sheetbills-logo.svg" alt="SheetBills Logo" className="h-8 w-auto" />
               </div>
-              <span className="text-lg font-normal text-green-800">SheetBills </span> 
+              <span className="text-xl font-normal text-slate-200">SheetBills </span> 
             </Link>
           </div>
 

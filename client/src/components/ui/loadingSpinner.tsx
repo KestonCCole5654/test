@@ -3,7 +3,7 @@ export const LoadingSpinner = () => (
     <div className="relative h-8 w-8">
       <div className="absolute inset-0 rounded bg-green-700/20 animate-ping"></div>
       <div className="relative h-full w-full p-10 flex items-center justify-center animate-pulse">
-        <img src="/sheetbills-logo.svg" alt="SheetBills Logo" className="h-8 w-auto" />
+        <img src="/file.svg" alt="SheetBills Logo" className="h-8 w-auto" />
       </div>
     </div>
     <span className="text-gray-500 font-cal-sans font-normal">Just a moment ...</span>

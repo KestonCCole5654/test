@@ -689,43 +689,89 @@ export default function Dashboard() {
 
   // Calculate stats from invoices
   const now = new Date();
-  const totalAmount = invoices.reduce((sum, inv) => sum + (inv.amount || 0), 0);
-  const totalInvoices = invoices.length;
-  const paidInvoicesTotal = invoices
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  
+  // Get current month's data
+  const currentMonthInvoices = invoices.filter(inv => {
+    const invDate = new Date(inv.date);
+    return invDate.getMonth() === currentMonth && invDate.getFullYear() === currentYear;
+  });
+  
+  // Get previous month's data
+  const previousMonthInvoices = invoices.filter(inv => {
+    const invDate = new Date(inv.date);
+    const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+    return invDate.getMonth() === prevMonth && invDate.getFullYear() === prevYear;
+  });
+
+  // Calculate current month totals
+  const currentMonthTotal = currentMonthInvoices.reduce((sum, inv) => sum + (inv.amount || 0), 0);
+  const currentMonthPaidTotal = currentMonthInvoices
     .filter(inv => inv.status === "Paid")
     .reduce((sum, inv) => sum + (inv.amount || 0), 0);
-  const unpaidInvoicesTotal = invoices
+  const currentMonthUnpaidTotal = currentMonthInvoices
     .filter(inv => inv.status === "Pending")
     .reduce((sum, inv) => sum + (inv.amount || 0), 0);
-  const paidInvoicesCount = invoices.filter(inv => inv.status?.toLowerCase() === "paid").length;
-  const unpaidInvoicesCount = invoices.filter(inv => inv.status?.toLowerCase() === "pending").length;
+  const currentMonthPaidCount = currentMonthInvoices.filter(inv => inv.status?.toLowerCase() === "paid").length;
+  const currentMonthUnpaidCount = currentMonthInvoices.filter(inv => inv.status?.toLowerCase() === "pending").length;
+
+  // Calculate previous month totals
+  const previousMonthTotal = previousMonthInvoices.reduce((sum, inv) => sum + (inv.amount || 0), 0);
+  const previousMonthPaidTotal = previousMonthInvoices
+    .filter(inv => inv.status === "Paid")
+    .reduce((sum, inv) => sum + (inv.amount || 0), 0);
+  const previousMonthUnpaidTotal = previousMonthInvoices
+    .filter(inv => inv.status === "Pending")
+    .reduce((sum, inv) => sum + (inv.amount || 0), 0);
+  const previousMonthPaidCount = previousMonthInvoices.filter(inv => inv.status?.toLowerCase() === "paid").length;
+  const previousMonthUnpaidCount = previousMonthInvoices.filter(inv => inv.status?.toLowerCase() === "pending").length;
+
+  // Calculate percentage changes
+  const calculatePercentChange = (current: number, previous: number) => {
+    if (previous === 0) return current > 0 ? 100 : 0;
+    return ((current - previous) / previous) * 100;
+  };
+
+  const revenuePercentChange = calculatePercentChange(currentMonthTotal, previousMonthTotal);
+  const totalInvoicesPercentChange = calculatePercentChange(
+    currentMonthInvoices.length,
+    previousMonthInvoices.length
+  );
+  const paidInvoicesPercentChange = calculatePercentChange(currentMonthPaidTotal, previousMonthPaidTotal);
+  const unpaidInvoicesPercentChange = calculatePercentChange(currentMonthUnpaidTotal, previousMonthUnpaidTotal);
 
   const stats: InvoiceStat[] = [
     {
       label: "Revenue",
-      value: `$${totalAmount.toLocaleString()}`,
-      percent: 4.75,
-      trend: "up"
+      value: `$${currentMonthTotal.toLocaleString()}`,
+      percent: Number(revenuePercentChange.toFixed(2)),
+      trend: revenuePercentChange >= 0 ? "up" : "down",
+      subLabel: "this month"
     },
     {
       label: "Total Invoices",
-      value: totalInvoices.toString(),
-      percent: 54.02,
-      trend: "up"
+      value: currentMonthInvoices.length.toString(),
+      percent: Number(totalInvoicesPercentChange.toFixed(2)),
+      trend: totalInvoicesPercentChange >= 0 ? "up" : "down",
+      subLabel: "this month"
     },
     {
       label: "Paid Invoices",
-      value: `$${paidInvoicesTotal.toLocaleString()}`,
-      count: paidInvoicesCount,
-      percent: 54.02,
-      trend: "up"
+      value: `$${currentMonthPaidTotal.toLocaleString()}`,
+      count: currentMonthPaidCount,
+      percent: Number(paidInvoicesPercentChange.toFixed(2)),
+      trend: paidInvoicesPercentChange >= 0 ? "up" : "down",
+      subLabel: "this month"
     },
     {
       label: "Unpaid Invoices",
-      value: `$${unpaidInvoicesTotal.toLocaleString()}`,
-      count: unpaidInvoicesCount,
-      percent: -1.39,
-      trend: "down"
+      value: `$${currentMonthUnpaidTotal.toLocaleString()}`,
+      count: currentMonthUnpaidCount,
+      percent: Number(unpaidInvoicesPercentChange.toFixed(2)),
+      trend: unpaidInvoicesPercentChange >= 0 ? "up" : "down",
+      subLabel: "this month"
     }
   ];
 

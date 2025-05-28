@@ -34,7 +34,7 @@ import supabase from "../../components/Auth/supabaseClient"
 import { useSession } from '@supabase/auth-helpers-react'
 import { LoadingSpinner } from "../../components/ui/loadingSpinner"
 
-const API_URL = "https://sheetbills-client.vercel.app"
+const API_URL = "https://sheetbills-server.vercel.app"
 
 interface BusinessData {
   companyName: string
@@ -253,12 +253,20 @@ export default function InitializePage() {
     async function checkOnboarding() {
       if (!googleAccessToken) return
       try {
-        const response = await fetch("https://sheetbills-client.vercel.app/api/check-master-sheet", {
+        const response = await fetch(`${API_URL}/api/check-master-sheet`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ accessToken: googleAccessToken }),
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${googleAccessToken}`
+          },
+          body: JSON.stringify({ accessToken: googleAccessToken })
         })
-        const data = await response.json()
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        
+        const data = await response.json() as { onboarded: boolean }
         setIsOnboarded(data.onboarded)
         if (data.onboarded) {
           navigate('/invoices')
@@ -494,14 +502,14 @@ export default function InitializePage() {
       })
   
       // Make the API request
-      console.log("Making API request to:", `${API_URL}/create-business-sheet`)
+      console.log("Making API request to:", `${API_URL}/api/create-business-sheet`)
       console.log("Request headers being sent:", {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${tokenToUse.substring(0, 20)}...`,
         'x-supabase-token': `${supabaseToken.substring(0, 20)}...`
       })
   
-      const response = await fetch(`${API_URL}/create-business-sheet`, {
+      const response = await fetch(`${API_URL}/api/create-business-sheet`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -979,6 +987,13 @@ export default function InitializePage() {
 
       <header className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 py-4 px-4">
         <div className="max-w-md mx-auto">
+          <div className="flex items-center justify-center mb-4">
+            <img 
+              src="/sheetbills-logo.svg" 
+              alt="SheetBills Logo" 
+              className="h-8 w-auto"
+            />
+          </div>
           {!showWelcome && !showSuccess && (
             <ProgressDots currentStep={showReview ? questions.length : currentQuestion} totalSteps={questions.length} />
           )}

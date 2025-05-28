@@ -24,8 +24,6 @@ import {
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb"
 import InvoiceClassic from "../../components/InvoiceClassic"
-import { TemplateModal } from '../../components/invoice/TemplateModal';
-import { Template } from '../../lib/templateService';
 
 // Replace the printStyles constant with this updated version
 const printStyles = `
@@ -145,8 +143,6 @@ export default function InvoiceForm() {
   })
   const key = location.state?.key
   const hideForm = location.state?.hideForm
-  const [userId, setUserId] = useState<string>('')
-  const [accessToken, setAccessToken] = useState<string>('')
 
   // Add useEffect to fetch spreadsheet URL if not available
   useEffect(() => {
@@ -1042,26 +1038,6 @@ ${businessData.phone}`
     }
   }, [invoiceToEdit])
 
-  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
-
-  const handleTemplateSelect = (template: Template) => {
-    setSelectedTemplate(template);
-    // Update the invoice data with the new template
-    updateInvoiceData('template', template.id);
-  };
-
-  useEffect(() => {
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session) {
-        setUserId(session.user.id)
-        setAccessToken(session.access_token)
-      }
-    }
-    getSession()
-  }, [])
-
   return (
     <>
       {/* Preview Mode - Cleaned up */}
@@ -1127,7 +1103,7 @@ ${businessData.phone}`
                   <Button
                     variant="outline"
                     className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2 rounded-md shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2 mt-1"
-                    onClick={() => setIsTemplateModalOpen(true)}
+                    onClick={() => { /* TODO: Open template chooser modal */ }}
                   >
                     Choose Template
                   </Button>
@@ -1532,14 +1508,8 @@ ${businessData.phone}`
         </div>
       )}
 
-      {/* Template Modal */}
-      <TemplateModal
-        isOpen={isTemplateModalOpen}
-        onClose={() => setIsTemplateModalOpen(false)}
-        onSelect={handleTemplateSelect}
-        accessToken={accessToken}
-        userId={userId}
-      />
+      
+      
     </>
   )
 }

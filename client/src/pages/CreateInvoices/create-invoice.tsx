@@ -1100,13 +1100,6 @@ ${businessData.phone}`
                     <Link2 className="w-4 h-4 mr-2" />
                     {isGeneratingLink ? "Generating Link ..." : "Generate Invoice Link"}
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2 rounded-md shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2 mt-1"
-                    onClick={() => { /* TODO: Open template chooser modal */ }}
-                  >
-                    Choose Template
-                  </Button>
                 </div>
                 {/* Shareable Link UI - shown directly under the three buttons */}
                 {shareableLink && (

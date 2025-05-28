@@ -34,7 +34,7 @@ import supabase from "../../components/Auth/supabaseClient"
 import { useSession } from '@supabase/auth-helpers-react'
 import { LoadingSpinner } from "../../components/ui/loadingSpinner"
 
-const API_URL = "https://sheetbills-client-git-development-keston-c-coles-projects.vercel.app"
+const API_URL = "https://sheetbills-client.vercel.app"
 
 interface BusinessData {
   companyName: string
@@ -253,7 +253,7 @@ export default function InitializePage() {
     async function checkOnboarding() {
       if (!googleAccessToken) return
       try {
-        const response = await fetch("https://sheetbills-client-git-development-keston-c-coles-projects.vercel.app/api/check-master-sheet", {
+        const response = await fetch("https://sheetbills-client.vercel.app/api/check-master-sheet", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ accessToken: googleAccessToken }),

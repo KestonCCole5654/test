@@ -19,15 +19,11 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // Middleware
 // ==========================
 app.use(cors({
-  origin: [
-    'https://sheetbills-client.vercel.app',
-    'https://sheetbills-client-git-development-keston-c-coles-projects.vercel.app',
-    'http://localhost:3000',
-    'http://localhost:5000'
-  ],
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['X-CSRF-Token', 'X-Requested-With', 'Accept', 'Accept-Version', 'Content-Length', 'Content-MD5', 'Content-Type', 'Date', 'X-Api-Version', 'Authorization', 'x-supabase-token'],
   credentials: true,
-  optionsSuccessStatus: 200
+  maxAge: 86400
 }));
 
 app.use(express.json()); // Parse JSON request bodies

@@ -146,8 +146,8 @@ const MacbookAir = (): React.ReactElement => {
           </Card>
         </div>
 
-        <section className="flex flex-col w-[849px] items-center gap-6 relative flex-[0_0_auto]">
-          <h1 className="relative self-stretch h-[161px]  [font-family:'Cal_Sans',Helvetica] font-normal text-transparent text-[50px] text-center ">
+        <section className="flex flex-col w-[849px] items-center gap-4 relative flex-[0_0_auto]">
+          <h1 className="relative self-stretch h-[161px] [font-family:'Cal_Sans',Helvetica] font-normal text-transparent text-[50px] text-center ">
             <span className="text-black">Tired of </span>
             <span className="text-green-800">Wrestling</span>
             <span className="text-black"> with </span>
@@ -156,7 +156,7 @@ const MacbookAir = (): React.ReactElement => {
             <span className="text-green-800">Google Sheets ?</span>
           </h1>
 
-          <p className="relative font-extralight text-lg text-center " style={{ color: '#5C5B6A' }}>
+          <p className="relative w-[600px] font-extralight text-lg text-center " style={{ color: '#5C5B6A' }}>
             Ditch the templates, formulas and frustration. SheetBills makes
             invoicing in Google Sheets fast, simple and professional
           </p>
@@ -166,7 +166,7 @@ const MacbookAir = (): React.ReactElement => {
           {benefitItems.map((item, index) => (
             <div
               key={index}
-              className="flex items-center gap-3 relative self-stretch w-full flex-[0_0_auto]"
+              className="flex items-center gap-3 relative self-stretch w-full"
             >
               <CheckIcon className="w-[20px] h-[20px] text-green-800" />
               <div className="relative font-extralight text-sm whitespace-nowrap" style={{ color: '#5C5B6A' }}>

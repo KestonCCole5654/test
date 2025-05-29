@@ -96,7 +96,7 @@ const MacbookAir = (): React.ReactElement => {
   return (
     <div className="flex flex-col items-center relative bg-white">
       {/* Responsive Header */}
-      <header className="w-full bg-white  flex flex-col md:flex-row items-center justify-between px-4 py-4 md:px-6 md:py-4 gap-2 md:gap-0">
+      <header className="max-w-7xl bg-white  flex flex-col md:flex-row items-center justify-between px-4 py-4 md:px-6 md:py-4 gap-2 md:gap-0">
         {/* Logo and Brand */}
         <div className="flex items-center gap-2">
           <img
@@ -128,7 +128,7 @@ const MacbookAir = (): React.ReactElement => {
         </div>
       </header>
 
-      <main className="flex flex-col items-center justify-center mt-20 w-full gap-y-10">
+      <section className="flex flex-col items-center justify-center mt-20 w-full gap-y-10">
 
         <div className="flex flex-col items-center justify-center w-full gap-y-2">
           {/* Made for Google Sheets */}
@@ -184,16 +184,15 @@ const MacbookAir = (): React.ReactElement => {
           Try for Free
         </Button>
 
-        {/* UI Mockup Section */}
-        <section className="flex justify-center items-center w-full mt-8 px-14">
-          <img
-            src="/UI_Mockup.png"
-            alt="UI Mockup"
-            className="max-w-full h-auto rounded-lg shadow-lg"
-          />
-        </section>
+      </section>
 
-      </main>
+      <section className="flex flex-col items-center justify-center w-full gap-y-10">
+        
+      </section>
+
+
+
+
     </div>
   );
 };

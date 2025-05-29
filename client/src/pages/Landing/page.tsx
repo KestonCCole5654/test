@@ -163,8 +163,6 @@ const MacbookAir = (): React.ReactElement => {
           </div>
         </div>
 
-
-
         {/* Benefit list */}
         <div className="flex flex-col justify-start gap-3">
           {benefitItems.map((item, index) => (
@@ -184,6 +182,7 @@ const MacbookAir = (): React.ReactElement => {
         <Button className="flex w-60 items-center hover:bg-green-900 justify-center bg-green-800 rounded-sm text-white text-sm">
           Try for Free
         </Button>
+
       </main>
     </div>
   );

@@ -6,6 +6,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
+import { useNavigate } from "react-router-dom";
 
 // Utils
 export function cn(...inputs: ClassValue[]) {
@@ -77,6 +78,8 @@ Card.displayName = "Card";
 
 // Main App Component
 const MacbookAir = (): React.ReactElement => {
+  const navigate = useNavigate();
+
   const navItems = [
     { title: "Why SheetBills ?", width: "150px" },
     { title: "How it Works", width: "150px" },
@@ -119,7 +122,7 @@ const MacbookAir = (): React.ReactElement => {
 
         {/* Button */}
         <div className="w-full md:w-auto mt-2 md:mt-0">
-          <Button className="w-full md:w-auto bg-green-800 rounded-sm text-white text-sm">
+          <Button onClick={() => navigate('/login')} className="w-full md:w-auto bg-green-800 rounded-sm text-white text-sm">
             Login
           </Button>
         </div>
@@ -177,7 +180,7 @@ const MacbookAir = (): React.ReactElement => {
         </div>
 
         {/* Try for Free button */}
-        <Button className="flex w-60 items-center hover:bg-green-900 justify-center bg-green-800 rounded-sm text-white text-sm">
+        <Button onClick={() => navigate('/login')} className="flex w-60 items-center hover:bg-green-900 justify-center bg-green-800 rounded-sm text-white text-sm">
           Try for Free
         </Button>
 

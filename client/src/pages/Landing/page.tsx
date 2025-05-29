@@ -121,7 +121,7 @@ const MacbookAir = (): React.ReactElement => {
           </nav>
 
           <Button className="inline-flex items-center justify-center gap-2.5 px-[45px] py-3 relative  bg-green-800 rounded-sm text-white font-normal text-md">
-            Get Started
+            Login
           </Button>
         </div>
       </header>

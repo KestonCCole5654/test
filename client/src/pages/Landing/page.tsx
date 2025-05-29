@@ -127,27 +127,30 @@ const MacbookAir = (): React.ReactElement => {
 
       <main className="flex flex-col items-center justify-center gap-[33px] px-[123px] py-[35px] relative self-stretch w-full ">
         <div className="inline-flex items-center relative flex-[0_0_auto]">
-          <div className="relative h-8 font-extralight text-sm text-center " style={{ color: '#5C5B6A' }}>
+          <div
+            className="relative h-8 font-extralight text-sm text-center"
+            style={{ color: "#5C5B6A" }}
+          >
             Made for
           </div>
 
-          <Card className="relative w-[185px] h-[55px] bg-white rounded-[9px] overflow-hidden shadow-[0px_4px_4px_#1ea952a6]">
-            <div className="flex w-[178px] items-center relative top-[9px] left-[7px]">
-              <img
-                className="relative w-[52px] h-[42px] object-contain"
-                alt="Google Sheets logo"
-                src="Google_Sheets_logo_(2014-2020).svg"
-              />
-
-              <div className="relative w-[107px] h-[22px] [font-family:'Cal_Sans',Helvetica] font-normal text-green-800 text-base text-center tracking-[0] leading-[normal]">
-                Google Sheets
-              </div>
-            </div>
+          <Card className="relative flex items-center ml-4 px-4 py-2 bg-white rounded-[12px] shadow-[0_4px_12px_#1ea95233]">
+            <img
+              className="w-8 h-8 object-contain mr-2"
+              alt="Google Sheets logo"
+              src="/Google_Sheets_logo_(2014-2020).svg"
+            />
+            <span
+              className="font-semibold text-lg"
+              style={{ color: "#1EA952" }}
+            >
+              Google Sheets
+            </span>
           </Card>
         </div>
 
-        <section className="flex flex-col w-[849px] items-center gap-4 relative flex-[0_0_auto]">
-          <h1 className="relative self-stretch w-[600px] [font-family:'Cal_Sans',Helvetica] font-normal text-transparent text-[50px] text-center ">
+        <section className="flex flex-col w-[849px] items-center text-center justify-center gap-4 relative flex-[0_0_auto]">
+          <h1 className="relative self-stretch w-[600px] font-normal text-transparent text-[50px] text-center ">
             <span className="text-black">Stop </span>
             <span className="text-green-800">Wrestling</span>
             <span className="text-black"> with </span>

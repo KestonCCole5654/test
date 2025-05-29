@@ -128,23 +128,20 @@ const MacbookAir = (): React.ReactElement => {
 
       <main className="flex flex-col items-center justify-center w-full gap-y-10">
         {/* Made for Google Sheets */}
-        <div className="inline-flex justify-center items-center">
-          <div
-            className="h-8 font-extralight text-sm text-center"
-            style={{ color: "#5C5B6A" }}
-          >
+        <div className="flex items-center space-x-2">
+          <span className="font-medium text-base" style={{ color: "#5C5B6A" }}>
             Made for
-          </div>
-          <Card className="flex items-center border-none justify-center ml-4 bg-white">
+          </span>
+          <span className="flex items-center bg-white rounded-full px-3 py-1 shadow" style={{ boxShadow: "0 1px 6px #e0e0e0" }}>
             <img
-              className="w-6 h-6 object-contain mr-2"
+              className="w-5 h-5 mr-2"
               alt="Google Sheets logo"
               src="/Google_Sheets_logo_(2014-2020).svg"
             />
-            <span className="font-normal text-md" style={{ color: "#1EA952" }}>
+            <span className="font-semibold text-base" style={{ color: "#1EA952" }}>
               Google Sheets
             </span>
-          </Card>
+          </span>
         </div>
 
         {/* Heading and subheading */}

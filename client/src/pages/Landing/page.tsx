@@ -152,8 +152,8 @@ const MacbookAir = (): React.ReactElement => {
         </div>
 
         <div className="flex flex-col items-center text-center mb-15 justify-center gap-4 w-full">
-          <h1 className="font-sans font-bold text-[56px] leading-tight w-full">
-            <span className="text-black">Stop </span>
+          <h1 className="font-cal-sans font-bold text-[56px] w-full">
+            <span className="text-black font-bold">Stop </span>
             <span className="text-green-800 font-bold">Wrestling</span>
             <span className="text-black"> with</span>
             <br />

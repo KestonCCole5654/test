@@ -303,6 +303,57 @@ export default function LandingPage() {
               </div>
             </div>
 
+            <div className="flex flex-col md:flex-row justify-center gap-8 w-full max-w-6xl">
+          {/* Testimonial 1 */}
+          <div className="flex-1 flex flex-col items-center  p-8 ">
+            <div className="flex mb-2">
+              {[...Array(5)].map((_, i) => (
+                <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /></svg>
+              ))}
+            </div>
+            <p className="text-gray-800 text-center mb-2">My man <a href="#" className="text-blue-700 font-semibold">@marc_louvion</a> is killing it with this product IMO.<br />Super easy to get started, <span className="bg-yellow-100 px-1 rounded">I got my invoice link in 2 minutes</span></p>
+            <div className="flex items-center mt-4">
+              <img src="/avatars/avatar1.jpg" alt="Tony Dinh" className="w-10 h-10 rounded-full mr-3 border-2 border-yellow-400" />
+              <div>
+                <div className="font-bold text-gray-800">Tony Dinh</div>
+                <div className="text-xs text-gray-500 flex items-center gap-1">138.8K followers on <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' className='w-4 h-4 inline'><path d='M22.46 5.924c-.793.352-1.645.59-2.54.698a4.48 4.48 0 001.965-2.475 8.94 8.94 0 01-2.828 1.082A4.48 4.48 0 0016.11 4c-2.485 0-4.5 2.014-4.5 4.5 0 .353.04.697.116 1.027C7.728 9.36 4.1 7.575 1.67 4.905c-.388.666-.61 1.44-.61 2.263 0 1.563.796 2.942 2.006 3.75a4.48 4.48 0 01-2.037-.563v.057c0 2.183 1.553 4.004 3.617 4.42-.378.104-.777.16-1.188.16-.29 0-.57-.028-.844-.08.57 1.78 2.223 3.078 4.183 3.113A8.98 8.98 0 012 19.54a12.68 12.68 0 006.88 2.017c8.26 0 12.785-6.84 12.785-12.785 0-.195-.004-.39-.013-.583A9.22 9.22 0 0024 4.59a8.98 8.98 0 01-2.54.698z'/></svg></div>
+              </div>
+            </div>
+          </div>
+          {/* Testimonial 2 */}
+          <div className="flex-1 flex flex-col items-center  p-8 ">
+            <div className="flex mb-2">
+              {[...Array(5)].map((_, i) => (
+                <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /></svg>
+              ))}
+            </div>
+            <p className="text-gray-800 text-center mb-2">When I realized I paid Stripe $1,600 to generate invoices in 2023, I turned off the invoicing feature.<br />My inbox was suddenly flooded with invoice requests...<br />I built SheetBills to let my customers generate and download invoices themselves so <span className="bg-yellow-100 px-1 rounded">I can focus on growing my businesses.</span></p>
+            <div className="flex items-center mt-4">
+              <img src="/avatars/avatar2.jpg" alt="Marc Lou" className="w-10 h-10 rounded-full mr-3 border-2 border-yellow-400" />
+              <div>
+                <div className="font-bold text-gray-800">Marc Lou</div>
+                <div className="text-xs text-gray-500 flex items-center gap-1">74.6K followers on <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' className='w-4 h-4 inline'><path d='M22.46 5.924c-.793.352-1.645.59-2.54.698a4.48 4.48 0 001.965-2.475 8.94 8.94 0 01-2.828 1.082A4.48 4.48 0 0016.11 4c-2.485 0-4.5 2.014-4.5 4.5 0 .353.04.697.116 1.027C7.728 9.36 4.1 7.575 1.67 4.905c-.388.666-.61 1.44-.61 2.263 0 1.563.796 2.942 2.006 3.75a4.48 4.48 0 01-2.037-.563v.057c0 2.183 1.553 4.004 3.617 4.42-.378.104-.777.16-1.188.16-.29 0-.57-.028-.844-.08.57 1.78 2.223 3.078 4.183 3.113A8.98 8.98 0 012 19.54a12.68 12.68 0 006.88 2.017c8.26 0 12.785-6.84 12.785-12.785 0-.195-.004-.39-.013-.583A9.22 9.22 0 0024 4.59a8.98 8.98 0 01-2.54.698z'/></svg></div>
+              </div>
+            </div>
+          </div>
+          {/* Testimonial 3 */}
+          <div className="flex-1 flex flex-col items-center p-8 ">
+            <div className="flex mb-2">
+              {[...Array(5)].map((_, i) => (
+                <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /></svg>
+              ))}
+            </div>
+            <p className="text-gray-800 text-center mb-2">Another day saving time with SheetBills.<br /><span className="bg-yellow-100 px-1 rounded">The best $49 spent in a long time.</span></p>
+            <div className="flex items-center mt-4">
+              <img src="/avatars/avatar3.jpg" alt="Juanjo Valiño" className="w-10 h-10 rounded-full mr-3 border-2 border-yellow-400" />
+              <div>
+                <div className="font-bold text-gray-800">Juanjo Valiño</div>
+                <div className="text-xs text-gray-500 flex items-center gap-1">5.6K followers on <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' className='w-4 h-4 inline'><path d='M22.46 5.924c-.793.352-1.645.59-2.54.698a4.48 4.48 0 001.965-2.475 8.94 8.94 0 01-2.828 1.082A4.48 4.48 0 0016.11 4c-2.485 0-4.5 2.014-4.5 4.5 0 .353.04.697.116 1.027C7.728 9.36 4.1 7.575 1.67 4.905c-.388.666-.61 1.44-.61 2.263 0 1.563.796 2.942 2.006 3.75a4.48 4.48 0 01-2.037-.563v.057c0 2.183 1.553 4.004 3.617 4.42-.378.104-.777.16-1.188.16-.29 0-.57-.028-.844-.08.57 1.78 2.223 3.078 4.183 3.113A8.98 8.98 0 012 19.54a12.68 12.68 0 006.88 2.017c8.26 0 12.785-6.84 12.785-12.785 0-.195-.004-.39-.013-.583A9.22 9.22 0 0024 4.59a8.98 8.98 0 01-2.54.698z'/></svg></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
             {/* Step 2 */}
             <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
               <div className="flex items-center gap-4 mb-4">

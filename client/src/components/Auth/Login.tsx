@@ -119,12 +119,11 @@ export default function LoginPage() {
 
       <div className="flex flex-1 flex-col items-center justify-center px-3 py-12">
         <div className="max-w-md w-full mx-auto ">
-          <div className="flex flex-col text-center justify-center items-center gap-3 mb--12">
-            <div className="h-22 w-22 p-2 rounded-sm  flex items-center justify-center">
+          <div className="flex flex-col text-center justify-center items-center gap-3 ">
+            <div className="h-20 w-20 p-2 rounded-sm space-x-2 flex items-center justify-center">
               <img src="/sheetbills-logo.svg" alt="SheetBills Logo" className="h-12 w-auto" />
               <span className="text-xl font-medium text-green-800">SheetBills</span>
             </div>
-           
           </div>
           
           <Card className="border-0 overflow-hidden">

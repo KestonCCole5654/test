@@ -128,7 +128,7 @@ const MacbookAir = (): React.ReactElement => {
 
       <main className="flex flex-col items-center justify-center w-full gap-y-10">
         {/* Made for Google Sheets */}
-        
+
         <div className="flex items-center space-x-2">
           <span className="font-medium text-base" style={{ color: "#5C5B6A" }}>
             Made for
@@ -148,11 +148,11 @@ const MacbookAir = (): React.ReactElement => {
         {/* Heading and subheading */}
         <div className="flex flex-col items-center text-center w-full">
           <h1 className="font-cal-sans font-bold text-[56px] w-full">
-            <span className="text-black font-bold">Stop </span>
-            <span className="text-green-800 font-bold">Wrestling</span>
-            <span className="text-black"> with</span>
+            <span className="text-black font-normal">Stop </span>
+            <span className="text-green-800 font-normal">Wrestling</span>
+            <span className="text-black font-normal"> with</span>
             <br />
-            <span className="text-green-800 font-bold">Invoices in Google Sheets ?</span>
+            <span className="text-green-800 font-normal">Invoices in Google Sheets ?</span>
           </h1>
           <p className="font-medium text-lg mt-2" style={{ color: "#5C5B6A" }}>
             Ditch the templates, formulas and frustration. SheetBills makes invoicing in<br />

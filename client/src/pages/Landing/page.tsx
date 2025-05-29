@@ -136,7 +136,7 @@ const MacbookAir = (): React.ReactElement => {
             Made for
           </div>
 
-          <Card className="flex items-center ml-4 px-4 py-4 bg-white rounded-[12px] shadow-[0_4px_12px_#1ea95233]">
+          <Card className="flex items-center justify-center ml-4  bg-white">
             <img
               className="w-6 h-6 object-contain mr-2"
               alt="Google Sheets logo"
@@ -151,7 +151,7 @@ const MacbookAir = (): React.ReactElement => {
           </Card>
         </div>
 
-        <section className="flex flex-col items-center text-center justify-center gap-4 w-full">
+        <section className="flex flex-col items-center text-center mb-15 justify-center gap-4 w-full">
           <h1 className="font-sans font-bold text-[56px] leading-tight w-full">
             <span className="text-black">Stop </span>
             <span className="text-green-800 font-bold">Wrestling</span>
@@ -168,7 +168,7 @@ const MacbookAir = (): React.ReactElement => {
           </p>
         </section>
 
-        <div className="flex flex-col mt-15 w-[210px] items-center justify-center gap-[11px] ">
+        <div className="flex flex-col w-[210px] items-center justify-center gap-[12px] ">
           {benefitItems.map((item, index) => (
             <div
               key={index}

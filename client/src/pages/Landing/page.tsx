@@ -80,7 +80,7 @@ const MacbookAir = (): React.ReactElement => {
   const navItems = [
     { title: "Why SheetBills ?", width: "150px" },
     { title: "How it Works", width: "150px" },
-    { title: "FAQs", width: "70px" },
+    { title: "FAQs", width: "150px" },
   ];
 
   const benefitItems = [

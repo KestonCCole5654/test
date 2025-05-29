@@ -147,8 +147,8 @@ const MacbookAir = (): React.ReactElement => {
         </div>
 
         <section className="flex flex-col w-[849px] items-center gap-4 relative flex-[0_0_auto]">
-          <h1 className="relative self-stretch h-[161px] [font-family:'Cal_Sans',Helvetica] font-normal text-transparent text-[50px] text-center ">
-            <span className="text-black">Stop</span>
+          <h1 className="relative self-stretch w-[600px] [font-family:'Cal_Sans',Helvetica] font-normal text-transparent text-[50px] text-center ">
+            <span className="text-black">Stop </span>
             <span className="text-green-800">Wrestling</span>
             <span className="text-black"> with </span>
             <span className="text-green-800">Invoices</span>

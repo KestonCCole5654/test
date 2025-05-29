@@ -130,10 +130,10 @@ const MacbookAir = (): React.ReactElement => {
 
       <main className="flex flex-col items-center justify-center mt-20 w-full gap-y-8">
 
-        <div className="flex flex-col items-center justify-center w-full gap-y-4">
+        <div className="flex flex-col items-center justify-center w-full gap-y-2">
           {/* Made for Google Sheets */}
           <div className="flex items-center space-x-2">
-            <span className="font-medium text-base" style={{ color: "#5C5B6A" }}>
+            <span className="font-normal text-sm" style={{ color: "#5C5B6A" }}>
               Made for
             </span>
             <span className="flex items-center bg-white  px-3 py-1 " >

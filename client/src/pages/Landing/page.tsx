@@ -296,10 +296,6 @@ const MacbookAir = (): React.ReactElement => {
 
             </div>
           </div>
-        </section>
-      
-
-
       </section>
 
 

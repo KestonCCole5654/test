@@ -183,3 +183,5 @@ const MacbookAir = (): React.ReactElement => {
     </div>
   );
 };
+
+export default MacbookAir;

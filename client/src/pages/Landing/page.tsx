@@ -125,8 +125,8 @@ const MacbookAir = (): React.ReactElement => {
         </div>
       </header>
 
-      <main className="flex flex-col items-center justify-center gap-[33px] px-[123px] py-[35px] relative self-stretch w-full ">
-        <div className="inline-flex items-center relative flex-[0_0_auto]">
+      <main className="flex flex-col items-center justify-center align-middle gap-[33px] relative self-stretch w-full ">
+        <div className="inline-flex items-center relative ">
           <div
             className="relative h-8 font-extralight text-sm text-center"
             style={{ color: "#5C5B6A" }}
@@ -141,7 +141,7 @@ const MacbookAir = (): React.ReactElement => {
               src="/Google_Sheets_logo_(2014-2020).svg"
             />
             <span
-              className="font-semibold text-lg"
+              className="font-normal text-md"
               style={{ color: "#1EA952" }}
             >
               Google Sheets
@@ -149,19 +149,20 @@ const MacbookAir = (): React.ReactElement => {
           </Card>
         </div>
 
-        <section className="flex flex-col w-[849px] items-center text-center justify-center gap-4 relative flex-[0_0_auto]">
-          <h1 className="relative self-stretch w-[600px] font-normal text-transparent text-[50px] text-center ">
+        <section className="flex flex-col items-center text-center justify-center gap-4 w-full">
+          <h1 className="font-sans font-bold text-[56px] leading-tight w-full">
             <span className="text-black">Stop </span>
-            <span className="text-green-800">Wrestling</span>
-            <span className="text-black"> with </span>
-            <span className="text-green-800">Invoices</span>
-            <span className="text-black"> in </span>
-            <span className="text-green-800">Google Sheets ?</span>
+            <span className="text-green-800 font-normal">Wrestling</span>
+            <span className="text-black"> with</span>
+            <br />
+            <span className="text-green-800 font-bold">Invoices in Google Sheets ?</span>
           </h1>
-
-          <p className="relative w-[600px] font-extralight text-lg text-center " style={{ color: '#5C5B6A' }}>
-            Ditch the templates, formulas and frustration. SheetBills makes
-            invoicing in Google Sheets fast, simple and professional
+          <p
+            className="font-medium text-lg mt-2"
+            style={{ color: "#5C5B6A" }}
+          >
+            Ditch the templates, formulas and frustration. SheetBills makes invoicing in<br />
+            Google Sheets fast, simple and professional
           </p>
         </section>
 

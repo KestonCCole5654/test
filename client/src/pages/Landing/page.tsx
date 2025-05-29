@@ -127,8 +127,8 @@ const MacbookAir = (): React.ReactElement => {
 
       <main className="flex flex-col items-center justify-center gap-[33px] px-[123px] py-[35px] relative self-stretch w-full ">
         <div className="inline-flex items-center relative flex-[0_0_auto]">
-          <div className="relative w-[138px] h-8 [font-family:'Cal_Sans',Helvetica] font-normal text-xl text-center tracking-[0] leading-[normal]" style={{ color: '#5C5B6A' }}>
-            Powered by
+          <div className="relative h-8 font-extralight text-sm text-center " style={{ color: '#5C5B6A' }}>
+            Made for
           </div>
 
           <Card className="relative w-[185px] h-[55px] bg-white rounded-[9px] overflow-hidden shadow-[0px_4px_4px_#1ea952a6]">
@@ -148,7 +148,7 @@ const MacbookAir = (): React.ReactElement => {
 
         <section className="flex flex-col w-[849px] items-center gap-4 relative flex-[0_0_auto]">
           <h1 className="relative self-stretch h-[161px] [font-family:'Cal_Sans',Helvetica] font-normal text-transparent text-[50px] text-center ">
-            <span className="text-black">Tired of </span>
+            <span className="text-black">Stop</span>
             <span className="text-green-800">Wrestling</span>
             <span className="text-black"> with </span>
             <span className="text-green-800">Invoices</span>

@@ -91,7 +91,7 @@ const MacbookAir = (): React.ReactElement => {
 
   return (
     <div className="flex flex-col items-center relative bg-white">
-      <header className="flex flex-col items-center justify-center gap-2.5 px-6 py-3 relative self-stretch w-full flex-[0_0_auto] bg-white shadow-[0px_4px_4px_#00000040]">
+      <header className="flex flex-col items-center justify-center gap-2.5 px-6 py-3 relative self-stretch w-full  bg-white ">
         <div className="flex items-center justify-center gap-[217px] relative self-stretch w-full flex-[0_0_auto]">
           <div className="inline-flex items-center gap-[7px] relative flex-[0_0_auto]">
             <div className="flex flex-col w-[54px] items-start gap-2.5 px-0 py-3 relative">

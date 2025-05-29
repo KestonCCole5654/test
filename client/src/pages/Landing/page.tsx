@@ -84,9 +84,9 @@ const MacbookAir = (): React.ReactElement => {
   ];
 
   const benefitItems = [
-    { text: "No more scattered files" },
-    { text: "No more formulas" },
-    { text: "No more formulas" },
+    { text: "No more Scattered Files/Sheets" },
+    { text: "No more Complex Invocie Generation" },
+    { text: "No more Formulas" },
    
   ];
 

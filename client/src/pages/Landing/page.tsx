@@ -111,15 +111,15 @@ const MacbookAir = (): React.ReactElement => {
             {navItems.map((item, index) => (
               <div
                 key={index}
-                className="relative cursor-pointer w-[150px] h-[18px] mt-[-1.00px] [font-family:'Cal_Sans',Helvetica] font-normal text-gray-600 text-md text-center tracking-[0] leading-[normal] whitespace-nowrap"
-                style={{ width: item.width }}
+                className="relative cursor-pointer w-[150px] h-[18px] mt-[-1.00px] [font-family:'Cal_Sans',Helvetica] font-normal text-md text-center tracking-[0] leading-[normal] whitespace-nowrap"
+                style={{ width: item.width, color: '#5C5B6A' }}
               >
                 {item.title}
               </div>
             ))}
           </nav>
 
-          <Button className="inline-flex items-center justify-center gap-2.5 px-[53px] py-3 relative flex-[0_0_auto] bg-green-800 rounded-sm text-white text-lg">
+          <Button className="inline-flex items-center justify-center gap-2.5 px-[45px] py-3 relative  bg-green-800 rounded-sm text-white font-normal text-md">
             Get Started
           </Button>
         </div>
@@ -127,7 +127,7 @@ const MacbookAir = (): React.ReactElement => {
 
       <main className="flex flex-col items-center justify-center gap-[33px] px-[123px] py-[35px] relative self-stretch w-full ">
         <div className="inline-flex items-center relative flex-[0_0_auto]">
-          <div className="relative w-[138px] h-8 [font-family:'Cal_Sans',Helvetica] font-normal text-gray-600 text-xl text-center tracking-[0] leading-[normal]">
+          <div className="relative w-[138px] h-8 [font-family:'Cal_Sans',Helvetica] font-normal text-xl text-center tracking-[0] leading-[normal]" style={{ color: '#5C5B6A' }}>
             Powered by
           </div>
 
@@ -147,7 +147,7 @@ const MacbookAir = (): React.ReactElement => {
         </div>
 
         <section className="flex flex-col w-[849px] items-center gap-6 relative flex-[0_0_auto]">
-          <h1 className="relative self-stretch h-[161px] mt-[-1.00px] [font-family:'Cal_Sans',Helvetica] font-normal text-transparent text-[50px] text-center tracking-[0] leading-[normal]">
+          <h1 className="relative self-stretch h-[161px]  [font-family:'Cal_Sans',Helvetica] font-normal text-transparent text-[50px] text-center ">
             <span className="text-black">Tired of </span>
             <span className="text-green-800">Wrestling</span>
             <span className="text-black"> with </span>
@@ -156,8 +156,8 @@ const MacbookAir = (): React.ReactElement => {
             <span className="text-green-800">Google Sheets ?</span>
           </h1>
 
-          <p className="relative w-[600px] h-[77px] [font-family:'Cal_Sans',Helvetica] font-normal text-gray-600 text-xl text-center tracking-[0] leading-[normal]">
-            Ditch the templates. formulas and frustration. SheetBills makes
+          <p className="relative font-extralight text-lg text-center " style={{ color: '#5C5B6A' }}>
+            Ditch the templates, formulas and frustration. SheetBills makes
             invoicing in Google Sheets fast, simple and professional
           </p>
         </section>
@@ -169,7 +169,7 @@ const MacbookAir = (): React.ReactElement => {
               className="flex items-center gap-3 relative self-stretch w-full flex-[0_0_auto]"
             >
               <CheckIcon className="w-[20px] h-[20px] text-green-800" />
-              <div className="relative w-[154px] h-[15px] mt-[-1.00px] [font-family:'Cal_Sans',Helvetica] font-normal text-gray-600 text-[20px] tracking-[0] leading-[normal] whitespace-nowrap">
+              <div className="relative font-extralight text-sm whitespace-nowrap" style={{ color: '#5C5B6A' }}>
                 {item.text}
               </div>
             </div>

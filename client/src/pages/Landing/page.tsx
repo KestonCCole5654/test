@@ -126,7 +126,7 @@ const MacbookAir = (): React.ReactElement => {
         </div>
       </header>
 
-      <main className="flex flex-col items-center justify-center w-full gap-y-4">
+      <main className="flex flex-col items-center justify-center w-full gap-y-8">
         {/* Made for Google Sheets */}
 
         <div className="flex items-center space-x-2">

@@ -41,7 +41,7 @@ const buttonVariants = cva(
 
 interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 
@@ -87,7 +87,7 @@ const MacbookAir = (): React.ReactElement => {
     { text: "No more Scattered Files/Sheets" },
     { text: "No more Complex Invocie Generation" },
     { text: "No more Formulas" },
-   
+
   ];
 
   return (
@@ -127,38 +127,43 @@ const MacbookAir = (): React.ReactElement => {
       </header>
 
       <main className="flex flex-col items-center justify-center w-full gap-y-8">
-        {/* Made for Google Sheets */}
 
-        <div className="flex items-center space-x-2">
-          <span className="font-medium text-base" style={{ color: "#5C5B6A" }}>
-            Made for
-          </span>
-          <span className="flex items-center bg-white  px-3 py-1 " >
-            <img
-              className="w-5 h-5 mr-2"
-              alt="Google Sheets logo"
-              src="/Google_Sheets_logo_(2014-2020).svg"
-            />
-            <span className="font-normal text-base" style={{ color: "#1EA952" }}>
-              Google Sheets
+
+        <div className="flex flex-col items-center justify-center w-full gap-y-4">
+          {/* Made for Google Sheets */}
+          <div className="flex items-center space-x-2">
+            <span className="font-medium text-base" style={{ color: "#5C5B6A" }}>
+              Made for
             </span>
-          </span>
+            <span className="flex items-center bg-white  px-3 py-1 " >
+              <img
+                className="w-5 h-5 mr-2"
+                alt="Google Sheets logo"
+                src="/Google_Sheets_logo_(2014-2020).svg"
+              />
+              <span className="font-normal text-base" style={{ color: "#1EA952" }}>
+                Google Sheets
+              </span>
+            </span>
+          </div>
+
+          {/* Heading and subheading */}
+          <div className="flex flex-col items-center text-center w-full">
+            <h1 className="font-cal-sans font-normal text-[56px] w-full">
+              <span className="text-black font-normal">Stop </span>
+              <span className="text-green-800 font-normal">Wrestling</span>
+              <span className="text-black font-normal"> with</span>
+              <br />
+              <span className="text-green-800 font-normal">Invoices in Google Sheets ?</span>
+            </h1>
+            <p className="font-medium text-lg mt-2" style={{ color: "#5C5B6A" }}>
+              Ditch the templates, formulas and frustration. SheetBills makes invoicing in<br />
+              Google Sheets fast, simple and professional
+            </p>
+          </div>
         </div>
 
-        {/* Heading and subheading */}
-        <div className="flex flex-col items-center text-center w-full">
-          <h1 className="font-cal-sans font-normal text-[56px] w-full">
-            <span className="text-black font-normal">Stop </span>
-            <span className="text-green-800 font-normal">Wrestling</span>
-            <span className="text-black font-normal"> with</span>
-            <br />
-            <span className="text-green-800 font-normal">Invoices in Google Sheets ?</span>
-          </h1>
-          <p className="font-medium text-lg mt-2" style={{ color: "#5C5B6A" }}>
-            Ditch the templates, formulas and frustration. SheetBills makes invoicing in<br />
-            Google Sheets fast, simple and professional
-          </p>
-        </div>
+
 
         {/* Benefit list */}
         <div className="flex flex-col justify-start gap-3">

@@ -93,7 +93,7 @@ const MacbookAir = (): React.ReactElement => {
   return (
     <div className="flex flex-col items-center relative bg-white">
       {/* Responsive Header */}
-      <header className="w-full bg-white shadow flex flex-col md:flex-row items-center justify-between px-4 py-2 md:px-6 md:py-3 gap-2 md:gap-0">
+      <header className="w-full bg-white  flex flex-col md:flex-row items-center justify-between px-4 py-2 md:px-6 md:py-3 gap-2 md:gap-0">
         {/* Logo and Brand */}
         <div className="flex items-center gap-2">
           <img

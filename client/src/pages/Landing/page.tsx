@@ -166,7 +166,7 @@ const MacbookAir = (): React.ReactElement => {
           </p>
         </section>
 
-        <div className="flex flex-col w-[210px] items-center justify-center gap-[11px] relative flex-[0_0_auto]">
+        <div className="flex flex-col w-[210px] items-center justify-center gap-[11px] ">
           {benefitItems.map((item, index) => (
             <div
               key={index}
@@ -180,7 +180,7 @@ const MacbookAir = (): React.ReactElement => {
           ))}
         </div>
 
-        <Button className="flex w-60 items-center justify-center gap-2.5 px-[53px] py-[17px] relative flex-[0_0_auto] bg-green-800 rounded-sm text-white text-lg">
+        <Button className="flex w-60 mt-15 items-center justify-center bg-green-800 rounded-sm text-white text-sm">
           Try for Free
         </Button>
       </main>

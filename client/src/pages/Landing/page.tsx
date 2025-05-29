@@ -184,6 +184,15 @@ const MacbookAir = (): React.ReactElement => {
           Try for Free
         </Button>
 
+        {/* UI Mockup Section */}
+        <section className="flex justify-center items-center w-full mt-8">
+          <img
+            src="/UI_Mockup.png"
+            alt="UI Mockup"
+            className="max-w-full h-auto rounded-lg shadow-lg"
+          />
+        </section>
+
       </main>
     </div>
   );

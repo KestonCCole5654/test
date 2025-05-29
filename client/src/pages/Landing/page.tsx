@@ -501,12 +501,22 @@ const MacbookAir = (): React.ReactElement => {
         </div>
       </section>
 
+       {/* Footer */}
+    <footer className="w-full bg-gray-50 py-10 flex flex-col items-center justify-center mt-20 border-t border-gray-100">
+      <img src="/sheetbills-logo.svg" alt="SheetBills Logo" className="h-8 mb-2" />
+      <div className="text-gray-500 text-base mb-1">Powered by <span className="text-green-800 font-normal">SheetBills</span></div>
+      <div className="text-gray-400 text-sm mb-1">© 2025 <span className="text-green-800 font-normal">SheetBills</span>. All rights reserved.</div>
+      <div className="flex gap-4 text-gray-500 text-sm mt-2">
+        <a href="/privacy" className="hover:underline">Privacy Policy</a>
+        <span>|</span>
+        <a href="/terms" className="hover:underline">Terms of Service</a>
+      </div>
+    </footer>
 
-     
 
- 
-
+  
     </div>
+   
   );
 };
 

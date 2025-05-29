@@ -163,7 +163,7 @@ const MacbookAir = (): React.ReactElement => {
         </div>
 
         {/* Benefit list */}
-        <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col justify-start gap-3">
           {benefitItems.map((item, index) => (
             <div
               key={index}

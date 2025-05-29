@@ -97,7 +97,7 @@ const MacbookAir = (): React.ReactElement => {
           <div className="inline-flex items-center gap-[7px] relative flex-[0_0_auto]">
             <div className="flex flex-col w-[54px] items-start gap-2.5 px-0 py-3 relative">
               <img
-                className="relative self-stretch w-full h-10"
+                className="h-10"
                 alt="Sheetbills"
                 src="/sheetbills-logo.svg"
               />

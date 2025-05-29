@@ -112,7 +112,7 @@ const MacbookAir = (): React.ReactElement => {
           {navItems.map((item, index) => (
             <div
               key={index}
-              className="text-base md:text-sm text-center"
+              className="text-md md:text-md text-center"
               style={{ color: '#5C5B6A' }}
             >
               {item.title}

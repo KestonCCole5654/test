@@ -126,9 +126,9 @@ const MacbookAir = (): React.ReactElement => {
         </div>
       </header>
 
-      <main className="flex flex-col mt-55 items-center justify-center align-middle  self-stretch w-full ">
+      <main className="flex flex-col mt-55 items-center justify-center align-middle gap-15  self-stretch w-full ">
 
-        <div className="inline-flex items-center ">
+        <div className="inline-flex justify-center  items-center ">
           <div
             className=" h-8 font-extralight text-sm text-center"
             style={{ color: "#5C5B6A" }}
@@ -136,7 +136,7 @@ const MacbookAir = (): React.ReactElement => {
             Made for
           </div>
 
-          <Card className="flex items-center justify-center ml-4  bg-white">
+          <Card className="flex items-center border-none justify-center ml-4  bg-white">
             <img
               className="w-6 h-6 object-contain mr-2"
               alt="Google Sheets logo"
@@ -151,7 +151,7 @@ const MacbookAir = (): React.ReactElement => {
           </Card>
         </div>
 
-        <section className="flex flex-col items-center text-center mb-15 justify-center gap-4 w-full">
+        <div className="flex flex-col items-center text-center mb-15 justify-center gap-4 w-full">
           <h1 className="font-sans font-bold text-[56px] leading-tight w-full">
             <span className="text-black">Stop </span>
             <span className="text-green-800 font-bold">Wrestling</span>
@@ -166,7 +166,7 @@ const MacbookAir = (): React.ReactElement => {
             Ditch the templates, formulas and frustration. SheetBills makes invoicing in<br />
             Google Sheets fast, simple and professional
           </p>
-        </section>
+        </div>
 
         <div className="flex flex-col w-[210px] items-center justify-center gap-[12px] ">
           {benefitItems.map((item, index) => (

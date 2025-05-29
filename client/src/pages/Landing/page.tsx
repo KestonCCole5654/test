@@ -109,7 +109,7 @@ const MacbookAir = (): React.ReactElement => {
           {navItems.map((item, index) => (
             <div
               key={index}
-              className="text-base md:text-xl text-center"
+              className="text-base md:text-sm text-center"
               style={{ color: '#5C5B6A' }}
             >
               {item.title}
@@ -125,8 +125,7 @@ const MacbookAir = (): React.ReactElement => {
         </div>
       </header>
 
-      <main className="flex flex-col items-center justify-center w-full gap-y-8">
-
+      <main className="flex flex-col items-center justify-center mt-40 w-full gap-y-8">
 
         <div className="flex flex-col items-center justify-center w-full gap-y-4">
           {/* Made for Google Sheets */}

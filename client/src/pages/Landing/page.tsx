@@ -120,7 +120,7 @@ const MacbookAir = (): React.ReactElement => {
             ))}
           </nav>
 
-          <Button className="inline-flex items-center justify-center gap-2.5 px-[45px] py-3 relative  bg-green-800 rounded-sm text-white font-normal text-md">
+          <Button className="inline-flex items-center justify-center gap-2.5 px-[45px] py-3 relative  bg-green-800 rounded-sm text-white font-normal text-sm">
             Login
           </Button>
         </div>
@@ -182,7 +182,7 @@ const MacbookAir = (): React.ReactElement => {
           ))}
         </div>
 
-        <Button className="flex w-60 mt-15 items-center justify-center bg-green-800 rounded-sm text-white text-sm">
+        <Button className="flex w-60 mt-10 items-center hover:bg-green-900 justify-center bg-green-800 rounded-sm text-white text-sm">
           Try for Free
         </Button>
       </main>

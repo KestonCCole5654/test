@@ -122,10 +122,9 @@ export default function LoginPage() {
           <div className="flex flex-col text-center justify-center items-center gap-3 mb--12">
             <div className="h-22 w-22 p-2 rounded-sm  flex items-center justify-center">
               <img src="/sheetbills-logo.svg" alt="SheetBills Logo" className="h-12 w-auto" />
+              <span className="text-lg font-medium text-green-800">SheetBills</span>
             </div>
-            <div>
-              <h2 className="text-2xl font-normal text-green-800">Hello, Welcome to SheetBills.</h2>
-            </div>
+           
           </div>
           
           <Card className="border-0 overflow-hidden">

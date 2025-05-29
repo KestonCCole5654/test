@@ -111,7 +111,7 @@ const MacbookAir = (): React.ReactElement => {
             {navItems.map((item, index) => (
               <div
                 key={index}
-                className="relative w-[150px] h-[18px] mt-[-1.00px] [font-family:'Cal_Sans',Helvetica] font-normal text-gray-600 text-lg text-center tracking-[0] leading-[normal] whitespace-nowrap"
+                className="relative cursor-pointer w-[150px] h-[18px] mt-[-1.00px] [font-family:'Cal_Sans',Helvetica] font-normal text-gray-600 text-md text-center tracking-[0] leading-[normal] whitespace-nowrap"
                 style={{ width: item.width }}
               >
                 {item.title}
@@ -119,7 +119,7 @@ const MacbookAir = (): React.ReactElement => {
             ))}
           </nav>
 
-          <Button className="inline-flex items-center justify-center gap-2.5 px-[53px] py-3 relative flex-[0_0_auto] bg-green-800 rounded-[10px] text-white text-lg">
+          <Button className="inline-flex items-center justify-center gap-2.5 px-[53px] py-3 relative flex-[0_0_auto] bg-green-800 rounded-sm text-white text-lg">
             Get Started
           </Button>
         </div>

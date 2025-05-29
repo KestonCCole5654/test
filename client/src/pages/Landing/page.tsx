@@ -92,35 +92,34 @@ const MacbookAir = (): React.ReactElement => {
 
   return (
     <div className="flex flex-col items-center relative bg-white">
-      <header className="flex flex-col items-center justify-center gap-2.5 px-6 py-3 relative self-stretch w-full  bg-white ">
-        <div className="flex items-center justify-center gap-[217px] relative self-stretch w-full flex-[0_0_auto]">
-          <div className="inline-flex items-center gap-[7px] relative flex-[0_0_auto]">
-            <div className="flex flex-col w-[54px] items-start gap-2.5 px-0 py-3 relative">
-              <img
-                className="h-10"
-                alt="Sheetbills"
-                src="/sheetbills-logo.svg"
-              />
+      {/* Responsive Header */}
+      <header className="w-full bg-white shadow flex flex-col md:flex-row items-center justify-between px-4 py-2 md:px-6 md:py-3 gap-2 md:gap-0">
+        {/* Logo and Brand */}
+        <div className="flex items-center gap-2">
+          <img
+            className="h-10 w-auto"
+            alt="Sheetbills"
+            src="/sheetbills-logo.svg"
+          />
+          <span className="font-normal text-green-800 text-xl">SheetBills</span>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex flex-col md:flex-row items-center gap-2 md:gap-6 mt-2 md:mt-0">
+          {navItems.map((item, index) => (
+            <div
+              key={index}
+              className="text-base md:text-xl text-center"
+              style={{ color: '#5C5B6A' }}
+            >
+              {item.title}
             </div>
+          ))}
+        </nav>
 
-            <div className="relative w-fit [font-family:'Cal_Sans',Helvetica] font-normal text-green-800 text-xl tracking-[0] leading-[normal]">
-              SheetBills
-            </div>
-          </div>
-
-          <nav className="inline-flex items-center justify-center gap-[13px] relative flex-[0_0_auto]">
-            {navItems.map((item, index) => (
-              <div
-                key={index}
-                className="relative cursor-pointer w-[150px] h-[18px] mt-[-1.00px] [font-family:'Cal_Sans',Helvetica] font-normal text-md text-center tracking-[0] leading-[normal] whitespace-nowrap"
-                style={{ width: item.width, color: '#5C5B6A' }}
-              >
-                {item.title}
-              </div>
-            ))}
-          </nav>
-
-          <Button className="inline-flex items-center hover:bg-green-900 justify-center gap-2.5 px-[45px] py-3 relative  bg-green-800 rounded-sm text-white font-normal text-sm">
+        {/* Button */}
+        <div className="w-full md:w-auto mt-2 md:mt-0">
+          <Button className="w-full md:w-auto bg-green-800 rounded-sm text-white text-sm">
             Login
           </Button>
         </div>

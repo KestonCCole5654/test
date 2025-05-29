@@ -98,7 +98,7 @@ const MacbookAir = (): React.ReactElement => {
               <img
                 className="relative self-stretch w-full h-10"
                 alt="Sheetbills"
-                src="/sheetbills-logo77-1.png"
+                src="/sheetbills-logo.svg"
               />
             </div>
 
@@ -134,9 +134,9 @@ const MacbookAir = (): React.ReactElement => {
           <Card className="relative w-[185px] h-[55px] bg-white rounded-[9px] overflow-hidden shadow-[0px_4px_4px_#1ea952a6]">
             <div className="flex w-[178px] items-center relative top-[9px] left-[7px]">
               <img
-                className="relative w-[52px] h-[42px] object-cover"
+                className="relative w-[52px] h-[42px] object-contain"
                 alt="Google Sheets logo"
-                src="/61447d485953a50004ee16dc--1--1.png"
+                src="https://asset.brandfetch.io/id2g3K9VMk/idXX_e7k_s.svg"
               />
 
               <div className="relative w-[107px] h-[22px] [font-family:'Cal_Sans',Helvetica] font-normal text-green-800 text-base text-center tracking-[0] leading-[normal]">

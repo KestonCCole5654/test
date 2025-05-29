@@ -136,7 +136,7 @@ const MacbookAir = (): React.ReactElement => {
               <img
                 className="relative w-[52px] h-[42px] object-contain"
                 alt="Google Sheets logo"
-                src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Google_Sheets_2020_Logo.svg"
+                src="Google_Sheets_logo_(2014-2020).svg"
               />
 
               <div className="relative w-[107px] h-[22px] [font-family:'Cal_Sans',Helvetica] font-normal text-green-800 text-base text-center tracking-[0] leading-[normal]">

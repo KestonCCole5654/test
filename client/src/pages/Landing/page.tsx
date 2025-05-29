@@ -120,38 +120,35 @@ const MacbookAir = (): React.ReactElement => {
             ))}
           </nav>
 
-          <Button className="inline-flex items-center justify-center gap-2.5 px-[45px] py-3 relative  bg-green-800 rounded-sm text-white font-normal text-sm">
+          <Button className="inline-flex items-center hover:bg-green-900 justify-center gap-2.5 px-[45px] py-3 relative  bg-green-800 rounded-sm text-white font-normal text-sm">
             Login
           </Button>
         </div>
       </header>
 
-      <main className="flex flex-col mt-55 items-center justify-center align-middle gap-15  self-stretch w-full ">
-
-        <div className="inline-flex justify-center  items-center ">
+      <main className="flex flex-col items-center justify-center w-full gap-y-10">
+        {/* Made for Google Sheets */}
+        <div className="inline-flex justify-center items-center">
           <div
-            className=" h-8 font-extralight text-sm text-center"
+            className="h-8 font-extralight text-sm text-center"
             style={{ color: "#5C5B6A" }}
           >
             Made for
           </div>
-
-          <Card className="flex items-center border-none justify-center ml-4  bg-white">
+          <Card className="flex items-center border-none justify-center ml-4 bg-white">
             <img
               className="w-6 h-6 object-contain mr-2"
               alt="Google Sheets logo"
               src="/Google_Sheets_logo_(2014-2020).svg"
             />
-            <span
-              className="font-normal text-md"
-              style={{ color: "#1EA952" }}
-            >
+            <span className="font-normal text-md" style={{ color: "#1EA952" }}>
               Google Sheets
             </span>
           </Card>
         </div>
 
-        <div className="flex flex-col items-center text-center mb-15 justify-center gap-4 w-full">
+        {/* Heading and subheading */}
+        <div className="flex flex-col items-center text-center w-full">
           <h1 className="font-cal-sans font-bold text-[56px] w-full">
             <span className="text-black font-bold">Stop </span>
             <span className="text-green-800 font-bold">Wrestling</span>
@@ -159,30 +156,29 @@ const MacbookAir = (): React.ReactElement => {
             <br />
             <span className="text-green-800 font-bold">Invoices in Google Sheets ?</span>
           </h1>
-          <p
-            className="font-medium text-lg mt-2"
-            style={{ color: "#5C5B6A" }}
-          >
+          <p className="font-medium text-lg mt-2" style={{ color: "#5C5B6A" }}>
             Ditch the templates, formulas and frustration. SheetBills makes invoicing in<br />
             Google Sheets fast, simple and professional
           </p>
         </div>
 
-        <div className="flex flex-col w-[210px] items-center justify-center gap-[12px] ">
+        {/* Benefit list */}
+        <div className="flex flex-col items-center gap-3">
           {benefitItems.map((item, index) => (
             <div
               key={index}
-              className="flex items-center gap-3 relative self-stretch w-full"
+              className="flex items-center gap-3"
             >
               <CheckIcon className="w-[20px] h-[20px] text-green-800" />
-              <div className="relative font-extralight text-sm whitespace-nowrap" style={{ color: '#5C5B6A' }}>
+              <div className="font-extralight text-sm whitespace-nowrap" style={{ color: '#5C5B6A' }}>
                 {item.text}
               </div>
             </div>
           ))}
         </div>
 
-        <Button className="flex w-60 mt-10 items-center hover:bg-green-900 justify-center bg-green-800 rounded-sm text-white text-sm">
+        {/* Try for Free button */}
+        <Button className="flex w-60 items-center hover:bg-green-900 justify-center bg-green-800 rounded-sm text-white text-sm">
           Try for Free
         </Button>
       </main>

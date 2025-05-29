@@ -1,5 +1,4 @@
 import { CheckIcon } from "lucide-react";
-import React from "react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { type ClassValue, clsx } from "clsx";
@@ -7,6 +6,39 @@ import { twMerge } from "tailwind-merge";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { useNavigate } from "react-router-dom";
+import { FileTextIcon, RefreshCwIcon, RocketIcon, ZapIcon } from "lucide-react";
+import React from "react";
+import { Card as CardComponent } from "../../components/ui/card";
+import { CardContent } from "../../components/ui/card";
+
+// Feature card data for mapping
+const featureCards = [
+  {
+    icon: <ZapIcon className="w-[41px] h-[41px]" />,
+    title: "Designed for Simplicity & Speed",
+    description:
+      "Transform your Google Sheets Into a powerful invoicing system. No more complex formulas or messy templates.",
+  },
+  {
+    icon: <FileTextIcon className="w-[49px] h-[49px]" />,
+    title: "Built on Google Sheets - No Extra Tools Needed",
+    description:
+      "Skip the learning curve! SheetBills works directly inside the Google Sheets you already use, so there's no need to install software or migrate data.",
+  },
+  {
+    icon: <RefreshCwIcon className="w-[51px] h-[51px]" />,
+    title: "Tired of Messy Invoice Spreadsheets?",
+    description:
+      "Stop battling copy-paste errors, broken formulas, and clunky templates.",
+  },
+  {
+    icon: <RocketIcon className="w-[49px] h-[49px]" />,
+    title: "Confused by Complex Invoicing Software?",
+    description:
+      "No need for heavy software — SheetBills simplifies invoicing right where you're already working: Google Sheets.",
+  },
+];
+
 
 // Utils
 export function cn(...inputs: ClassValue[]) {
@@ -187,7 +219,87 @@ const MacbookAir = (): React.ReactElement => {
       </section>
 
       <section className="flex flex-col items-center justify-center w-full gap-y-10">
-        
+
+
+       
+          <div className="flex flex-col items-center gap-[30px]">
+            <header className="flex flex-col items-center justify-center">
+              <h2 className="text-xl text-green-800 [font-family:'Cal_Sans',Helvetica] font-normal">
+                Why Us ?
+              </h2>
+
+              <div className="flex flex-col items-start">
+                <h1 className="w-[686px] text-[50px] text-center [font-family:'Cal_Sans',Helvetica] font-normal">
+                  <span className="text-green-800">Invoice</span>
+                  <span className="text-black">
+                    &nbsp;&nbsp;Creation&nbsp;&nbsp;Made{" "}
+                  </span>
+                  <span className="text-green-800">Simple</span>
+                </h1>
+
+                <p className="w-[686px] text-xl text-gray-600 text-center [font-family:'Cal_Sans',Helvetica] font-normal">
+                  Transform your Google Sheets Into a powerful invoicing system. No
+                  more complex formulas or messy templates.
+                </p>
+              </div>
+            </header>
+
+            <div className="flex w-[982px] items-center justify-center gap-[35px] px-[62px] py-[38px]">
+
+              <div className="flex flex-col items-start gap-[35px] ml-[-17.50px]">
+                <div className="flex flex-col items-start gap-[73px]">
+                  {featureCards.slice(0, 2).map((card, index) => (
+                    <CardComponent
+                      key={index}
+                      className="w-[434px] h-[284px] rounded-[10px] overflow-hidden"
+                    >
+                      <CardContent className="flex flex-col items-center gap-[7px] pt-5">
+                        <div className="w-[102px] h-[95px] bg-white rounded-[9px] overflow-hidden border-4 border-solid border-green-800 shadow-[0px_4px_4px_#00000040] flex items-center justify-center">
+                          {card.icon}
+                        </div>
+                        <h3 className="h-[45px] [font-family:'Cal_Sans',Helvetica] font-normal text-black text-[25px] text-center">
+                          {card.title}
+                        </h3>
+                        <p className="h-[77px] [font-family:'Cal_Sans',Helvetica] font-normal text-gray-600 text-xl text-center">
+                          {card.description}
+                        </p>
+                      </CardContent>
+                    </CardComponent>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-col items-start gap-[59px] mr-[-17.50px]">
+                <div className="flex flex-col h-[655px] items-start gap-[70px]">
+                  {featureCards.slice(2, 4).map((card, index) => (
+                    <CardComponent
+                      key={index}
+                      className="w-[424px] h-[276px] rounded-[10px] overflow-hidden"
+                    >
+                      <CardContent className="flex flex-col items-center gap-[7px] pt-5">
+                        <div className="w-[102px] h-[95px] bg-white rounded-[9px] overflow-hidden border-4 border-solid border-green-800 shadow-[0px_4px_4px_#00000040] flex items-center justify-center">
+                          {card.icon}
+                        </div>
+                        <h3 className="h-[45px] [font-family:'Cal_Sans',Helvetica] font-normal text-black text-[25px] text-center">
+                          {card.title}
+                        </h3>
+                        <p className="h-[77px] [font-family:'Cal_Sans',Helvetica] font-normal text-gray-600 text-xl text-center">
+                          {card.description}
+                        </p>
+                      </CardContent>
+                    </CardComponent>
+                  ))}
+                </div>
+              </div>
+
+
+
+            </div>
+          </div>
+        </section>
+      
+
+
       </section>
 
 

@@ -126,9 +126,9 @@ const MacbookAir = (): React.ReactElement => {
   ];
 
   return (
-    <div className="flex flex-col items-center relative bg-white">
+    <div className="flex flex-col items-center relative bg-gray-50">
       {/* Responsive Header */}
-      <header className="max-w-7xl bg-white flex items-center justify-between px-4 py-4 md:px-6 md:py-4 w-full">
+      <header className="max-w-7xl bg-gray-50 flex items-center justify-between px-4 py-4 md:px-6 md:py-4 w-full">
         {/* Logo and Brand */}
         <div className="flex items-center gap-2">
           <img
@@ -160,7 +160,7 @@ const MacbookAir = (): React.ReactElement => {
             <span className="font-normal text-sm" style={{ color: "#5C5B6A" }}>
               Made for
             </span>
-            <span className="flex items-center   bg-white  px-1 py-1 " >
+            <span className="flex items-center   bg-gray-50 px-1 py-1 " >
               <img
                 className="w-5 h-5 mr-1"
                 alt="Google Sheets logo"
@@ -323,106 +323,38 @@ const MacbookAir = (): React.ReactElement => {
         </div>
       </section>
 
-      {/* How it Works Section */}
-      <section className="flex flex-col items-center justify-center w-full pb-10 py-8">
-        <div className="flex flex-col md:flex-col items-center justify-center w-full max-w-7xl px-4 gap-8">
-          {/* Left: Subtitle and Heading */}
-          <div className="flex-1 flex flex-col justify-center items-center">
-            <span className="text-green-800 font-normal text-md mb-2">How it Works ?</span>
-            <h2 className="text-5xl font-extrabold text-gray-800 ">
-              Built For Freelancers & Small Businesses
+      {/* Demo Video Section */}
+      <section className="w-full bg-gray-50 py-20 flex flex-col items-center">
+      <h2 className="text-lg text-green-800 font-cal-sans pb-6 font-normal">
+              How it Works ? 
             </h2>
-          </div>
-          
-          {/* Right: Description and Button */}
-          <div className="flex-1 flex flex-col items-center md:items-center">
-            <p className="text-gray-700 text-md text-center md:text-center mb-6 max-w-2xl">
-              SheetBills makes creating and managing invoices easy with a simple streamlined process that takes you from sign-up to sending professional invoices in just a few steps
-            </p>
-          </div>
-        </div>
-
-        {/* Step 1 Row */}
-        <div className="flex flex-col md:flex-row items-center justify-center w-full max-w-6xl px-4 gap-8 mt-16">
-          {/* Left: Just the provided image */}
-          <div className="flex-1 flex flex-col items-center justify-center">
-            <img src="/step1.png" alt="How it works visual" className="w-full max-w-xs md:max-w-sm rounded-lg shadow" />
-          </div>
-
-          {/* Right: Step Number and Description */}
-          <div className="flex-1 flex flex-col items-center md:items-center">
-            <div className="text-[120px] font-bold text-green-800 leading-none mb-2">01</div>
-            <div className="text-2xl font-normal mb-2 text-center md:text-center">Sign In with Google — That's It.</div>
-            <div className="text-gray-700 text-md max-w-2xl text-center md:text-center">
-            Skip the signup struggle. With Google sign-in, you're in — fast, secure, and ready to generate invoices immediately.
-            </div>
-          </div>
-        </div>
-
-
-        {/* Step 2 Row */}
-        <div className="flex flex-col md:flex-row items-center justify-center w-full max-w-6xl px-4 gap-8 mt-16">
-          {/* Right: Step Number and Description */}
-          <div className="flex-1 flex flex-col items-center md:items-center">
-            <div className="text-[120px] font-bold text-green-800 leading-none mb-2">02</div>
-            <div className="text-2xl font-normal mb-2 text-center md:text-center">Set Up Your Business Details</div>
-            <div className="text-gray-700 text-md max-w-2xl text-center md:text-center">
-              Set up your business info once — We'll Handle the Rest. Enjoy perfectly branded invoices every time — no extra steps needed
-            </div>
-          </div>
-
-            {/* Left: Just the provided image */}
-            <div className="flex-1 flex flex-col items-center justify-center">
-            <img src="/step2.png" alt="How it works visual" className="w-full max-w-xs md:max-w-sm rounded-lg shadow" />
-          </div>
-        </div>
-
-         {/* Step 3 Row */}
-        <div className="flex flex-col pt-10 md:flex-row items-center justify-center w-full max-w-6xl px-4 gap-8 mt-16">
-          {/* Left: Just the provided image */}
-          <div className="flex-1 flex flex-col items-center justify-center">
-            <img src="/Step3.png" alt="How it works visual" className="w-full max-w-xs md:max-w-sm rounded-lg shadow" />
-          </div>
-
-          {/* Right: Step Number and Description */}
-          <div className="flex-1 flex flex-col items-center md:items-center">
-            <div className="text-[120px] font-bold text-green-800 leading-none mb-2">03</div>
-            <div className="text-2xl font-normal mb-2 text-center md:text-center">Create Your First Invoice</div>
-            <div className="text-gray-700 text-md max-w-2xl text-center md:text-center">
-            It's That Simple. Add your client's details, enter the items, and SheetBills will craft a polished, branded invoice ready to share or print.
-            </div>
-          </div>
-        </div>
-
-         {/* Step 4 Row */}
-         <div className="flex flex-col md:flex-row items-center justify-center w-full max-w-6xl px-4 gap-8 mt-16">
-          {/* Right: Step Number and Description */}
-          <div className="flex-1 flex flex-col items-center md:items-center">
-            <div className="text-[120px] font-bold text-green-800 leading-none mb-2">04</div>
-            <div className="text-2xl font-normal mb-2 text-center md:text-center">Done! Now Share, Edit or Print Your Invoice</div>
-            <div className="text-gray-700 text-md max-w-2xl text-center md:text-center">
-            Whether you want to email a live and secure invoice link or hand over a printed copy, SheetBills makes it easy. 
-        
-            </div>
-          </div>
-
-            {/* Left: Just the provided image */}
-            <div className="flex-1 pt-10 flex flex-col items-center justify-center">
-            <img src="/step5.png" alt="How it works visual" className="w-full max-w-xs md:max-w-sm bg-white" />
+        <h2 className="text-4xl md:text-5xl font-normal text-gray-800 text-center mb-4">See SheetBills in Action</h2>
+        <p className="text-lg text-gray-600 text-center mb-10 max-w-2xl">Watch this quick demo to see how easy it is to create, send, and manage invoices with SheetBills.</p>
+        <div className="w-full flex justify-center">
+          <div className="w-full max-w-4xl aspect-video rounded-xl overflow-hidden shadow-lg border border-gray-200 bg-black">
+            <iframe
+              className="w-full h-full"
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+              title="SheetBills Demo Video"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
           </div>
         </div>
       </section>
 
-  
-
-         {/* Pricing Section */}
-         <section className="w-full bg-white py-20 flex flex-col items-center">
-        <h2 className="text-4xl md:text-4xl font-extrabold leading-loose text-gray-800 text-center mb-4"> Quit Wasting In Google Sheets, <br /> Get Your SheetBills Free Plan</h2>
+      {/* Pricing Section */}
+      <section className="w-full bg-gray-50 py-20 flex flex-col items-center">
+      <h2 className="text-lg text-green-800 font-cal-sans pb-6 font-normal">
+               Pricing 
+            </h2>
+        <h2 className="text-4xl md:text-5xl font-normal leading-loose text-gray-800 text-center mb-4"> Quit Invoicing in Google Sheets, <br /> Get Your SheetBills Free Plan</h2>
         <p className="text-lg md:text-lg text-gray-600 text-center mb-10 max-w-2xl">All the essentials for $0.00 — forever. <span className='text-green-800 font-normal'> <br/> Paid plans with advanced features are coming soon!</span></p>
         <div className="flex flex-col items-center w-full">
           <div className="relative bg-white border-2 border-green-800 rounded-2xl shadow p-8 max-w-md w-full flex flex-col items-center mb-8">
             {/* Badge */}
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-800 text-white text-sm font-normal px-4 py-1 rounded-full">SheetBills Essentials</div>
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-800 text-white text-sm font-normal px-4 py-1 rounded-full">All Feature Included</div>
             {/* Price */}
             <div className="flex items-end gap-2 mb-2 mt-4">
               
@@ -444,7 +376,7 @@ const MacbookAir = (): React.ReactElement => {
       </section>
       
       {/* FAQs Section */}
-      <section className="w-full bg-white py-20 flex flex-col items-center">
+      <section className="w-full bg-gray-50 py-20 flex flex-col items-center">
         <h2 className="text-4xl font-extrabold text-gray-800 text-center mb-12">Frequently Asked Questions</h2>
         <div className="w-full max-w-2xl mx-auto divide-y divide-gray-200">
           {/* FAQ 1 - open by default */}

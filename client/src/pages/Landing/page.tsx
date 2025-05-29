@@ -14,20 +14,20 @@ import { CardContent } from "../../components/ui/card";
 // Feature card data for mapping
 const featureCards = [
   {
-    icon: <ZapIcon className="w-[41px] h-[41px]" />,
+    icon: <ZapIcon className="w-[35px] h-[35px] " />,
     title: "Designed for Simplicity & Speed",
     description:
       "Transform your Google Sheets Into a powerful invoicing system. No more complex formulas or messy templates.",
   },
   {
     icon: <FileTextIcon className="w-[49px] h-[49px]" />,
-    title: "Built on Google Sheets - No Extra Tools Needed",
+    title: "Google Sheets Powered",
     description:
       "Skip the learning curve! SheetBills works directly inside the Google Sheets you already use, so there's no need to install software or migrate data.",
   },
   {
     icon: <RefreshCwIcon className="w-[51px] h-[51px]" />,
-    title: "Tired of Messy Invoice Spreadsheets?",
+    title: "No More Messy Invoice Spreadsheets",
     description:
       "Stop battling copy-paste errors, broken formulas, and clunky templates.",
   },
@@ -128,7 +128,7 @@ const MacbookAir = (): React.ReactElement => {
   return (
     <div className="flex flex-col items-center relative bg-white">
       {/* Responsive Header */}
-      <header className="max-w-7xl bg-white  flex flex-col md:flex-row items-center justify-between px-4 py-4 md:px-6 md:py-4 gap-2 md:gap-0">
+      <header className="max-w-7xl bg-white flex items-center justify-between px-4 py-4 md:px-6 md:py-4 w-full">
         {/* Logo and Brand */}
         <div className="flex items-center gap-2">
           <img
@@ -140,24 +140,16 @@ const MacbookAir = (): React.ReactElement => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex flex-col md:flex-row items-center gap-2 md:gap-6 mt-2 md:mt-0">
-          {navItems.map((item, index) => (
-            <div
-              key={index}
-              className="text-md md:text-md text-center"
-              style={{ color: '#5C5B6A' }}
-            >
-              {item.title}
-            </div>
-          ))}
+        <nav className="flex items-center gap-8">
+          <span className="text-md text-[#5C5B6A]">Why SheetBills ?</span>
+          <span className="text-md text-[#5C5B6A]">How it Works</span>
+          <span className="text-md text-[#5C5B6A]">FAQs</span>
         </nav>
 
         {/* Button */}
-        <div className="w-full md:w-auto mt-2 md:mt-0">
-          <Button onClick={() => navigate('/login')} className="w-full md:w-auto bg-green-800 rounded-sm text-white text-sm">
-            Login
-          </Button>
-        </div>
+        <Button onClick={() => navigate('/login')} className="bg-green-800 rounded-sm text-white text-sm px-6 py-2">
+          Login
+        </Button>
       </header>
 
       <section className="flex flex-col items-center justify-center mt-20 w-full gap-y-10">
@@ -168,7 +160,7 @@ const MacbookAir = (): React.ReactElement => {
             <span className="font-normal text-sm" style={{ color: "#5C5B6A" }}>
               Made for
             </span>
-            <span className="flex items-center bg-white  px-3 py-1 " >
+            <span className="flex items-center   bg-white  px-1 py-1 " >
               <img
                 className="w-5 h-5 mr-1"
                 alt="Google Sheets logo"
@@ -182,14 +174,15 @@ const MacbookAir = (): React.ReactElement => {
 
           {/* Heading and subheading */}
           <div className="flex flex-col items-center text-center w-full">
-            <h1 className="font-cal-sans font-normal text-[56px] w-full">
+            <h1 className="font-cal-sans font-normal leading-tight text-[56px] w-full">
               <span className="text-black font-normal">Stop </span>
               <span className="text-green-800 font-normal">Wrestling</span>
               <span className="text-black font-normal"> with</span>
               <br />
               <span className="text-green-800 font-normal">Invoices in Google Sheets ?</span>
             </h1>
-            <p className="font-medium text-lg mt-2" style={{ color: "#5C5B6A" }}>
+
+            <p className="font-medium text-lg pt-6" style={{ color: "#5C5B6A" }}>
               Ditch the templates, formulas and frustration. SheetBills makes invoicing in<br />
               Google Sheets fast, simple and professional
             </p>
@@ -197,7 +190,7 @@ const MacbookAir = (): React.ReactElement => {
         </div>
 
         {/* Benefit list */}
-        <div className="flex flex-col justify-start gap-3">
+        <div className="flex flex-col max-w-2xl justify-start gap-3">
           {benefitItems.map((item, index) => (
             <div
               key={index}
@@ -216,86 +209,115 @@ const MacbookAir = (): React.ReactElement => {
           Try for Free
         </Button>
 
+        {/* Social Proof/Testimonial */}
+        <div className="flex items-center gap-4 ">
+          {/* Avatars */}
+          <div className="flex items-center">
+            {[1, 2, 3, 4, 5].map((n, i) => (
+              <img
+                key={i}
+                src="https://www.shutterstock.com/image-photo/smiling-african-american-millennial-businessman-600nw-1437938108.jpg"
+                alt={`User ${n}`}
+                className={`w-10 h-10 rounded-full object-cover ring-2 ring-white shadow ${i !== 0 ? '-ml-3' : ''}`}
+                style={{ background: "#eee" }}
+              />
+            ))}
+          </div>
+
+          <div className="flex flex-col ">
+
+
+            {/* Stars */}
+            <div className="flex pl-2 text-yellow-400">
+              {[...Array(5)].map((_, i) => (
+                <svg key={i} xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="w-5 h-5">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" />
+                </svg>
+              ))}
+            </div>
+
+            {/* Text */}
+            <span className="ml-2 text-lg"><span className="font-normal">Join</span> 250+ Satisfied Users</span>
+
+          </div>
+
+        </div>
+
       </section>
 
-      <section className="flex flex-col items-center justify-center w-full gap-y-10">
+      <section className="flex flex-col items-center justify-center pt-40 w-full gap-y-10">
+        <div className="flex flex-col items-center gap-[30px]">
+          <header className="flex flex-col items-center justify-center">
+            <h2 className="text-lg text-green-800 font-cal-sans font-normal">
+              Why Us ?
+            </h2>
+            <div className="flex flex-col justify-center gap-y-2 items-center">
+              <h1 className="w-[686px] text-[50px] text-center font-cal-sans font-normal">
+                <span className="text-green-800">Invoice</span>
+                <span className="text-green-800"> Creation</span>
+                <span className="text-black"> Made </span>
 
-
-       
-          <div className="flex flex-col items-center gap-[30px]">
-            <header className="flex flex-col items-center justify-center">
-              <h2 className="text-xl text-green-800 [font-family:'Cal_Sans',Helvetica] font-normal">
-                Why Us ?
-              </h2>
-
-              <div className="flex flex-col items-start">
-                <h1 className="w-[686px] text-[50px] text-center [font-family:'Cal_Sans',Helvetica] font-normal">
-                  <span className="text-green-800">Invoice</span>
-                  <span className="text-black">
-                    &nbsp;&nbsp;Creation&nbsp;&nbsp;Made{" "}
-                  </span>
-                  <span className="text-green-800">Simple</span>
-                </h1>
-
-                <p className="w-[686px] text-xl text-gray-600 text-center [font-family:'Cal_Sans',Helvetica] font-normal">
-                  Transform your Google Sheets Into a powerful invoicing system. No
-                  more complex formulas or messy templates.
-                </p>
-              </div>
-            </header>
-
-            <div className="flex w-[982px] items-center justify-center gap-[35px] px-[62px] py-[38px]">
-
-              <div className="flex flex-col items-start gap-[35px] ml-[-17.50px]">
-                <div className="flex flex-col items-start gap-[73px]">
-                  {featureCards.slice(0, 2).map((card, index) => (
-                    <CardComponent
-                      key={index}
-                      className="w-[434px] h-[284px] rounded-[10px] overflow-hidden"
-                    >
-                      <CardContent className="flex flex-col items-center gap-[7px] pt-5">
-                        <div className="w-[102px] h-[95px] bg-white rounded-[9px] overflow-hidden border-4 border-solid border-green-800 shadow-[0px_4px_4px_#00000040] flex items-center justify-center">
-                          {card.icon}
-                        </div>
-                        <h3 className="h-[45px] [font-family:'Cal_Sans',Helvetica] font-normal text-black text-[25px] text-center">
-                          {card.title}
-                        </h3>
-                        <p className="h-[77px] [font-family:'Cal_Sans',Helvetica] font-normal text-gray-600 text-xl text-center">
-                          {card.description}
-                        </p>
-                      </CardContent>
-                    </CardComponent>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex flex-col items-start gap-[59px] mr-[-17.50px]">
-                <div className="flex flex-col h-[655px] items-start gap-[70px]">
-                  {featureCards.slice(2, 4).map((card, index) => (
-                    <CardComponent
-                      key={index}
-                      className="w-[424px] h-[276px] rounded-[10px] overflow-hidden"
-                    >
-                      <CardContent className="flex flex-col items-center gap-[7px] pt-5">
-                        <div className="w-[102px] h-[95px] bg-white rounded-[9px] overflow-hidden border-4 border-solid border-green-800 shadow-[0px_4px_4px_#00000040] flex items-center justify-center">
-                          {card.icon}
-                        </div>
-                        <h3 className="h-[45px] [font-family:'Cal_Sans',Helvetica] font-normal text-black text-[25px] text-center">
-                          {card.title}
-                        </h3>
-                        <p className="h-[77px] [font-family:'Cal_Sans',Helvetica] font-normal text-gray-600 text-xl text-center">
-                          {card.description}
-                        </p>
-                      </CardContent>
-                    </CardComponent>
-                  ))}
-                </div>
-              </div>
-
-
-
+                <span className="text-green-800">Simple</span>
+              </h1>
+              <p className="w-[600px] text-lg text-gray-600 text-center font-cal-sans font-normal">
+                Transform your Google Sheets Into a powerful invoicing system. No
+                more complex formulas or messy templates.
+              </p>
             </div>
+          </header>
+
+          <div className="flex max-w-4xl items-center justify-center gap-5 px-5 py-5">
+
+            {/* First Column */}
+            <div className="flex  flex-col items-start ">
+              <div className="flex flex-col items-start gap-y-4">
+                {featureCards.slice(0, 2).map((card, index) => (
+                  <CardComponent
+                    key={index}
+                    className="max-w-md  border-none"
+                  >
+                    <CardContent className="flex  border border-gray-200 rounded-md  flex-col items-center gap-[7px]">
+                      <div className=" bg-white  border-green-800 p-8 flex items-center justify-center">
+                        {card.icon}
+                      </div>
+                      <h3 className=" font-normal text-black text-2xl text-center">
+                        {card.title}
+                      </h3>
+                      <p className="font-normal text-gray-600 text-md max-w-sm text-center">
+                        {card.description}
+                      </p>
+                    </CardContent>
+                  </CardComponent>
+                ))}
+              </div>
+            </div>
+
+            {/* Second Column */}
+            <div className="flex  flex-col items-start ">
+              <div className="flex flex-col items-start gap-y-4">
+                {featureCards.slice(0, 2).map((card, index) => (
+                  <CardComponent
+                    key={index}
+                    className="max-w-md  border-none"
+                  >
+                    <CardContent className="flex border border-gray-200 rounded-md flex-col items-center gap-[7px]">
+                      <div className=" bg-white   p-8 flex items-center justify-center">
+                        {card.icon}
+                      </div>
+                      <h3 className=" font-normal  text-2xl text-center">
+                        {card.title}
+                      </h3>
+                      <p className="font-normal text-gray-600 text-md max-w-sm text-center">
+                        {card.description}
+                      </p>
+                    </CardContent>
+                  </CardComponent>
+                ))}
+              </div>
+            </div>
+
           </div>
+        </div>
       </section>
 
 

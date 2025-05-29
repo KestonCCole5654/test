@@ -132,7 +132,7 @@ const MacbookAir = (): React.ReactElement => {
           <span className="font-medium text-base" style={{ color: "#5C5B6A" }}>
             Made for
           </span>
-          <span className="flex items-center bg-white rounded-full px-3 py-1 shadow" style={{ boxShadow: "0 1px 6px #e0e0e0" }}>
+          <span className="flex items-center bg-white  px-3 py-1 " >
             <img
               className="w-5 h-5 mr-2"
               alt="Google Sheets logo"

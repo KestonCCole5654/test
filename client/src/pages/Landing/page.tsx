@@ -128,6 +128,7 @@ const MacbookAir = (): React.ReactElement => {
 
       <main className="flex flex-col items-center justify-center w-full gap-y-10">
         {/* Made for Google Sheets */}
+        
         <div className="flex items-center space-x-2">
           <span className="font-medium text-base" style={{ color: "#5C5B6A" }}>
             Made for
@@ -138,7 +139,7 @@ const MacbookAir = (): React.ReactElement => {
               alt="Google Sheets logo"
               src="/Google_Sheets_logo_(2014-2020).svg"
             />
-            <span className="font-semibold text-base" style={{ color: "#1EA952" }}>
+            <span className="font-normal text-base" style={{ color: "#1EA952" }}>
               Google Sheets
             </span>
           </span>

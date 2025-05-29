@@ -128,7 +128,7 @@ const MacbookAir = (): React.ReactElement => {
         </div>
       </header>
 
-      <main className="flex flex-col items-center justify-center mt-20 w-full gap-y-8">
+      <main className="flex flex-col items-center justify-center mt-20 w-full gap-y-10">
 
         <div className="flex flex-col items-center justify-center w-full gap-y-2">
           {/* Made for Google Sheets */}
@@ -138,7 +138,7 @@ const MacbookAir = (): React.ReactElement => {
             </span>
             <span className="flex items-center bg-white  px-3 py-1 " >
               <img
-                className="w-5 h-5 mr-2"
+                className="w-5 h-5 mr-1"
                 alt="Google Sheets logo"
                 src="/Google_Sheets_logo_(2014-2020).svg"
               />

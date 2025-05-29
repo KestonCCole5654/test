@@ -108,14 +108,17 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen font-cal-sans flex flex-col bg-gradient-to-b from-white to-gray-50">
-      {/* <div className="flex items-center mb-4 p-10">
-        <a href="/" className="flex items-center space-x-2">
-          <div className="h-8 w-8 rounded bg-green-800 flex items-center justify-center">
-            <img src="/icon1.svg" alt="SheetBills Logo" className="h-6 w-auto" />
-          </div>
-          <span className="text-lg font-medium text-green-800">SheetBills</span>
-        </a>
-      </div> */}
+      <div className="flex items-center mb-4 p-10">
+        <button 
+          onClick={() => navigate('/')} 
+          className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <span>Back to Home</span>
+        </button>
+      </div>
 
       <div className="flex flex-1 flex-col items-center justify-center px-3 py-12">
         <div className="max-w-md w-full mx-auto ">

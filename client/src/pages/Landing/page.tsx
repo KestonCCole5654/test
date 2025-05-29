@@ -86,7 +86,8 @@ const MacbookAir = (): React.ReactElement => {
   const benefitItems = [
     { text: "No more scattered files" },
     { text: "No more formulas" },
-    { text: "No more copying and pasting" },
+    { text: "No more formulas" },
+   
   ];
 
   return (
@@ -125,16 +126,17 @@ const MacbookAir = (): React.ReactElement => {
         </div>
       </header>
 
-      <main className="flex flex-col items-center justify-center align-middle gap-[33px] relative self-stretch w-full ">
-        <div className="inline-flex items-center relative ">
+      <main className="flex flex-col mt-25 items-center justify-center align-middle  self-stretch w-full ">
+
+        <div className="inline-flex items-center ">
           <div
-            className="relative h-8 font-extralight text-sm text-center"
+            className=" h-8 font-extralight text-sm text-center"
             style={{ color: "#5C5B6A" }}
           >
             Made for
           </div>
 
-          <Card className="relative flex items-center ml-4 px-4 py-2 bg-white rounded-[12px] shadow-[0_4px_12px_#1ea95233]">
+          <Card className="flex items-center ml-4 px-4 py-4 bg-white rounded-[12px] shadow-[0_4px_12px_#1ea95233]">
             <img
               className="w-8 h-8 object-contain mr-2"
               alt="Google Sheets logo"
@@ -152,7 +154,7 @@ const MacbookAir = (): React.ReactElement => {
         <section className="flex flex-col items-center text-center justify-center gap-4 w-full">
           <h1 className="font-sans font-bold text-[56px] leading-tight w-full">
             <span className="text-black">Stop </span>
-            <span className="text-green-800 font-normal">Wrestling</span>
+            <span className="text-green-800 font-bold">Wrestling</span>
             <span className="text-black"> with</span>
             <br />
             <span className="text-green-800 font-bold">Invoices in Google Sheets ?</span>

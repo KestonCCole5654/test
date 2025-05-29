@@ -147,7 +147,7 @@ const MacbookAir = (): React.ReactElement => {
 
         {/* Heading and subheading */}
         <div className="flex flex-col items-center text-center w-full">
-          <h1 className="font-cal-sans font-bold text-[56px] w-full">
+          <h1 className="font-cal-sans font-normal text-[56px] w-full">
             <span className="text-black font-normal">Stop </span>
             <span className="text-green-800 font-normal">Wrestling</span>
             <span className="text-black font-normal"> with</span>

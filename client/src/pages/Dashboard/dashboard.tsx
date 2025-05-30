@@ -961,8 +961,8 @@ export default function Dashboard() {
       </div> */}
 
       <div>
-        <h1 className="text-2xl font-semibold text-gray-900">Quotations</h1>
-        <p className="text-sm text-gray-500">Manage your quotations</p>
+        <h1 className="text-2xl font-normal text-gray-900">Invoices</h1>
+        <p className="text-sm text-gray-500">Manage your invoices</p>
       </div>
 
       {/* Filter Tabs, Search, and Create Invoice Row */}

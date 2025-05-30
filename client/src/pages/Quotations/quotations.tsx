@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import {
@@ -11,14 +11,8 @@ import {
   TableHeader,
   TableRow,
 } from "../../components/ui/table"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu"
 import { useNavigate } from "react-router-dom"
-import { Plus, MoreVertical, Search, Download, Mail, Trash2, Pencil } from "lucide-react"
+import { Plus, Search, Trash2 } from "lucide-react"
 import { useToast } from "../../components/ui/use-toast"
 import {
   Breadcrumb,
@@ -48,6 +42,10 @@ export default function Quotations() {
   const [quotations, setQuotations] = useState<Quotation[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [isLoading, setIsLoading] = useState(true)
+  const [selectedInvoices, setSelectedInvoices] = useState<Set<string>>(new Set())
+  const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const headerCheckboxRef = useRef<HTMLInputElement>(null)
 
   // Format currency
   const formatCurrency = (amount: number): string => {
@@ -64,22 +62,6 @@ export default function Quotations() {
       month: "short",
       day: "numeric",
     })
-  }
-
-  // Get status color
-  const getStatusColor = (status: Quotation["status"]): string => {
-    switch (status) {
-      case "Draft":
-        return "bg-gray-100 text-gray-800"
-      case "Sent":
-        return "bg-blue-100 text-blue-800"
-      case "Accepted":
-        return "bg-green-100 text-green-800"
-      case "Rejected":
-        return "bg-red-100 text-red-800"
-      default:
-        return "bg-gray-100 text-gray-800"
-    }
   }
 
   // Load quotations
@@ -155,6 +137,24 @@ export default function Quotations() {
     }
   }
 
+  const handleSelectAllVisible = () => {
+    if (headerCheckboxRef.current?.checked) {
+      setSelectedInvoices(new Set(quotations.map(q => q.id)))
+    } else {
+      setSelectedInvoices(new Set())
+    }
+  }
+
+  const handleSelectInvoice = (id: string) => {
+    const newSelectedInvoices = new Set(selectedInvoices)
+    if (newSelectedInvoices.has(id)) {
+      newSelectedInvoices.delete(id)
+    } else {
+      newSelectedInvoices.add(id)
+    }
+    setSelectedInvoices(newSelectedInvoices)
+  }
+
   return (
     <div className="container mx-auto py-6">
       {/* Breadcrumb Navigation */}
@@ -201,101 +201,171 @@ export default function Quotations() {
         </div>
       </div>
 
-      {/* Quotations Table */}
-      <div className="bg-white rounded-lg border border-gray-200">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="px-6 py-4 whitespace-nowrap border-r border-gray-200">Quotation #</TableHead>
-              <TableHead className="px-6 py-4 border-r border-gray-200">Customer</TableHead>
-              <TableHead className="px-6 py-4 whitespace-nowrap font-cal-sans font-normal border-r border-gray-200">Date</TableHead>
-              <TableHead className="px-6 py-4 whitespace-nowrap font-cal-sans font-normal border-r border-gray-200">Valid Until</TableHead>
-              <TableHead className="px-6 py-4 text-right border-r border-gray-200">Amount</TableHead>
-              <TableHead className="px-6 py-4 border-r border-gray-200">Status</TableHead>
-              <TableHead className="px-6 py-4 text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center py-8">
-                  Loading quotations...
-                </TableCell>
-              </TableRow>
-            ) : filteredQuotations.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center py-8">
-                  No quotations found
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredQuotations.map((quotation) => (
-                <TableRow key={quotation.id}>
-                  <TableCell className="px-6 py-4 whitespace-nowrap border-r border-gray-200 font-medium">
-                    {quotation.quotationNumber}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 border-r border-gray-200">
-                    <div className="flex items-center gap-3">
-                      <div className="flex flex-col">
-                        <span className="font-medium text-gray-900">
-                          {quotation.customer.name}
-                        </span>
-                        <span className="text-sm text-gray-500">
-                          {quotation.customer.email}
-                        </span>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap font-cal-sans font-normal border-r border-gray-200">
-                    {formatDate(quotation.date)}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap font-cal-sans font-normal border-r border-gray-200">
-                    {formatDate(quotation.validUntil)}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 text-right border-r border-gray-200">
-                    ${formatCurrency(quotation.amount)}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 border-r border-gray-200">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(quotation.status)}`}>
-                      {quotation.status}
-                    </span>
-                  </TableCell>
-                  <TableCell className="px-6 py-4 text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Open menu</span>
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => navigate(`/edit-quotation/${quotation.id}`)}>
-                          <Pencil className="w-4 h-4 mr-2" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Download className="w-4 h-4 mr-2" />
-                          Download PDF
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Mail className="w-4 h-4 mr-2" />
-                          Send Email
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="text-red-600"
-                          onClick={() => handleDelete(quotation.id)}
-                        >
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+      {/* Table Card */}
+      <div className="bg-white border border-gray-200">
+        {/* Toolbar section above the table */}
+        <div className="flex items-center justify-between p-4 border-b bg-gray-50 rounded-t-lg mb-0">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSelectAllVisible}
+              className="text-white"
+              disabled={quotations.length === 0}
+            >
+              {selectedInvoices.size === quotations.length ? "Deselect All" : "Select All"}
+            </Button>
+            <span className="text-sm text-slate-500">
+              {selectedInvoices.size} selected
+            </span>
+          </div>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => setIsBulkDeleteDialogOpen(true)}
+            disabled={selectedInvoices.size === 0 || isDeleting}
+            className="bg-red-100 text-red-700 border-red-200 hover:bg-red-200"
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            {isDeleting ? "Deleting..." : "Delete Selected"}
+          </Button>
+        </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          {filteredQuotations.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+              <h3 className="text-lg font-medium text-gray-900 mb-1 font-cal-sans">
+                No quotations found
+              </h3>
+              <p className="text-sm text-gray-500 mb-6 font-cal-sans">
+                Please refresh to see your quotations or create a new quotation.
+              </p>
+            </div>
+          ) : (
+            <Table className="min-w-full text-sm">
+              <TableHeader>
+                <TableRow className="bg-gray-50 border-b border-gray-200">
+                  <TableHead className="w-8 px-4 border-r border-gray-200"></TableHead>
+                  <TableHead className="w-[56px] px-6 py-4 align-middle text-center border-r border-gray-200">
+                    <input
+                      type="checkbox"
+                      ref={headerCheckboxRef}
+                      checked={selectedInvoices.size === quotations.length}
+                      onChange={handleSelectAllVisible}
+                      aria-label="Select all quotations on this page"
+                      className="mx-auto accent-green-800 h-4 w-4 rounded border-gray-300"
+                    />
+                  </TableHead>
+                  <TableHead className="px-6 py-4 border-r border-gray-200">
+                    Number
+                  </TableHead>
+                  <TableHead className="px-6 py-4 border-r border-gray-200">
+                    Client
+                  </TableHead>
+                  <TableHead className="px-6 py-4 border-r border-gray-200">
+                    Date
+                  </TableHead>
+                  <TableHead className="px-6 py-4 border-r border-gray-200">
+                    Valid Until
+                  </TableHead>
+                  <TableHead className="px-6 py-4 border-r border-gray-200">
+                    Status
+                  </TableHead>
+                  <TableHead className="px-6 py-4 border-r border-gray-200">
+                    Total
+                  </TableHead>
+                  <TableHead className="px-6 py-4 text-center">
+                    Actions
+                  </TableHead>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              </TableHeader>
+              <TableBody className="cursor-pointer">
+                {filteredQuotations.map((quotation) => (
+                  <TableRow key={quotation.id} className="hover:bg-slate-50 border-b border-gray-200">
+                    <TableCell className="w-8 px-4 border-r border-gray-200"></TableCell>
+                    <TableCell className="w-[56px] px-6 py-4 align-middle text-center border-r border-gray-200">
+                      <input
+                        type="checkbox"
+                        checked={selectedInvoices.has(quotation.id)}
+                        onChange={() => handleSelectInvoice(quotation.id)}
+                        aria-label={`Select quotation ${quotation.id}`}
+                        className="mx-auto accent-green-800 h-4 w-4 rounded border-gray-300"
+                      />
+                    </TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                      {quotation.quotationNumber}
+                    </TableCell>
+                    <TableCell className="px-6 py-4 border-r border-gray-200">
+                      <div className="flex items-center gap-3">
+                        <div className="flex flex-col">
+                          <span className="font-medium text-gray-900">
+                            {quotation.customer.name}
+                          </span>
+                          <span className="text-sm text-gray-500">
+                            {quotation.customer.email}
+                          </span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap font-cal-sans font-normal border-r border-gray-200">
+                      {formatDate(quotation.date)}
+                    </TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap font-cal-sans font-normal border-r border-gray-200">
+                      {formatDate(quotation.validUntil)}
+                    </TableCell>
+                    <TableCell className="px-6 py-4 border-r border-gray-200">
+                      {quotation.status === "Accepted" ? (
+                        <span className="inline-block px-3 py-1 font-cal-sans font-normal rounded-md border border-green-200 bg-green-50 text-green-700 text-sm">
+                          Accepted
+                        </span>
+                      ) : quotation.status === "Sent" ? (
+                        <span className="inline-block px-3 py-1 font-cal-sans font-normal rounded-md border border-amber-200 bg-amber-50 text-amber-700 text-sm">
+                          Sent
+                        </span>
+                      ) : quotation.status === "Draft" ? (
+                        <span className="inline-block px-3 py-1 font-cal-sans font-normal rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-sm">
+                          Draft
+                        </span>
+                      ) : (
+                        <span className="inline-block px-3 py-1 font-cal-sans font-normal rounded-md border border-red-200 bg-red-50 text-red-700 text-sm">
+                          Rejected
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right font-normal font-cal-sans text-md px-6 py-4 border-r border-gray-200">
+                      ${formatCurrency(quotation.amount)}
+                    </TableCell>
+                    <TableCell className="px-6 py-4 text-center">
+                      <div className="flex justify-center gap-2">
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/edit-quotation/${quotation.id}`);
+                          }}
+                          className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
+                          size="sm"
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(quotation.id);
+                          }}
+                          className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
+                          size="sm"
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </div>
       </div>
     </div>
   )

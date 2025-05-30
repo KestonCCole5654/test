@@ -149,7 +149,7 @@ const LandingPage = () => {
             </p>
 
             {/* Benefits */}
-            <div className="flex flex-col items-start space-y-4 max-w-md mx-auto mb-8">
+            <div className="flex flex-col items-start space-y-4 px-25 max-w-md mx-auto mb-8">
               {benefitItems.map((item, index) => (
                 <div key={index} className="flex items-center space-x-3">
                   <CheckIcon className="w-5 h-5 text-green-800 flex-shrink-0" />

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
@@ -27,7 +27,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb"
-import { Plus, Search, MoreHorizontal, Edit, Trash2, RefreshCw } from "lucide-react"
+import { Plus, Search, MoreHorizontal, Edit, Trash2, RefreshCw, GripVertical, X } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,6 +38,17 @@ import { LoadingSpinner } from "../../components/ui/loadingSpinner"
 import { CustomerSidebar } from "../../components/Customers/CustomerSidebar"
 import { toast } from "../../components/ui/use-toast"
 import supabase from "../../components/Auth/supabaseClient"
+import { Checkbox } from "../../components/ui/checkbox"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../../components/ui/alert-dialog"
 
 interface Customer {
   id: string
@@ -67,6 +78,10 @@ export default function CustomersPage() {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
   const [sidebarMode, setSidebarMode] = useState<"create" | "edit">("create")
   const [selectedCustomers, setSelectedCustomers] = useState<string[]>([])
+  const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [bulkDeleteMessage, setBulkDeleteMessage] = useState<string | null>(null)
+  const headerCheckboxRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     fetchCustomers()
@@ -334,16 +349,6 @@ export default function CustomersPage() {
               </p>
             </div>
             <div className="flex items-center gap-4">
-              {selectedCustomers.length > 0 && (
-                <Button
-                  variant="destructive"
-                  onClick={handleBulkDelete}
-                  className="flex items-center"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Delete Selected ({selectedCustomers.length})
-                </Button>
-              )}
               <div className="relative w-72">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
                 <Input
@@ -375,52 +380,104 @@ export default function CustomersPage() {
 
           <Card>
             <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[50px]">
-                      <input
-                        type="checkbox"
-                        checked={selectedCustomers.length === filteredCustomers.length}
-                        onChange={toggleAllCustomers}
-                        className="h-4 w-4 rounded border-gray-300"
-                      />
-                    </TableHead>
-                    <TableHead>Logo</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Company</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead>Paid Invoices</TableHead>
-                    <TableHead>Unpaid Invoices</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {loading ? (
-                    <TableRow>
-                      <TableCell colSpan={9} className="text-center py-8">
-                        <LoadingSpinner />
-                      </TableCell>
+              <div className="flex items-center justify-between p-4 border-b bg-gray-50 rounded-t-lg mb-0">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={toggleAllCustomers}
+                    className="text-white"
+                    disabled={filteredCustomers.length === 0}
+                  >
+                    {selectedCustomers.length === filteredCustomers.length ? "Deselect All" : "Select All"}
+                  </Button>
+                  <span className="text-sm text-slate-500">
+                    {selectedCustomers.length} selected
+                  </span>
+                </div>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => setIsBulkDeleteDialogOpen(true)}
+                  disabled={selectedCustomers.length === 0 || isDeleting}
+                  className="bg-red-100 text-red-700 border-red-200 hover:bg-red-200"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  {isDeleting ? "Deleting..." : "Delete Selected"}
+                </Button>
+              </div>
+
+              {bulkDeleteMessage && (
+                <div className="flex items-center font-light justify-between bg-green-50 border border-green-200 text-green-800 rounded px-4 py-2 mb-2">
+                  <span>{bulkDeleteMessage}</span>
+                  <button
+                    onClick={() => setBulkDeleteMessage(null)}
+                    className="ml-4 p-1 rounded hover:bg-green-100 focus:outline-none"
+                    aria-label="Dismiss message"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              )}
+
+              {filteredCustomers.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                  <h3 className="text-lg font-medium text-gray-900 mb-1 font-cal-sans">
+                    No customers found
+                  </h3>
+                  <p className="text-sm text-gray-500 mb-6 font-cal-sans">
+                    Please refresh to see your customers or create a new customer.
+                  </p>
+                </div>
+              ) : (
+                <Table className="min-w-full text-sm">
+                  <TableHeader>
+                    <TableRow className="bg-gray-50 border-b border-gray-200">
+                      <TableHead className="w-8 px-4 border-r border-gray-200"></TableHead>
+                      <TableHead className="w-[56px] px-6 py-4 align-middle text-center border-r border-gray-200">
+                        <input
+                          type="checkbox"
+                          ref={headerCheckboxRef}
+                          checked={selectedCustomers.length === filteredCustomers.length && filteredCustomers.length > 0}
+                          onChange={toggleAllCustomers}
+                          aria-label="Select all customers on this page"
+                          className="mx-auto accent-green-800 h-4 w-4 rounded border-gray-300"
+                        />
+                      </TableHead>
+                      <TableHead className="px-6 py-4 border-r border-gray-200">Logo</TableHead>
+                      <TableHead className="px-6 py-4 border-r border-gray-200">Name</TableHead>
+                      <TableHead className="px-6 py-4 border-r border-gray-200">Company</TableHead>
+                      <TableHead className="px-6 py-4 border-r border-gray-200">Email</TableHead>
+                      <TableHead className="px-6 py-4 border-r border-gray-200">Phone</TableHead>
+                      <TableHead className="px-6 py-4 border-r border-gray-200">Paid Invoices</TableHead>
+                      <TableHead className="px-6 py-4 border-r border-gray-200">Unpaid Invoices</TableHead>
+                      <TableHead className="px-6 py-4 text-center">Actions</TableHead>
                     </TableRow>
-                  ) : filteredCustomers.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={9} className="text-center py-8 text-gray-500">
-                        No customers found
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredCustomers.map((customer) => (
-                      <TableRow key={customer.id}>
-                        <TableCell>
-                          <input
-                            type="checkbox"
-                            checked={selectedCustomers.includes(customer.id)}
-                            onChange={() => toggleCustomerSelection(customer.id)}
-                            className="h-4 w-4 rounded border-gray-300"
-                          />
+                  </TableHeader>
+                  <TableBody>
+                    {filteredCustomers.map((customer) => (
+                      <TableRow 
+                        key={customer.id}
+                        className="hover:bg-slate-50 border-b border-gray-200"
+                      >
+                        <TableCell className="w-8 px-4 align-middle text-center border-r border-gray-200">
+                          <div className="flex items-center justify-center h-full min-h-[40px]">
+                            <span className="inline-flex items-center justify-center cursor-grab text-gray-400 hover:text-gray-600 active:text-gray-800">
+                              <GripVertical className="h-6 w-6" />
+                            </span>
+                          </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="w-[56px] px-6 py-4 align-middle text-center border-r border-gray-200">
+                          <div className="flex items-center justify-center h-full min-h-[40px]">
+                            <Checkbox
+                              checked={selectedCustomers.includes(customer.id)}
+                              onCheckedChange={() => toggleCustomerSelection(customer.id)}
+                              aria-label={`Select customer ${customer.id}`}
+                              className="mx-auto"
+                            />
+                          </div>
+                        </TableCell>
+                        <TableCell className="px-6 py-4 border-r border-gray-200">
                           {customer.logo ? (
                             <img 
                               src={customer.logo} 
@@ -435,21 +492,26 @@ export default function CustomersPage() {
                             </div>
                           )}
                         </TableCell>
-                        <TableCell className="font-medium">{customer.name}</TableCell>
-                        <TableCell>{customer.company || "-"}</TableCell>
-                        <TableCell>{customer.email}</TableCell>
-                        <TableCell>{customer.phone || "-"}</TableCell>
-                        <TableCell>
+                        <TableCell className="px-6 py-4 border-r border-gray-200">
+                          <div className="flex flex-col">
+                            <span className="font-medium text-gray-900">{customer.name}</span>
+                            <span className="text-sm text-gray-500">{customer.email}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="px-6 py-4 border-r border-gray-200">{customer.company || "-"}</TableCell>
+                        <TableCell className="px-6 py-4 border-r border-gray-200">{customer.email}</TableCell>
+                        <TableCell className="px-6 py-4 border-r border-gray-200">{customer.phone || "-"}</TableCell>
+                        <TableCell className="px-6 py-4 border-r border-gray-200">
                           <span className="text-green-600 font-medium">
                             {customer.invoice_counts?.paid || 0}
                           </span>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="px-6 py-4 border-r border-gray-200">
                           <span className="text-red-600 font-medium">
                             {customer.invoice_counts?.unpaid || 0}
                           </span>
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="px-6 py-4 text-center">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" size="icon">
@@ -472,14 +534,43 @@ export default function CustomersPage() {
                           </DropdownMenu>
                         </TableCell>
                       </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
             </CardContent>
           </Card>
         </div>
       </div>
+
+      <AlertDialog
+        open={isBulkDeleteDialogOpen}
+        onOpenChange={setIsBulkDeleteDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-cal-sans font-medium">
+              Are you sure you want to delete these customers?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="font-cal-sans text-gray-700">
+              This action cannot be undone. This will permanently delete{" "}
+              {selectedCustomers.length} selected customer(s).
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="font-cal-sans">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkDelete}
+              className="bg-gray-800 font-cal-sans focus:ring-gray-800"
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <CustomerSidebar
         isOpen={isCustomerSidebarOpen}

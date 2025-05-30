@@ -27,7 +27,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb"
-import { Plus, Search, MoreHorizontal, Edit, Trash2, RefreshCw, GripVertical, X } from "lucide-react"
+import { Plus, Search, MoreHorizontal, Edit, Trash2, RefreshCw, GripVertical, X, Mail } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -444,10 +444,7 @@ export default function CustomersPage() {
                           className="mx-auto accent-green-800 h-4 w-4 rounded border-gray-300"
                         />
                       </TableHead>
-                      <TableHead className="px-6 py-4 border-r border-gray-200">Logo</TableHead>
                       <TableHead className="px-6 py-4 border-r border-gray-200">Name</TableHead>
-                      <TableHead className="px-6 py-4 border-r border-gray-200">Company</TableHead>
-                      <TableHead className="px-6 py-4 border-r border-gray-200">Email</TableHead>
                       <TableHead className="px-6 py-4 border-r border-gray-200">Phone</TableHead>
                       <TableHead className="px-6 py-4 border-r border-gray-200">Paid Invoices</TableHead>
                       <TableHead className="px-6 py-4 border-r border-gray-200">Unpaid Invoices</TableHead>
@@ -478,28 +475,26 @@ export default function CustomersPage() {
                           </div>
                         </TableCell>
                         <TableCell className="px-6 py-4 border-r border-gray-200">
-                          {customer.logo ? (
-                            <img 
-                              src={customer.logo} 
-                              alt={`${customer.name} logo`}
-                              className="h-8 w-8 rounded-full object-cover"
-                            />
-                          ) : (
-                            <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
-                              <span className="text-xs text-gray-500">
-                                {customer.name.charAt(0).toUpperCase()}
-                              </span>
+                          <div className="flex items-center gap-3">
+                            {customer.logo ? (
+                              <img 
+                                src={customer.logo} 
+                                alt={`${customer.name} logo`}
+                                className="h-8 w-8 rounded-full object-cover"
+                              />
+                            ) : (
+                              <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                <span className="text-xs text-gray-500">
+                                  {customer.name.charAt(0).toUpperCase()}
+                                </span>
+                              </div>
+                            )}
+                            <div className="flex flex-col">
+                              <span className="font-medium text-gray-900">{customer.name}</span>
+                              <span className="text-sm text-gray-500">{customer.email}</span>
                             </div>
-                          )}
-                        </TableCell>
-                        <TableCell className="px-6 py-4 border-r border-gray-200">
-                          <div className="flex flex-col">
-                            <span className="font-medium text-gray-900">{customer.name}</span>
-                            <span className="text-sm text-gray-500">{customer.email}</span>
                           </div>
                         </TableCell>
-                        <TableCell className="px-6 py-4 border-r border-gray-200">{customer.company || "-"}</TableCell>
-                        <TableCell className="px-6 py-4 border-r border-gray-200">{customer.email}</TableCell>
                         <TableCell className="px-6 py-4 border-r border-gray-200">{customer.phone || "-"}</TableCell>
                         <TableCell className="px-6 py-4 border-r border-gray-200">
                           <span className="text-green-600 font-medium">
@@ -512,26 +507,30 @@ export default function CustomersPage() {
                           </span>
                         </TableCell>
                         <TableCell className="px-6 py-4 text-center">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => handleEditCustomer(customer)}>
-                                <Edit className="h-4 w-4 mr-2" />
-                                Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                onClick={() => handleDeleteCustomer(customer.id)}
-                                className="text-red-600"
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <div className="flex items-center justify-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEditCustomer(customer)}
+                              className="h-8 w-8"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                // TODO: Implement send message functionality
+                                toast({
+                                  title: "Coming Soon",
+                                  description: "Message functionality will be available soon.",
+                                })
+                              }}
+                              className="h-8 w-8"
+                            >
+                              <Mail className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}

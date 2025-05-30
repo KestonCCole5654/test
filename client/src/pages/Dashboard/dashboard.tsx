@@ -1047,11 +1047,11 @@ export default function Dashboard() {
             Refresh
           </Button>
           <Button
-            onClick={() => setIsCustomerSidebarOpen(true)}
+            onClick={() => navigate("/create-invoice")}
             className="bg-green-800 hover:bg-green-900 shadow-none"
             disabled={isStateLoading}
           >
-            New Customer
+            New Invoice
           </Button>
         </div>
       </div>

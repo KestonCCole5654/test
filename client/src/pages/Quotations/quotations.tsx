@@ -22,7 +22,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb"
-import { InvoiceStats, InvoiceStat } from "../../components/ui/InvoiceStats"
+import { InvoiceStats, InvoiceStat, useBrandLogo } from "../../components/ui/InvoiceStats"
 
 interface Quotation {
   id: string
@@ -35,6 +35,22 @@ interface Quotation {
   }
   amount: number
   status: "Draft" | "Sent" | "Accepted" | "Rejected"
+}
+
+function ClientCell({ name, email }: { name: string; email: string }) {
+  const domain = email.split("@")[1] || "";
+  const logoUrl = useBrandLogo(domain);
+  return (
+    <div className="flex items-center gap-3">
+      {logoUrl && (
+        <img src={logoUrl} alt="Client Logo" className="h-7 w-7 rounded-full border border-gray-200 bg-white object-contain" />
+      )}
+      <div className="flex flex-col">
+        <span className="font-medium text-gray-900">{name}</span>
+        <span className="text-sm text-gray-500">{email}</span>
+      </div>
+    </div>
+  );
 }
 
 export default function Quotations() {
@@ -272,6 +288,34 @@ export default function Quotations() {
     },
   ]
 
+  // Mark as Accepted
+  const handleMarkAccepted = (id: string) => {
+    setQuotations((prev) =>
+      prev.map((q) =>
+        q.id === id ? { ...q, status: "Accepted" } : q
+      )
+    )
+    toast({
+      title: "Success",
+      description: "Quotation marked as Accepted.",
+      variant: "default",
+    })
+  }
+
+  // Mark as Sent
+  const handleMarkSent = (id: string) => {
+    setQuotations((prev) =>
+      prev.map((q) =>
+        q.id === id ? { ...q, status: "Sent" } : q
+      )
+    )
+    toast({
+      title: "Success",
+      description: "Quotation marked as Sent.",
+      variant: "default",
+    })
+  }
+
   return (
     <div className="container mx-auto py-6">
       {/* Breadcrumb Navigation */}
@@ -409,7 +453,15 @@ export default function Quotations() {
               </TableHeader>
               <TableBody className="cursor-pointer">
                 {filteredQuotations.map((quotation) => (
-                  <TableRow key={quotation.id} className="hover:bg-slate-50 border-b border-gray-200">
+                  <TableRow
+                    key={quotation.id}
+                    className="hover:bg-slate-50 border-b border-gray-200"
+                    onClick={e => {
+                      if ((e.target as HTMLElement).tagName === "INPUT" || (e.target as HTMLElement).closest("button")) return;
+                      navigate(`/quotation-preview/${quotation.id}`);
+                    }}
+                    style={{ cursor: "pointer" }}
+                  >
                     <TableCell className="w-8 px-4 border-r border-gray-200"></TableCell>
                     <TableCell className="w-[56px] px-6 py-4 align-middle text-center border-r border-gray-200">
                       <input
@@ -418,22 +470,14 @@ export default function Quotations() {
                         onChange={() => handleSelectInvoice(quotation.id)}
                         aria-label={`Select quotation ${quotation.id}`}
                         className="mx-auto accent-green-800 h-4 w-4 rounded border-gray-300"
+                        onClick={e => e.stopPropagation()}
                       />
                     </TableCell>
                     <TableCell className="px-6 py-4 whitespace-nowrap border-r border-gray-200">
                       {quotation.quotationNumber}
                     </TableCell>
                     <TableCell className="px-6 py-4 border-r border-gray-200">
-                      <div className="flex items-center gap-3">
-                        <div className="flex flex-col">
-                          <span className="font-medium text-gray-900">
-                            {quotation.customer.name}
-                          </span>
-                          <span className="text-sm text-gray-500">
-                            {quotation.customer.email}
-                          </span>
-                        </div>
-                      </div>
+                      <ClientCell name={quotation.customer.name} email={quotation.customer.email} />
                     </TableCell>
                     <TableCell className="px-6 py-4 whitespace-nowrap font-cal-sans font-normal border-r border-gray-200">
                       {formatDate(quotation.date)}
@@ -466,24 +510,26 @@ export default function Quotations() {
                     <TableCell className="px-6 py-4 text-center">
                       <div className="flex justify-center gap-2">
                         <Button
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation();
-                            navigate(`/edit-quotation/${quotation.id}`);
+                            handleMarkAccepted(quotation.id);
                           }}
-                          className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
+                          className="border border-gray-300 text-green-700 bg-white hover:bg-green-50 px-3 shadow-none"
                           size="sm"
+                          disabled={quotation.status === "Accepted"}
                         >
-                          Edit
+                          Mark as Accepted
                         </Button>
                         <Button
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation();
-                            handleDelete(quotation.id);
+                            handleMarkSent(quotation.id);
                           }}
-                          className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
+                          className="border border-gray-300 text-amber-700 bg-white hover:bg-amber-50 px-3 shadow-none"
                           size="sm"
+                          disabled={quotation.status === "Sent"}
                         >
-                          Delete
+                          Mark as Sent Quote
                         </Button>
                       </div>
                     </TableCell>

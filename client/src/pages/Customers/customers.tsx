@@ -27,7 +27,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb"
-import { Plus, Search, MoreHorizontal, Edit, Trash2, RefreshCw, GripVertical, X, Mail } from "lucide-react"
+import { Plus, Search, MoreHorizontal, Edit, Trash2, RefreshCw, GripVertical, X, Mail, Users, CheckCircle2, XCircle } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -378,6 +378,54 @@ export default function CustomersPage() {
             </div>
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Total Customers</p>
+                    <h3 className="text-2xl font-semibold mt-1">{customers.length}</h3>
+                  </div>
+                  <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                    <Users className="h-6 w-6 text-blue-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Paid Customers</p>
+                    <h3 className="text-2xl font-semibold mt-1">
+                      {customers.filter(c => (c.invoice_counts?.paid || 0) > 0).length}
+                    </h3>
+                  </div>
+                  <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+                    <CheckCircle2 className="h-6 w-6 text-green-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Unpaid Customers</p>
+                    <h3 className="text-2xl font-semibold mt-1">
+                      {customers.filter(c => (c.invoice_counts?.unpaid || 0) > 0).length}
+                    </h3>
+                  </div>
+                  <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
+                    <XCircle className="h-6 w-6 text-red-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           <Card>
             <CardContent className="p-0">
               <div className="flex items-center justify-between p-4 border-b bg-gray-50 rounded-t-lg mb-0">
@@ -509,15 +557,15 @@ export default function CustomersPage() {
                         <TableCell className="px-6 py-4 text-center">
                           <div className="flex items-center justify-center gap-2">
                             <Button
-                              variant="ghost"
+                              variant="outline"
                               size="icon"
                               onClick={() => handleEditCustomer(customer)}
-                              className="h-8 w-8"
+                              className="h-8 w-8 border-gray-300 hover:bg-gray-100"
                             >
-                              <Edit className="h-4 w-4" />
+                              <Edit className="h-4 w-4 text-gray-700" />
                             </Button>
                             <Button
-                              variant="ghost"
+                              variant="outline"
                               size="icon"
                               onClick={() => {
                                 // TODO: Implement send message functionality
@@ -526,9 +574,9 @@ export default function CustomersPage() {
                                   description: "Message functionality will be available soon.",
                                 })
                               }}
-                              className="h-8 w-8"
+                              className="h-8 w-8 border-gray-300 hover:bg-gray-100"
                             >
-                              <Mail className="h-4 w-4" />
+                              <Mail className="h-4 w-4 text-gray-700" />
                             </Button>
                           </div>
                         </TableCell>

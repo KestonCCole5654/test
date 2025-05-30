@@ -101,8 +101,26 @@ export default function CustomersPage() {
   const handleCustomerSubmit = async (data: any) => {
     try {
       setIsCustomerLoading(true)
-      // TODO: Implement customer creation logic
-      console.log("Creating customer:", data)
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        throw new Error("No active session")
+      }
+
+      const response = await fetch("https://sheetbills-server.vercel.app/api/customers", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.provider_token}`,
+          "x-supabase-token": session.access_token
+        },
+        body: JSON.stringify(data)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to create customer")
+      }
+
       // After successful creation, close the sidebar and refresh the list
       setIsCustomerSidebarOpen(false)
       await fetchCustomers()
@@ -114,11 +132,46 @@ export default function CustomersPage() {
       console.error("Error creating customer:", error)
       toast({
         title: "Error",
-        description: "Failed to create customer. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to create customer. Please try again.",
         variant: "destructive",
       })
     } finally {
       setIsCustomerLoading(false)
+    }
+  }
+
+  const handleDeleteCustomer = async (customerId: string) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        throw new Error("No active session")
+      }
+
+      const response = await fetch(`https://sheetbills-server.vercel.app/api/customers/${customerId}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${session.provider_token}`,
+          "x-supabase-token": session.access_token
+        }
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to delete customer")
+      }
+
+      await fetchCustomers()
+      toast({
+        title: "Success",
+        description: "Customer deleted successfully.",
+      })
+    } catch (error) {
+      console.error("Error deleting customer:", error)
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to delete customer. Please try again.",
+        variant: "destructive",
+      })
     }
   }
 
@@ -231,9 +284,7 @@ export default function CustomersPage() {
                                 Edit
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                onClick={() => {
-                                  // Handle delete
-                                }}
+                                onClick={() => handleDeleteCustomer(customer.id)}
                                 className="text-red-600"
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />

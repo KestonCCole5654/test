@@ -22,6 +22,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb"
+import { InvoiceStats, InvoiceStat } from "../../components/ui/InvoiceStats"
 
 interface Quotation {
   id: string
@@ -155,6 +156,122 @@ export default function Quotations() {
     setSelectedInvoices(newSelectedInvoices)
   }
 
+  // Calculate stats from quotations
+  const now = new Date()
+  const currentMonth = now.getMonth()
+  const currentYear = now.getFullYear()
+
+  // Get current month's data
+  const currentMonthQuotations = quotations.filter((q) => {
+    const qDate = new Date(q.date)
+    return (
+      qDate.getMonth() === currentMonth &&
+      qDate.getFullYear() === currentYear
+    )
+  })
+
+  // Get previous month's data
+  const previousMonthQuotations = quotations.filter((q) => {
+    const qDate = new Date(q.date)
+    const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1
+    const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear
+    return (
+      qDate.getMonth() === prevMonth && qDate.getFullYear() === prevYear
+    )
+  })
+
+  // Calculate current month totals
+  const currentMonthTotal = currentMonthQuotations.reduce(
+    (sum, q) => sum + (q.amount || 0),
+    0
+  )
+  const currentMonthAcceptedTotal = currentMonthQuotations
+    .filter((q) => q.status === "Accepted")
+    .reduce((sum, q) => sum + (q.amount || 0), 0)
+  const currentMonthSentTotal = currentMonthQuotations
+    .filter((q) => q.status === "Sent")
+    .reduce((sum, q) => sum + (q.amount || 0), 0)
+  const currentMonthAcceptedCount = currentMonthQuotations.filter(
+    (q) => q.status === "Accepted"
+  ).length
+  const currentMonthSentCount = currentMonthQuotations.filter(
+    (q) => q.status === "Sent"
+  ).length
+
+  // Calculate previous month totals
+  const previousMonthTotal = previousMonthQuotations.reduce(
+    (sum, q) => sum + (q.amount || 0),
+    0
+  )
+  const previousMonthAcceptedTotal = previousMonthQuotations
+    .filter((q) => q.status === "Accepted")
+    .reduce((sum, q) => sum + (q.amount || 0), 0)
+  const previousMonthSentTotal = previousMonthQuotations
+    .filter((q) => q.status === "Sent")
+    .reduce((sum, q) => sum + (q.amount || 0), 0)
+  const previousMonthAcceptedCount = previousMonthQuotations.filter(
+    (q) => q.status === "Accepted"
+  ).length
+  const previousMonthSentCount = previousMonthQuotations.filter(
+    (q) => q.status === "Sent"
+  ).length
+
+  // Calculate percentage changes
+  const calculatePercentChange = (current: number, previous: number) => {
+    if (previous === 0) return current > 0 ? 100 : 0
+    return ((current - previous) / previous) * 100
+  }
+
+  const revenuePercentChange = calculatePercentChange(
+    currentMonthTotal,
+    previousMonthTotal
+  )
+  const totalQuotationsPercentChange = calculatePercentChange(
+    currentMonthQuotations.length,
+    previousMonthQuotations.length
+  )
+  const acceptedQuotationsPercentChange = calculatePercentChange(
+    currentMonthAcceptedTotal,
+    previousMonthAcceptedTotal
+  )
+  const sentQuotationsPercentChange = calculatePercentChange(
+    currentMonthSentTotal,
+    previousMonthSentTotal
+  )
+
+  const stats: InvoiceStat[] = [
+    {
+      label: "Total Value",
+      value: `$${currentMonthTotal.toLocaleString()}`,
+      percent: Number(revenuePercentChange.toFixed(2)),
+      trend: revenuePercentChange >= 0 ? "up" : "down",
+      subLabel: "this month",
+    },
+    {
+      label: "Total Quotations",
+      value: currentMonthQuotations.length.toString(),
+      percent: Number(totalQuotationsPercentChange.toFixed(2)),
+      trend: totalQuotationsPercentChange >= 0 ? "up" : "down",
+      subLabel: "this month",
+    },
+    {
+      label: "Accepted Quotations",
+      value: `$${currentMonthAcceptedTotal.toLocaleString()}`,
+      count: currentMonthAcceptedCount,
+      percent: Number(acceptedQuotationsPercentChange.toFixed(2)),
+      trend: acceptedQuotationsPercentChange >= 0 ? "up" : "down",
+      subLabel: "this month",
+    },
+    {
+      label: "Sent Quotations",
+      value: `$${currentMonthSentTotal.toLocaleString()}`,
+      count: currentMonthSentCount,
+      percent: Number(sentQuotationsPercentChange.toFixed(2)),
+      trend: sentQuotationsPercentChange >= 0 ? "up" : "down",
+      subLabel: "this month",
+    },
+  ]
+
   return (
     <div className="container mx-auto py-6">
       {/* Breadcrumb Navigation */}
@@ -171,6 +288,16 @@ export default function Quotations() {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
+
+      {/* Stats Card */}
+      <InvoiceStats
+        stats={stats}
+        lastUpdated={now.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        })}
+      />
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">

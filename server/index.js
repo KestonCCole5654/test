@@ -2410,5 +2410,327 @@ app.post('/api/check-master-sheet', async (req, res) => {
   }
 });
 
+////////////////////////////////////////////////////////////////////
+{/*Methods to Handle Customer Logic*/}
+////////////////////////////////////////////////////////////////////
+
+// Initialize customer sheet
+app.post('/api/customers/init-sheet', async (req, res) => {
+  try {
+    // Verify Supabase authentication
+    const supabaseToken = req.headers['x-supabase-token'];
+    if (!supabaseToken) {
+      return res.status(401).json({ error: 'Missing Supabase token' });
+    }
+
+    // Verify the Supabase user session is valid
+    const { data: { user }, error } = await supabase.auth.getUser(supabaseToken);
+    if (error || !user) {
+      return res.status(401).json({ error: 'Invalid Supabase session' });
+    }
+
+    // Extract and validate Google authentication token
+    const googleToken = req.headers.authorization?.split(' ')[1];
+    if (!googleToken) {
+      return res.status(401).json({ error: 'Missing Google credentials' });
+    }
+
+    // Get master sheet
+    const masterSheet = await getOrCreateMasterSheet(googleToken, user.id);
+
+    // Initialize Google Sheets API
+    const auth = new google.auth.OAuth2();
+    auth.setCredentials({ access_token: googleToken });
+    const sheets = google.sheets({ version: 'v4', auth });
+
+    // Create new customer sheet
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: masterSheet.id,
+      requestBody: {
+        requests: [{
+          addSheet: {
+            properties: {
+              title: 'Customers',
+              gridProperties: {
+                rowCount: 1000,
+                columnCount: 10,
+                frozenRowCount: 1
+              }
+            }
+          }
+        }]
+      }
+    });
+
+    // Add headers
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: masterSheet.id,
+      range: 'Customers!A1:J1',
+      valueInputOption: 'USER_ENTERED',
+      requestBody: {
+        values: [[
+          'Customer ID',
+          'Name',
+          'Email',
+          'Phone',
+          'Address',
+          'Company',
+          'Notes',
+          'Created At',
+          'Last Updated',
+          'Status'
+        ]]
+      }
+    });
+
+    res.json({ success: true, message: 'Customer sheet initialized' });
+  } catch (error) {
+    console.error('Error initializing customer sheet:', error);
+    res.status(500).json({ error: 'Failed to initialize customer sheet' });
+  }
+});
+
+// Get all customers
+app.get('/api/customers', async (req, res) => {
+  try {
+    // Verify authentication
+    const supabaseToken = req.headers['x-supabase-token'];
+    const googleToken = req.headers.authorization?.split(' ')[1];
+    
+    if (!supabaseToken || !googleToken) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    // Get master sheet
+    const masterSheet = await getOrCreateMasterSheet(googleToken, user.id);
+    
+    // Initialize Google Sheets API
+    const auth = new google.auth.OAuth2();
+    auth.setCredentials({ access_token: googleToken });
+    const sheets = google.sheets({ version: 'v4', auth });
+
+    // Get customer data
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: masterSheet.id,
+      range: 'Customers!A2:J',
+    });
+
+    const rows = response.data.values || [];
+    const customers = rows.map(row => ({
+      id: row[0],
+      name: row[1],
+      email: row[2],
+      phone: row[3],
+      address: row[4],
+      company: row[5],
+      notes: row[6],
+      created_at: row[7],
+      last_updated: row[8],
+      status: row[9] || 'active'
+    }));
+
+    res.json({ customers });
+  } catch (error) {
+    console.error('Error fetching customers:', error);
+    res.status(500).json({ error: 'Failed to fetch customers' });
+  }
+});
+
+// Add new customer
+app.post('/api/customers', async (req, res) => {
+  try {
+    const { name, email, phone, address, company, notes } = req.body;
+    
+    // Verify authentication
+    const supabaseToken = req.headers['x-supabase-token'];
+    const googleToken = req.headers.authorization?.split(' ')[1];
+    
+    if (!supabaseToken || !googleToken) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    // Get master sheet
+    const masterSheet = await getOrCreateMasterSheet(googleToken, user.id);
+    
+    // Initialize Google Sheets API
+    const auth = new google.auth.OAuth2();
+    auth.setCredentials({ access_token: googleToken });
+    const sheets = google.sheets({ version: 'v4', auth });
+
+    const customerId = `CUST-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const timestamp = new Date().toISOString();
+
+    // Add customer to sheet
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: masterSheet.id,
+      range: 'Customers!A:J',
+      valueInputOption: 'USER_ENTERED',
+      requestBody: {
+        values: [[
+          customerId,
+          name,
+          email,
+          phone,
+          address,
+          company || '',
+          notes || '',
+          timestamp,
+          timestamp,
+          'active'
+        ]]
+      }
+    });
+
+    res.json({
+      success: true,
+      customer: {
+        id: customerId,
+        name,
+        email,
+        phone,
+        address,
+        company,
+        notes,
+        created_at: timestamp,
+        last_updated: timestamp,
+        status: 'active'
+      }
+    });
+  } catch (error) {
+    console.error('Error adding customer:', error);
+    res.status(500).json({ error: 'Failed to add customer' });
+  }
+});
+
+// Update customer
+app.put('/api/customers/:customerId', async (req, res) => {
+  try {
+    const { customerId } = req.params;
+    const { name, email, phone, address, company, notes, status } = req.body;
+    
+    // Verify authentication
+    const supabaseToken = req.headers['x-supabase-token'];
+    const googleToken = req.headers.authorization?.split(' ')[1];
+    
+    if (!supabaseToken || !googleToken) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    // Get master sheet
+    const masterSheet = await getOrCreateMasterSheet(googleToken, user.id);
+    
+    // Initialize Google Sheets API
+    const auth = new google.auth.OAuth2();
+    auth.setCredentials({ access_token: googleToken });
+    const sheets = google.sheets({ version: 'v4', auth });
+
+    // Get current customer data
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: masterSheet.id,
+      range: 'Customers!A2:J',
+    });
+
+    const rows = response.data.values || [];
+    const rowIndex = rows.findIndex(row => row[0] === customerId);
+    
+    if (rowIndex === -1) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+
+    // Update customer data
+    const timestamp = new Date().toISOString();
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: masterSheet.id,
+      range: `Customers!A${rowIndex + 2}:J${rowIndex + 2}`,
+      valueInputOption: 'USER_ENTERED',
+      requestBody: {
+        values: [[
+          customerId,
+          name,
+          email,
+          phone,
+          address,
+          company || '',
+          notes || '',
+          rows[rowIndex][7], // Keep original created_at
+          timestamp,
+          status || rows[rowIndex][9] // Keep original status if not provided
+        ]]
+      }
+    });
+
+    res.json({
+      success: true,
+      customer: {
+        id: customerId,
+        name,
+        email,
+        phone,
+        address,
+        company,
+        notes,
+        created_at: rows[rowIndex][7],
+        last_updated: timestamp,
+        status: status || rows[rowIndex][9]
+      }
+    });
+  } catch (error) {
+    console.error('Error updating customer:', error);
+    res.status(500).json({ error: 'Failed to update customer' });
+  }
+});
+
+// Delete customer (soft delete)
+app.delete('/api/customers/:customerId', async (req, res) => {
+  try {
+    const { customerId } = req.params;
+    
+    // Verify authentication
+    const supabaseToken = req.headers['x-supabase-token'];
+    const googleToken = req.headers.authorization?.split(' ')[1];
+    
+    if (!supabaseToken || !googleToken) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    // Get master sheet
+    const masterSheet = await getOrCreateMasterSheet(googleToken, user.id);
+    
+    // Initialize Google Sheets API
+    const auth = new google.auth.OAuth2();
+    auth.setCredentials({ access_token: googleToken });
+    const sheets = google.sheets({ version: 'v4', auth });
+
+    // Get current customer data
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: masterSheet.id,
+      range: 'Customers!A2:J',
+    });
+
+    const rows = response.data.values || [];
+    const rowIndex = rows.findIndex(row => row[0] === customerId);
+    
+    if (rowIndex === -1) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+
+    // Update customer status to inactive
+    const timestamp = new Date().toISOString();
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: masterSheet.id,
+      range: `Customers!J${rowIndex + 2}`,
+      valueInputOption: 'USER_ENTERED',
+      requestBody: {
+        values: [['inactive']]
+      }
+    });
+
+    res.json({ success: true, message: 'Customer deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting customer:', error);
+    res.status(500).json({ error: 'Failed to delete customer' });
+  }
+});
+
 
 

@@ -19,13 +19,11 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // Middleware
 // ==========================
 app.use(cors({
-  origin: ['https://sheetbills-client.vercel.app', 'http://localhost:3000'],
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['X-CSRF-Token', 'X-Requested-With', 'Accept', 'Accept-Version', 'Content-Length', 'Content-MD5', 'Content-Type', 'Date', 'X-Api-Version', 'Authorization', 'x-supabase-token'],
   credentials: true,
-  maxAge: 86400,
-  preflightContinue: false,
-  optionsSuccessStatus: 204
+  maxAge: 86400
 }));
 
 app.use(express.json()); // Parse JSON request bodies
@@ -2411,14 +2409,6 @@ app.post('/api/check-master-sheet', async (req, res) => {
     return res.status(500).json({ error: 'Failed to check master sheet' });
   }
 });
-
-// Import quotation routes
-const quotationRoutes = require('./api/quotations');
-const sharedQuotationRoutes = require('./api/quotations/shared');
-
-// Add quotation routes
-app.use('/api/quotations', quotationRoutes);
-app.use('/api/quotations/shared', sharedQuotationRoutes);
 
 
 

@@ -119,13 +119,50 @@ export default function CustomersPage() {
                 Manage your customer contacts and information
               </p>
             </div>
-            <Button
-              onClick={() => navigate("/customers/new")}
-              className="bg-green-800 hover:bg-green-700"
-            >
-             
-               New Customer
-            </Button>
+            <div className="flex items-center gap-2 mb-6">
+              <div className="relative w-72">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+                <Input
+                  placeholder="Search customers..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-8"
+                />
+              </div>
+              <Button
+                variant="outline"
+                onClick={fetchCustomers}
+                className="flex items-center border ml-2"
+                disabled={loading}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-4 h-4 mr-1"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M2.25 12a9.75 9.75 0 111.5 5.25"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M2.25 12V7.5a.75.75 0 01.75-.75H7.5"
+                  />
+                </svg>
+                Refresh
+              </Button>
+              <Button
+                onClick={() => navigate("/customers/new")}
+                className="bg-green-800 hover:bg-green-700 ml-2"
+              >
+                New Customer
+              </Button>
+            </div>
           </div>
 
           <Card>
@@ -136,15 +173,6 @@ export default function CustomersPage() {
                   <CardDescription>
                     View and manage your customer contacts
                   </CardDescription>
-                </div>
-                <div className="relative w-64">
-                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
-                  <Input
-                    placeholder="Search customers..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-8"
-                  />
                 </div>
               </div>
             </CardHeader>

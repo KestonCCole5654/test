@@ -59,6 +59,8 @@ export default function CustomersPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [isCustomerSidebarOpen, setIsCustomerSidebarOpen] = useState(false)
   const [isCustomerLoading, setIsCustomerLoading] = useState(false)
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
+  const [sidebarMode, setSidebarMode] = useState<"create" | "edit">("create")
 
   useEffect(() => {
     fetchCustomers()
@@ -106,8 +108,12 @@ export default function CustomersPage() {
         throw new Error("No active session")
       }
 
-      const response = await fetch("https://sheetbills-server.vercel.app/api/customers", {
-        method: "POST",
+      const url = sidebarMode === "create" 
+        ? "https://sheetbills-server.vercel.app/api/customers"
+        : `https://sheetbills-server.vercel.app/api/customers/${selectedCustomer?.id}`
+
+      const response = await fetch(url, {
+        method: sidebarMode === "create" ? "POST" : "PUT",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${session.provider_token}`,
@@ -118,26 +124,33 @@ export default function CustomersPage() {
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || "Failed to create customer")
+        throw new Error(errorData.error || `Failed to ${sidebarMode} customer`)
       }
 
-      // After successful creation, close the sidebar and refresh the list
+      // After successful creation/update, close the sidebar and refresh the list
       setIsCustomerSidebarOpen(false)
+      setSelectedCustomer(null)
       await fetchCustomers()
       toast({
         title: "Success",
-        description: "Customer created successfully.",
+        description: `Customer ${sidebarMode === "create" ? "created" : "updated"} successfully.`,
       })
     } catch (error) {
-      console.error("Error creating customer:", error)
+      console.error(`Error ${sidebarMode}ing customer:`, error)
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to create customer. Please try again.",
+        description: error instanceof Error ? error.message : `Failed to ${sidebarMode} customer. Please try again.`,
         variant: "destructive",
       })
     } finally {
       setIsCustomerLoading(false)
     }
+  }
+
+  const handleEditCustomer = (customer: Customer) => {
+    setSelectedCustomer(customer)
+    setSidebarMode("edit")
+    setIsCustomerSidebarOpen(true)
   }
 
   const handleDeleteCustomer = async (customerId: string) => {
@@ -175,6 +188,12 @@ export default function CustomersPage() {
     }
   }
 
+  const handleNewCustomer = () => {
+    setSelectedCustomer(null)
+    setSidebarMode("create")
+    setIsCustomerSidebarOpen(true)
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container bg-gray-50/50 max-w-7xl mx-auto px-4">
@@ -200,7 +219,7 @@ export default function CustomersPage() {
                 Manage your customer contacts and information
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
               <div className="relative w-72">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
                 <Input
@@ -222,7 +241,7 @@ export default function CustomersPage() {
                 Refresh
               </Button>
               <Button
-                onClick={() => setIsCustomerSidebarOpen(true)}
+                onClick={handleNewCustomer}
                 className="bg-green-800 hover:bg-green-900"
               >
                 New Customer
@@ -231,59 +250,60 @@ export default function CustomersPage() {
           </div>
 
           <Card>
-           
-            <CardContent>
-              {loading ? (
-                <div className="flex justify-center items-center h-64">
-                  <LoadingSpinner />
-                </div>
-              ) : error ? (
-                <div className="text-center text-red-500 py-4">{error}</div>
-              ) : (
-                <Table>
-                  <TableHeader>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Company</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Phone</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {loading ? (
                     <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Phone</TableHead>
-                      <TableHead>Company</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="w-[100px]">Actions</TableHead>
+                      <TableCell colSpan={6} className="text-center py-8">
+                        <LoadingSpinner />
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredCustomers.map((customer) => (
+                  ) : filteredCustomers.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                        No customers found
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredCustomers.map((customer) => (
                       <TableRow key={customer.id}>
                         <TableCell className="font-medium">{customer.name}</TableCell>
-                        <TableCell>{customer.email}</TableCell>
-                        <TableCell>{customer.phone}</TableCell>
                         <TableCell>{customer.company || "-"}</TableCell>
+                        <TableCell>{customer.email}</TableCell>
+                        <TableCell>{customer.phone || "-"}</TableCell>
                         <TableCell>
-                          <span
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              customer.status === "active"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-gray-100 text-gray-800"
-                            }`}
-                          >
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            customer.status === "active" 
+                              ? "bg-green-100 text-green-800" 
+                              : "bg-gray-100 text-gray-800"
+                          }`}>
                             {customer.status}
                           </span>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
+                              <Button variant="ghost" size="icon">
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                onClick={() => navigate(`/customers/${customer.id}/edit`)}
-                              >
+                              <DropdownMenuItem onClick={() => handleEditCustomer(customer)}>
                                 <Edit className="h-4 w-4 mr-2" />
                                 Edit
                               </DropdownMenuItem>
-                              <DropdownMenuItem
+                              <DropdownMenuItem 
                                 onClick={() => handleDeleteCustomer(customer.id)}
                                 className="text-red-600"
                               >
@@ -294,21 +314,25 @@ export default function CustomersPage() {
                           </DropdownMenu>
                         </TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
+                    ))
+                  )}
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
         </div>
       </div>
 
-      {/* Add Customer Sidebar */}
       <CustomerSidebar
         isOpen={isCustomerSidebarOpen}
-        onClose={() => setIsCustomerSidebarOpen(false)}
+        onClose={() => {
+          setIsCustomerSidebarOpen(false)
+          setSelectedCustomer(null)
+        }}
         onSubmit={handleCustomerSubmit}
         isLoading={isCustomerLoading}
+        mode={sidebarMode}
+        initialData={selectedCustomer}
       />
     </div>
   )

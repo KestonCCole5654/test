@@ -23,6 +23,7 @@ const customerFormSchema = z.object({
   }),
   phone: z.string().optional(),
   address: z.string().optional(),
+  company: z.string().optional(),
   notes: z.string().optional(),
 })
 
@@ -32,9 +33,10 @@ interface CustomerFormProps {
   initialData?: CustomerFormValues
   onSubmit: (data: CustomerFormValues) => void
   isLoading?: boolean
+  mode?: "create" | "edit"
 }
 
-export function CustomerForm({ initialData, onSubmit, isLoading }: CustomerFormProps) {
+export function CustomerForm({ initialData, onSubmit, isLoading, mode = "create" }: CustomerFormProps) {
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerFormSchema),
     defaultValues: initialData || {
@@ -42,6 +44,7 @@ export function CustomerForm({ initialData, onSubmit, isLoading }: CustomerFormP
       email: "",
       phone: "",
       address: "",
+      company: "",
       notes: "",
     },
   })
@@ -71,6 +74,20 @@ export function CustomerForm({ initialData, onSubmit, isLoading }: CustomerFormP
               <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input placeholder="customer@example.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="company"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Company</FormLabel>
+              <FormControl>
+                <Input placeholder="Company name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -128,7 +145,7 @@ export function CustomerForm({ initialData, onSubmit, isLoading }: CustomerFormP
         />
 
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Saving..." : "Save Customer"}
+          {isLoading ? "Saving..." : mode === "create" ? "Create Customer" : "Update Customer"}
         </Button>
       </form>
     </Form>

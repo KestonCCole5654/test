@@ -20,8 +20,9 @@ export function CustomerSidebar({ isOpen, onClose, onSubmit, isLoading }: Custom
       >
         <div className=" bg-white border-b px-6 py-4">
           <SheetHeader className="flex flex-row items-center justify-between space-y-0">
-            <SheetTitle className="text-xl font-normal">Add New Customer</SheetTitle>
-            <p className="text-sm text-gray-500">Enter customer details below</p>
+            <SheetTitle className="text-xl font-normal">Add New Customer  </SheetTitle>
+
+            <p className="text-sm text-gray-500">Enter your customer's details below. <br /> This will be used to create a new customer record.</p>
 
             <Button
               variant="ghost"

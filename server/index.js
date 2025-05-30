@@ -2501,6 +2501,12 @@ app.get('/api/customers', async (req, res) => {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
+    // Verify the Supabase user session is valid
+    const { data: { user }, error: userError } = await supabase.auth.getUser(supabaseToken);
+    if (userError || !user) {
+      return res.status(401).json({ error: 'Invalid Supabase session' });
+    }
+
     // Get master sheet
     const masterSheet = await getOrCreateMasterSheet(googleToken, user.id);
     
@@ -2508,6 +2514,54 @@ app.get('/api/customers', async (req, res) => {
     const auth = new google.auth.OAuth2();
     auth.setCredentials({ access_token: googleToken });
     const sheets = google.sheets({ version: 'v4', auth });
+
+    // Check if Customers sheet exists
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId: masterSheet.id });
+    const customerSheet = spreadsheet.data.sheets.find(s => s.properties.title === 'Customers');
+    
+    if (!customerSheet) {
+      // Initialize customer sheet if it doesn't exist
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: masterSheet.id,
+        requestBody: {
+          requests: [{
+            addSheet: {
+              properties: {
+                title: 'Customers',
+                gridProperties: {
+                  rowCount: 1000,
+                  columnCount: 10,
+                  frozenRowCount: 1
+                }
+              }
+            }
+          }]
+        }
+      });
+
+      // Add headers
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: masterSheet.id,
+        range: 'Customers!A1:J1',
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+          values: [[
+            'Customer ID',
+            'Name',
+            'Email',
+            'Phone',
+            'Address',
+            'Company',
+            'Notes',
+            'Created At',
+            'Last Updated',
+            'Status'
+          ]]
+        }
+      });
+
+      return res.json({ customers: [] });
+    }
 
     // Get customer data
     const response = await sheets.spreadsheets.values.get({
@@ -2549,6 +2603,12 @@ app.post('/api/customers', async (req, res) => {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
+    // Verify the Supabase user session is valid
+    const { data: { user }, error: userError } = await supabase.auth.getUser(supabaseToken);
+    if (userError || !user) {
+      return res.status(401).json({ error: 'Invalid Supabase session' });
+    }
+
     // Get master sheet
     const masterSheet = await getOrCreateMasterSheet(googleToken, user.id);
     
@@ -2557,7 +2617,54 @@ app.post('/api/customers', async (req, res) => {
     auth.setCredentials({ access_token: googleToken });
     const sheets = google.sheets({ version: 'v4', auth });
 
-    const customerId = `CUST-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    // Check if Customers sheet exists
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId: masterSheet.id });
+    const customerSheet = spreadsheet.data.sheets.find(s => s.properties.title === 'Customers');
+    
+    if (!customerSheet) {
+      // Initialize customer sheet if it doesn't exist
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: masterSheet.id,
+        requestBody: {
+          requests: [{
+            addSheet: {
+              properties: {
+                title: 'Customers',
+                gridProperties: {
+                  rowCount: 1000,
+                  columnCount: 10,
+                  frozenRowCount: 1
+                }
+              }
+            }
+          }]
+        }
+      });
+
+      // Add headers
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: masterSheet.id,
+        range: 'Customers!A1:J1',
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+          values: [[
+            'Customer ID',
+            'Name',
+            'Email',
+            'Phone',
+            'Address',
+            'Company',
+            'Notes',
+            'Created At',
+            'Last Updated',
+            'Status'
+          ]]
+        }
+      });
+    }
+
+    // Generate a unique customer ID
+    const customerId = `CUST-${Date.now().toString().slice(-6)}`;
     const timestamp = new Date().toISOString();
 
     // Add customer to sheet
@@ -2570,8 +2677,8 @@ app.post('/api/customers', async (req, res) => {
           customerId,
           name,
           email,
-          phone,
-          address,
+          phone || '',
+          address || '',
           company || '',
           notes || '',
           timestamp,

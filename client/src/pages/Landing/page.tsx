@@ -47,17 +47,17 @@ const LandingPage = () => {
   return (
     <div className="flex flex-col p- min-h-screen bg-gray-50">
       {/* Header */}
-      <header className=" top-0 z-50 w-full bg-gray-50  ">
+      <header className="  z-50 w-full bg-gray-50  ">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-24">
             {/* Logo */}
             <div className="flex items-center gap-2">
               <img
-                className="h-8 w-auto"
+                className="h-12 w-auto"
                 alt="Sheetbills"
                 src="/sheetbills-logo.svg"
               />
-              <span className="font-normal text-green-800 text-lg">
+              <span className="font-medium leading-relaxed text-green-800 text-xl">
                 SheetBills
               </span>
             </div>
@@ -79,7 +79,7 @@ const LandingPage = () => {
             <div className="hidden md:block">
               <Button
                 onClick={() => navigate("/login")}
-                className="bg-green-800 hover:bg-green-700 text-white px-6"
+                className="bg-green-800 hover:bg-green-700 text-white px-6 rounded-md font-sans font-medium text-md"
               >
                 Login
               </Button>
@@ -242,12 +242,12 @@ const LandingPage = () => {
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-green-800 text-lg mb-4">Why Us?</h2>
-              <h3 className="text-3xl md:text-4xl font-medium text-[#2F303C] mb-6">
+              <h3 className="text-3xl md:text-4xl font-medium text-[#2F303C] mb-4">
                 <span className="text-[#2F303C]">Invoice Creation</span>
                 <span className="text-[#2F303C]"> Made </span>
                 <span className="text-[#2F303C]">Simple</span>
               </h3>
-              <p className="text-gray-600 font-sans text-lg font-medium max-w-xl mx-auto">
+              <p className="text-gray-600 font-sans text-lg font-medium max-w-xs md:max-w-xl mx-auto">
                 Transform your Google Sheets Into a powerful invoicing system.
                 No more complex formulas or messy templates.
               </p>
@@ -257,9 +257,9 @@ const LandingPage = () => {
               {featureCards.map((card, index) => (
                 <div
                   key={index}
-                  className="bg-gray-50 p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow"
+                  className="bg-gray-50 p-8 rounded-lg border border-green-100 hover:shadow-lg hover:shadow-green-200 shadow-green-100 shadow-lg transition-shadow"
                 >
-                  <div className="flex items-center justify-center mb-4">
+                  <div className="flex items-center justify-center mb-8">
                     {card.icon}
                   </div>
                   <h4 className="text-xl font-medium text-center mb-3">
@@ -279,10 +279,12 @@ const LandingPage = () => {
         {/* How it Works Section */}
         <section className="py-16 md:py-24 px-4" id="how">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-normal text-[#2F303C] text-center mb-12">
+          <h2 className="text-green-800 text-lg mb-4 text-center">How it Works</h2>
+
+            <h2 className="text-3xl md:text-4xl font-normal text-[#2F303C] text-center mb-4">
               Get Started in Just 3 Simple Steps
             </h2>
-            <p className="text-gray-600 text-center max-w-2xl mx-auto mb-14">
+            <p className="text-gray-600 font-sans text-lg font-medium text-center max-w-2xl mx-auto mb-20">
               SheetBills is designed to be simple and easy to use.
             </p>
             <div className="grid md:grid-cols-2 gap-12">
@@ -295,14 +297,14 @@ const LandingPage = () => {
                     isOpen: true,
                   },
                   {
-                    title: "2. Get your SheetBills link",
+                    title: "2. Setup your Business Details",
                     description:
-                      "Instantly generate a unique link for your business.",
+                      "To brand your invoices - Enter your business name, address, and other details. ",
                   },
                   {
-                    title: "3. Customers generate invoices",
+                    title: "3. Create Your Invoices",
                     description:
-                      "Your customers fill out a simple form and we handle the rest.",
+                      "Generate your invoices straight from sheetbills and have the invoices stored in your google drive/sheets.",
                   },
                 ].map((step, index) => (
                   <details
@@ -326,7 +328,7 @@ const LandingPage = () => {
                       </span>
                       <span>{index === openStepIdx ? "-" : "+"}</span>
                     </summary>
-                    <div className="mt-4 text-gray-600 pl-4">
+                    <div className="mt-4 text-gray-600 font-sans font-medium text-lg pl-4">
                       {step.description}
                     </div>
                   </details>
@@ -346,18 +348,18 @@ const LandingPage = () => {
         {/* Pricing Section */}
         <section className="bg-gray-50 py-16 md:py-24 px-4" id="pricing">
           <div className="max-w-7xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-normal text-[#2F303C] mb-6">
+            <h2 className="text-3xl md:text-4xl font-normal text-[#2F303C] mb-4">
               Get Your SheetBills Free Plan
             </h2>
-            <p className="text-gray-600 mb-12">
+            <p className="text-gray-600 font-sans text-lg font-medium mb-12">
               All the essentials for $0.00 — forever.
-              <span className="text-green-800 block mt-2">
+              <span className="text-green-800 font-sans text-lg font-medium block mt-2">
                 Paid plans with advanced features are coming soon!
               </span>
             </p>
 
             <div className="max-w-md mx-auto relative bg-white rounded-2xl border-2 border-green-800 p-6 md:p-8">
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-green-800 text-white px-4 py-1 rounded-full text-sm">
+              <div className="absolute -top-4 left-1/2 font-sans font-bold text-md transform -translate-x-1/2 bg-green-800 text-white px-4 py-1 rounded-full ">
                 All Features Included
               </div>
 
@@ -366,18 +368,18 @@ const LandingPage = () => {
                   <span className="text-4xl md:text-5xl font-normal">
                     $0.00
                   </span>
-                  <span className="text-gray-500 ml-2">USD</span>
+                  <span className="text-gray-500 font-sans font-medium ml-2">USD</span>
                 </div>
               </div>
 
               <ul className="space-y-4 mb-8 text-left">
                 <li className="flex items-center">
                   <CheckIcon className="w-5 h-5 text-green-800 mr-2" />
-                  <span>Unlimited invoices</span>
+                  <span className="font-sans font-medium text-lg">Unlimited invoices</span>
                 </li>
                 <li className="flex items-center">
                   <CheckIcon className="w-5 h-5 text-green-800 mr-2" />
-                  <span>
+                  <span className="font-sans font-medium text-lg">
                     <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded mr-1">
                       Unlimited
                     </span>
@@ -386,13 +388,13 @@ const LandingPage = () => {
                 </li>
                 <li className="flex items-center">
                   <CheckIcon className="w-5 h-5 text-green-800 mr-2" />
-                  <span>Automatic formatting — no templates or formulas</span>
+                  <span className="font-sans font-medium text-lg">Automatic formatting — no templates or formulas</span>
                 </li>
               </ul>
 
               <Button
                 onClick={() => navigate("/login")}
-                className="w-full bg-green-800 hover:bg-green-700 text-white py-3"
+                className="w-full bg-green-800 hover:bg-green-700 text-white py-3 rounded-md font-sans font-medium text-md"
               >
                 Get Started Free
               </Button>
@@ -403,7 +405,7 @@ const LandingPage = () => {
         {/* FAQs Section */}
         <section className="py-16 md:py-24 px-4" id="faqs">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl  font-normal text-[#2F303C] text-center mb-12">
+            <h2 className="text-3xl md:text-4xl  font-normal text-[#2F303C] text-center mb-24">
               Frequently Asked Questions
             </h2>
             <div className="space-y-6">
@@ -429,7 +431,7 @@ const LandingPage = () => {
                     <span>{faq.q}</span>
                     <span className="text-green-800">+</span>
                   </summary>
-                  <div className="mt-4 text-gray-600">{faq.a}</div>
+                  <div className="mt-4 text-gray-600 font-sans font-medium text-lg">{faq.a}</div>
                 </details>
               ))}
             </div>

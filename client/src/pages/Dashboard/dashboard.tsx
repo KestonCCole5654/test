@@ -1,23 +1,37 @@
-"use client"
+"use client";
 
-import React, { useEffect, useState, useRef } from "react"
-import { Trash2, MoreVertical, RefreshCw, ArrowUpDown, X, GripVertical } from "lucide-react"
-import { Button } from "../../components/ui/button"
-import { Input } from "../../components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
+import React, { useEffect, useState, useRef } from "react";
+import {
+  Trash2,
+  MoreVertical,
+  RefreshCw,
+  ArrowUpDown,
+  X,
+  GripVertical,
+} from "lucide-react";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu"
-import { useNavigate, useLocation } from "react-router-dom"
-import { Skeleton } from "../../components/ui/skeleton"
-import { toast } from "../../components/ui/use-toast"
-import supabase from "../../components/Auth/supabaseClient"
-import type { User } from "@supabase/supabase-js"
-import { Card, CardContent } from "../../components/ui/card"
+} from "../../components/ui/dropdown-menu";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Skeleton } from "../../components/ui/skeleton";
+import { toast } from "../../components/ui/use-toast";
+import supabase from "../../components/Auth/supabaseClient";
+import type { User } from "@supabase/supabase-js";
+import { Card, CardContent } from "../../components/ui/card";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,15 +41,37 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "../../components/ui/alert-dialog"
-import { Label } from "../../components/ui/label"
-import { Calendar } from "../../components/ui/calendar"
-import { Checkbox } from "../../components/ui/checkbox"
-import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
-import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
-import { Sheet, SheetContent, SheetHeader, SheetFooter, SheetTitle, SheetDescription } from "../../components/ui/sheet"
-import { InvoiceStats, InvoiceStat, useBrandLogo } from "../../components/ui/InvoiceStats"
+} from "../../components/ui/alert-dialog";
+import { Label } from "../../components/ui/label";
+import { Calendar } from "../../components/ui/calendar";
+import { Checkbox } from "../../components/ui/checkbox";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetFooter,
+  SheetTitle,
+  SheetDescription,
+} from "../../components/ui/sheet";
+import {
+  InvoiceStats,
+  InvoiceStat,
+  useBrandLogo,
+} from "../../components/ui/InvoiceStats";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -43,47 +79,47 @@ import {
   BreadcrumbLink,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "../../components/ui/breadcrumb"
+} from "../../components/ui/breadcrumb";
 
 // =====================
 // Types & Interfaces
 // =====================
 interface Invoice {
-  id: string
-  invoiceNumber: string
-  date: string
-  dueDate: string
-  amount: number
-  paidAmount?: number
-  lastPaymentDate?: string
+  id: string;
+  invoiceNumber: string;
+  date: string;
+  dueDate: string;
+  amount: number;
+  paidAmount?: number;
+  lastPaymentDate?: string;
   customer: {
-    name: string
-    email: string
-    address: string
-  }
+    name: string;
+    email: string;
+    address: string;
+  };
   items: {
-    description: string
-    quantity: number
-    price: number
-  }[]
+    description: string;
+    quantity: number;
+    price: number;
+  }[];
   tax: {
-    type: "fixed" | "percentage"
-    value: number
-  }
+    type: "fixed" | "percentage";
+    value: number;
+  };
   discount: {
-    type: "fixed" | "percentage"
-    value: number
-  }
-  notes: string
-  template: "modern" | "classic" | "minimal"
-  status: "Paid" | "Pending" | "Partially Paid"
+    type: "fixed" | "percentage";
+    value: number;
+  };
+  notes: string;
+  template: "modern" | "classic" | "minimal";
+  status: "Paid" | "Pending" | "Partially Paid";
 }
 
 interface Spreadsheet {
-  id: string
-  name: string
-  sheetUrl: string
-  isDefault: boolean
+  id: string;
+  name: string;
+  sheetUrl: string;
+  isDefault: boolean;
 }
 
 // =====================
@@ -91,61 +127,72 @@ interface Spreadsheet {
 // =====================
 export default function Dashboard() {
   // ----------- State & Constants -----------
-  const navigate = useNavigate()
-  const location = useLocation()
-  const [user, setUser] = useState<User | null>(null)
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [user, setUser] = useState<User | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>(() => {
     // Try to load cached data on initial render
-    const cachedData = localStorage.getItem("cachedInvoices")
-    return cachedData ? JSON.parse(cachedData) : []
-  })
-  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([])
-  const [isStateLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [spreadsheets, setSpreadsheets] = useState<Spreadsheet[]>([])
-  const [selectedSpreadsheetUrl, setSelectedSpreadsheetUrl] = useState<string | null>(() =>
-    localStorage.getItem("defaultSheetUrl"),
-  )
-  const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
+    const cachedData = localStorage.getItem("cachedInvoices");
+    return cachedData ? JSON.parse(cachedData) : [];
+  });
+  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([]);
+  const [isStateLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [spreadsheets, setSpreadsheets] = useState<Spreadsheet[]>([]);
+  const [selectedSpreadsheetUrl, setSelectedSpreadsheetUrl] = useState<
+    string | null
+  >(() => localStorage.getItem("defaultSheetUrl"));
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof Invoice | null
-    direction: "ascending" | "descending"
-  }>({ key: null, direction: "ascending" })
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [invoiceToDelete, setInvoiceToDelete] = useState<Invoice | null>(null)
+    key: keyof Invoice | null;
+    direction: "ascending" | "descending";
+  }>({ key: null, direction: "ascending" });
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [invoiceToDelete, setInvoiceToDelete] = useState<Invoice | null>(null);
   const [lastFetchTime, setLastFetchTime] = useState<number>(() => {
-    const cachedTime = localStorage.getItem("lastFetchTime")
-    return cachedTime ? Number.parseInt(cachedTime) : 0
-  })
+    const cachedTime = localStorage.getItem("lastFetchTime");
+    return cachedTime ? Number.parseInt(cachedTime) : 0;
+  });
   // Pagination
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(10)
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
   // Partial Payment Modal
-  const [isPartialPaymentModalOpen, setIsPartialPaymentModalOpen] = useState(false)
-  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
-  const [partialPaymentAmount, setPartialPaymentAmount] = useState("")
-  const [paymentDate, setPaymentDate] = useState<Date>(new Date())
+  const [isPartialPaymentModalOpen, setIsPartialPaymentModalOpen] =
+    useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [partialPaymentAmount, setPartialPaymentAmount] = useState("");
+  const [paymentDate, setPaymentDate] = useState<Date>(new Date());
   // Bulk selection
-  const [selectedInvoices, setSelectedInvoices] = useState<Set<string>>(new Set())
-  const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
-  const headerCheckboxRef = useRef<HTMLInputElement>(null)
-  const [bulkDeleteMessage, setBulkDeleteMessage] = useState<string | null>(null)
+  const [selectedInvoices, setSelectedInvoices] = useState<Set<string>>(
+    new Set()
+  );
+  const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const headerCheckboxRef = useRef<HTMLInputElement>(null);
+  const [bulkDeleteMessage, setBulkDeleteMessage] = useState<string | null>(
+    null
+  );
   // Row order for drag-and-drop
-  const [rowOrder, setRowOrder] = React.useState<string[]>([])
-  const [showWelcome, setShowWelcome] = useState(false)
+  const [rowOrder, setRowOrder] = React.useState<string[]>([]);
+  const [showWelcome, setShowWelcome] = useState(false);
 
   // =====================
   // Table Pagination & Selection (must be above useEffect hooks)
   // =====================
-  const indexOfLastItem = currentPage * itemsPerPage
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage
-  const currentItems = filteredInvoices.slice(indexOfFirstItem, indexOfLastItem)
-  const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage)
-  const allVisibleIds = currentItems.map((invoice) => invoice.id)
-  const allVisibleSelected = allVisibleIds.every((id) => selectedInvoices.has(id))
-  const someVisibleSelected = allVisibleIds.some((id) => selectedInvoices.has(id)) && !allVisibleSelected
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredInvoices.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+  const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
+  const allVisibleIds = currentItems.map((invoice) => invoice.id);
+  const allVisibleSelected = allVisibleIds.every((id) =>
+    selectedInvoices.has(id)
+  );
+  const someVisibleSelected =
+    allVisibleIds.some((id) => selectedInvoices.has(id)) && !allVisibleSelected;
 
   // =====================
   // Effects
@@ -153,157 +200,172 @@ export default function Dashboard() {
 
   // Auth check on mount
   useEffect(() => {
-    let isMounted = true
-    const abortController = new AbortController()
+    let isMounted = true;
+    const abortController = new AbortController();
     const checkAuth = async () => {
       try {
         const {
           data: { user },
           error,
-        } = await supabase.auth.getUser()
-        if (!isMounted) return
+        } = await supabase.auth.getUser();
+        if (!isMounted) return;
         if (error) {
           navigate("/login", {
             state: {
               error: "Session verification failed",
               from: location.pathname,
             },
-          })
-          return
+          });
+          return;
         }
         if (!user) {
-          navigate("/login", { state: { from: location.pathname }, replace: true })
-          return
+          navigate("/login", {
+            state: { from: location.pathname },
+            replace: true,
+          });
+          return;
         }
-        setUser(user)
+        setUser(user);
         const {
           data: { session },
-        } = await supabase.auth.getSession()
+        } = await supabase.auth.getSession();
         if (!session || (session.expires_at ?? 0) * 1000 < Date.now()) {
-          await supabase.auth.signOut()
-          navigate("/login", { state: { sessionExpired: true } })
+          await supabase.auth.signOut();
+          navigate("/login", { state: { sessionExpired: true } });
         }
       } catch (err) {
-        if (!isMounted) return
+        if (!isMounted) return;
         navigate("/login", {
           state: {
             error: "Connection error. Please try again.",
             from: location.pathname,
           },
-        })
+        });
       }
-    }
-    checkAuth()
+    };
+    checkAuth();
     return () => {
-      isMounted = false
-      abortController.abort()
-    }
-  }, [navigate, location.pathname])
+      isMounted = false;
+      abortController.abort();
+    };
+  }, [navigate, location.pathname]);
 
   // Fetch spreadsheets for user
   useEffect(() => {
-    const abortController = new AbortController()
-    let isMounted = true
+    const abortController = new AbortController();
+    let isMounted = true;
     const fetchData = async () => {
       try {
-        if (!user) return
-        setIsLoading(true)
+        if (!user) return;
+        setIsLoading(true);
         const {
           data: { session },
           error,
-        } = await supabase.auth.getSession()
-        if (!isMounted) return
+        } = await supabase.auth.getSession();
+        if (!isMounted) return;
         if (error || !session) {
-          throw new Error(error?.message || "Session validation failed")
+          throw new Error(error?.message || "Session validation failed");
         }
-        const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/spreadsheets", {
-          signal: abortController.signal,
-          headers: { Authorization: `Bearer ${session.provider_token}` },
-        })
+        const response = await fetch(
+          "https://sheetbills-server.vercel.app/api/sheets/spreadsheets",
+          {
+            signal: abortController.signal,
+            headers: { Authorization: `Bearer ${session.provider_token}` },
+          }
+        );
         if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
+          const errorData = await response.json();
+          throw new Error(
+            errorData.error || `HTTP error! status: ${response.status}`
+          );
         }
-        const data = await response.json()
-        if (!isMounted) return
-        const spreadsheets = data.spreadsheets || []
-        setSpreadsheets(spreadsheets)
-        const storedDefault = localStorage.getItem("defaultSheetUrl")
-        const validDefault = spreadsheets.some((s: Spreadsheet) => s.sheetUrl === storedDefault)
+        const data = await response.json();
+        if (!isMounted) return;
+        const spreadsheets = data.spreadsheets || [];
+        setSpreadsheets(spreadsheets);
+        const storedDefault = localStorage.getItem("defaultSheetUrl");
+        const validDefault = spreadsheets.some(
+          (s: Spreadsheet) => s.sheetUrl === storedDefault
+        );
         if (spreadsheets.length > 0) {
-          const newDefault = spreadsheets.find((s: Spreadsheet) => s.isDefault) || spreadsheets[0]
+          const newDefault =
+            spreadsheets.find((s: Spreadsheet) => s.isDefault) ||
+            spreadsheets[0];
           if (!validDefault) {
-            localStorage.setItem("defaultSheetUrl", newDefault.sheetUrl)
-            setSelectedSpreadsheetUrl(newDefault.sheetUrl)
+            localStorage.setItem("defaultSheetUrl", newDefault.sheetUrl);
+            setSelectedSpreadsheetUrl(newDefault.sheetUrl);
           }
         }
       } catch (err) {
-        if (!isMounted) return
+        if (!isMounted) return;
         if (err instanceof Error && err.message.includes("401")) {
-          navigate("/login", { state: { from: location.pathname }, replace: true })
+          navigate("/login", {
+            state: { from: location.pathname },
+            replace: true,
+          });
         }
       } finally {
-        if (isMounted) setIsLoading(false)
+        if (isMounted) setIsLoading(false);
       }
-    }
-    fetchData()
+    };
+    fetchData();
     return () => {
-      isMounted = false
-      abortController.abort()
-    }
-  }, [user, navigate, location.pathname])
+      isMounted = false;
+      abortController.abort();
+    };
+  }, [user, navigate, location.pathname]);
 
   // Filter and sort invoices when data or filters change
   useEffect(() => {
     const filtered = invoices.filter((invoice) => {
-      const searchLower = searchQuery.toLowerCase()
+      const searchLower = searchQuery.toLowerCase();
       const matchesSearch =
         invoice.id.toLowerCase().includes(searchLower) ||
         invoice.customer.name.toLowerCase().includes(searchLower) ||
-        invoice.customer.email.toLowerCase().includes(searchLower)
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-      const dueDate = new Date(invoice.dueDate)
-      let matchesStatus = true
+        invoice.customer.email.toLowerCase().includes(searchLower);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const dueDate = new Date(invoice.dueDate);
+      let matchesStatus = true;
       switch (statusFilter.toLowerCase()) {
         case "paid":
-          matchesStatus = invoice.status === "Paid"
-          break
+          matchesStatus = invoice.status === "Paid";
+          break;
         case "pending":
-          matchesStatus = invoice.status === "Pending" && dueDate >= today
-          break
+          matchesStatus = invoice.status === "Pending" && dueDate >= today;
+          break;
         case "overdue":
-          matchesStatus = invoice.status === "Pending" && dueDate < today
-          break
+          matchesStatus = invoice.status === "Pending" && dueDate < today;
+          break;
       }
-      return matchesSearch && matchesStatus
-    })
-    setFilteredInvoices(filtered)
-    setCurrentPage(1) // Reset to first page when filters change
-  }, [invoices, searchQuery, statusFilter])
+      return matchesSearch && matchesStatus;
+    });
+    setFilteredInvoices(filtered);
+    setCurrentPage(1); // Reset to first page when filters change
+  }, [invoices, searchQuery, statusFilter]);
 
   // Update row order when current items change
   useEffect(() => {
-    setRowOrder(currentItems.map((inv) => inv.id))
-  }, [currentItems])
+    setRowOrder(currentItems.map((inv) => inv.id));
+  }, [currentItems]);
 
   // Indeterminate state for header checkbox
   useEffect(() => {
     if (headerCheckboxRef.current) {
-      headerCheckboxRef.current.indeterminate = someVisibleSelected
+      headerCheckboxRef.current.indeterminate = someVisibleSelected;
     }
-  }, [someVisibleSelected])
+  }, [someVisibleSelected]);
 
   // Check for just_onboarded flag and no invoices on mount or when invoices change
   useEffect(() => {
-    const justOnboarded = localStorage.getItem('just_onboarded') === 'true'
+    const justOnboarded = localStorage.getItem("just_onboarded") === "true";
     if (justOnboarded && invoices.length === 0) {
-      setShowWelcome(true)
-      localStorage.removeItem('just_onboarded') // Remove flag after showing
+      setShowWelcome(true);
+      localStorage.removeItem("just_onboarded"); // Remove flag after showing
     } else {
-      setShowWelcome(false)
+      setShowWelcome(false);
     }
-  }, [invoices])
+  }, [invoices]);
 
   // Add this useEffect after your other useEffects
   useEffect(() => {
@@ -343,47 +405,51 @@ export default function Dashboard() {
       currency: "USD",
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-    })
+    });
   }
 
   // Format date for display
   function formatDate(dateString: string): string {
-    const date = new Date(dateString)
+    const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
-    })
+    });
   }
 
   // Validate Google Sheet URL
   const isValidGoogleSheetUrl = (url: string): boolean => {
-    return /^https:\/\/docs\.google\.com\/spreadsheets\/d\/[a-zA-Z0-9-_]+/.test(url)
-  }
+    return /^https:\/\/docs\.google\.com\/spreadsheets\/d\/[a-zA-Z0-9-_]+/.test(
+      url
+    );
+  };
 
   // Validate tax/discount fields
   const validateFinancialField = (field: any) => {
     return {
-      type: ["percentage", "fixed"].includes(field?.type) ? field.type : "fixed",
+      type: ["percentage", "fixed"].includes(field?.type)
+        ? field.type
+        : "fixed",
       value: Math.max(0, Number(field?.value) || 0),
-    }
-  }
+    };
+  };
 
   // Utility function to calculate overdue days accurately
   function getOverdueDays(dueDateString: string): number {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0) // Reset time to start of day
-    const dueDate = new Date(dueDateString)
-    dueDate.setHours(0, 0, 0, 0) // Reset time to start of day
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to start of day
+    const dueDate = new Date(dueDateString);
+    dueDate.setHours(0, 0, 0, 0); // Reset time to start of day
 
     // If due date is in the future, return 0
-    if (dueDate > today) return 0
+    if (dueDate > today) return 0;
 
     // Calculate the difference in days
-    const diffTime = today.getTime() - dueDate.getTime()
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    const diffTime = today.getTime() - dueDate.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    return diffDays
+    return diffDays;
   }
 
   // =====================
@@ -392,133 +458,150 @@ export default function Dashboard() {
   // Fetch invoices from API and cache
   const fetchInvoices = async (sheetUrl: string) => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       // Check if we need to refresh the data (5 minutes cache)
-      const currentTime = Date.now()
-      const timeSinceLastFetch = currentTime - lastFetchTime
-      const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes in milliseconds
+      const currentTime = Date.now();
+      const timeSinceLastFetch = currentTime - lastFetchTime;
+      const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
       if (timeSinceLastFetch < CACHE_DURATION && invoices.length > 0) {
-        setIsLoading(false)
-        return // Use cached data
+        setIsLoading(false);
+        return; // Use cached data
       }
       // Validate URL format first
       if (!isValidGoogleSheetUrl(sheetUrl)) {
-        throw new Error("Invalid Google Sheets URL format")
+        throw new Error("Invalid Google Sheets URL format");
       }
       const {
         data: { session },
         error: sessionError,
-      } = await supabase.auth.getSession()
+      } = await supabase.auth.getSession();
       // Handle session errors
       if (sessionError) {
-        throw new Error(`Session error: ${sessionError.message}`)
+        throw new Error(`Session error: ${sessionError.message}`);
       }
       if (!session) {
-        navigate("/login", { state: { sessionExpired: true } })
-        return
+        navigate("/login", { state: { sessionExpired: true } });
+        return;
       }
       // Validate Google token presence
-      const googleToken = session.provider_token
-      const supabaseToken = session.access_token
+      const googleToken = session.provider_token;
+      const supabaseToken = session.access_token;
       if (!googleToken) {
-        await supabase.auth.signOut()
-        navigate("/login", { state: { needsReauth: true } })
-        return
+        await supabase.auth.signOut();
+        navigate("/login", { state: { needsReauth: true } });
+        return;
       }
       const response = await fetch(
-        `https://sheetbills-server.vercel.app/api/sheets/data?sheetUrl=${encodeURIComponent(sheetUrl)}`,
+        `https://sheetbills-server.vercel.app/api/sheets/data?sheetUrl=${encodeURIComponent(
+          sheetUrl
+        )}`,
         {
           headers: {
             Authorization: `Bearer ${googleToken}`,
             "X-Supabase-Token": supabaseToken,
           },
-        },
-      )
+        }
+      );
       // Handle specific error cases
       if (response.status === 401) {
-        await supabase.auth.signOut()
-        navigate("/login", { state: { sessionExpired: true } })
-        return
+        await supabase.auth.signOut();
+        navigate("/login", { state: { sessionExpired: true } });
+        return;
       }
       if (response.status === 404) {
-        throw new Error("Spreadsheet not found - Check URL and sharing permissions")
+        throw new Error(
+          "Spreadsheet not found - Check URL and sharing permissions"
+        );
       }
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || `API Error: ${response.statusText}`)
+        const errorData = await response.json();
+        throw new Error(errorData.error || `API Error: ${response.statusText}`);
       }
-      const data = await response.json()
+      const data = await response.json();
       // Validate response structure
       if (!Array.isArray(data)) {
-        throw new Error("Invalid API response format - Expected array of invoices")
+        throw new Error(
+          "Invalid API response format - Expected array of invoices"
+        );
       }
       // Transform data with strict validation
       const transformedData = data
         .map((invoice: any) => {
           try {
             // Parse customer and items if they are strings
-            let customer = invoice.customer
+            let customer = invoice.customer;
             if (typeof customer === "string") {
               try {
-                customer = JSON.parse(customer)
+                customer = JSON.parse(customer);
               } catch {
-                customer = { name: "", email: "", address: "" }
+                customer = { name: "", email: "", address: "" };
               }
             }
-            let items = invoice.items
+            let items = invoice.items;
             if (typeof items === "string") {
               try {
-                items = JSON.parse(items)
+                items = JSON.parse(items);
               } catch {
-                items = []
+                items = [];
               }
             }
             if (!invoice.id || typeof invoice.amount !== "number") {
-              throw new Error("Missing required invoice fields")
+              throw new Error("Missing required invoice fields");
             }
             return {
               id: invoice.id,
               date: invoice.date || new Date().toISOString().split("T")[0],
               dueDate: invoice.dueDate || "",
-              status: ["Paid", "Pending"].includes(invoice.status) ? invoice.status : "Pending",
+              status: ["Paid", "Pending"].includes(invoice.status)
+                ? invoice.status
+                : "Pending",
               amount: invoice.amount,
               customer,
               items,
               tax: validateFinancialField(invoice.tax),
               discount: validateFinancialField(invoice.discount),
               notes: invoice.notes || "",
-              template: ["modern", "classic", "minimal"].includes(invoice.template) ? invoice.template : "modern",
-            }
+              template: ["modern", "classic", "minimal"].includes(
+                invoice.template
+              )
+                ? invoice.template
+                : "modern",
+            };
           } catch (itemError) {
-            console.warn("Invalid invoice item:", invoice, itemError)
-            return null
+            console.warn("Invalid invoice item:", invoice, itemError);
+            return null;
           }
         })
-        .filter(Boolean)
+        .filter(Boolean);
       if (transformedData.length === 0) {
-        throw new Error("No valid invoices found in spreadsheet")
+        throw new Error("No valid invoices found in spreadsheet");
       }
       // Cache the data
-      localStorage.setItem("cachedInvoices", JSON.stringify(transformedData))
-      localStorage.setItem("lastFetchTime", currentTime.toString())
-      setLastFetchTime(currentTime)
-      setInvoices(transformedData.filter((invoice): invoice is Invoice => invoice !== null))
-      setError(null)
+      localStorage.setItem("cachedInvoices", JSON.stringify(transformedData));
+      localStorage.setItem("lastFetchTime", currentTime.toString());
+      setLastFetchTime(currentTime);
+      setInvoices(
+        transformedData.filter(
+          (invoice): invoice is Invoice => invoice !== null
+        )
+      );
+      setError(null);
     } catch (err) {
-      const error = err instanceof Error ? err : new Error("Unknown error occurred")
-      setError(error.message)
+      const error =
+        err instanceof Error ? err : new Error("Unknown error occurred");
+      setError(error.message);
       toast({
         title: "Data Loading Failed",
         description: error.message,
         variant: "destructive",
-      })
+      });
       if (error.message.includes("Reauthenticate")) {
-        navigate("/login", { state: { needsReauth: true } })
+        navigate("/login", { state: { needsReauth: true } });
       }
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   // =====================
   // Table & Bulk Actions
@@ -526,207 +609,244 @@ export default function Dashboard() {
   // Checkbox selection for invoices
   const handleSelectInvoice = (invoiceId: string) => {
     setSelectedInvoices((prev) => {
-      const newSet = new Set(prev)
+      const newSet = new Set(prev);
       if (newSet.has(invoiceId)) {
-        newSet.delete(invoiceId)
+        newSet.delete(invoiceId);
       } else {
-        newSet.add(invoiceId)
+        newSet.add(invoiceId);
       }
-      return newSet
-    })
-  }
+      return newSet;
+    });
+  };
   // Select all visible invoices
   const handleSelectAllVisible = () => {
-    const allVisibleIds = currentItems.map((invoice) => invoice.id)
-    const allSelected = allVisibleIds.every((id) => selectedInvoices.has(id))
+    const allVisibleIds = currentItems.map((invoice) => invoice.id);
+    const allSelected = allVisibleIds.every((id) => selectedInvoices.has(id));
     setSelectedInvoices((prev) => {
-      const newSet = new Set(prev)
+      const newSet = new Set(prev);
       if (allSelected) {
         // Deselect all visible
-        allVisibleIds.forEach((id) => newSet.delete(id))
+        allVisibleIds.forEach((id) => newSet.delete(id));
       } else {
         // Select all visible
-        allVisibleIds.forEach((id) => newSet.add(id))
+        allVisibleIds.forEach((id) => newSet.add(id));
       }
-      return newSet
-    })
-  }
+      return newSet;
+    });
+  };
   // Select all invoices across all pages
   const handleSelectAllGlobal = () => {
     if (selectedInvoices.size === filteredInvoices.length) {
-      setSelectedInvoices(new Set())
+      setSelectedInvoices(new Set());
     } else {
-      setSelectedInvoices(new Set(filteredInvoices.map((invoice) => invoice.id)))
+      setSelectedInvoices(
+        new Set(filteredInvoices.map((invoice) => invoice.id))
+      );
     }
-  }
+  };
 
   // Bulk delete selected invoices
   const handleBulkDelete = async () => {
     try {
-      setIsDeleting(true)
+      setIsDeleting(true);
       const {
         data: { session },
         error: sessionError,
-      } = await supabase.auth.getSession()
+      } = await supabase.auth.getSession();
       if (sessionError) {
-        throw new Error(sessionError.message)
+        throw new Error(sessionError.message);
       }
       localStorage.removeItem("cachedInvoices");
       localStorage.removeItem("lastFetchTime");
-      const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/bulk-delete", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.provider_token}`,
-          "X-Supabase-Token": session?.access_token || "",
-        },
-        body: JSON.stringify({
-          invoiceIds: Array.from(selectedInvoices),
-          sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
-        }),
-      })
+      const response = await fetch(
+        "https://sheetbills-server.vercel.app/api/sheets/bulk-delete",
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.provider_token}`,
+            "X-Supabase-Token": session?.access_token || "",
+          },
+          body: JSON.stringify({
+            invoiceIds: Array.from(selectedInvoices),
+            sheetUrl: spreadsheets.find(
+              (sheet) => sheet.name === "SheetBills Invoices"
+            )?.sheetUrl,
+          }),
+        }
+      );
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || "Failed to delete invoices")
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to delete invoices");
       }
       // Update local state by removing the deleted invoices
-      const updatedInvoices = invoices.filter((inv) => !selectedInvoices.has(inv.id))
-      setInvoices(updatedInvoices)
-      if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
+      const updatedInvoices = invoices.filter(
+        (inv) => !selectedInvoices.has(inv.id)
+      );
+      setInvoices(updatedInvoices);
+      if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl);
       setBulkDeleteMessage(
-        `${selectedInvoices.size} invoice(s) have been deleted successfully and removed from your dashboard.`,
-      )
-      setSelectedInvoices(new Set())
-      setIsBulkDeleteDialogOpen(false)
+        `${selectedInvoices.size} invoice(s) have been deleted successfully and removed from your dashboard.`
+      );
+      setSelectedInvoices(new Set());
+      setIsBulkDeleteDialogOpen(false);
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to delete invoices",
+        description:
+          error instanceof Error ? error.message : "Failed to delete invoices",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsDeleting(false)
+      setIsDeleting(false);
     }
-  }
-
-
+  };
 
   // =====================
   // Table Rendering & UI
   // =====================
   // Handle page change
   const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber)
-  }
+    setCurrentPage(pageNumber);
+  };
 
   // Sorting handler
   const handleSort = (key: keyof Invoice) => {
-    const direction = sortConfig.key === key && sortConfig.direction === "ascending" ? "descending" : "ascending"
+    const direction =
+      sortConfig.key === key && sortConfig.direction === "ascending"
+        ? "descending"
+        : "ascending";
     const sortedInvoices = [...filteredInvoices].sort((a, b) => {
-      let valueA: any = a[key]
-      let valueB: any = b[key]
+      let valueA: any = a[key];
+      let valueB: any = b[key];
       if (key === "date" || key === "dueDate") {
-        valueA = typeof valueA === "string" || typeof valueA === "number" ? new Date(valueA).getTime() : 0
-        valueB = typeof valueB === "string" || typeof valueB === "number" ? new Date(valueB).getTime() : 0
+        valueA =
+          typeof valueA === "string" || typeof valueA === "number"
+            ? new Date(valueA).getTime()
+            : 0;
+        valueB =
+          typeof valueB === "string" || typeof valueB === "number"
+            ? new Date(valueB).getTime()
+            : 0;
       } else if (key === "amount") {
-        valueA = a.amount
-        valueB = b.amount
+        valueA = a.amount;
+        valueB = b.amount;
       } else if (key === "customer") {
-        valueA = typeof a.customer === "object" ? a.customer.name : a.customer
-        valueB = typeof b.customer === "object" ? b.customer.name : b.customer
+        valueA = typeof a.customer === "object" ? a.customer.name : a.customer;
+        valueB = typeof b.customer === "object" ? b.customer.name : b.customer;
       } else if (key === "status") {
-        valueA = a.status
-        valueB = b.status
+        valueA = a.status;
+        valueB = b.status;
       }
-      if (valueA === undefined) valueA = ""
-      if (valueB === undefined) valueB = ""
-      if (valueA < valueB) return direction === "ascending" ? -1 : 1
-      if (valueA > valueB) return direction === "ascending" ? 1 : -1
-      return 0
-    })
-    setSortConfig({ key, direction })
-    setFilteredInvoices(sortedInvoices)
-  }
+      if (valueA === undefined) valueA = "";
+      if (valueB === undefined) valueB = "";
+      if (valueA < valueB) return direction === "ascending" ? -1 : 1;
+      if (valueA > valueB) return direction === "ascending" ? 1 : -1;
+      return 0;
+    });
+    setSortConfig({ key, direction });
+    setFilteredInvoices(sortedInvoices);
+  };
 
   function handleRefresh(event?: React.MouseEvent<HTMLButtonElement>): void {
     if (selectedSpreadsheetUrl && user) {
       // Clear cache before fetching
-      localStorage.removeItem("cachedInvoices")
-      localStorage.removeItem("lastFetchTime")
-      setLastFetchTime(0)
-      fetchInvoices(selectedSpreadsheetUrl)
+      localStorage.removeItem("cachedInvoices");
+      localStorage.removeItem("lastFetchTime");
+      setLastFetchTime(0);
+      fetchInvoices(selectedSpreadsheetUrl);
       toast({
         title: "Data Refreshed",
         description: "The invoice data has been refreshed successfully.",
-      })
+      });
     } else {
       toast({
         title: "Error",
-        description: "Unable to refresh data. Please ensure a spreadsheet is selected.",
+        description:
+          "Unable to refresh data. Please ensure a spreadsheet is selected.",
         variant: "destructive",
-      })
+      });
     }
   }
 
-  const sensors = useSensors(useSensor(PointerSensor))
+  const sensors = useSensors(useSensor(PointerSensor));
 
   // Handle drag end
   const handleDragEnd = (event: any) => {
-    const { active, over } = event
+    const { active, over } = event;
     if (active.id !== over?.id) {
-      const oldIndex = rowOrder.indexOf(active.id)
-      const newIndex = rowOrder.indexOf(over.id)
-      const newOrder = arrayMove(rowOrder, oldIndex, newIndex)
-      setRowOrder(newOrder)
+      const oldIndex = rowOrder.indexOf(active.id);
+      const newIndex = rowOrder.indexOf(over.id);
+      const newOrder = arrayMove(rowOrder, oldIndex, newIndex);
+      setRowOrder(newOrder);
 
       // Reorder the invoices array
-      const reorderedInvoices = [...invoices]
-      const [movedInvoice] = reorderedInvoices.splice(oldIndex, 1)
-      reorderedInvoices.splice(newIndex, 0, movedInvoice)
-      setInvoices(reorderedInvoices)
+      const reorderedInvoices = [...invoices];
+      const [movedInvoice] = reorderedInvoices.splice(oldIndex, 1);
+      reorderedInvoices.splice(newIndex, 0, movedInvoice);
+      setInvoices(reorderedInvoices);
     }
-  }
+  };
 
   // Calculate stats from invoices
   const now = new Date();
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
-  
+
   // Get current month's data
-  const currentMonthInvoices = invoices.filter(inv => {
+  const currentMonthInvoices = invoices.filter((inv) => {
     const invDate = new Date(inv.date);
-    return invDate.getMonth() === currentMonth && invDate.getFullYear() === currentYear;
+    return (
+      invDate.getMonth() === currentMonth &&
+      invDate.getFullYear() === currentYear
+    );
   });
-  
+
   // Get previous month's data
-  const previousMonthInvoices = invoices.filter(inv => {
+  const previousMonthInvoices = invoices.filter((inv) => {
     const invDate = new Date(inv.date);
     const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
     const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
-    return invDate.getMonth() === prevMonth && invDate.getFullYear() === prevYear;
+    return (
+      invDate.getMonth() === prevMonth && invDate.getFullYear() === prevYear
+    );
   });
 
   // Calculate current month totals
-  const currentMonthTotal = currentMonthInvoices.reduce((sum, inv) => sum + (inv.amount || 0), 0);
+  const currentMonthTotal = currentMonthInvoices.reduce(
+    (sum, inv) => sum + (inv.amount || 0),
+    0
+  );
   const currentMonthPaidTotal = currentMonthInvoices
-    .filter(inv => inv.status === "Paid")
+    .filter((inv) => inv.status === "Paid")
     .reduce((sum, inv) => sum + (inv.amount || 0), 0);
   const currentMonthUnpaidTotal = currentMonthInvoices
-    .filter(inv => inv.status === "Pending")
+    .filter((inv) => inv.status === "Pending")
     .reduce((sum, inv) => sum + (inv.amount || 0), 0);
-  const currentMonthPaidCount = currentMonthInvoices.filter(inv => inv.status?.toLowerCase() === "paid").length;
-  const currentMonthUnpaidCount = currentMonthInvoices.filter(inv => inv.status?.toLowerCase() === "pending").length;
+  const currentMonthPaidCount = currentMonthInvoices.filter(
+    (inv) => inv.status?.toLowerCase() === "paid"
+  ).length;
+  const currentMonthUnpaidCount = currentMonthInvoices.filter(
+    (inv) => inv.status?.toLowerCase() === "pending"
+  ).length;
 
   // Calculate previous month totals
-  const previousMonthTotal = previousMonthInvoices.reduce((sum, inv) => sum + (inv.amount || 0), 0);
+  const previousMonthTotal = previousMonthInvoices.reduce(
+    (sum, inv) => sum + (inv.amount || 0),
+    0
+  );
   const previousMonthPaidTotal = previousMonthInvoices
-    .filter(inv => inv.status === "Paid")
+    .filter((inv) => inv.status === "Paid")
     .reduce((sum, inv) => sum + (inv.amount || 0), 0);
   const previousMonthUnpaidTotal = previousMonthInvoices
-    .filter(inv => inv.status === "Pending")
+    .filter((inv) => inv.status === "Pending")
     .reduce((sum, inv) => sum + (inv.amount || 0), 0);
-  const previousMonthPaidCount = previousMonthInvoices.filter(inv => inv.status?.toLowerCase() === "paid").length;
-  const previousMonthUnpaidCount = previousMonthInvoices.filter(inv => inv.status?.toLowerCase() === "pending").length;
+  const previousMonthPaidCount = previousMonthInvoices.filter(
+    (inv) => inv.status?.toLowerCase() === "paid"
+  ).length;
+  const previousMonthUnpaidCount = previousMonthInvoices.filter(
+    (inv) => inv.status?.toLowerCase() === "pending"
+  ).length;
 
   // Calculate percentage changes
   const calculatePercentChange = (current: number, previous: number) => {
@@ -734,13 +854,22 @@ export default function Dashboard() {
     return ((current - previous) / previous) * 100;
   };
 
-  const revenuePercentChange = calculatePercentChange(currentMonthTotal, previousMonthTotal);
+  const revenuePercentChange = calculatePercentChange(
+    currentMonthTotal,
+    previousMonthTotal
+  );
   const totalInvoicesPercentChange = calculatePercentChange(
     currentMonthInvoices.length,
     previousMonthInvoices.length
   );
-  const paidInvoicesPercentChange = calculatePercentChange(currentMonthPaidTotal, previousMonthPaidTotal);
-  const unpaidInvoicesPercentChange = calculatePercentChange(currentMonthUnpaidTotal, previousMonthUnpaidTotal);
+  const paidInvoicesPercentChange = calculatePercentChange(
+    currentMonthPaidTotal,
+    previousMonthPaidTotal
+  );
+  const unpaidInvoicesPercentChange = calculatePercentChange(
+    currentMonthUnpaidTotal,
+    previousMonthUnpaidTotal
+  );
 
   const stats: InvoiceStat[] = [
     {
@@ -748,14 +877,14 @@ export default function Dashboard() {
       value: `$${currentMonthTotal.toLocaleString()}`,
       percent: Number(revenuePercentChange.toFixed(2)),
       trend: revenuePercentChange >= 0 ? "up" : "down",
-      subLabel: "this month"
+      subLabel: "this month",
     },
     {
       label: "Total Invoices",
       value: currentMonthInvoices.length.toString(),
       percent: Number(totalInvoicesPercentChange.toFixed(2)),
       trend: totalInvoicesPercentChange >= 0 ? "up" : "down",
-      subLabel: "this month"
+      subLabel: "this month",
     },
     {
       label: "Paid Invoices",
@@ -763,7 +892,7 @@ export default function Dashboard() {
       count: currentMonthPaidCount,
       percent: Number(paidInvoicesPercentChange.toFixed(2)),
       trend: paidInvoicesPercentChange >= 0 ? "up" : "down",
-      subLabel: "this month"
+      subLabel: "this month",
     },
     {
       label: "Unpaid Invoices",
@@ -771,8 +900,8 @@ export default function Dashboard() {
       count: currentMonthUnpaidCount,
       percent: Number(unpaidInvoicesPercentChange.toFixed(2)),
       trend: unpaidInvoicesPercentChange >= 0 ? "up" : "down",
-      subLabel: "this month"
-    }
+      subLabel: "this month",
+    },
   ];
 
   return (
@@ -792,20 +921,27 @@ export default function Dashboard() {
         </Breadcrumb>
       </div>
 
-
       {/* Welcome message for newly onboarded users only */}
       {showWelcome && (
         <div className="mb-6 text-center">
           <span className="text-xl font-cal-sans font-normal text-gray-800">
-            Hi, welcome aboard! {user?.user_metadata?.name || user?.email?.split("@")[0] || "there"}, Create your first invoice by clicking the <span className="text-green-800">New Invoice</span> button.
+            Hi, welcome aboard!{" "}
+            {user?.user_metadata?.name || user?.email?.split("@")[0] || "there"}
+            , Create your first invoice by clicking the{" "}
+            <span className="text-green-800">New Invoice</span> button.
           </span>
         </div>
       )}
 
-
-
       {/* Stats Card */}
-      <InvoiceStats stats={stats} lastUpdated={now.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} />
+      <InvoiceStats
+        stats={stats}
+        lastUpdated={now.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        })}
+      />
 
       {/* Tips Section */}
       {/* <div className="mb-6 p-4 bg-green-50 border border-green-200">
@@ -824,6 +960,11 @@ export default function Dashboard() {
         </div>
       </div> */}
 
+      <div>
+        <h1 className="text-2xl font-semibold text-gray-900">Quotations</h1>
+        <p className="text-sm text-gray-500">Manage your quotations</p>
+      </div>
+
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
         <div className="flex bg-gray-100 border border-gray-200">
@@ -834,10 +975,11 @@ export default function Dashboard() {
           ].map((tab) => (
             <button
               key={tab.value}
-              className={`px-6 py-2 text-sm transition-colors border border-gray-200 focus:outline-none ${statusFilter === tab.value
+              className={`px-6 py-2 text-sm transition-colors border border-gray-200 focus:outline-none ${
+                statusFilter === tab.value
                   ? "text-gray-700 border-gray-300 bg-gray-200" // active
                   : "text-gray-600 border-gray-200 bg-gray-100 hover:bg-gray-200"
-                } `}
+              } `}
               onClick={() => setStatusFilter(tab.value)}
             >
               {tab.label}
@@ -847,7 +989,18 @@ export default function Dashboard() {
         <div className="flex gap-3 w-full md:w-auto">
           <div className="relative w-full md:w-96 lg:w-[32rem]">
             <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
             </span>
             <Input
               placeholder="Search for Invoices ..."
@@ -862,19 +1015,23 @@ export default function Dashboard() {
             className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 shadow-none"
             disabled={isStateLoading}
           >
-            <RefreshCw className={`mr-2 h-4 w-4 ${isStateLoading ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`mr-2 h-4 w-4 ${isStateLoading ? "animate-spin" : ""}`}
+            />
             Refresh
           </Button>
           <Button
             onClick={() => {
-              const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
-              const invoicesSheetUrl = invoicesSheet?.sheetUrl
+              const invoicesSheet = spreadsheets.find(
+                (sheet) => sheet.name === "SheetBills Invoices"
+              );
+              const invoicesSheetUrl = invoicesSheet?.sheetUrl;
               navigate("/create-invoice", {
                 state: {
                   selectedSpreadsheetUrl: invoicesSheetUrl,
                   key: Date.now(),
                 },
-              })
+              });
             }}
             className="border border-gray-300 text-white bg-green-800 hover:bg-green-900 shadow-none"
             disabled={isStateLoading}
@@ -883,8 +1040,6 @@ export default function Dashboard() {
           </Button>
         </div>
       </div>
-
-
 
       {/* Table Card */}
       <div className="bg-white border border-gray-200 ">
@@ -900,7 +1055,9 @@ export default function Dashboard() {
             >
               {allVisibleSelected ? "Deselect All" : "Select All"}
             </Button>
-            <span className="text-sm text-slate-500">{selectedInvoices.size} selected</span>
+            <span className="text-sm text-slate-500">
+              {selectedInvoices.size} selected
+            </span>
           </div>
           <Button
             variant="destructive"
@@ -930,10 +1087,12 @@ export default function Dashboard() {
         <div className="overflow-x-auto">
           {filteredInvoices.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-
-              <h3 className="text-lg font-medium text-gray-900 mb-1 font-cal-sans">No invoices found</h3>
-              <p className="text-sm text-gray-500 mb-6 font-cal-sans">Please refresh to see your invoices or create a new invoice.</p>
-
+              <h3 className="text-lg font-medium text-gray-900 mb-1 font-cal-sans">
+                No invoices found
+              </h3>
+              <p className="text-sm text-gray-500 mb-6 font-cal-sans">
+                Please refresh to see your invoices or create a new invoice.
+              </p>
             </div>
           ) : (
             <Table className="min-w-full text-sm">
@@ -950,20 +1109,39 @@ export default function Dashboard() {
                       className="mx-auto accent-green-800 h-4 w-4 rounded border-gray-300"
                     />
                   </TableHead>
-                  <TableHead className="px-6 py-4 border-r border-gray-200">Number</TableHead>
-                  <TableHead className="px-6 py-4 border-r border-gray-200">Client</TableHead>
-                  <TableHead className="px-6 py-4 border-r border-gray-200">Due Date</TableHead>
-                  <TableHead className="px-6 py-4 border-r border-gray-200">Status</TableHead>
-                  <TableHead className="px-6 py-4 border-r border-gray-200">Total</TableHead>
-                  <TableHead className="px-6 py-4 text-center">Actions</TableHead>
+                  <TableHead className="px-6 py-4 border-r border-gray-200">
+                    Number
+                  </TableHead>
+                  <TableHead className="px-6 py-4 border-r border-gray-200">
+                    Client
+                  </TableHead>
+                  <TableHead className="px-6 py-4 border-r border-gray-200">
+                    Due Date
+                  </TableHead>
+                  <TableHead className="px-6 py-4 border-r border-gray-200">
+                    Status
+                  </TableHead>
+                  <TableHead className="px-6 py-4 border-r border-gray-200">
+                    Total
+                  </TableHead>
+                  <TableHead className="px-6 py-4 text-center">
+                    Actions
+                  </TableHead>
                 </TableRow>
               </TableHeader>
-              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <SortableContext items={rowOrder} strategy={verticalListSortingStrategy}>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={rowOrder}
+                  strategy={verticalListSortingStrategy}
+                >
                   <TableBody className="cursor-pointer">
                     {rowOrder.map((id) => {
-                      const invoice = currentItems.find((inv) => inv.id === id)
-                      if (!invoice) return null
+                      const invoice = currentItems.find((inv) => inv.id === id);
+                      if (!invoice) return null;
                       return (
                         <SortableTableRow
                           key={invoice.id}
@@ -973,31 +1151,43 @@ export default function Dashboard() {
                           selectedInvoices={selectedInvoices}
                           handleSelectInvoice={handleSelectInvoice}
                         >
-                          <TableCell className="px-6 py-4 whitespace-nowrap border-r border-gray-200">{invoice.id}</TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap border-r border-gray-200">
+                            {invoice.id}
+                          </TableCell>
                           <TableCell className="px-6 py-4 border-r border-gray-200">
                             <div className="flex items-center gap-3">
                               {(() => {
-                                const email = typeof invoice.customer === "object" ? invoice.customer.email : "";
+                                const email =
+                                  typeof invoice.customer === "object"
+                                    ? invoice.customer.email
+                                    : "";
                                 const domain = email.split("@")[1] || "";
                                 return <ClientLogo domain={domain} />;
                               })()}
                               <div className="flex flex-col">
                                 <span className="font-medium text-gray-900">
-                                  {typeof invoice.customer === "object" ? invoice.customer.name : invoice.customer}
+                                  {typeof invoice.customer === "object"
+                                    ? invoice.customer.name
+                                    : invoice.customer}
                                 </span>
                                 <span className="text-sm text-gray-500">
-                                  {typeof invoice.customer === "object" ? invoice.customer.email : ""}
+                                  {typeof invoice.customer === "object"
+                                    ? invoice.customer.email
+                                    : ""}
                                 </span>
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell className="px-6 py-4 whitespace-nowrap font-cal-sans font-normal border-r border-gray-200">{formatDate(invoice.dueDate)}</TableCell>
+                          <TableCell className="px-6 py-4 whitespace-nowrap font-cal-sans font-normal border-r border-gray-200">
+                            {formatDate(invoice.dueDate)}
+                          </TableCell>
                           <TableCell className="px-6 py-4 border-r border-gray-200">
                             {invoice.status === "Paid" ? (
                               <span className="inline-block px-3 py-1 font-cal-sans font-normal rounded-md border border-green-200 bg-green-50 text-green-700 text-sm">
                                 Paid
                               </span>
-                            ) : invoice.status === "Pending" && getOverdueDays(invoice.dueDate) > 0 ? (
+                            ) : invoice.status === "Pending" &&
+                              getOverdueDays(invoice.dueDate) > 0 ? (
                               <span className="inline-block px-3 py-1 font-cal-sans font-normal rounded-md border border-amber-200 bg-amber-50 text-amber-700 text-sm ">
                                 Pending
                               </span>
@@ -1011,25 +1201,32 @@ export default function Dashboard() {
                               </span>
                             )}
                           </TableCell>
-                          <TableCell className="text-right font-normal font-cal-sans text-md px-6 py-4 border-r border-gray-200">{formatCurrency(invoice.amount)}</TableCell>
+                          <TableCell className="text-right font-normal font-cal-sans text-md px-6 py-4 border-r border-gray-200">
+                            {formatCurrency(invoice.amount)}
+                          </TableCell>
                           <TableCell className="text-center px-6 py-4">
                             <div className="flex justify-center gap-2">
                               <Button
                                 onClick={async (e) => {
-                                  e.stopPropagation()
+                                  e.stopPropagation();
                                   try {
                                     const {
                                       data: { session },
                                       error: sessionError,
-                                    } = await supabase.auth.getSession()
+                                    } = await supabase.auth.getSession();
                                     if (sessionError) {
-                                      throw new Error(sessionError.message)
+                                      throw new Error(sessionError.message);
                                     }
 
                                     // Find the invoices sheet and validate it exists
-                                    const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
+                                    const invoicesSheet = spreadsheets.find(
+                                      (sheet) =>
+                                        sheet.name === "SheetBills Invoices"
+                                    );
                                     if (!invoicesSheet?.sheetUrl) {
-                                      throw new Error("Invoice spreadsheet not found. Please ensure you have access to the SheetBills Invoices spreadsheet.")
+                                      throw new Error(
+                                        "Invoice spreadsheet not found. Please ensure you have access to the SheetBills Invoices spreadsheet."
+                                      );
                                     }
 
                                     const response = await fetch(
@@ -1039,40 +1236,60 @@ export default function Dashboard() {
                                         headers: {
                                           "Content-Type": "application/json",
                                           Authorization: `Bearer ${session?.provider_token}`,
-                                          "X-Supabase-Token": session?.access_token || "",
+                                          "X-Supabase-Token":
+                                            session?.access_token || "",
                                         },
                                         body: JSON.stringify({
                                           invoiceId: invoice.id,
                                           sheetUrl: invoicesSheet.sheetUrl,
                                         }),
-                                      },
-                                    )
+                                      }
+                                    );
                                     if (!response.ok) {
-                                      const errorData = await response.json()
-                                      console.error("Mark as paid error:", errorData)
+                                      const errorData = await response.json();
+                                      console.error(
+                                        "Mark as paid error:",
+                                        errorData
+                                      );
                                       toast({
                                         title: "Error marking as paid",
-                                        description: errorData.error || errorData.details || "Failed to mark invoice as paid.",
+                                        description:
+                                          errorData.error ||
+                                          errorData.details ||
+                                          "Failed to mark invoice as paid.",
                                         variant: "destructive",
-                                      })
-                                      return
+                                      });
+                                      return;
                                     }
-                                    const updatedInvoices = invoices.map((inv) =>
-                                      inv.id === invoice.id ? { ...inv, status: "Paid" as const } : inv,
-                                    )
-                                    setInvoices(updatedInvoices)
-                                    if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
+                                    const updatedInvoices = invoices.map(
+                                      (inv) =>
+                                        inv.id === invoice.id
+                                          ? { ...inv, status: "Paid" as const }
+                                          : inv
+                                    );
+                                    setInvoices(updatedInvoices);
+                                    if (selectedSpreadsheetUrl)
+                                      await fetchInvoices(
+                                        selectedSpreadsheetUrl
+                                      );
                                     toast({
                                       title: "Status Updated",
-                                      description: "Invoice marked as paid successfully.",
-                                    })
+                                      description:
+                                        "Invoice marked as paid successfully.",
+                                    });
                                   } catch (error) {
-                                    console.error("Mark as paid error (catch):", error)
+                                    console.error(
+                                      "Mark as paid error (catch):",
+                                      error
+                                    );
                                     toast({
                                       title: "Error marking as paid",
-                                      description: error instanceof Error ? error.message : "Failed to update invoice status.",
+                                      description:
+                                        error instanceof Error
+                                          ? error.message
+                                          : "Failed to update invoice status.",
                                       variant: "destructive",
-                                    })
+                                    });
                                   }
                                 }}
                                 className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
@@ -1083,14 +1300,14 @@ export default function Dashboard() {
                               </Button>
                               <Button
                                 onClick={async (e) => {
-                                  e.stopPropagation()
+                                  e.stopPropagation();
                                   try {
                                     const {
                                       data: { session },
                                       error: sessionError,
-                                    } = await supabase.auth.getSession()
+                                    } = await supabase.auth.getSession();
                                     if (sessionError) {
-                                      throw new Error(sessionError.message)
+                                      throw new Error(sessionError.message);
                                     }
                                     const response = await fetch(
                                       "https://sheetbills-server.vercel.app/api/sheets/mark-as-pending",
@@ -1099,33 +1316,54 @@ export default function Dashboard() {
                                         headers: {
                                           "Content-Type": "application/json",
                                           Authorization: `Bearer ${session?.provider_token}`,
-                                          "X-Supabase-Token": session?.access_token || "",
+                                          "X-Supabase-Token":
+                                            session?.access_token || "",
                                         },
                                         body: JSON.stringify({
                                           invoiceId: invoice.id,
-                                          sheetUrl: spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")?.sheetUrl,
+                                          sheetUrl: spreadsheets.find(
+                                            (sheet) =>
+                                              sheet.name ===
+                                              "SheetBills Invoices"
+                                          )?.sheetUrl,
                                         }),
-                                      },
-                                    )
+                                      }
+                                    );
                                     if (!response.ok) {
-                                      const errorData = await response.json()
-                                      throw new Error(errorData.error || "Failed to mark invoice as pending")
+                                      const errorData = await response.json();
+                                      throw new Error(
+                                        errorData.error ||
+                                          "Failed to mark invoice as pending"
+                                      );
                                     }
-                                    const updatedInvoices = invoices.map((inv) =>
-                                      inv.id === invoice.id ? { ...inv, status: "Pending" as const } : inv,
-                                    )
-                                    setInvoices(updatedInvoices)
-                                    if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
+                                    const updatedInvoices = invoices.map(
+                                      (inv) =>
+                                        inv.id === invoice.id
+                                          ? {
+                                              ...inv,
+                                              status: "Pending" as const,
+                                            }
+                                          : inv
+                                    );
+                                    setInvoices(updatedInvoices);
+                                    if (selectedSpreadsheetUrl)
+                                      await fetchInvoices(
+                                        selectedSpreadsheetUrl
+                                      );
                                     toast({
                                       title: "Status Updated",
-                                      description: "Invoice marked as pending successfully.",
-                                    })
+                                      description:
+                                        "Invoice marked as pending successfully.",
+                                    });
                                   } catch (error) {
                                     toast({
                                       title: "Error",
-                                      description: error instanceof Error ? error.message : "Failed to update invoice status",
+                                      description:
+                                        error instanceof Error
+                                          ? error.message
+                                          : "Failed to update invoice status",
                                       variant: "destructive",
-                                    })
+                                    });
                                   }
                                 }}
                                 className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
@@ -1137,7 +1375,7 @@ export default function Dashboard() {
                             </div>
                           </TableCell>
                         </SortableTableRow>
-                      )
+                      );
                     })}
                   </TableBody>
                 </SortableContext>
@@ -1173,72 +1411,95 @@ export default function Dashboard() {
               </Button>
             </div>
             <div className="text-sm text-gray-500">
-              Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredInvoices.length)} of{" "}
+              Showing {indexOfFirstItem + 1}-
+              {Math.min(indexOfLastItem, filteredInvoices.length)} of{" "}
               {filteredInvoices.length} invoices
             </div>
           </div>
         )}
-
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-cal-sans font-medium" >Are you sure you want to delete this invoice?</AlertDialogTitle>
+            <AlertDialogTitle className="font-cal-sans font-medium">
+              Are you sure you want to delete this invoice?
+            </AlertDialogTitle>
             <AlertDialogDescription className="font-cal-sans text-gray-700">
-              This action cannot be undone. This will permanently delete the invoice
-              {invoiceToDelete ? <span className="font-medium font-cal-sans"> #{invoiceToDelete.id}</span> : null}.
+              This action cannot be undone. This will permanently delete the
+              invoice
+              {invoiceToDelete ? (
+                <span className="font-medium font-cal-sans">
+                  {" "}
+                  #{invoiceToDelete.id}
+                </span>
+              ) : null}
+              .
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={async () => {
-                if (!invoiceToDelete) return
+                if (!invoiceToDelete) return;
                 try {
                   const {
                     data: { session },
                     error: sessionError,
-                  } = await supabase.auth.getSession()
+                  } = await supabase.auth.getSession();
                   if (sessionError) {
-                    throw new Error(sessionError.message)
+                    throw new Error(sessionError.message);
                   }
                   localStorage.removeItem("cachedInvoices");
                   localStorage.removeItem("lastFetchTime");
-                  const response = await fetch("https://sheetbills-server.vercel.app/api/sheets/delete-invoice", {
-                    method: "DELETE",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${session?.provider_token}`,
-                      "X-Supabase-Token": session?.access_token || "",
-                    },
-                    body: JSON.stringify({ invoiceId: invoiceToDelete.id }),
-                  })
+                  const response = await fetch(
+                    "https://sheetbills-server.vercel.app/api/sheets/delete-invoice",
+                    {
+                      method: "DELETE",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${session?.provider_token}`,
+                        "X-Supabase-Token": session?.access_token || "",
+                      },
+                      body: JSON.stringify({ invoiceId: invoiceToDelete.id }),
+                    }
+                  );
                   if (!response.ok) {
-                    const errorData = await response.json()
-                    throw new Error(errorData.error || "Failed to delete invoice")
+                    const errorData = await response.json();
+                    throw new Error(
+                      errorData.error || "Failed to delete invoice"
+                    );
                   }
                   // Update local state by removing the deleted invoice
-                  const updatedInvoices = invoices.filter((inv) => inv.id !== invoiceToDelete.id)
-                  setInvoices(updatedInvoices)
-                  if (selectedSpreadsheetUrl) await fetchInvoices(selectedSpreadsheetUrl)
+                  const updatedInvoices = invoices.filter(
+                    (inv) => inv.id !== invoiceToDelete.id
+                  );
+                  setInvoices(updatedInvoices);
+                  if (selectedSpreadsheetUrl)
+                    await fetchInvoices(selectedSpreadsheetUrl);
                   setBulkDeleteMessage(
                     `Invoice #${invoiceToDelete.id} has been deleted successfully and removed from your dashboard.`
-                  )
+                  );
                   toast({
                     title: "Invoice Deleted",
                     description: "Invoice has been deleted successfully.",
-                  })
+                  });
                 } catch (error) {
                   toast({
                     title: "Error",
-                    description: error instanceof Error ? error.message : "Failed to delete invoice",
+                    description:
+                      error instanceof Error
+                        ? error.message
+                        : "Failed to delete invoice",
                     variant: "destructive",
-                  })
+                  });
                 } finally {
-                  setInvoiceToDelete(null)
-                  setIsDeleteDialogOpen(false)
+                  setInvoiceToDelete(null);
+                  setIsDeleteDialogOpen(false);
                 }
               }}
               className="bg-gray-800 font- focus:ring-gray-800"
@@ -1250,16 +1511,24 @@ export default function Dashboard() {
       </AlertDialog>
 
       {/* Bulk Delete Confirmation Dialog */}
-      <AlertDialog open={isBulkDeleteDialogOpen} onOpenChange={setIsBulkDeleteDialogOpen}>
+      <AlertDialog
+        open={isBulkDeleteDialogOpen}
+        onOpenChange={setIsBulkDeleteDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-cal-sans font-medium">Are you sure you want to delete these invoices?</AlertDialogTitle>
+            <AlertDialogTitle className="font-cal-sans font-medium">
+              Are you sure you want to delete these invoices?
+            </AlertDialogTitle>
             <AlertDialogDescription className="font-cal-sans text-gray-700">
-              This action cannot be undone. This will permanently delete {selectedInvoices.size} selected invoice(s).
+              This action cannot be undone. This will permanently delete{" "}
+              {selectedInvoices.size} selected invoice(s).
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="font-cal-sans">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="font-cal-sans">
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleBulkDelete}
               className="bg-gray-800 font-cal-sans focus:ring-gray-800"
@@ -1270,68 +1539,80 @@ export default function Dashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
     </div>
-  )
+  );
 }
 
 // =====================
 // Sortable Table Row Component
 // =====================
 interface SortableTableRowProps {
-  id: string
-  children: React.ReactNode
-  invoice: Invoice
-  spreadsheets: Spreadsheet[]
-  selectedInvoices: Set<string>
-  handleSelectInvoice: (id: string) => void
-  [key: string]: any
+  id: string;
+  children: React.ReactNode;
+  invoice: Invoice;
+  spreadsheets: Spreadsheet[];
+  selectedInvoices: Set<string>;
+  handleSelectInvoice: (id: string) => void;
+  [key: string]: any;
 }
 
-function SortableTableRow({ id, children, invoice, spreadsheets, selectedInvoices, handleSelectInvoice, ...props }: SortableTableRowProps) {
+function SortableTableRow({
+  id,
+  children,
+  invoice,
+  spreadsheets,
+  selectedInvoices,
+  handleSelectInvoice,
+  ...props
+}: SortableTableRowProps) {
   const {
     attributes,
     listeners,
     setNodeRef,
     transform,
     transition,
-    isDragging
-  } = useSortable({ id })
+    isDragging,
+  } = useSortable({ id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    position: 'relative' as const,
+    position: "relative" as const,
     zIndex: isDragging ? 1 : 0,
-  }
+  };
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleRowClick = (e: React.MouseEvent) => {
     // Don't navigate if clicking on the checkbox or drag handle
     if (e.target instanceof HTMLElement) {
-      const isCheckbox = e.target.closest('[role="checkbox"]')
-      const isDragHandle = e.target.closest('[data-draggable]')
+      const isCheckbox = e.target.closest('[role="checkbox"]');
+      const isDragHandle = e.target.closest("[data-draggable]");
       if (isCheckbox || isDragHandle) {
-        return
+        return;
       }
     }
 
     if (invoice) {
-      const invoicesSheet = spreadsheets.find((sheet) => sheet.name === "SheetBills Invoices")
-      const invoicesSheetUrl = invoicesSheet?.sheetUrl
+      const invoicesSheet = spreadsheets.find(
+        (sheet) => sheet.name === "SheetBills Invoices"
+      );
+      const invoicesSheetUrl = invoicesSheet?.sheetUrl;
       // Ensure invoiceNumber is always present and matches id
-      const invoiceToEdit = { ...invoice, invoiceNumber: invoice.invoiceNumber || invoice.id }
+      const invoiceToEdit = {
+        ...invoice,
+        invoiceNumber: invoice.invoiceNumber || invoice.id,
+      };
       navigate("/create-invoice", {
         state: {
           invoiceToEdit,
           selectedSpreadsheetUrl: invoicesSheetUrl,
           hideForm: true,
         },
-      })
+      });
     }
-  }
+  };
 
   return (
     <tr
@@ -1341,7 +1622,10 @@ function SortableTableRow({ id, children, invoice, spreadsheets, selectedInvoice
       className="hover:bg-slate-50 border-b border-gray-200"
       {...props}
     >
-      <td className="w-8 px-4 align-middle text-center border-r border-gray-200" style={{ verticalAlign: "middle" }}>
+      <td
+        className="w-8 px-4 align-middle text-center border-r border-gray-200"
+        style={{ verticalAlign: "middle" }}
+      >
         <div className="flex items-center justify-center h-full min-h-[40px]">
           <span
             {...attributes}
@@ -1353,7 +1637,10 @@ function SortableTableRow({ id, children, invoice, spreadsheets, selectedInvoice
           </span>
         </div>
       </td>
-      <td className="w-[56px] px-6 py-4 align-middle text-center border-r border-gray-200" style={{ verticalAlign: "middle" }}>
+      <td
+        className="w-[56px] px-6 py-4 align-middle text-center border-r border-gray-200"
+        style={{ verticalAlign: "middle" }}
+      >
         <div className="flex items-center justify-center h-full min-h-[40px]">
           <Checkbox
             checked={selectedInvoices.has(invoice.id)}
@@ -1366,7 +1653,7 @@ function SortableTableRow({ id, children, invoice, spreadsheets, selectedInvoice
       </td>
       {children}
     </tr>
-  )
+  );
 }
 
 // =====================
@@ -1376,14 +1663,18 @@ function ClientLogo({ domain }: { domain: string }) {
   const logoUrl = useBrandLogo(domain);
   return (
     <div className="h-10 w-10 rounded-md border border-gray-200 bg-white flex items-center justify-center overflow-hidden shadow-sm">
-      {domain === 'gmail.com' ? (
-        <img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" alt="logo" className="w-6 h-6 object-contain" />
+      {domain === "gmail.com" ? (
+        <img
+          src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico"
+          alt="logo"
+          className="w-6 h-6 object-contain"
+        />
       ) : logoUrl ? (
         <img src={logoUrl} alt="logo" className="w-6 h-6 object-contain" />
       ) : (
         <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
           <span className="text-xs font-medium text-gray-400">
-            {domain ? domain.charAt(0).toUpperCase() : '?'}
+            {domain ? domain.charAt(0).toUpperCase() : "?"}
           </span>
         </div>
       )}

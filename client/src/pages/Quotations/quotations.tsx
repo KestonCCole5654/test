@@ -206,13 +206,13 @@ export default function Quotations() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Quotation #</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Valid Until</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="px-6 py-4 whitespace-nowrap border-r border-gray-200">Quotation #</TableHead>
+              <TableHead className="px-6 py-4 border-r border-gray-200">Customer</TableHead>
+              <TableHead className="px-6 py-4 whitespace-nowrap font-cal-sans font-normal border-r border-gray-200">Date</TableHead>
+              <TableHead className="px-6 py-4 whitespace-nowrap font-cal-sans font-normal border-r border-gray-200">Valid Until</TableHead>
+              <TableHead className="px-6 py-4 text-right border-r border-gray-200">Amount</TableHead>
+              <TableHead className="px-6 py-4 border-r border-gray-200">Status</TableHead>
+              <TableHead className="px-6 py-4 text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -231,22 +231,36 @@ export default function Quotations() {
             ) : (
               filteredQuotations.map((quotation) => (
                 <TableRow key={quotation.id}>
-                  <TableCell className="font-medium">{quotation.quotationNumber}</TableCell>
-                  <TableCell>{formatDate(quotation.date)}</TableCell>
-                  <TableCell>{formatDate(quotation.validUntil)}</TableCell>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium">{quotation.customer.name}</p>
-                      <p className="text-sm text-gray-500">{quotation.customer.email}</p>
+                  <TableCell className="px-6 py-4 whitespace-nowrap border-r border-gray-200 font-medium">
+                    {quotation.quotationNumber}
+                  </TableCell>
+                  <TableCell className="px-6 py-4 border-r border-gray-200">
+                    <div className="flex items-center gap-3">
+                      <div className="flex flex-col">
+                        <span className="font-medium text-gray-900">
+                          {quotation.customer.name}
+                        </span>
+                        <span className="text-sm text-gray-500">
+                          {quotation.customer.email}
+                        </span>
+                      </div>
                     </div>
                   </TableCell>
-                  <TableCell className="text-right">${formatCurrency(quotation.amount)}</TableCell>
-                  <TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap font-cal-sans font-normal border-r border-gray-200">
+                    {formatDate(quotation.date)}
+                  </TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap font-cal-sans font-normal border-r border-gray-200">
+                    {formatDate(quotation.validUntil)}
+                  </TableCell>
+                  <TableCell className="px-6 py-4 text-right border-r border-gray-200">
+                    ${formatCurrency(quotation.amount)}
+                  </TableCell>
+                  <TableCell className="px-6 py-4 border-r border-gray-200">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(quotation.status)}`}>
                       {quotation.status}
                     </span>
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="px-6 py-4 text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">

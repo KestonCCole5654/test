@@ -123,8 +123,8 @@ export default function CustomersPage() {
               onClick={() => navigate("/customers/new")}
               className="bg-green-800 hover:bg-green-700"
             >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Customer
+             
+               New Customer
             </Button>
           </div>
 

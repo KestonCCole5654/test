@@ -18,9 +18,11 @@ export function CustomerSidebar({ isOpen, onClose, onSubmit, isLoading }: Custom
         className="w-full sm:max-w-lg p-0 sm:p-6 overflow-y-auto"
         side="right"
       >
-        <div className="sticky top-0 z-10 bg-white border-b px-6 py-4">
+        <div className=" bg-white border-b px-6 py-4">
           <SheetHeader className="flex flex-row items-center justify-between space-y-0">
-            <SheetTitle className="text-xl font-semibold">Add New Customer</SheetTitle>
+            <SheetTitle className="text-xl font-normal">Add New Customer</SheetTitle>
+            <p className="text-sm text-gray-500">Enter customer details below</p>
+
             <Button
               variant="ghost"
               size="icon"

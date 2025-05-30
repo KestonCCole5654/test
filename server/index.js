@@ -2410,5 +2410,13 @@ app.post('/api/check-master-sheet', async (req, res) => {
   }
 });
 
+// Import quotation routes
+const quotationRoutes = require('./api/quotations');
+const sharedQuotationRoutes = require('./api/quotations/shared');
+
+// Add quotation routes
+app.use('/api/quotations', quotationRoutes);
+app.use('/api/quotations/shared', sharedQuotationRoutes);
+
 
 

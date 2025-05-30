@@ -7,6 +7,8 @@ import Dashboard from './pages/Dashboard/dashboard';
 import SidebarLayout from './components/Layout/SidebarLayout';
 import AuthenticatedRoute from './components/Auth/authenticatedRoute';
 import InvoiceForm from './pages/CreateInvoices/create-invoice';
+import QuotationForm from './pages/CreateQuotations/create-quotation';
+import Quotations from './pages/Quotations/quotations';
 import type { 
   Subscription,
   AuthChangeEvent,
@@ -188,6 +190,10 @@ function App() {
           <Route path="/email-invoice/:invoiceId" element={<EmailInvoice />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          {/* Quotation Routes */}
+          <Route path="/quotations" element={<Quotations />} />
+          <Route path="/create-quotation" element={<QuotationForm />} />
+          <Route path="/edit-quotation/:quotationId" element={<QuotationForm />} />
         </Route>
 
         {/* Public Invoice Route - must be after catch-all to take precedence */}

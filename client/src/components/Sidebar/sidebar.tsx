@@ -15,7 +15,8 @@ import {
   Archive,
   Plus,
   Mail,
-  Scale
+  Scale,
+  ClipboardList
 } from "lucide-react"
 import supabase from "../Auth/supabaseClient"
 import { Button } from "../ui/button"
@@ -116,6 +117,22 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
             >
               <Archive size={20} className="flex-shrink-0" />
               {!collapsed && <span className="ml-3">Invoices</span>}
+            </Link>
+          </li>
+
+          <li>
+            <Link
+              to="/quotations"
+              className={cn(
+                "flex items-center px-3 py-2 rounded-md transition-colors",
+                isActive("/quotations") 
+                  ? "bg-green-100 text-green-800" 
+                  : "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
+                collapsed && "justify-center"
+              )}
+            >
+              <ClipboardList size={20} className="flex-shrink-0" />
+              {!collapsed && <span className="ml-3">Quotations</span>}
             </Link>
           </li>
         

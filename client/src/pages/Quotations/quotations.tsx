@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "../../components/ui/table"
 import { useNavigate } from "react-router-dom"
-import { Plus, Search, Trash2, RotateCcw } from "lucide-react"
+import { Plus, Search, Trash2, RotateCcw, MoreVertical, RefreshCw, ArrowUpDown, X, GripVertical } from "lucide-react"
 import { useToast } from "../../components/ui/use-toast"
 import {
   Breadcrumb,
@@ -64,6 +64,17 @@ export default function Quotations() {
   const [isDeleting, setIsDeleting] = useState(false)
   const headerCheckboxRef = useRef<HTMLInputElement>(null)
   const [statusFilter, setStatusFilter] = useState<string>("All")
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
+  const indexOfLastItem = currentPage * itemsPerPage
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage
+  const currentItems = quotations.slice(indexOfFirstItem, indexOfLastItem)
+  const totalPages = Math.ceil(quotations.length / itemsPerPage)
+  const allVisibleIds = currentItems.map((q) => q.id)
+  const allVisibleSelected = allVisibleIds.every((id) => selectedInvoices.has(id))
+  const someVisibleSelected = allVisibleIds.some((id) => selectedInvoices.has(id)) && !allVisibleSelected
 
   // Format currency
   const formatCurrency = (amount: number): string => {
@@ -161,10 +172,18 @@ export default function Quotations() {
   }
 
   const handleSelectAllVisible = () => {
-    if (headerCheckboxRef.current?.checked) {
-      setSelectedInvoices(new Set(quotations.map(q => q.id)))
+    if (allVisibleSelected) {
+      setSelectedInvoices((prev) => {
+        const newSet = new Set(prev)
+        allVisibleIds.forEach((id) => newSet.delete(id))
+        return newSet
+      })
     } else {
-      setSelectedInvoices(new Set())
+      setSelectedInvoices((prev) => {
+        const newSet = new Set(prev)
+        allVisibleIds.forEach((id) => newSet.add(id))
+        return newSet
+      })
     }
   }
 
@@ -322,6 +341,18 @@ export default function Quotations() {
     })
   }
 
+  // Pagination handler
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber)
+  }
+
+  // Indeterminate state for header checkbox
+  useEffect(() => {
+    if (headerCheckboxRef.current) {
+      headerCheckboxRef.current.indeterminate = someVisibleSelected
+    }
+  }, [someVisibleSelected])
+
   return (
     <div className="container mx-auto py-6">
       {/* Breadcrumb Navigation */}
@@ -349,43 +380,37 @@ export default function Quotations() {
         })}
       />
 
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Quotations</h1>
-          <p className="text-sm text-gray-500">Manage your quotations</p>
-        </div>
-        <Button
-          onClick={() => navigate("/create-quotation")}
-          className="bg-green-800 hover:bg-green-900 text-white"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          New Quotation
-        </Button>
-      </div>
-
-      {/* Search, Refresh, and Filter */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          <Input
-            type="text"
-            placeholder="Search quotations..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
+      {/* Toolbar: Search, Refresh, New Quotation */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <span className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              type="text"
+              placeholder="Search for Quotations ..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 w-full md:w-96 lg:w-[32rem] border-gray-200"
+              disabled={isLoading}
+            />
+          </span>
           <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-green-800"
             onClick={loadQuotations}
-            aria-label="Refresh quotations"
+            className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 shadow-none"
+            disabled={isLoading}
           >
-            <RotateCcw className="w-5 h-5" />
+            <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
+          <Button
+            onClick={() => navigate("/create-quotation")}
+            className="border border-gray-300 text-white bg-green-800 hover:bg-green-900 shadow-none"
+            disabled={isLoading}
+          >
+            New Quotation
           </Button>
         </div>
-        <div className="flex gap-2 mt-2 sm:mt-0">
+        <div className="flex gap-2 mt-2 md:mt-0">
           {['All', 'Draft', 'Sent', 'Accepted'].map((status) => (
             <Button
               key={status}
@@ -405,7 +430,7 @@ export default function Quotations() {
       </div>
 
       {/* Table Card */}
-      <div className="bg-white border border-gray-200">
+      <div className="bg-white border border-gray-200 ">
         {/* Toolbar section above the table */}
         <div className="flex items-center justify-between p-4 border-b bg-gray-50 rounded-t-lg mb-0">
           <div className="flex items-center gap-2">
@@ -414,9 +439,9 @@ export default function Quotations() {
               size="sm"
               onClick={handleSelectAllVisible}
               className="text-white"
-              disabled={quotations.length === 0}
+              disabled={currentItems.length === 0}
             >
-              {selectedInvoices.size === quotations.length ? "Deselect All" : "Select All"}
+              {allVisibleSelected ? "Deselect All" : "Select All"}
             </Button>
             <span className="text-sm text-slate-500">
               {selectedInvoices.size} selected
@@ -433,10 +458,9 @@ export default function Quotations() {
             {isDeleting ? "Deleting..." : "Delete Selected"}
           </Button>
         </div>
-
         {/* Table */}
         <div className="overflow-x-auto">
-          {filteredQuotations.length === 0 ? (
+          {currentItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
               <h3 className="text-lg font-medium text-gray-900 mb-1 font-cal-sans">
                 No quotations found
@@ -454,37 +478,23 @@ export default function Quotations() {
                     <input
                       type="checkbox"
                       ref={headerCheckboxRef}
-                      checked={selectedInvoices.size === quotations.length}
+                      checked={allVisibleSelected && currentItems.length > 0}
                       onChange={handleSelectAllVisible}
                       aria-label="Select all quotations on this page"
                       className="mx-auto accent-green-800 h-4 w-4 rounded border-gray-300"
                     />
                   </TableHead>
-                  <TableHead className="px-6 py-4 border-r border-gray-200">
-                    Number
-                  </TableHead>
-                  <TableHead className="px-6 py-4 border-r border-gray-200">
-                    Client
-                  </TableHead>
-                  <TableHead className="px-6 py-4 border-r border-gray-200">
-                    Date
-                  </TableHead>
-                  <TableHead className="px-6 py-4 border-r border-gray-200">
-                    Valid Until
-                  </TableHead>
-                  <TableHead className="px-6 py-4 border-r border-gray-200">
-                    Status
-                  </TableHead>
-                  <TableHead className="px-6 py-4 border-r border-gray-200">
-                    Total
-                  </TableHead>
-                  <TableHead className="px-6 py-4 text-center">
-                    Actions
-                  </TableHead>
+                  <TableHead className="px-6 py-4 border-r border-gray-200">Number</TableHead>
+                  <TableHead className="px-6 py-4 border-r border-gray-200">Client</TableHead>
+                  <TableHead className="px-6 py-4 border-r border-gray-200">Date</TableHead>
+                  <TableHead className="px-6 py-4 border-r border-gray-200">Valid Until</TableHead>
+                  <TableHead className="px-6 py-4 border-r border-gray-200">Status</TableHead>
+                  <TableHead className="px-6 py-4 border-r border-gray-200">Total</TableHead>
+                  <TableHead className="px-6 py-4 text-center">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody className="cursor-pointer">
-                {filteredQuotations.map((quotation) => (
+                {currentItems.map((quotation) => (
                   <TableRow
                     key={quotation.id}
                     className="hover:bg-slate-50 border-b border-gray-200"
@@ -571,6 +581,34 @@ export default function Quotations() {
             </Table>
           )}
         </div>
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex font- items-center justify-between px-4 py-3 border-t border-gray-200 bg-white">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="border-gray-200"
+              >
+                Previous
+              </Button>
+              <div className="text-sm text-gray-500">
+                Page {currentPage} of {totalPages}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="border-gray-200"
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

@@ -27,7 +27,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb"
-import { Plus, Search, MoreHorizontal, Edit, Trash2 } from "lucide-react"
+import { Plus, Search, MoreHorizontal, Edit, Trash2, RefreshCw } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +35,8 @@ import {
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu"
 import { LoadingSpinner } from "../../components/ui/loadingSpinner"
+import { CustomerSidebar } from "../../components/Customers/CustomerSidebar"
+import { toast } from "../../components/ui/use-toast"
 import supabase from "../../components/Auth/supabaseClient"
 
 interface Customer {
@@ -53,8 +55,10 @@ export default function CustomersPage() {
   const navigate = useNavigate()
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState("")
   const [error, setError] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [isCustomerSidebarOpen, setIsCustomerSidebarOpen] = useState(false)
+  const [isCustomerLoading, setIsCustomerLoading] = useState(false)
 
   useEffect(() => {
     fetchCustomers()
@@ -94,32 +98,56 @@ export default function CustomersPage() {
     customer.company?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
+  const handleCustomerSubmit = async (data: any) => {
+    try {
+      setIsCustomerLoading(true)
+      // TODO: Implement customer creation logic
+      console.log("Creating customer:", data)
+      // After successful creation, close the sidebar and refresh the list
+      setIsCustomerSidebarOpen(false)
+      await fetchCustomers()
+      toast({
+        title: "Success",
+        description: "Customer created successfully.",
+      })
+    } catch (error) {
+      console.error("Error creating customer:", error)
+      toast({
+        title: "Error",
+        description: "Failed to create customer. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsCustomerLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container bg-gray-50/50 max-w-7xl mx-auto px-4">
-      <div className="mt-4 mb-6">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Invoices</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-      </div>
+        <div className="mt-4 mb-6">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Customers</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900">Customers</h1>
+              <h1 className="text-2xl font-Normal text-gray-900">Customers</h1>
               <p className="mt-1 text-sm text-gray-500">
                 Manage your customer contacts and information
               </p>
             </div>
-            <div className="flex items-center gap-2 mb-6">
+            <div className="flex items-center gap-2">
               <div className="relative w-72">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
                 <Input
@@ -132,33 +160,17 @@ export default function CustomersPage() {
               <Button
                 variant="outline"
                 onClick={fetchCustomers}
-                className="flex items-center border ml-2"
+                className="flex items-center border"
                 disabled={loading}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-4 h-4 mr-1"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M2.25 12a9.75 9.75 0 111.5 5.25"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M2.25 12V7.5a.75.75 0 01.75-.75H7.5"
-                  />
-                </svg>
+                <RefreshCw
+                  className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`}
+                />
                 Refresh
               </Button>
               <Button
-                onClick={() => navigate("/customers/new")}
-                className="bg-green-800 hover:bg-green-700 ml-2"
+                onClick={() => setIsCustomerSidebarOpen(true)}
+                className="bg-green-800 hover:bg-green-900"
               >
                 New Customer
               </Button>
@@ -166,16 +178,7 @@ export default function CustomersPage() {
           </div>
 
           <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Customer List</CardTitle>
-                  <CardDescription>
-                    View and manage your customer contacts
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
+           
             <CardContent>
               {loading ? (
                 <div className="flex justify-center items-center h-64">
@@ -248,6 +251,14 @@ export default function CustomersPage() {
           </Card>
         </div>
       </div>
+
+      {/* Add Customer Sidebar */}
+      <CustomerSidebar
+        isOpen={isCustomerSidebarOpen}
+        onClose={() => setIsCustomerSidebarOpen(false)}
+        onSubmit={handleCustomerSubmit}
+        isLoading={isCustomerLoading}
+      />
     </div>
   )
 } 

@@ -80,6 +80,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb";
+import { CustomerSidebar } from "../../components/Customers/CustomerSidebar"
 
 // =====================
 // Types & Interfaces
@@ -176,6 +177,8 @@ export default function Dashboard() {
   // Row order for drag-and-drop
   const [rowOrder, setRowOrder] = React.useState<string[]>([]);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [isCustomerSidebarOpen, setIsCustomerSidebarOpen] = useState(false)
+  const [isCustomerLoading, setIsCustomerLoading] = useState(false)
 
   // =====================
   // Table Pagination & Selection (must be above useEffect hooks)
@@ -904,6 +907,29 @@ export default function Dashboard() {
     },
   ];
 
+  const handleCustomerSubmit = async (data: any) => {
+    try {
+      setIsCustomerLoading(true)
+      // TODO: Implement customer creation logic
+      console.log("Creating customer:", data)
+      // After successful creation, close the sidebar
+      setIsCustomerSidebarOpen(false)
+      toast({
+        title: "Success",
+        description: "Customer created successfully.",
+      })
+    } catch (error) {
+      console.error("Error creating customer:", error)
+      toast({
+        title: "Error",
+        description: "Failed to create customer. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsCustomerLoading(false)
+    }
+  }
+
   return (
     <div className="container bg-gray-50/50 max-w-7xl mx-auto px-4">
       {/* Breadcrumb Navigation */}
@@ -1021,22 +1047,11 @@ export default function Dashboard() {
             Refresh
           </Button>
           <Button
-            onClick={() => {
-              const invoicesSheet = spreadsheets.find(
-                (sheet) => sheet.name === "SheetBills Invoices"
-              );
-              const invoicesSheetUrl = invoicesSheet?.sheetUrl;
-              navigate("/create-invoice", {
-                state: {
-                  selectedSpreadsheetUrl: invoicesSheetUrl,
-                  key: Date.now(),
-                },
-              });
-            }}
-            className="border border-gray-300 text-white bg-green-800 hover:bg-green-900 shadow-none"
+            onClick={() => setIsCustomerSidebarOpen(true)}
+            className="bg-green-800 hover:bg-green-900 shadow-none"
             disabled={isStateLoading}
           >
-            New Invoice
+            New Customer
           </Button>
         </div>
       </div>
@@ -1539,6 +1554,14 @@ export default function Dashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Add Customer Sidebar */}
+      <CustomerSidebar
+        isOpen={isCustomerSidebarOpen}
+        onClose={() => setIsCustomerSidebarOpen(false)}
+        onSubmit={handleCustomerSubmit}
+        isLoading={isCustomerLoading}
+      />
     </div>
   );
 }

@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "../../components/ui/table"
 import { useNavigate } from "react-router-dom"
-import { Plus, Search, Trash2 } from "lucide-react"
+import { Plus, Search, Trash2, RotateCcw } from "lucide-react"
 import { useToast } from "../../components/ui/use-toast"
 import {
   Breadcrumb,
@@ -63,6 +63,7 @@ export default function Quotations() {
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const headerCheckboxRef = useRef<HTMLInputElement>(null)
+  const [statusFilter, setStatusFilter] = useState<string>("All")
 
   // Format currency
   const formatCurrency = (amount: number): string => {
@@ -81,60 +82,65 @@ export default function Quotations() {
     })
   }
 
-  // Load quotations
-  useEffect(() => {
-    const loadQuotations = async () => {
-      setIsLoading(true)
-      try {
-        // TODO: Implement API call to fetch quotations
-        // For now, using mock data
-        const mockQuotations: Quotation[] = [
-          {
-            id: "1",
-            quotationNumber: "QT-2024-0001",
-            date: "2024-03-15",
-            validUntil: "2024-04-15",
-            customer: {
-              name: "John Doe",
-              email: "john@example.com",
-            },
-            amount: 1500.00,
-            status: "Draft",
+  // Move loadQuotations outside useEffect for refresh
+  const loadQuotations = async () => {
+    setIsLoading(true)
+    try {
+      // TODO: Implement API call to fetch quotations
+      // For now, using mock data
+      const mockQuotations: Quotation[] = [
+        {
+          id: "1",
+          quotationNumber: "QT-2024-0001",
+          date: "2024-03-15",
+          validUntil: "2024-04-15",
+          customer: {
+            name: "John Doe",
+            email: "john@example.com",
           },
-          {
-            id: "2",
-            quotationNumber: "QT-2024-0002",
-            date: "2024-03-14",
-            validUntil: "2024-04-14",
-            customer: {
-              name: "Jane Smith",
-              email: "jane@example.com",
-            },
-            amount: 2750.50,
-            status: "Sent",
+          amount: 1500.0,
+          status: "Draft",
+        },
+        {
+          id: "2",
+          quotationNumber: "QT-2024-0002",
+          date: "2024-03-14",
+          validUntil: "2024-04-14",
+          customer: {
+            name: "Jane Smith",
+            email: "jane@example.com",
           },
-        ]
-        setQuotations(mockQuotations)
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to load quotations",
-          variant: "destructive",
-        })
-      } finally {
-        setIsLoading(false)
-      }
+          amount: 2750.5,
+          status: "Sent",
+        },
+      ]
+      setQuotations(mockQuotations)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load quotations",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
     }
+  }
 
+  useEffect(() => {
     loadQuotations()
+    // eslint-disable-next-line
   }, [toast])
 
-  // Filter quotations based on search query
-  const filteredQuotations = quotations.filter((quotation) =>
-    quotation.quotationNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    quotation.customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    quotation.customer.email.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  // Filter quotations based on search query and status
+  const filteredQuotations = quotations.filter((quotation) => {
+    const matchesSearch =
+      quotation.quotationNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      quotation.customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      quotation.customer.email.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesStatus =
+      statusFilter === "All" || quotation.status === statusFilter
+    return matchesSearch && matchesStatus
+  })
 
   // Handle delete quotation
   const handleDelete = async (id: string) => {
@@ -358,9 +364,9 @@ export default function Quotations() {
         </Button>
       </div>
 
-      {/* Search and Filters */}
-      <div className="mb-6">
-        <div className="relative">
+      {/* Search, Refresh, and Filter */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+        <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <Input
             type="text"
@@ -369,6 +375,32 @@ export default function Quotations() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
           />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-green-800"
+            onClick={loadQuotations}
+            aria-label="Refresh quotations"
+          >
+            <RotateCcw className="w-5 h-5" />
+          </Button>
+        </div>
+        <div className="flex gap-2 mt-2 sm:mt-0">
+          {['All', 'Draft', 'Sent', 'Accepted'].map((status) => (
+            <Button
+              key={status}
+              variant={statusFilter === status ? 'default' : 'outline'}
+              className={
+                statusFilter === status
+                  ? 'bg-green-800 text-white border-green-800'
+                  : 'bg-white text-gray-700 border-gray-200'
+              }
+              onClick={() => setStatusFilter(status)}
+              size="sm"
+            >
+              {status}
+            </Button>
+          ))}
         </div>
       </div>
 

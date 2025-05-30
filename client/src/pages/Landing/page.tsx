@@ -1,455 +1,396 @@
-import { CheckIcon } from "lucide-react";
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
-import { Slot } from "@radix-ui/react-slot";
-import { cva, type VariantProps } from "class-variance-authority";
-import { useNavigate } from "react-router-dom";
-import { FileTextIcon, RefreshCwIcon, RocketIcon, ZapIcon } from "lucide-react";
-import React from "react";
-import { Card as CardComponent } from "../../components/ui/card";
-import { CardContent } from "../../components/ui/card";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { CheckIcon, Menu, X, FileTextIcon, RefreshCwIcon, RocketIcon, ZapIcon } from 'lucide-react';
+import { Button } from '../../components/ui/button'
 
-// Feature card data for mapping
+// Feature card data
 const featureCards = [
   {
-    icon: <ZapIcon className="w-[35px] h-[35px] " />,
+    icon: <ZapIcon className="w-8 md:w-[35px] h-8 md:h-[35px]" />,
     title: "Designed for Simplicity & Speed",
-    description:
-      "Transform your Google Sheets Into a powerful invoicing system. No more complex formulas or messy templates.",
+    description: "Transform your Google Sheets Into a powerful invoicing system. No more complex formulas or messy templates.",
   },
   {
-    icon: <FileTextIcon className="w-[49px] h-[49px]" />,
+    icon: <FileTextIcon className="w-8 md:w-[49px] h-8 md:h-[49px]" />,
     title: "Google Sheets Powered",
-    description:
-      "Skip the learning curve! SheetBills works directly inside the Google Sheets you already use, so there's no need to install software or migrate data.",
+    description: "Skip the learning curve! SheetBills works directly inside the Google Sheets you already use, so there's no need to install software or migrate data.",
   },
   {
-    icon: <RefreshCwIcon className="w-[51px] h-[51px]" />,
+    icon: <RefreshCwIcon className="w-8 md:w-[51px] h-8 md:h-[51px]" />,
     title: "No More Messy Invoice Spreadsheets",
-    description:
-      "Stop battling copy-paste errors, broken formulas, and clunky templates.",
+    description: "Stop battling copy-paste errors, broken formulas, and clunky templates.",
   },
   {
-    icon: <RocketIcon className="w-[49px] h-[49px]" />,
+    icon: <RocketIcon className="w-8 md:w-[49px] h-8 md:h-[49px]" />,
     title: "Confused by Complex Invoicing Software?",
-    description:
-      "No need for heavy software — SheetBills simplifies invoicing right where you're already working: Google Sheets.",
+    description: "No need for heavy software — SheetBills simplifies invoicing right where you're already working: Google Sheets.",
   },
 ];
 
+const navItems = [
+  { title: "Why SheetBills ?", href: "#why" },
+  { title: "How it Works", href: "#how" },
+  { title: "FAQs", href: "#faqs" },
+];
 
-// Utils
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+const benefitItems = [
+  { text: "No more Scattered Files/Sheets" },
+  { text: "No more Complex Invoice Generation" },
+  { text: "No more Formulas" },
+];
 
-// Button Component
-const buttonVariants = cva(
-  "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-  {
-    variants: {
-      variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-      },
-      size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  }
-);
-
-interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-  VariantProps<typeof buttonVariants> {
-  asChild?: boolean;
-}
-
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button";
-    return (
-      <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
-        {...props}
-      />
-    );
-  }
-);
-Button.displayName = "Button";
-
-// Card Component
-const Card = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      "rounded-lg border bg-card text-card-foreground shadow-sm",
-      className
-    )}
-    {...props}
-  />
-));
-Card.displayName = "Card";
-
-// Main App Component
-const MacbookAir = (): React.ReactElement => {
+const LandingPage = () => {
   const navigate = useNavigate();
-
-  const navItems = [
-    { title: "Why SheetBills ?", width: "150px" },
-    { title: "How it Works", width: "150px" },
-    { title: "FAQs", width: "150px" },
-  ];
-
-  const benefitItems = [
-    { text: "No more Scattered Files/Sheets" },
-    { text: "No more Complex Invocie Generation" },
-    { text: "No more Formulas" },
-
-  ];
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [openStepIdx, setOpenStepIdx] = useState(0);
 
   return (
-    <div className="flex flex-col items-center relative bg-gray-50">
-      {/* Responsive Header */}
-      <header className="max-w-7xl bg-gray-50 flex items-center justify-between px-4 py-4 md:px-6 md:py-4 w-full">
-        {/* Logo and Brand */}
-        <div className="flex items-center gap-2">
-          <img
-            className="h-10 w-auto"
-            alt="Sheetbills"
-            src="/sheetbills-logo.svg"
-          />
-          <span className="font-normal text-green-800 text-xl">SheetBills</span>
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className=" top-0 z-50 w-full bg-gray-50  ">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <div className="flex items-center gap-2">
+              <img
+                className="h-8 w-auto"
+                alt="Sheetbills"
+                src="/sheetbills-logo.svg"
+              />
+              <span className="font-normal text-green-800 text-lg">SheetBills</span>
+            </div>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-8">
+              {navItems.map((item) => (
+                <a
+                  key={item.title}
+                  href={item.href}
+                  className="text-gray-600 hover:text-green-800 transition-colors"
+                >
+                  {item.title}
+                </a>
+              ))}
+            </nav>
+
+            {/* Desktop Login Button */}
+            <div className="hidden md:block">
+              <Button
+                onClick={() => navigate('/login')}
+                className="bg-green-800 hover:bg-green-700 text-white px-6"
+              >
+                Login
+              </Button>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              className="md:hidden p-2 text-gray-600"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+
+          {/* Mobile Navigation */}
+          {isMobileMenuOpen && (
+            <div className="md:hidden py-4 space-y-4">
+              {navItems.map((item) => (
+                <a
+                  key={item.title}
+                  href={item.href}
+                  className="block text-gray-600 hover:text-green-800 py-2"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {item.title}
+                </a>
+              ))}
+              <Button
+                onClick={() => {
+                  navigate('/login');
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full bg-green-800 hover:bg-green-700 text-white mt-4"
+              >
+                Login
+              </Button>
+            </div>
+          )}
         </div>
-
-        {/* Navigation */}
-        <nav className="flex items-center gap-8">
-          <span className="text-md text-[#5C5B6A]">Why SheetBills ?</span>
-          <span className="text-md text-[#5C5B6A]">How it Works</span>
-          <span className="text-md text-[#5C5B6A]">FAQs</span>
-        </nav>
-
-        {/* Button */}
-        <Button onClick={() => navigate('/login')} className="bg-green-800 rounded-sm text-white text-sm px-6 py-2">
-          Login
-        </Button>
       </header>
 
-      <section className="flex flex-col items-center justify-center mt-20 w-full gap-y-10">
-
-        <div className="flex flex-col items-center justify-center w-full gap-y-2">
-          {/* Made for Google Sheets */}
-          <div className="flex items-center space-x-2">
-            <span className="font-normal text-sm" style={{ color: "#5C5B6A" }}>
-              Made for
-            </span>
-            <span className="flex items-center   bg-gray-50 px-1 py-1 " >
-              <img
-                className="w-5 h-5 mr-1"
-                alt="Google Sheets logo"
-                src="/Google_Sheets_logo_(2014-2020).svg"
-              />
-              <span className="font-normal text-base" style={{ color: "#1EA952" }}>
-                Google Sheets
+      <main className="flex-grow">
+        {/* Hero Section */}
+        <section className="px-4 pt-8 md:pt-20 pb-12 md:pb-20">
+          <div className="max-w-7xl mx-auto text-center">
+            <div className="flex items-center justify-center space-x-2 mb-6">
+              <span className="text-gray-600 text-sm">Made for</span>
+              <span className="flex items-center bg-gray-50 px-2 py-1 rounded">
+                <img
+                  className="w-5 h-5 mr-1"
+                  alt="Google Sheets logo"
+                  src="/Google_Sheets_logo_(2014-2020).svg"
+                />
+                <span className="text-green-600">Google Sheets</span>
               </span>
-            </span>
-          </div>
+            </div>
 
-          {/* Heading and subheading */}
-          <div className="flex flex-col items-center text-center w-full">
-            <h1 className="font-cal-sans font-normal leading-tight text-[56px] w-full">
-              <span className="text-black font-normal">Stop </span>
-              <span className="text-green-800 font-normal">Wrestling</span>
-              <span className="text-black font-normal"> with</span>
-              <br />
-              <span className="text-green-800 font-normal">Invoices in Google Sheets ?</span>
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-normal leading-tight mb-6">
+              <span className="text-black">Stop </span>
+              <span className="text-green-800">Wrestling</span>
+              <span className="text-black"> with</span>
+              <br className="hidden sm:block" />
+              <span className="text-green-800">Invoices in Google Sheets?</span>
             </h1>
 
-            <p className="font-medium text-lg pt-6" style={{ color: "#5C5B6A" }}>
-              Ditch the templates, formulas and frustration. SheetBills makes invoicing in<br />
+            <p className="text-gray-600 text-lg md:text-xl max-w-2xl mx-auto mb-8">
+              Ditch the templates, formulas and frustration. SheetBills makes invoicing in
               Google Sheets fast, simple and professional
             </p>
-          </div>
-        </div>
-        
 
-        {/* Benefit list */}
-        <div className="flex flex-col max-w-2xl justify-start gap-3">
-          {benefitItems.map((item, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-3"
-            >
-              <CheckIcon className="w-[20px] h-[20px] text-green-800" />
-              <div className="font-extralight text-sm whitespace-nowrap" style={{ color: '#5C5B6A' }}>
-                {item.text}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Try for Free button */}
-        <Button onClick={() => navigate('/login')} className="flex w-60 items-center hover:bg-green-900 justify-center bg-green-800 rounded-sm text-white text-sm">
-          Try for Free
-        </Button>
-
-        {/* Social Proof/Testimonial */}
-        <div className="flex items-center gap-4 ">
-          {/* Avatars */}
-          <div className="flex items-center">
-            {[1, 2, 3, 4, 5].map((n, i) => (
-              <img
-                key={i}
-                src="https://www.shutterstock.com/image-photo/smiling-african-american-millennial-businessman-600nw-1437938108.jpg"
-                alt={`User ${n}`}
-                className={`w-10 h-10 rounded-full object-cover ring-2 ring-white shadow ${i !== 0 ? '-ml-3' : ''}`}
-                style={{ background: "#eee" }}
-              />
-            ))}
-          </div>
-
-          <div className="flex flex-col ">
-
-
-            {/* Stars */}
-            <div className="flex pl-2 text-yellow-400">
-              {[...Array(5)].map((_, i) => (
-                <svg key={i} xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="w-5 h-5">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" />
-                </svg>
+            {/* Benefits */}
+            <div className="flex flex-col items-start space-y-4 max-w-md mx-auto mb-8">
+              {benefitItems.map((item, index) => (
+                <div key={index} className="flex items-center space-x-3">
+                  <CheckIcon className="w-5 h-5 text-green-800 flex-shrink-0" />
+                  <span className="text-gray-600">{item.text}</span>
+                </div>
               ))}
             </div>
 
-            {/* Text */}
-            <span className="ml-2 text-lg"><span className="font-normal">Join</span> 250+ Satisfied Users</span>
+            <Button
+              onClick={() => navigate('/login')}
+              className="w-full sm:w-auto bg-green-800 hover:bg-green-700 text-white px-8 py-3"
+            >
+              Try for Free
+            </Button>
 
+            {/* Social Proof */}
+            <div className="mt-12 flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+              <div className="flex -space-x-2">
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <img
+                    key={n}
+                    src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg"
+                    alt={`User ${n}`}
+                    className="w-8 h-8 rounded-full border-2 border-white"
+                  />
+                ))}
+              </div>
+              <div className="text-center sm:text-left">
+                <div className="flex text-yellow-400 justify-center sm:justify-start">
+                  {[...Array(5)].map((_, i) => (
+                    <span key={i} className="text-yellow-400">★</span>
+                  ))}
+                </div>
+                <p className="text-gray-600">
+                  Join <span className="font-medium">250+</span> Satisfied Users
+                </p>
+              </div>
+            </div>
           </div>
+        </section>
 
-        </div>
-
-
-      </section>
-
-      {/* Why Us Section */}
-      <section className="flex flex-col items-center justify-center pt-40 pb-20 w-full gap-y-10">
-        <div className="flex flex-col items-center gap-[30px]">
-          <header className="flex flex-col items-center justify-center">
-            <h2 className="text-lg text-green-800 font-cal-sans font-normal">
-              Why Us ?
-            </h2>
-            <div className="flex flex-col justify-center gap-y-2 items-center">
-              <h1 className="w-[686px] text-[50px] text-center font-cal-sans font-normal">
-                <span className="text-green-800">Invoice</span>
-                <span className="text-green-800"> Creation</span>
+        {/* Features Section */}
+        <section className="bg-gray-50 py-16 md:py-24 px-4" id="features">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-green-800 text-lg mb-4">Why Us?</h2>
+              <h3 className="text-3xl md:text-4xl font-normal mb-6">
+                <span className="text-green-800">Invoice Creation</span>
                 <span className="text-black"> Made </span>
-
                 <span className="text-green-800">Simple</span>
-              </h1>
-              <p className="w-[600px] text-lg text-gray-600 pb-10 text-center font-cal-sans font-normal">
-                Transform your Google Sheets Into a powerful invoicing system. No
-                more complex formulas or messy templates.
+              </h3>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Transform your Google Sheets Into a powerful invoicing system.
+                No more complex formulas or messy templates.
               </p>
             </div>
-          </header>
 
-          <div className="flex max-w-4xl items-center justify-center gap-5 px-5 py-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {featureCards.map((card, index) => (
+                <div
+                  key={index}
+                  className="bg-gray-50 p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow"
+                >
+                  <div className="flex items-center justify-center mb-4">
+                    {card.icon}
+                  </div>
+                  <h4 className="text-xl font-medium text-center mb-3">{card.title}</h4>
+                  <p className="text-gray-600 text-center">{card.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
-            {/* First Column */}
-            <div className="flex  flex-col items-start ">
-              <div className="flex flex-col items-start gap-y-4">
-                {featureCards.slice(0, 2).map((card, index) => (
-                  <CardComponent
+        {/* How it Works Section */}
+        <section className="py-16 md:py-24 px-4" id="how">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+              Get Started in Just 3 Simple Steps
+            </h2>
+            <div className="grid md:grid-cols-2 gap-12">
+              <div className="space-y-6">
+                {[
+                  {
+                    title: "1. Connect your Google Account",
+                    description: "Securely link your Google Sheets to SheetBills. No coding required.",
+                    isOpen: true
+                  },
+                  {
+                    title: "2. Get your SheetBills link",
+                    description: "Instantly generate a unique link for your business."
+                  },
+                  {
+                    title: "3. Customers generate invoices",
+                    description: "Your customers fill out a simple form and we handle the rest."
+                  }
+                ].map((step, index) => (
+                  <details
                     key={index}
-                    className="max-w-md  border-none"
+                    open={index === openStepIdx}
+                    className="group border-b border-gray-200 pb-4"
                   >
-                    <CardContent className="flex  border border-gray-200 rounded-md  flex-col items-center gap-[7px]">
-                      <div className=" bg-white  border-green-800 p-8 flex items-center justify-center">
-                        {card.icon}
-                      </div>
-                      <h3 className=" font-normal text-black text-2xl text-center">
-                        {card.title}
-                      </h3>
-                      <p className="font-normal text-gray-600 text-md max-w-sm text-center">
-                        {card.description}
-                      </p>
-                    </CardContent>
-                  </CardComponent>
+                    <summary
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setOpenStepIdx(index === openStepIdx ? -1 : index);
+                      }}
+                      className="flex justify-between items-center cursor-pointer text-lg"
+                    >
+                      <span className={index === 0 ? "text-green-800" : "text-gray-800"}>
+                        {step.title}
+                      </span>
+                      <span>{index === openStepIdx ? "-" : "+"}</span>
+                    </summary>
+                    <div className="mt-4 text-gray-600 pl-4">{step.description}</div>
+                  </details>
                 ))}
               </div>
-            </div>
-
-            {/* Second Column */}
-            <div className="flex  flex-col items-start ">
-              <div className="flex flex-col items-start gap-y-4">
-                {featureCards.slice(0, 2).map((card, index) => (
-                  <CardComponent
-                    key={index}
-                    className="max-w-md  border-none"
-                  >
-                    <CardContent className="flex border border-gray-200 rounded-md flex-col items-center gap-[7px]">
-                      <div className=" bg-white   p-8 flex items-center justify-center">
-                        {card.icon}
-                      </div>
-                      <h3 className=" font-normal  text-2xl text-center">
-                        {card.title}
-                      </h3>
-                      <p className="font-normal text-gray-600 text-md max-w-sm text-center">
-                        {card.description}
-                      </p>
-                    </CardContent>
-                  </CardComponent>
-                ))}
+              <div className="hidden md:block">
+                <img
+                  src="/placeholder-image.jpg"
+                  alt="How it works"
+                  className="rounded-lg shadow-lg"
+                />
               </div>
             </div>
-
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Demo Video Section */}
-      <section className="w-full bg-gray-50 py-20 flex flex-col items-center">
-      <h2 className="text-lg text-green-800 font-cal-sans pb-6 font-normal">
-              How it Works ? 
+        {/* Pricing Section */}
+        <section className="bg-gray-50 py-16 md:py-24 px-4" id="pricing">
+          <div className="max-w-7xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-normal mb-6">
+              Get Your SheetBills Free Plan
             </h2>
-        <h2 className="text-4xl md:text-5xl font-normal text-gray-800 text-center mb-4">See SheetBills in Action</h2>
-        <p className="text-lg text-gray-600 text-center mb-10 max-w-2xl">Watch this quick demo to see how easy it is to create, send, and manage invoices with SheetBills.</p>
-        <div className="w-full flex justify-center">
-          <div className="w-full max-w-4xl aspect-video rounded-xl overflow-hidden shadow-lg border border-gray-200 bg-black">
-            <iframe
-              className="w-full h-full"
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-              title="SheetBills Demo Video"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
-          </div>
-        </div>
-      </section>
+            <p className="text-gray-600 mb-12">
+              All the essentials for $0.00 — forever.
+              <span className="text-green-800 block mt-2">
+                Paid plans with advanced features are coming soon!
+              </span>
+            </p>
 
-      {/* Pricing Section */}
-      <section className="w-full bg-gray-50 py-20 flex flex-col items-center">
-      <h2 className="text-lg text-green-800 font-cal-sans pb-6 font-normal">
-               Pricing 
+            <div className="max-w-md mx-auto relative bg-white rounded-2xl border-2 border-green-800 p-6 md:p-8">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-green-800 text-white px-4 py-1 rounded-full text-sm">
+                All Features Included
+              </div>
+
+              <div className="mt-4 mb-8">
+                <div className="flex items-baseline justify-center">
+                  <span className="text-4xl md:text-5xl font-normal">$0.00</span>
+                  <span className="text-gray-500 ml-2">USD</span>
+                </div>
+              </div>
+
+              <ul className="space-y-4 mb-8 text-left">
+                <li className="flex items-center">
+                  <CheckIcon className="w-5 h-5 text-green-800 mr-2" />
+                  <span>Unlimited invoices</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckIcon className="w-5 h-5 text-green-800 mr-2" />
+                  <span>
+                    <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded mr-1">
+                      Unlimited
+                    </span>
+                    Invoice Link Generation
+                  </span>
+                </li>
+                <li className="flex items-center">
+                  <CheckIcon className="w-5 h-5 text-green-800 mr-2" />
+                  <span>Automatic formatting — no templates or formulas</span>
+                </li>
+              </ul>
+
+              <Button
+                onClick={() => navigate('/login')}
+                className="w-full bg-green-800 hover:bg-green-700 text-white py-3"
+              >
+                Get Started Free
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQs Section */}
+        <section className="py-16 md:py-24 px-4" id="faqs">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+              Frequently Asked Questions
             </h2>
-        <h2 className="text-4xl md:text-5xl font-normal leading-loose text-gray-800 text-center mb-4"> Quit Invoicing in Google Sheets, <br /> Get Your SheetBills Free Plan</h2>
-        <p className="text-lg md:text-lg text-gray-600 text-center mb-10 max-w-2xl">All the essentials for $0.00 — forever. <span className='text-green-800 font-normal'> <br/> Paid plans with advanced features are coming soon!</span></p>
-        <div className="flex flex-col items-center w-full">
-          <div className="relative bg-white border-2 border-green-800 rounded-2xl shadow p-8 max-w-md w-full flex flex-col items-center mb-8">
-            {/* Badge */}
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-800 text-white text-sm font-normal px-4 py-1 rounded-full">All Feature Included</div>
-            {/* Price */}
-            <div className="flex items-end gap-2 mb-2 mt-4">
-              
-              <span className="text-5xl font-normal text-gray-800">$0.00</span>
-              <span className="text-gray-500 font-normal mb-1 ml-1">USD</span>
+            <div className="space-y-6">
+              {[
+                {
+                  q: "How do you bill your servers?",
+                  a: "Servers have both a monthly price cap and a price per hour. Your server's bill will never exceed its monthly price cap."
+                },
+                {
+                  q: "Do you bill servers that are off?",
+                  a: "Yes, servers that are off are still billed until they are deleted from your account."
+                },
+                {
+                  q: "Is there any way to get a custom configuration?",
+                  a: "Yes, you can contact our support team to discuss custom configurations for your needs."
+                }
+              ].map((faq, index) => (
+                <details key={index} className="group border-b border-gray-200 pb-4">
+                  <summary className="flex justify-between items-center cursor-pointer text-lg font-medium">
+                    <span>{faq.q}</span>
+                    <span className="text-green-800">+</span>
+                  </summary>
+                  <div className="mt-4 text-gray-600">{faq.a}</div>
+                </details>
+              ))}
             </div>
-            {/* Features */}
-            <ul className="w-full space-y-3 text-base mb-6 mt-2">
-              <li className="flex items-center text-gray-800"><span className="text-green-800 mr-2">✔</span> Unlimited invoices</li>
-              <li className="flex items-center text-gray-800"><span className="text-green-800 mr-2">✔<span className='bg-green-100 text-green-800 px-2 py-0.5 rounded mr-1 text-sm font-normal'>Unlimited</span></span> Invoice Link Generation</li>
-              <li className="flex items-center text-gray-800"><span className="text-green-800 mr-2">✔</span>  Automatic formatting — no templates or formulas</li>
-            </ul>
-            {/* CTA Button */}
-            <Button onClick={() => navigate('/login')} className="w-full bg-green-800 hover:bg-green-900 rounded-lg text-white py-2 mb-3 font-Normal flex items-center justify-center gap-2">Get SheetBills <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' className='w-5 h-5'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17 8l4 4m0 0l-4 4m4-4H3' /></svg></Button>
-            {/* Note */}
-            <div className="text-xs text-gray-600 text-center">This is SheetBills free plan, <a href="/login" className="underline text-green-800">it's yours forever</a></div>
+          </div>
+        </section>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-gray-50 border-t border-gray-100 py-8 px-4">
+        <div className="max-w-7xl mx-auto text-center">
+          <img src="/sheetbills-logo.svg" alt="SheetBills Logo" className="h-8 mx-auto mb-4" />
+          <p className="text-gray-600 mb-2">
+            Powered by <span className="text-green-800">SheetBills</span>
+          </p>
+          <p className="text-gray-500 text-sm mb-4">
+            © 2025 <span className="text-green-800">SheetBills</span>. All rights reserved.
+          </p>
+          <div className="flex justify-center space-x-4 text-sm">
+            <a href="/privacy" className="text-gray-600 hover:text-green-800">
+              Privacy Policy
+            </a>
+            <span className="text-gray-300">|</span>
+            <a href="/terms" className="text-gray-600 hover:text-green-800">
+              Terms of Service
+            </a>
           </div>
         </div>
-      </section>
-      
-      {/* FAQs Section */}
-      <section className="w-full bg-gray-50 py-20 flex flex-col items-center">
-        <h2 className="text-4xl font-extrabold text-gray-800 text-center mb-12">Frequently Asked Questions</h2>
-        <div className="w-full max-w-2xl mx-auto divide-y divide-gray-200">
-          {/* FAQ 1 - open by default */}
-          <details open className="group py-6">
-            <summary className="flex items-center justify-between cursor-pointer  font-normal text-lg focus:outline-none">
-              <span>How do you bill your servers?</span>
-              <span className="ml-2">
-                <svg className="w-6 h-6 text-green-800 group-open:block hidden" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-              </span>
-            </summary>
-            <div className="mt-4 text-gray-700 text-base">
-              Servers have both a monthly price cap and a price per hour. Your server's bill will never exceed its monthly price cap. If you delete your Cloud Server before the end of the billing month, you will only be billed the hourly rate. We will bill you for each cloud server until you choose to delete them. Even if you aren't actively using your server, we will bill you for it.
-            </div>
-          </details>
-          {/* FAQ 2 */}
-          <details className="group py-6">
-            <summary className="flex items-center justify-between cursor-pointer text-lg text-gray-800 font-medium focus:outline-none">
-              <span>Do you bill servers that are off?</span>
-              <span className="ml-2">
-                <svg className="w-6 h-6 text-green-800 group-open:hidden" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
-                <svg className="w-6 h-6 text-green-800 group-open:block hidden" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-              </span>
-            </summary>
-            <div className="mt-4 text-gray-700 text-base">
-              Yes, servers that are off are still billed until they are deleted from your account.
-            </div>
-          </details>
-          {/* FAQ 3 */}
-          <details className="group py-6">
-            <summary className="flex items-center justify-between cursor-pointer text-lg text-gray-800 font-medium focus:outline-none">
-              <span>Is there any way to get a custom configuration?</span>
-              <span className="ml-2">
-                <svg className="w-6 h-6 text-green-800 group-open:hidden" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
-                <svg className="w-6 h-6 text-green-800 group-open:block hidden" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-              </span>
-            </summary>
-            <div className="mt-4 text-gray-700 text-base">
-              Yes, you can contact our support team to discuss custom configurations for your needs.
-            </div>
-          </details>
-          {/* FAQ 4 */}
-          <details className="group py-6">
-            <summary className="flex items-center justify-between cursor-pointer text-lg text-gray-800 font-medium focus:outline-none">
-              <span>How reliable are local storage disks for servers?</span>
-              <span className="ml-2">
-                <svg className="w-6 h-6 text-green-800 group-open:hidden" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
-                <svg className="w-6 h-6 text-green-800 group-open:block hidden" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-              </span>
-            </summary>
-            <div className="mt-4 text-gray-700 text-base">
-              Our local storage disks are enterprise-grade and highly reliable, but we always recommend regular backups for mission-critical data.
-            </div>
-          </details>
-        </div>
-      </section>
-
-       {/* Footer */}
-    <footer className="w-full bg-gray-50 py-10 flex flex-col items-center justify-center mt-20 border-t border-gray-100">
-      <img src="/sheetbills-logo.svg" alt="SheetBills Logo" className="h-8 mb-2" />
-      <div className="text-gray-500 text-base mb-1">Powered by <span className="text-green-800 font-normal">SheetBills</span></div>
-      <div className="text-gray-400 text-sm mb-1">© 2025 <span className="text-green-800 font-normal">SheetBills</span>. All rights reserved.</div>
-      <div className="flex gap-4 text-gray-500 text-sm mt-2">
-        <a href="/privacy" className="hover:underline">Privacy Policy</a>
-        <span>|</span>
-        <a href="/terms" className="hover:underline">Terms of Service</a>
-      </div>
-    </footer>
-
-
-  
+      </footer>
     </div>
-   
   );
 };
 
-export default MacbookAir;
+export default LandingPage;

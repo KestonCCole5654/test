@@ -1042,9 +1042,9 @@ ${businessData.phone}`
     <>
       {/* Preview Mode - Cleaned up */}
       {!isFormExpanded && (
-        <div className="w-full max-w-7xl mx-auto mt-5">
+        <div className="w-full max-w-7xl mx-auto mt-4">
           {/* Breadcrumb Navigation */}
-          <div className="mt-4 max-w-7xl mb-6">
+          <div className="max-w-7xl mb-6">
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
@@ -1077,7 +1077,7 @@ ${businessData.phone}`
                 <div className="flex flex-col gap-3 mt-2">
                   <Button
                     variant="default"
-                    className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2 rounded-md shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
+                    className="bg-green-800 hover:bg-green-900 text-white font-normal px-4 py-2 rounded-md shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
                     onClick={() => setIsFormExpanded(true)}
                   >
                     <Pencil className="w-4 h-4 mr-2" />
@@ -1451,7 +1451,7 @@ ${businessData.phone}`
                   </CardContent>
                 </Card>
 
-                <div className="flex gap-3 justify-end no-print">
+                <div className="flex w-full justify-end no-print">
                   {invoiceToEdit ? (
                     <Button
                       variant="outline"

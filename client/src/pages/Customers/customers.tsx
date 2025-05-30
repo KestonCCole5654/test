@@ -96,20 +96,20 @@ export default function CustomersPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="w-full">
-        <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/invoices">Dashboard</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Customers</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
+      <div className="container bg-gray-50/50 max-w-7xl mx-auto px-4">
+      <div className="mt-4 mb-6">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Invoices</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
           <div className="flex justify-between items-center mb-6">

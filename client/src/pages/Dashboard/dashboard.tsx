@@ -80,7 +80,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb";
-import { LoadingPage } from "../../components/LoadingPage";
+import { LoadingPage } from "../../components/ui/loadingSpinner";
 
 // =====================
 // Types & Interfaces

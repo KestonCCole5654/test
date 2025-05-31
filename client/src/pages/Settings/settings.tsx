@@ -23,7 +23,7 @@ import { LoadingSpinner } from "../../components/ui/loadingSpinner"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog'
 import { Checkbox } from '../../components/ui/checkbox'
 import { useBrandLogo } from "../../components/ui/InvoiceStats"
-import { LoadingPage } from "../../components/ui/LoadingPage"
+import { LoadingPage } from "../../components/ui/loadingSpinner"
 
 interface UserData {
   name: string

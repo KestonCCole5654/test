@@ -95,7 +95,7 @@ const WelcomeScreen = ({ onStart }: { onStart: () => void }) => {
       </p>
       <Button
         onClick={onStart}
-        className="bg-green-600 font-cal-sans hover:bg-green-700 px-8 py-6 text-lg"
+        className="bg-green-800 font-cal-sans hover:bg-green-900 px-8 py-6 text-lg"
       >
         Get Started
         <ArrowRight className="ml-2 h-5 w-5" />
@@ -730,7 +730,7 @@ export default function InitializePage() {
           )}
 
           <Button
-            className="flex-1 bg-green-600 font-cal-sans hover:bg-green-700"
+            className="flex-1 bg-green-800 font-cal-sans hover:bg-green-900"
             onClick={handleNext}
             type="button"
           >
@@ -856,7 +856,7 @@ export default function InitializePage() {
           </Button>
 
           <Button
-            className="flex-1 bg-green-600 hover:bg-green-700 font-cal-sans"
+            className="flex-1 bg-green-800 hover:bg-green-900 font-cal-sans"
             onClick={createBusinessSheet}
             disabled={isSubmitting}
             type="button"
@@ -987,13 +987,15 @@ export default function InitializePage() {
 
       <header className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 py-4 px-4">
         <div className="max-w-md mx-auto">
-          <div className="flex items-center justify-center mb-4">
-            <img 
-              src="/sheetbills-logo.svg" 
-              alt="SheetBills Logo" 
-              className="h-8 w-auto"
-            />
-          </div>
+          {!showSuccess && (
+            <div className="flex items-center justify-center mb-4">
+              <img 
+                src="/sheetbills-logo.svg" 
+                alt="SheetBills Logo" 
+                className="h-8 w-auto"
+              />
+            </div>
+          )}
           {!showWelcome && !showSuccess && (
             <ProgressDots currentStep={showReview ? questions.length : currentQuestion} totalSteps={questions.length} />
           )}

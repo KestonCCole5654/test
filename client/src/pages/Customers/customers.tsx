@@ -467,6 +467,7 @@ export default function CustomersPage() {
                 <Table className="min-w-full text-sm">
                   <TableHeader>
                     <TableRow className="bg-gray-50 border-b border-gray-200">
+                      <TableHead className="w-8 px-4 border-r border-gray-200"></TableHead>
                       <TableHead className="w-[56px] px-6 py-4 align-middle text-center border-r border-gray-200">
                         <input
                           type="checkbox"

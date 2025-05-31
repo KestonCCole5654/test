@@ -3152,5 +3152,58 @@ app.get('/api/invoices/:invoiceId', async (req, res) => {
   }
 });
 
+// Get counts of paid and unpaid invoices for a customer
+app.get('/api/invoices/customer/:customerId/counts', async (req, res) => {
+  try {
+    const { customerId } = req.params;
+    const { sheetUrl } = req.query;
+    if (!customerId || !sheetUrl) {
+      return res.status(400).json({ error: 'Missing customerId or sheetUrl' });
+    }
+
+    // Get authorization header
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Authorization header is required' });
+    }
+    const accessToken = authHeader.split(' ')[1];
+
+    // Initialize Google Sheets API
+    const auth = new google.auth.OAuth2();
+    auth.setCredentials({ access_token: accessToken });
+    const sheets = google.sheets({ version: 'v4', auth });
+
+    // Extract spreadsheet ID from URL
+    const spreadsheetId = extractSheetIdFromUrl(sheetUrl);
+    if (!spreadsheetId) {
+      return res.status(400).json({ error: 'Invalid sheet URL' });
+    }
+
+    // Fetch all invoices
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: 'SheetBills Invoices!A2:K',
+    });
+    const rows = response.data.values || [];
+
+    // Find the index of the customer ID and status columns
+    // Assuming headers: [Invoice ID, Date, Due Date, Customer ID, Items, Amount, Tax, Discount, Notes, Template, Status]
+    // Customer ID is at index 3, Status is at index 10
+    let paid = 0;
+    let unpaid = 0;
+    for (const row of rows) {
+      if (row[3] === customerId) {
+        const status = (row[10] || '').toLowerCase();
+        if (status === 'paid') paid++;
+        else if (status === 'pending' || status === 'unpaid' || status === 'overdue') unpaid++;
+      }
+    }
+    res.json({ paid, unpaid });
+  } catch (error) {
+    console.error('Error counting invoices for customer:', error);
+    res.status(500).json({ error: 'Failed to count invoices for customer' });
+  }
+});
+
 
 

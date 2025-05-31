@@ -179,6 +179,8 @@ export default function Dashboard() {
   const [showWelcome, setShowWelcome] = useState(false);
   const [isCustomerSidebarOpen, setIsCustomerSidebarOpen] = useState(false)
   const [isCustomerLoading, setIsCustomerLoading] = useState(false)
+  // Add customers state
+  const [customers, setCustomers] = useState([]);
 
   // =====================
   // Table Pagination & Selection (must be above useEffect hooks)
@@ -395,6 +397,35 @@ export default function Dashboard() {
     if (selectedSpreadsheetUrl) {
       fetchInvoices(selectedSpreadsheetUrl);
     }
+  }, [selectedSpreadsheetUrl]);
+
+  // Fetch customers on mount or when selectedSpreadsheetUrl changes
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        if (!selectedSpreadsheetUrl) return;
+        setIsLoading(true);
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+        const response = await fetch(
+          `https://sheetbills-server.vercel.app/api/customers?sheetUrl=${encodeURIComponent(selectedSpreadsheetUrl)}`,
+          {
+            headers: {
+              "Authorization": `Bearer ${session.provider_token}`,
+              "x-supabase-token": session.access_token
+            }
+          }
+        );
+        if (!response.ok) return;
+        const data = await response.json();
+        setCustomers(data.customers || []);
+      } catch (err) {
+        // Optionally handle error
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchCustomers();
   }, [selectedSpreadsheetUrl]);
 
   // =====================
@@ -930,6 +961,11 @@ export default function Dashboard() {
     }
   }
 
+  // Helper to get customer object by ID
+  function getCustomerById(customerId: string) {
+    return customers.find((c: any) => c.id === customerId);
+  }
+
   return (
     <div className="container bg-gray-50/50 max-w-7xl mx-auto px-4">
       {/* Breadcrumb Navigation */}
@@ -1172,23 +1208,38 @@ export default function Dashboard() {
                           <TableCell className="px-6 py-4 border-r border-gray-200">
                             <div className="flex items-center gap-3">
                               {(() => {
-                                const email =
-                                  typeof invoice.customer === "object"
-                                    ? invoice.customer.email
-                                    : "";
+                                let customerObj = typeof invoice.customer === "object"
+                                  ? invoice.customer
+                                  : getCustomerById(invoice.customer);
+                                const email = customerObj?.email || "";
                                 const domain = email.split("@")[1] || "";
                                 return <ClientLogo domain={domain} />;
                               })()}
                               <div className="flex flex-col">
                                 <span className="font-medium text-gray-900">
-                                  {typeof invoice.customer === "object"
-                                    ? invoice.customer.name
-                                    : invoice.customer}
+                                  {(() => {
+                                    let customerObj = typeof invoice.customer === "object" && invoice.customer !== null && !Array.isArray(invoice.customer)
+                                      ? invoice.customer
+                                      : getCustomerById(invoice.customer as unknown as string);
+                                    if (customerObj && typeof customerObj === "object" && "name" in customerObj) {
+                                      return String(customerObj.name || "");
+                                    }
+                                    if (typeof invoice.customer === "string") {
+                                      return invoice.customer;
+                                    }
+                                    return "";
+                                  })()}
                                 </span>
                                 <span className="text-sm text-gray-500">
-                                  {typeof invoice.customer === "object"
-                                    ? invoice.customer.email
-                                    : ""}
+                                  {(() => {
+                                    let customerObj = typeof invoice.customer === "object" && invoice.customer !== null && !Array.isArray(invoice.customer)
+                                      ? invoice.customer
+                                      : getCustomerById(invoice.customer as unknown as string);
+                                    if (customerObj && typeof customerObj === "object" && "email" in customerObj) {
+                                      return String(customerObj.email || "");
+                                    }
+                                    return "";
+                                  })()}
                                 </span>
                               </div>
                             </div>

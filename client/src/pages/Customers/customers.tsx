@@ -468,14 +468,14 @@ export default function CustomersPage() {
                   <TableHeader>
                     <TableRow className="bg-gray-50 border-b border-gray-200">
                       <TableHead className="w-8 px-4 border-r border-gray-200"></TableHead>
-                      <TableHead className="w-[56px] border-r border-gray-200 !p-0 !m-0 flex items-center justify-center">
+                      <TableHead className="w-[56px] px-6 py-4 align-middle text-center border-r border-gray-200">
                         <input
                           type="checkbox"
                           ref={headerCheckboxRef}
                           checked={selectedCustomers.length === filteredCustomers.length && filteredCustomers.length > 0}
                           onChange={toggleAllCustomers}
                           aria-label="Select all customers on this page"
-                          className="accent-green-800 h-4 w-4 rounded border-gray-300"
+                          className="mx-auto accent-green-800 h-4 w-4 rounded border-gray-300"
                         />
                       </TableHead>
                       <TableHead className="px-6 py-4 border-r border-gray-200">Name</TableHead>
@@ -498,13 +498,16 @@ export default function CustomersPage() {
                             </span>
                           </div>
                         </TableCell>
-                        <TableCell className="w-[56px] border-r border-gray-200 !p-0 !m-0 flex items-center justify-center">
-                          <Checkbox
-                            checked={selectedCustomers.includes(customer.id)}
-                            onCheckedChange={() => toggleCustomerSelection(customer.id)}
-                            aria-label={`Select customer ${customer.id}`}
-                            className="accent-green-800 h-4 w-4"
-                          />
+                        <TableCell className="w-[56px] px-6 py-4 align-middle text-center border-r border-gray-200">
+                          <div className="flex items-center justify-center h-full min-h-[40px]">
+                            <Checkbox
+                              checked={selectedCustomers.includes(customer.id)}
+                              onCheckedChange={() => toggleCustomerSelection(customer.id)}
+                              aria-label={`Select customer ${customer.id}`}
+                              className="mx-auto"
+                              onClick={e => e.stopPropagation()}
+                            />
+                          </div>
                         </TableCell>
                         <TableCell className="px-6 py-4 border-r border-gray-200">
                           <div className="flex items-center gap-3">

@@ -467,7 +467,6 @@ export default function CustomersPage() {
                 <Table className="min-w-full text-sm">
                   <TableHeader>
                     <TableRow className="bg-gray-50 border-b border-gray-200">
-                      <TableHead className="w-8 px-4 border-r border-gray-200"></TableHead>
                       <TableHead className="w-[56px] px-6 py-4 align-middle text-center border-r border-gray-200">
                         <input
                           type="checkbox"
@@ -491,13 +490,6 @@ export default function CustomersPage() {
                         key={customer.id}
                         className="hover:bg-slate-50 border-b border-gray-200"
                       >
-                        <TableCell className="w-8 px-4 align-middle text-center border-r border-gray-200">
-                          <div className="flex items-center justify-center h-full min-h-[40px]">
-                            <span className="inline-flex items-center justify-center cursor-grab text-gray-400 hover:text-gray-600 active:text-gray-800">
-                              <GripVertical className="h-6 w-6" />
-                            </span>
-                          </div>
-                        </TableCell>
                         <TableCell className="w-[56px] px-6 py-4 align-middle text-center border-r border-gray-200">
                           <div className="flex items-center justify-center h-full min-h-[40px]">
                             <Checkbox

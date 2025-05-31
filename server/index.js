@@ -2866,10 +2866,17 @@ app.delete('/api/customers/bulk-delete', async (req, res) => {
 
     // Get user info from Supabase
     const { data: { user }, error: userError } = await supabase.auth.getUser(supabaseToken);
-    if (userError || !user) return res.status(401).json({ error: 'Invalid Supabase session' });
+    if (userError || !user) {
+      console.error('Supabase auth error:', userError);
+      return res.status(401).json({ error: 'Invalid Supabase session' });
+    }
 
     // Get master sheet
     const masterSheet = await getOrCreateMasterSheet(googleToken, user.id);
+    if (!masterSheet) {
+      console.error('Failed to get master sheet');
+      return res.status(500).json({ error: 'Failed to access master sheet' });
+    }
 
     // Initialize Google Sheets API
     const auth = new google.auth.OAuth2();
@@ -2879,7 +2886,10 @@ app.delete('/api/customers/bulk-delete', async (req, res) => {
     // Get Customers sheet metadata
     const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId: masterSheet.id });
     const customerSheet = spreadsheet.data.sheets.find(s => s.properties.title === 'Customers');
-    if (!customerSheet) return res.status(404).json({ error: 'Customers sheet not found' });
+    if (!customerSheet) {
+      console.error('Customers sheet not found');
+      return res.status(404).json({ error: 'Customers sheet not found' });
+    }
     const sheetId = customerSheet.properties.sheetId;
 
     // Fetch all customer rows (skip header)
@@ -2928,6 +2938,7 @@ app.delete('/api/customers/bulk-delete', async (req, res) => {
     console.error('Error deleting customers:', error);
     res.status(500).json({
       error: error instanceof Error ? error.message : 'Failed to delete customers',
+      details: error.response?.data || null
     });
   }
 });

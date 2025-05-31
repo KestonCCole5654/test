@@ -395,7 +395,7 @@ export default function CustomersPage() {
               <Button
                 variant="outline"
                 onClick={fetchCustomers}
-                className="flex items-center border"
+                className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 shadow-none"
                 disabled={loading}
               >
                 <RefreshCw

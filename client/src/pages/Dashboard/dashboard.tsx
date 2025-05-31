@@ -80,7 +80,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb";
-import { CustomerSidebar } from "../../components/Customers/CustomerSidebar"
+import { LoadingPage } from "../../components/LoadingPage";
 
 // =====================
 // Types & Interfaces
@@ -177,8 +177,6 @@ export default function Dashboard() {
   // Row order for drag-and-drop
   const [rowOrder, setRowOrder] = React.useState<string[]>([]);
   const [showWelcome, setShowWelcome] = useState(false);
-  const [isCustomerSidebarOpen, setIsCustomerSidebarOpen] = useState(false)
-  const [isCustomerLoading, setIsCustomerLoading] = useState(false)
 
   // =====================
   // Table Pagination & Selection (must be above useEffect hooks)
@@ -907,27 +905,19 @@ export default function Dashboard() {
     },
   ];
 
-  const handleCustomerSubmit = async (data: any) => {
-    try {
-      setIsCustomerLoading(true)
-      // TODO: Implement customer creation logic
-      console.log("Creating customer:", data)
-      // After successful creation, close the sidebar
-      setIsCustomerSidebarOpen(false)
-      toast({
-        title: "Success",
-        description: "Customer created successfully.",
-      })
-    } catch (error) {
-      console.error("Error creating customer:", error)
-      toast({
-        title: "Error",
-        description: "Failed to create customer. Please try again.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsCustomerLoading(false)
-    }
+  if (isStateLoading) {
+    return <LoadingPage />
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -1554,14 +1544,6 @@ export default function Dashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {/* Add Customer Sidebar */}
-      <CustomerSidebar
-        isOpen={isCustomerSidebarOpen}
-        onClose={() => setIsCustomerSidebarOpen(false)}
-        onSubmit={handleCustomerSubmit}
-        isLoading={isCustomerLoading}
-      />
     </div>
   );
 }

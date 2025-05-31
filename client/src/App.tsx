@@ -26,8 +26,6 @@ import EmailInvoice from './pages/EmailInvoice/email-invoice';
 import LegalPage from './pages/Legal/legal';
 import LandingPage from './pages/Landing/page';
 import AccountStatus from './pages/AccountStatus/AccountStatus';
-import CustomersPage from './pages/Customers/customers';
-import CustomerForm from './pages/Customers/new-customer';
 // import TemplateDesignerPage from './components/TemplateDesigner/TemplateDesignerPage';
 // SidebarLayout already includes the Outlet component
 
@@ -190,8 +188,6 @@ function App() {
           <Route path="/email-invoice/:invoiceId" element={<EmailInvoice />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/customers" element={<CustomersPage />} />
-          <Route path="/customers/new" element={<CustomerForm />} />
         </Route>
 
         {/* Public Invoice Route - must be after catch-all to take precedence */}

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { Card } from "../../components/ui/card";
 import InvoiceClassic from "../../components/InvoiceClassic";
+import { LoadingPage } from "../../components/ui/loadingSpinner";
 
 // You can import your InvoiceClassic component if you want to reuse the design
 // import { InvoiceClassic } from "../CreateInvoices/create-invoice";
@@ -51,11 +52,13 @@ export default function PublicInvoice() {
     fetchInvoice();
   }, [token, sheetUrl]);
 
+  if (loading) {
+    return <LoadingPage />
+  }
+
   return (
     <div className="min-h-screen flex flex-col items-center font-cal-sans justify-center bg-gray-50 py-8 px-2">
       <Card className="w-full max-w-4xl">
-        
-        {loading && <div className="text-center text-gray-500">Loading Invoice from link ...</div>}
         {error && (
           <div className="text-center text-red-600 mb-4">{error}</div>
         )}
@@ -64,11 +67,10 @@ export default function PublicInvoice() {
             <InvoiceClassic data={invoice} businessData={businessData || {}} showShadow={false} />
           </div>
         )}
-     
       </Card>
-      <footer className="w-full font-inter  text-center text-md text-gray-400 mt-10 mb-2">
-          Powered by <span className=" font-inter font-medium text-green-800">SheetBills™</span>
-        </footer>
+      <footer className="w-full font-inter text-center text-md text-gray-400 mt-10 mb-2">
+        Powered by <span className="font-inter font-medium text-green-800">SheetBills™</span>
+      </footer>
     </div>
   );
 } 

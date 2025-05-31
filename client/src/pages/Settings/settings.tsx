@@ -23,6 +23,7 @@ import { LoadingSpinner } from "../../components/ui/loadingSpinner"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog'
 import { Checkbox } from '../../components/ui/checkbox'
 import { useBrandLogo } from "../../components/ui/InvoiceStats"
+import { LoadingPage } from "../../components/ui/LoadingPage"
 
 interface UserData {
   name: string
@@ -299,13 +300,7 @@ export default function SettingsPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="flex flex-col justify-center items-center gap-4">
-          <LoadingSpinner />
-        </div>
-      </div>
-    )
+    return <LoadingPage />
   }
 
   return (

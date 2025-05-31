@@ -81,7 +81,7 @@ const HeroSection = () => {
                 clip-rule="evenodd"
               ></path>
             </svg>
-            Ditch more formulas & templates
+            Ditch formulas & templates
           </li>
         </ul>
         </div>

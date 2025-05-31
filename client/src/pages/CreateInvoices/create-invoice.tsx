@@ -24,6 +24,10 @@ import {
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb"
 import InvoiceClassic from "../../components/InvoiceClassic"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "../../components/ui/command"
+import { Popover, PopoverContent, PopoverTrigger } from "../../components/ui/popover"
+import { Check, ChevronsUpDown } from "lucide-react"
+import { cn } from "../../lib/utils"
 
 // Replace the printStyles constant with this updated version
 const printStyles = `
@@ -114,9 +118,12 @@ export interface InvoiceItem {
 }
 
 export interface Customer {
+  id?: string
   name: string
   email: string
   address: string
+  phone?: string
+  company?: string
 }
 
 export interface BusinessData {
@@ -1038,6 +1045,40 @@ ${businessData.phone}`
     }
   }, [invoiceToEdit])
 
+  const [customers, setCustomers] = useState<Customer[]>([])
+  const [open, setOpen] = useState(false)
+  const [value, setValue] = useState("")
+
+  // Add useEffect to fetch customers
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session) {
+          throw new Error("No active session")
+        }
+
+        const response = await fetch("https://sheetbills-server.vercel.app/api/customers", {
+          headers: {
+            "Authorization": `Bearer ${session.provider_token}`,
+            "x-supabase-token": session.access_token
+          }
+        })
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch customers")
+        }
+
+        const data = await response.json()
+        setCustomers(data.customers)
+      } catch (error) {
+        console.error("Error fetching customers:", error)
+      }
+    }
+
+    fetchCustomers()
+  }, [])
+
   return (
     <>
       {/* Preview Mode - Cleaned up */}
@@ -1242,13 +1283,55 @@ ${businessData.phone}`
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <Label htmlFor="customerName" className="text-sm font-medium">Name</Label>
-                          <Input
-                            id="customerName"
-                            value={invoiceData.customer.name}
-                            onChange={(e) => updateInvoiceData("customer.name", e.target.value)}
-                            placeholder="Customer name"
-                            className="mt-1.5  font-inter font-light"
-                          />
+                          <Popover open={open} onOpenChange={setOpen}>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                aria-expanded={open}
+                                className="w-full justify-between mt-1.5 font-inter font-light"
+                              >
+                                {value
+                                  ? customers.find((customer) => customer.name === value)?.name
+                                  : "Select customer..."}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-full p-0">
+                              <Command>
+                                <CommandInput placeholder="Search customer..." />
+                                <CommandEmpty>No customer found.</CommandEmpty>
+                                <CommandGroup>
+                                  {customers.map((customer) => (
+                                    <CommandItem
+                                      key={customer.id}
+                                      value={customer.name}
+                                      onSelect={(currentValue) => {
+                                        setValue(currentValue === value ? "" : currentValue)
+                                        const selectedCustomer = customers.find(c => c.name === currentValue)
+                                        if (selectedCustomer) {
+                                          updateInvoiceData("customer", {
+                                            name: selectedCustomer.name,
+                                            email: selectedCustomer.email,
+                                            address: selectedCustomer.address
+                                          })
+                                        }
+                                        setOpen(false)
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          value === customer.name ? "opacity-100" : "opacity-0"
+                                        )}
+                                      />
+                                      {customer.name}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
                         </div>
                         <div>
                           <Label htmlFor="customerEmail" className="text-sm font-medium">Email</Label>

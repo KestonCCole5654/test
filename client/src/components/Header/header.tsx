@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react"
-import { Link, useNavigate, useLocation } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Menu, X, ChevronDown, LogOut, Settings, User, Bell, HelpCircle } from "lucide-react"
 import supabase from "../../components/Auth/supabaseClient"
 import { Button } from "../ui/button"
@@ -14,11 +14,9 @@ import {
 } from "../ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { User as SupabaseUser } from '@supabase/supabase-js'
-import { cn } from "../../lib/utils"
 
 const Header = () => {
   const navigate = useNavigate()
-  const location = useLocation()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
@@ -72,14 +70,8 @@ const Header = () => {
 
   // Close mobile menu when navigating
   const handleNavigation = () => {
-    navigate("/invoices")
+    setIsMobileMenuOpen(false)
   }
-
-  const navigation = [
-    { name: 'Dashboard', href: '/dashboard' },
-    { name: 'Invoices', href: '/invoices' },
-    { name: 'Settings', href: '/settings' }
-  ]
 
   return (
     <header className="sticky no-print top-0 font-cal-sans z-50 bg-gray-900 shadow-xs">
@@ -99,16 +91,34 @@ const Header = () => {
           <nav className="hidden md:flex items-center space-x-1">
             {user && (
               <>
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "px-3 py-2 rounded-md font-normal text-slate-200 hover:text-slate-300",
-                    location.pathname === "/invoices" ? "text-gray-900" : "text-gray-500"
-                  )}
+                <Link
+                  to="/invoices"
+                  className="px-3 py-2 rounded-md font-normal text-slate-200 hover:text-slate-300 transition-colors"
                   onClick={handleNavigation}
                 >
-                  Invoices
-                </Button>
+                 Invoices
+                </Link>
+                <Link
+                  to="/customers"
+                  className="px-3 py-2 rounded-md font-normal text-slate-200 hover:text-slate-300  transition-colors"
+                  onClick={handleNavigation}
+                >
+                  Customers
+                </Link>
+                <Link
+                  to="/settings"
+                  className="px-3 py-2 rounded-md font-normal text-slate-200 hover:text-slate-300  transition-colors"
+                  onClick={handleNavigation}
+                >
+                  Account & Settings
+                </Link>
+                <Link
+                  to="/contact"
+                  className="px-3 py-2 rounded-md font-normal text-slate-200 hover:text-slate-300  transition-colors"
+                  onClick={handleNavigation}
+                >
+                  Contact & Support
+                </Link>
               </>
             )}
           </nav>
@@ -189,16 +199,34 @@ const Header = () => {
           <div className="container max-w-7xl mx-auto px-4 sm:px-6 py-3">
             {user && (
               <nav className="flex flex-col space-y-1">
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "px-3 py-2 rounded-md font-normal text-slate-700 hover:text-slate-900",
-                    location.pathname === "/invoices" ? "text-gray-900" : "text-gray-500"
-                  )}
+                <Link
+                  to="/invoices"
+                  className="px-3 py-2.5 rounded-md text-slate-700 hover:text-slate-900 transition-colors"
                   onClick={handleNavigation}
                 >
-                  Invoices
-                </Button>
+                 Invoices
+                </Link>
+                <Link
+                  to="/customers"
+                  className="px-3 py-2.5 rounded-md text-slate-700 hover:text-slate-900 transition-colors"
+                  onClick={handleNavigation}
+                >
+                  Customers
+                </Link>
+                <Link
+                  to="/settings"
+                  className="px-3 py-2.5 rounded-md text-slate-700 hover:text-slate-900 transition-colors"
+                  onClick={handleNavigation}
+                >
+                  Settings
+                </Link>
+                <Link
+                  to="/contact"
+                  className="px-3 py-2.5 rounded-md text-slate-700 hover:text-slate-900 transition-colors"
+                  onClick={handleNavigation}
+                >
+                  Contact & Support
+                </Link>
               </nav>
             )}
           </div>

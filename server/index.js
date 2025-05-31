@@ -2029,7 +2029,7 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
     const sheets = google.sheets({ version: 'v4', auth });
     const drive = google.drive({ version: 'v3', auth });
 
-    // Create new spreadsheet with three tabs
+    // Create new spreadsheet with two tabs
     const spreadsheet = await sheets.spreadsheets.create({
       requestBody: {
         properties: {
@@ -2048,12 +2048,6 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
             properties: {
               title: 'Business Details',
               gridProperties: { rowCount: 100, columnCount: 3 }
-            }
-          },
-          {
-            properties: {
-              title: 'Customers',
-              gridProperties: { rowCount: 1000, columnCount: 10 }
             }
           }
         ]
@@ -2094,18 +2088,6 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
       requestBody: { values: [invoiceHeaders] }
     });
 
-    // Add headers to 'Customers' tab
-    const customerHeaders = [
-      'Customer ID', 'Name', 'Email', 'Phone', 'Address',
-      'Company', 'Notes', 'Created At', 'Status', 'Logo'
-    ];
-    await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range: 'Customers!A1:J1',
-      valueInputOption: 'RAW',
-      requestBody: { values: [customerHeaders] }
-    });
-
     // Add headers and business details to 'Business Details' tab
     const businessHeaders = ['Field', 'Value', 'Last Updated'];
     const now = new Date().toISOString();
@@ -2120,15 +2102,45 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
     await sheets.spreadsheets.values.batchUpdate({
       spreadsheetId,
       requestBody: {
-        valueInputOption: 'RAW',
+        valueInputOption: 'USER_ENTERED',
         data: [
+          { range: 'Business Details!A1:C1', values: [businessHeaders] },
+          { range: 'Business Details!A2:C6', values: businessDetails }
+        ]
+      }
+    });
+
+    // Format headers for both tabs
+    const invoiceSheetId = spreadsheet.data.sheets[0].properties.sheetId;
+    const businessSheetId = spreadsheet.data.sheets[1].properties.sheetId;
+
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: {
+        requests: [
           {
-            range: 'Business Details!A1:C1',
-            values: [businessHeaders]
+            repeatCell: {
+              range: { sheetId: invoiceSheetId, startRowIndex: 0, endRowIndex: 1 },
+              cell: {
+                userEnteredFormat: {
+                  backgroundColor: { red: 0.8, green: 0.8, blue: 0.8 },
+                  textFormat: { bold: true }
+                }
+              },
+              fields: 'userEnteredFormat(backgroundColor,textFormat)'
+            }
           },
           {
-            range: 'Business Details!A2:C6',
-            values: businessDetails
+            repeatCell: {
+              range: { sheetId: businessSheetId, startRowIndex: 0, endRowIndex: 1 },
+              cell: {
+                userEnteredFormat: {
+                  backgroundColor: { red: 0.8, green: 0.8, blue: 0.8 },
+                  textFormat: { bold: true }
+                }
+              },
+              fields: 'userEnteredFormat(backgroundColor,textFormat)'
+            }
           }
         ]
       }
@@ -2136,8 +2148,8 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
 
     return { spreadsheetId, spreadsheetUrl };
   } catch (error) {
-    console.error('Error creating unified business sheet:', error);
-    throw new Error('Failed to create business sheet');
+    console.error('Unified business sheet creation error:', error);
+    throw new Error(`Failed to create unified business sheet: ${error.message}`);
   }
 }
 /**
@@ -2481,81 +2493,94 @@ app.post('/api/customers/init-sheet', async (req, res) => {
 // Get all customers
 app.get('/api/customers', async (req, res) => {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      return res.status(401).json({ error: 'No active session' });
+    // Verify authentication
+    const supabaseToken = req.headers['x-supabase-token'];
+    const googleToken = req.headers.authorization?.split(' ')[1];
+    
+    if (!supabaseToken || !googleToken) {
+      return res.status(401).json({ error: 'Authentication required' });
     }
 
-    // Get the SheetBills Invoices sheet URL
-    const sheetsResponse = await axios.get("https://sheetbills-server.vercel.app/api/sheets/spreadsheets", {
-      headers: {
-        Authorization: `Bearer ${session.provider_token}`,
-        "X-Supabase-Token": session.access_token,
-      },
-    });
-
-    const invoicesSheet = sheetsResponse.data.spreadsheets.find(sheet => sheet.name === "SheetBills Invoices");
-    if (!invoicesSheet) {
-      throw new Error("SheetBills Invoices sheet not found");
+    // Verify the Supabase user session is valid
+    const { data: { user }, error: userError } = await supabase.auth.getUser(supabaseToken);
+    if (userError || !user) {
+      return res.status(401).json({ error: 'Invalid Supabase session' });
     }
 
-    const spreadsheetId = extractSheetIdFromUrl(invoicesSheet.sheetUrl);
-    if (!spreadsheetId) {
-      throw new Error("Invalid sheet URL");
-    }
+    // Get master sheet
+    const masterSheet = await getOrCreateMasterSheet(googleToken, user.id);
     
     // Initialize Google Sheets API
     const auth = new google.auth.OAuth2();
-    auth.setCredentials({ access_token: session.provider_token });
+    auth.setCredentials({ access_token: googleToken });
     const sheets = google.sheets({ version: 'v4', auth });
 
-    // Get customers from the Customers tab
-    const customersResponse = await sheets.spreadsheets.values.get({
-      spreadsheetId,
+    // Check if Customers sheet exists
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId: masterSheet.id });
+    const customerSheet = spreadsheet.data.sheets.find(s => s.properties.title === 'Customers');
+    
+    if (!customerSheet) {
+      // Initialize customer sheet if it doesn't exist
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: masterSheet.id,
+        requestBody: {
+          requests: [{
+            addSheet: {
+              properties: {
+                title: 'Customers',
+                gridProperties: {
+                  rowCount: 1000,
+                  columnCount: 10,
+                  frozenRowCount: 1
+                }
+              }
+            }
+          }]
+        }
+      });
+
+      // Add headers
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: masterSheet.id,
+        range: 'Customers!A1:J1',
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+          values: [[
+            'Customer ID',
+            'Name',
+            'Email',
+            'Phone',
+            'Address',
+            'Company',
+            'Notes',
+            'Created At',
+            'Last Updated',
+            'Status'
+          ]]
+        }
+      });
+
+      return res.json({ customers: [] });
+    }
+
+    // Get customer data
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: masterSheet.id,
       range: 'Customers!A2:J',
     });
 
-    // Get invoices from the SheetBills Invoices tab
-    const invoicesResponse = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: 'SheetBills Invoices!A2:M',
-    });
-
-    const customerRows = customersResponse.data.values || [];
-    const invoiceRows = invoicesResponse.data.values || [];
-
-    // Create a map to store invoice counts for each customer
-    const customerInvoiceCounts = {};
-
-    // Process invoices to count paid and unpaid for each customer
-    invoiceRows.forEach(row => {
-      const customerName = row[3]; // Customer Name column
-      const status = row[12]; // Status column
-
-      if (!customerInvoiceCounts[customerName]) {
-        customerInvoiceCounts[customerName] = { paid: 0, unpaid: 0 };
-      }
-
-      if (status === 'Paid') {
-        customerInvoiceCounts[customerName].paid++;
-      } else {
-        customerInvoiceCounts[customerName].unpaid++;
-      }
-    });
-
-    // Map customers with their invoice counts
-    const customers = customerRows.map(row => ({
-      id: row[0] || '',
-      name: row[1] || '',
-      email: row[2] || '',
-      phone: row[3] || '',
-      address: row[4] || '',
-      company: row[5] || '',
-      notes: row[6] || '',
-      created_at: row[7] || new Date().toISOString(),
-      status: row[8] || 'active',
-      logo: row[9] || '',
-      invoice_counts: customerInvoiceCounts[row[1]] || { paid: 0, unpaid: 0 }
+    const rows = response.data.values || [];
+    const customers = rows.map(row => ({
+      id: row[0],
+      name: row[1],
+      email: row[2],
+      phone: row[3],
+      address: row[4],
+      company: row[5],
+      notes: row[6],
+      created_at: row[7],
+      last_updated: row[8],
+      status: row[9] || 'active'
     }));
 
     res.json({ customers });
@@ -2565,157 +2590,195 @@ app.get('/api/customers', async (req, res) => {
   }
 });
 
-// Create a new customer
+// Add new customer
 app.post('/api/customers', async (req, res) => {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      return res.status(401).json({ error: 'No active session' });
+    const { name, email, phone, address, company, notes } = req.body;
+    
+    // Verify authentication
+    const supabaseToken = req.headers['x-supabase-token'];
+    const googleToken = req.headers.authorization?.split(' ')[1];
+    
+    if (!supabaseToken || !googleToken) {
+      return res.status(401).json({ error: 'Authentication required' });
     }
 
-    const customerData = req.body;
-    if (!customerData.name || !customerData.email) {
-      return res.status(400).json({ error: 'Name and email are required' });
+    // Verify the Supabase user session is valid
+    const { data: { user }, error: userError } = await supabase.auth.getUser(supabaseToken);
+    if (userError || !user) {
+      return res.status(401).json({ error: 'Invalid Supabase session' });
     }
 
-    // Get the SheetBills Invoices sheet URL
-    const sheetsResponse = await axios.get("https://sheetbills-server.vercel.app/api/sheets/spreadsheets", {
-      headers: {
-        Authorization: `Bearer ${session.provider_token}`,
-        "X-Supabase-Token": session.access_token,
-      },
-    });
-
-    const invoicesSheet = sheetsResponse.data.spreadsheets.find(sheet => sheet.name === "SheetBills Invoices");
-    if (!invoicesSheet) {
-      throw new Error("SheetBills Invoices sheet not found");
-    }
-
-    const spreadsheetId = extractSheetIdFromUrl(invoicesSheet.sheetUrl);
-    if (!spreadsheetId) {
-      throw new Error("Invalid sheet URL");
-    }
+    // Get master sheet
+    const masterSheet = await getOrCreateMasterSheet(googleToken, user.id);
     
     // Initialize Google Sheets API
     const auth = new google.auth.OAuth2();
-    auth.setCredentials({ access_token: session.provider_token });
+    auth.setCredentials({ access_token: googleToken });
     const sheets = google.sheets({ version: 'v4', auth });
 
+    // Check if Customers sheet exists
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId: masterSheet.id });
+    const customerSheet = spreadsheet.data.sheets.find(s => s.properties.title === 'Customers');
+    
+    if (!customerSheet) {
+      // Initialize customer sheet if it doesn't exist
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: masterSheet.id,
+        requestBody: {
+          requests: [{
+            addSheet: {
+              properties: {
+                title: 'Customers',
+                gridProperties: {
+                  rowCount: 1000,
+                  columnCount: 10,
+                  frozenRowCount: 1
+                }
+              }
+            }
+          }]
+        }
+      });
+
+      // Add headers
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: masterSheet.id,
+        range: 'Customers!A1:J1',
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+          values: [[
+            'Customer ID',
+            'Name',
+            'Email',
+            'Phone',
+            'Address',
+            'Company',
+            'Notes',
+            'Created At',
+            'Last Updated',
+            'Status'
+          ]]
+        }
+      });
+    }
+
     // Generate a unique customer ID
-    const customerId = `CUST-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const customerId = `CUST-${Date.now().toString().slice(-6)}`;
+    const timestamp = new Date().toISOString();
 
-    // Prepare customer data
-    const values = [[
-      customerId,
-      customerData.name,
-      customerData.email,
-      customerData.phone || '',
-      customerData.address || '',
-      customerData.company || '',
-      customerData.notes || '',
-      new Date().toISOString(),
-      'active',
-      customerData.logo || ''
-    ]];
-
-    // Append the new customer to the sheet
+    // Add customer to sheet
     await sheets.spreadsheets.values.append({
-      spreadsheetId,
+      spreadsheetId: masterSheet.id,
       range: 'Customers!A:J',
-      valueInputOption: 'RAW',
-      insertDataOption: 'INSERT_ROWS',
-      resource: { values }
+      valueInputOption: 'USER_ENTERED',
+      requestBody: {
+        values: [[
+          customerId,
+          name,
+          email,
+          phone || '',
+          address || '',
+          company || '',
+          notes || '',
+          timestamp,
+          timestamp,
+          'active'
+        ]]
+      }
     });
 
     res.json({
       success: true,
       customer: {
         id: customerId,
-        ...customerData,
-        created_at: new Date().toISOString(),
+        name,
+        email,
+        phone,
+        address,
+        company,
+        notes,
+        created_at: timestamp,
+        last_updated: timestamp,
         status: 'active'
       }
     });
   } catch (error) {
-    console.error('Error creating customer:', error);
-    res.status(500).json({ error: 'Failed to create customer' });
+    console.error('Error adding customer:', error);
+    res.status(500).json({ error: 'Failed to add customer' });
   }
 });
 
-// Update a customer
+// Update customer
 app.put('/api/customers/:customerId', async (req, res) => {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      return res.status(401).json({ error: 'No active session' });
-    }
-
     const { customerId } = req.params;
-    const customerData = req.body;
-
-    // Get the SheetBills Invoices sheet URL
-    const sheetsResponse = await axios.get("https://sheetbills-server.vercel.app/api/sheets/spreadsheets", {
-      headers: {
-        Authorization: `Bearer ${session.provider_token}`,
-        "X-Supabase-Token": session.access_token,
-      },
-    });
-
-    const invoicesSheet = sheetsResponse.data.spreadsheets.find(sheet => sheet.name === "SheetBills Invoices");
-    if (!invoicesSheet) {
-      throw new Error("SheetBills Invoices sheet not found");
+    const { name, email, phone, address, company, notes, status } = req.body;
+    
+    // Verify authentication
+    const supabaseToken = req.headers['x-supabase-token'];
+    const googleToken = req.headers.authorization?.split(' ')[1];
+    
+    if (!supabaseToken || !googleToken) {
+      return res.status(401).json({ error: 'Authentication required' });
     }
 
-    const spreadsheetId = extractSheetIdFromUrl(invoicesSheet.sheetUrl);
-    if (!spreadsheetId) {
-      throw new Error("Invalid sheet URL");
-    }
+    // Get master sheet
+    const masterSheet = await getOrCreateMasterSheet(googleToken, user.id);
     
     // Initialize Google Sheets API
     const auth = new google.auth.OAuth2();
-    auth.setCredentials({ access_token: session.provider_token });
+    auth.setCredentials({ access_token: googleToken });
     const sheets = google.sheets({ version: 'v4', auth });
 
-    // Get all customers to find the row index
+    // Get current customer data
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId,
+      spreadsheetId: masterSheet.id,
       range: 'Customers!A2:J',
     });
 
     const rows = response.data.values || [];
     const rowIndex = rows.findIndex(row => row[0] === customerId);
+    
     if (rowIndex === -1) {
       return res.status(404).json({ error: 'Customer not found' });
     }
 
-    // Update the customer data
-    const values = [[
-      customerId,
-      customerData.name,
-      customerData.email,
-      customerData.phone || '',
-      customerData.address || '',
-      customerData.company || '',
-      customerData.notes || '',
-      rows[rowIndex][7], // Keep the original created_at
-      customerData.status || 'active',
-      customerData.logo || ''
-    ]];
-
+    // Update customer data
+    const timestamp = new Date().toISOString();
     await sheets.spreadsheets.values.update({
-      spreadsheetId,
+      spreadsheetId: masterSheet.id,
       range: `Customers!A${rowIndex + 2}:J${rowIndex + 2}`,
-      valueInputOption: 'RAW',
-      resource: { values }
+      valueInputOption: 'USER_ENTERED',
+      requestBody: {
+        values: [[
+          customerId,
+          name,
+          email,
+          phone,
+          address,
+          company || '',
+          notes || '',
+          rows[rowIndex][7], // Keep original created_at
+          timestamp,
+          status || rows[rowIndex][9] // Keep original status if not provided
+        ]]
+      }
     });
 
     res.json({
       success: true,
       customer: {
         id: customerId,
-        ...customerData,
+        name,
+        email,
+        phone,
+        address,
+        company,
+        notes,
         created_at: rows[rowIndex][7],
-        status: customerData.status || 'active'
+        last_updated: timestamp,
+        status: status || rows[rowIndex][9]
       }
     });
   } catch (error) {
@@ -2724,69 +2787,52 @@ app.put('/api/customers/:customerId', async (req, res) => {
   }
 });
 
-// Delete a customer
+// Delete customer (soft delete)
 app.delete('/api/customers/:customerId', async (req, res) => {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      return res.status(401).json({ error: 'No active session' });
-    }
-
     const { customerId } = req.params;
     
-    // Get the SheetBills Invoices sheet URL
-    const sheetsResponse = await axios.get("https://sheetbills-server.vercel.app/api/sheets/spreadsheets", {
-      headers: {
-        Authorization: `Bearer ${session.provider_token}`,
-        "X-Supabase-Token": session.access_token,
-      },
-    });
-
-    const invoicesSheet = sheetsResponse.data.spreadsheets.find(sheet => sheet.name === "SheetBills Invoices");
-    if (!invoicesSheet) {
-      throw new Error("SheetBills Invoices sheet not found");
+    // Verify authentication
+    const supabaseToken = req.headers['x-supabase-token'];
+    const googleToken = req.headers.authorization?.split(' ')[1];
+    
+    if (!supabaseToken || !googleToken) {
+      return res.status(401).json({ error: 'Authentication required' });
     }
 
-    const spreadsheetId = extractSheetIdFromUrl(invoicesSheet.sheetUrl);
-    if (!spreadsheetId) {
-      throw new Error("Invalid sheet URL");
-    }
+    // Get master sheet
+    const masterSheet = await getOrCreateMasterSheet(googleToken, user.id);
     
     // Initialize Google Sheets API
     const auth = new google.auth.OAuth2();
-    auth.setCredentials({ access_token: session.provider_token });
+    auth.setCredentials({ access_token: googleToken });
     const sheets = google.sheets({ version: 'v4', auth });
 
-    // Get all customers to find the row index
+    // Get current customer data
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId,
+      spreadsheetId: masterSheet.id,
       range: 'Customers!A2:J',
     });
 
     const rows = response.data.values || [];
     const rowIndex = rows.findIndex(row => row[0] === customerId);
+    
     if (rowIndex === -1) {
       return res.status(404).json({ error: 'Customer not found' });
     }
 
-    // Delete the row
-    await sheets.spreadsheets.batchUpdate({
-      spreadsheetId,
+    // Update customer status to inactive
+    const timestamp = new Date().toISOString();
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: masterSheet.id,
+      range: `Customers!J${rowIndex + 2}`,
+      valueInputOption: 'USER_ENTERED',
       requestBody: {
-        requests: [{
-          deleteDimension: {
-            range: {
-              sheetId: (await sheets.spreadsheets.get({ spreadsheetId })).data.sheets.find(s => s.properties.title === 'Customers').properties.sheetId,
-              dimension: 'ROWS',
-              startIndex: rowIndex + 1,
-              endIndex: rowIndex + 2
-            }
-          }
-        }]
+        values: [['inactive']]
       }
     });
 
-    res.json({ success: true });
+    res.json({ success: true, message: 'Customer deleted successfully' });
   } catch (error) {
     console.error('Error deleting customer:', error);
     res.status(500).json({ error: 'Failed to delete customer' });

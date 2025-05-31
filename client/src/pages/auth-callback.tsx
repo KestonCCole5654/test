@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import supabase from '../components/Auth/supabaseClient'
-import { LoadingPage } from '../components/ui/loadingSpinner'
+import { LoadingSpinner } from '../components/ui/loadingSpinner'
 
 export default function AuthCallback() {
   const [error, setError] = useState<string | null>(null)
@@ -257,5 +257,14 @@ export default function AuthCallback() {
     )
   }
 
-  return <LoadingPage />
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="text-center">
+        <LoadingSpinner />
+        <p className="mt-4 text-slate-600 text-sm font-medium">
+          Setting up your account...
+        </p>
+      </div>
+    </div>
+  )
 } 

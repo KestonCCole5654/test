@@ -118,6 +118,7 @@ export interface InvoiceItem {
 }
 
 export interface Customer {
+  id?: string
   name: string
   email: string
   address: string
@@ -666,6 +667,40 @@ export default function InvoiceForm() {
     }
   }
 
+  const [customers, setCustomers] = useState<Customer[]>([])
+  const [open, setOpen] = useState(false)
+  const [value, setValue] = useState("")
+
+  // Add useEffect to fetch customers
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session) {
+          throw new Error("No active session")
+        }
+
+        const response = await fetch("https://sheetbills-server.vercel.app/api/customers", {
+          headers: {
+            "Authorization": `Bearer ${session.provider_token}`,
+            "x-supabase-token": session.access_token
+          }
+        })
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch customers")
+        }
+
+        const data = await response.json()
+        setCustomers(data.customers)
+      } catch (error) {
+        console.error("Error fetching customers:", error)
+      }
+    }
+
+    fetchCustomers()
+  }, [])
+
   const [showSuggestions, setShowSuggestions] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -678,6 +713,34 @@ export default function InvoiceForm() {
       if (!session?.provider_token) {
         alert("Google authentication required")
         return
+      }
+
+      // Save customer info before saving invoice
+      const customerToSave = {
+        name: invoiceData.customer.name,
+        email: invoiceData.customer.email,
+        address: invoiceData.customer.address,
+        notes: invoiceData.notes || ""
+      }
+      // Check if customer already exists (by email or name)
+      const existingCustomer = customers.find(
+        (c: Customer) => c.email === customerToSave.email || c.name === customerToSave.name
+      )
+      if (!existingCustomer && customerToSave.name && customerToSave.email) {
+        try {
+          await fetch("https://sheetbills-server.vercel.app/api/customers", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${session.provider_token}`,
+              "x-supabase-token": session.access_token
+            },
+            body: JSON.stringify(customerToSave)
+          })
+        } catch (err) {
+          console.error("Error saving customer info:", err)
+          // Optionally show a toast, but don't block invoice save
+        }
       }
 
       // Get the SheetBills Invoices sheet URL
@@ -1253,12 +1316,56 @@ ${businessData.phone}`
                           <Label htmlFor="customerName" className="text-sm font-medium">Name</Label>
                           <div className="relative">
                             <Input
-                              type="text"
-                              placeholder="Customer Name"
+                              id="customerName"
+                              ref={inputRef}
                               value={invoiceData.customer.name}
-                              onChange={(e) => updateInvoiceData("customer", { ...invoiceData.customer, name: e.target.value })}
-                              className="w-full"
+                              onChange={e => {
+                                updateInvoiceData("customer.name", e.target.value)
+                                setShowSuggestions(true)
+                              }}
+                              onFocus={() => {
+                                if (invoiceData.customer.name.length > 0) setShowSuggestions(true)
+                              }}
+                              onBlur={e => {
+                                // Delay hiding to allow click on suggestion
+                                setTimeout(() => setShowSuggestions(false), 100)
+                              }}
+                              placeholder="Customer name"
+                              className="mt-1.5 font-inter font-light"
+                              autoComplete="off"
                             />
+                            {showSuggestions && invoiceData.customer.name && (
+                              <div className="absolute z-10 left-0 right-0 mt-1 bg-white border rounded-lg shadow-md max-h-48 overflow-auto">
+                                {customers.filter(customer =>
+                                  customer.name.toLowerCase().includes(invoiceData.customer.name.toLowerCase())
+                                ).length === 0 ? (
+                                  <div className="px-4 py-2 text-gray-500">No customer found.</div>
+                                ) : (
+                                  customers
+                                    .filter(customer =>
+                                      customer.name.toLowerCase().includes(invoiceData.customer.name.toLowerCase())
+                                    )
+                                    .map(customer => (
+                                      <div
+                                        key={customer.id}
+                                        className="px-4 py-2 cursor-pointer hover:bg-green-50 hover:text-green-800 transition-colors"
+                                        onMouseDown={e => {
+                                          // onMouseDown to prevent blur before click
+                                          e.preventDefault()
+                                          updateInvoiceData("customer", {
+                                            name: customer.name,
+                                            email: customer.email,
+                                            address: customer.address
+                                          })
+                                          setShowSuggestions(false)
+                                        }}
+                                      >
+                                        {customer.name}
+                                      </div>
+                                    ))
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                         <div>

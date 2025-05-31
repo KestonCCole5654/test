@@ -15,8 +15,7 @@ import {
   Archive,
   Plus,
   Mail,
-  Scale,
-  Users
+  Scale
 } from "lucide-react"
 import supabase from "../Auth/supabaseClient"
 import { Button } from "../ui/button"
@@ -115,11 +114,42 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
                 collapsed && "justify-center"
               )}
             >
-              <FileText size={20} className="flex-shrink-0" />
+              <Archive size={20} className="flex-shrink-0" />
               {!collapsed && <span className="ml-3">Invoices</span>}
             </Link>
           </li>
           
+          <li>
+            <Link
+              to="/customers"
+              className={cn(
+                "flex items-center px-3 py-2 rounded-md transition-colors",
+                isActive("/customers") 
+                  ? "bg-green-100 text-green-800" 
+                  : "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
+                collapsed && "justify-center"
+              )}
+            >
+              <Mail size={20} className="flex-shrink-0" />
+              {!collapsed && <span className="ml-3">Customers</span>}
+            </Link>
+          </li>
+        
+          <li>
+            <Link
+              to="/create-invoice"
+              className={cn(
+                "flex items-center px-3 py-2 rounded-md transition-colors",
+                isActive("/create-invoice") 
+                  ? "bg-green-100 text-green-800" 
+                  : "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
+                collapsed && "justify-center"
+              )}
+            >
+              <FileText size={20} className="flex-shrink-0" />
+              {!collapsed && <span className="ml-3">Create Invoice</span>}
+            </Link>
+          </li>
           <li>
             <Link
               to="/settings"

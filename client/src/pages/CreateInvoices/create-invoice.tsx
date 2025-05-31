@@ -1573,7 +1573,7 @@ ${businessData.phone}`
                     <Button
                       variant="outline"
                       onClick={handleUpdate}
-                      className="bg-green-800 hover:bg-green-900 text-white font-inter font-light"
+                      className="bg-green-800 hover:bg-green-900 text-white font-inter font-light w-full"
                       disabled={isUpdating}
                     >
                       {isUpdating ? "Updating Invoice..." : "Update Invoice"}
@@ -1582,7 +1582,7 @@ ${businessData.phone}`
                     <Button
                       variant="outline"
                       onClick={handleSave}
-                      className="bg-green-800 hover:bg-green-900 text-white font-inter font-light"
+                      className="bg-green-800 hover:bg-green-900 text-white font-inter font-light w-full"
                       disabled={isSaving}
                     >
                       {isSaving ? "Saving Invoice..." : "Save Invoice"}

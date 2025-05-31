@@ -1,12 +1,8 @@
 export const LoadingSpinner = () => (
   <div className="flex flex-col justify-center items-center h-full gap-3">
-    <div className="relative h-8 w-8">
-      <div className="absolute inset-0 rounded bg-green-700/20 animate-ping"></div>
-      <div className="relative h-full w-full p-10 flex items-center justify-center animate-pulse">
-        <img src="/file.svg" alt="SheetBills Logo" className="h-8 w-auto" />
-      </div>
+    <div className="h-8 w-8 flex items-center justify-center">
+      <div className="h-8 w-8 border-4 border-green-800 border-t-transparent rounded-full animate-spin"></div>
     </div>
-    <span className="text-gray-500 font-cal-sans font-normal">Just a moment ...</span>
   </div>
 );
 

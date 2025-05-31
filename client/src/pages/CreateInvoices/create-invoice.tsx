@@ -1079,6 +1079,9 @@ ${businessData.phone}`
     fetchCustomers()
   }, [])
 
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+
   return (
     <>
       {/* Preview Mode - Cleaned up */}
@@ -1283,41 +1286,59 @@ ${businessData.phone}`
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <Label htmlFor="customerName" className="text-sm font-medium">Name</Label>
-                          <Command className="rounded-lg border shadow-md mt-1.5">
-                            <CommandInput 
-                              placeholder="Search customer..." 
+                          <div className="relative">
+                            <Input
+                              id="customerName"
+                              ref={inputRef}
                               value={invoiceData.customer.name}
-                              onValueChange={(value) => {
-                                updateInvoiceData("customer.name", value)
+                              onChange={e => {
+                                updateInvoiceData("customer.name", e.target.value)
+                                setShowSuggestions(true)
                               }}
+                              onFocus={() => {
+                                if (invoiceData.customer.name.length > 0) setShowSuggestions(true)
+                              }}
+                              onBlur={e => {
+                                // Delay hiding to allow click on suggestion
+                                setTimeout(() => setShowSuggestions(false), 100)
+                              }}
+                              placeholder="Customer name"
+                              className="mt-1.5 font-inter font-light"
+                              autoComplete="off"
                             />
-                            <CommandEmpty>No customer found.</CommandEmpty>
-                            <CommandGroup className="max-h-[200px] overflow-auto">
-                              {customers
-                                .filter(customer => 
+                            {showSuggestions && invoiceData.customer.name && (
+                              <div className="absolute z-10 left-0 right-0 mt-1 bg-white border rounded-lg shadow-md max-h-48 overflow-auto">
+                                {customers.filter(customer =>
                                   customer.name.toLowerCase().includes(invoiceData.customer.name.toLowerCase())
-                                )
-                                .map((customer) => (
-                                  <CommandItem
-                                    key={customer.id}
-                                    value={customer.name}
-                                    onSelect={(value) => {
-                                      const selectedCustomer = customers.find(c => c.name === value)
-                                      if (selectedCustomer) {
-                                        updateInvoiceData("customer", {
-                                          name: selectedCustomer.name,
-                                          email: selectedCustomer.email,
-                                          address: selectedCustomer.address
-                                        })
-                                      }
-                                    }}
-                                    className="cursor-pointer"
-                                  >
-                                    {customer.name}
-                                  </CommandItem>
-                                ))}
-                            </CommandGroup>
-                          </Command>
+                                ).length === 0 ? (
+                                  <div className="px-4 py-2 text-gray-500">No customer found.</div>
+                                ) : (
+                                  customers
+                                    .filter(customer =>
+                                      customer.name.toLowerCase().includes(invoiceData.customer.name.toLowerCase())
+                                    )
+                                    .map(customer => (
+                                      <div
+                                        key={customer.id}
+                                        className="px-4 py-2 cursor-pointer hover:bg-green-50 hover:text-green-800 transition-colors"
+                                        onMouseDown={e => {
+                                          // onMouseDown to prevent blur before click
+                                          e.preventDefault()
+                                          updateInvoiceData("customer", {
+                                            name: customer.name,
+                                            email: customer.email,
+                                            address: customer.address
+                                          })
+                                          setShowSuggestions(false)
+                                        }}
+                                      >
+                                        {customer.name}
+                                      </div>
+                                    ))
+                                )}
+                              </div>
+                            )}
+                          </div>
                         </div>
                         <div>
                           <Label htmlFor="customerEmail" className="text-sm font-medium">Email</Label>
@@ -1378,14 +1399,13 @@ ${businessData.phone}`
                               <span className="sr-only">Remove item</span>
                             </Button>
                           </div>
-
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                               <Label htmlFor={`item-name-${index}`} className="text-sm font-medium">Name</Label>
                               <Input
                                 id={`item-name-${index}`}
                                 value={item.name}
-                                onChange={(e) => updateItem(index, "name", e.target.value)}
+                                onChange={e => updateItem(index, "name", e.target.value)}
                                 placeholder="Item name"
                                 className="mt-1.5  font-inter font-light"
                               />
@@ -1395,7 +1415,7 @@ ${businessData.phone}`
                               <Textarea
                                 id={`item-description-${index}`}
                                 value={item.description}
-                                onChange={(e) => updateItem(index, "description", e.target.value)}
+                                onChange={e => updateItem(index, "description", e.target.value)}
                                 placeholder="Item description"
                                 className="mt-1.5  font-inter font-light"
                               />
@@ -1408,7 +1428,7 @@ ${businessData.phone}`
                                 id={`item-quantity-${index}`}
                                 type="number"
                                 value={item.quantity}
-                                onChange={(e) => {
+                                onChange={e => {
                                   const val = e.target.value;
                                   updateItem(index, "quantity", val === "" ? "" : parseInt(val));
                                 }}
@@ -1422,7 +1442,7 @@ ${businessData.phone}`
                                 id={`item-price-${index}`}
                                 type="number"
                                 value={item.price}
-                                onChange={(e) => {
+                                onChange={e => {
                                   const val = e.target.value;
                                   updateItem(index, "price", val === "" ? "" : parseFloat(val));
                                 }}
@@ -1438,7 +1458,7 @@ ${businessData.phone}`
                               <div className="flex gap-2 mt-1.5">
                                 <Select
                                   value={item.discount.type}
-                                  onValueChange={(value) => {
+                                  onValueChange={value => {
                                     updateItem(index, "discount", { ...item.discount, type: value });
                                   }}
                                 >
@@ -1454,7 +1474,7 @@ ${businessData.phone}`
                                   id={`item-discount-${index}`}
                                   type="number"
                                   value={item.discount.value}
-                                  onChange={(e) => {
+                                  onChange={e => {
                                     const val = e.target.value;
                                     updateItem(index, "discount", { ...item.discount, value: val === "" ? "" : parseFloat(val) });
                                   }}
@@ -1469,7 +1489,7 @@ ${businessData.phone}`
                               <div className="flex gap-2 mt-1.5">
                                 <Select
                                   value={item.tax.type}
-                                  onValueChange={(value) => {
+                                  onValueChange={value => {
                                     updateItem(index, "tax", { ...item.tax, type: value });
                                   }}
                                 >
@@ -1485,7 +1505,7 @@ ${businessData.phone}`
                                   id={`item-tax-${index}`}
                                   type="number"
                                   value={item.tax.value}
-                                  onChange={(e) => {
+                                  onChange={e => {
                                     const val = e.target.value;
                                     updateItem(index, "tax", { ...item.tax, value: val === "" ? "" : parseFloat(val) });
                                   }}

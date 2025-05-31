@@ -1283,55 +1283,41 @@ ${businessData.phone}`
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <Label htmlFor="customerName" className="text-sm font-medium">Name</Label>
-                          <Popover open={open} onOpenChange={setOpen}>
-                            <PopoverTrigger asChild>
-                              <Button
-                                variant="outline"
-                                role="combobox"
-                                aria-expanded={open}
-                                className="w-full justify-between mt-1.5 font-inter font-light"
-                              >
-                                {value
-                                  ? customers.find((customer) => customer.name === value)?.name
-                                  : "Select customer..."}
-                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-full p-0">
-                              <Command>
-                                <CommandInput placeholder="Search customer..." />
-                                <CommandEmpty>No customer found.</CommandEmpty>
-                                <CommandGroup>
-                                  {customers.map((customer) => (
-                                    <CommandItem
-                                      key={customer.id}
-                                      value={customer.name}
-                                      onSelect={(currentValue) => {
-                                        setValue(currentValue === value ? "" : currentValue)
-                                        const selectedCustomer = customers.find(c => c.name === currentValue)
-                                        if (selectedCustomer) {
-                                          updateInvoiceData("customer", {
-                                            name: selectedCustomer.name,
-                                            email: selectedCustomer.email,
-                                            address: selectedCustomer.address
-                                          })
-                                        }
-                                        setOpen(false)
-                                      }}
-                                    >
-                                      <Check
-                                        className={cn(
-                                          "mr-2 h-4 w-4",
-                                          value === customer.name ? "opacity-100" : "opacity-0"
-                                        )}
-                                      />
-                                      {customer.name}
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </Command>
-                            </PopoverContent>
-                          </Popover>
+                          <Command className="rounded-lg border shadow-md mt-1.5">
+                            <CommandInput 
+                              placeholder="Search customer..." 
+                              value={invoiceData.customer.name}
+                              onValueChange={(value) => {
+                                updateInvoiceData("customer.name", value)
+                              }}
+                            />
+                            <CommandEmpty>No customer found.</CommandEmpty>
+                            <CommandGroup className="max-h-[200px] overflow-auto">
+                              {customers
+                                .filter(customer => 
+                                  customer.name.toLowerCase().includes(invoiceData.customer.name.toLowerCase())
+                                )
+                                .map((customer) => (
+                                  <CommandItem
+                                    key={customer.id}
+                                    value={customer.name}
+                                    onSelect={(value) => {
+                                      const selectedCustomer = customers.find(c => c.name === value)
+                                      if (selectedCustomer) {
+                                        updateInvoiceData("customer", {
+                                          name: selectedCustomer.name,
+                                          email: selectedCustomer.email,
+                                          address: selectedCustomer.address
+                                        })
+                                      }
+                                    }}
+                                    className="cursor-pointer"
+                                  >
+                                    {customer.name}
+                                  </CommandItem>
+                                ))}
+                            </CommandGroup>
+                          </Command>
                         </div>
                         <div>
                           <Label htmlFor="customerEmail" className="text-sm font-medium">Email</Label>
@@ -1341,7 +1327,7 @@ ${businessData.phone}`
                             value={invoiceData.customer.email}
                             onChange={(e) => updateInvoiceData("customer.email", e.target.value)}
                             placeholder="customer@example.com"
-                            className="mt-1.5  font-inter font-light"
+                            className="mt-1.5 font-inter font-light"
                           />
                         </div>
                       </div>

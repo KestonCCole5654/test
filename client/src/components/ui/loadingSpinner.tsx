@@ -1,9 +1,17 @@
-export const LoadingSpinner = () => (
-  <div className="flex flex-col justify-center items-center h-full gap-3">
-    <div className="h-8 w-8 flex items-center justify-center">
-      <div className="h-8 w-8 border-4 border-green-800 border-t-transparent rounded-full animate-spin"></div>
-    </div>
-  </div>
-);
+import React from "react"
+import { cn } from "../../lib/utils"
+
+interface LoadingSpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
+  className?: string
+}
+
+export function LoadingSpinner({ className, ...props }: LoadingSpinnerProps) {
+  return (
+    <div
+      className={cn("animate-spin rounded-full border-4 border-gray-200 border-t-green-800", className)}
+      {...props}
+    />
+  )
+}
 
 export default LoadingSpinner;

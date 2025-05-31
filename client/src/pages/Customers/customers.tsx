@@ -72,6 +72,7 @@ export default function CustomersPage() {
   const navigate = useNavigate()
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingState, setLoadingState] = useState<string>("")
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [isCustomerSidebarOpen, setIsCustomerSidebarOpen] = useState(false)
@@ -91,11 +92,13 @@ export default function CustomersPage() {
   const fetchCustomers = async () => {
     try {
       setLoading(true)
+      setLoadingState("Fetching customer data...")
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
         throw new Error("No active session")
       }
 
+      setLoadingState("Retrieving customer list...")
       const response = await fetch("https://sheetbills-server.vercel.app/api/customers", {
         headers: {
           "Authorization": `Bearer ${session.provider_token}`,
@@ -109,6 +112,7 @@ export default function CustomersPage() {
 
       const data = await response.json()
       
+      setLoadingState("Calculating invoice statistics...")
       // Fetch invoice counts for each customer
       const customersWithCounts = await Promise.all(
         data.customers.map(async (customer: Customer) => {
@@ -131,6 +135,7 @@ export default function CustomersPage() {
             // Fetch company logo using brand fetch
             if (customer.company) {
               try {
+                setLoadingState(`Fetching company data for ${customer.name}...`)
                 const brandResponse = await fetch(
                   `https://sheetbills-server.vercel.app/api/brand-fetch?domain=${encodeURIComponent(customer.company)}`,
                   {
@@ -165,6 +170,7 @@ export default function CustomersPage() {
       setError(err instanceof Error ? err.message : "Failed to fetch customers")
     } finally {
       setLoading(false)
+      setLoadingState("")
     }
   }
 
@@ -177,6 +183,7 @@ export default function CustomersPage() {
   const handleCustomerSubmit = async (data: any) => {
     try {
       setIsCustomerLoading(true)
+      setLoadingState(sidebarMode === "create" ? "Creating new customer..." : "Updating customer information...")
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
         throw new Error("No active session")
@@ -201,9 +208,9 @@ export default function CustomersPage() {
         throw new Error(errorData.error || `Failed to ${sidebarMode} customer`)
       }
 
-      // After successful creation/update, close the sidebar and refresh the list
       setIsCustomerSidebarOpen(false)
       setSelectedCustomer(null)
+      setLoadingState("Refreshing customer list...")
       await fetchCustomers()
       toast({
         title: "Success",
@@ -218,6 +225,7 @@ export default function CustomersPage() {
       })
     } finally {
       setIsCustomerLoading(false)
+      setLoadingState("")
     }
   }
 
@@ -229,6 +237,7 @@ export default function CustomersPage() {
 
   const handleDeleteCustomer = async (customerId: string) => {
     try {
+      setLoadingState("Deleting customer...")
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
         throw new Error("No active session")
@@ -247,6 +256,7 @@ export default function CustomersPage() {
         throw new Error(errorData.error || "Failed to delete customer")
       }
 
+      setLoadingState("Refreshing customer list...")
       await fetchCustomers()
       toast({
         title: "Success",
@@ -259,6 +269,8 @@ export default function CustomersPage() {
         description: error instanceof Error ? error.message : "Failed to delete customer. Please try again.",
         variant: "destructive",
       })
+    } finally {
+      setLoadingState("")
     }
   }
 
@@ -273,12 +285,11 @@ export default function CustomersPage() {
 
     try {
       setIsDeleting(true);
+      setLoadingState(`Deleting ${selectedCustomers.length} customers...`);
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         throw new Error("No active session");
       }
-
-      console.log("Attempting to delete customers:", selectedCustomers);
 
       const response = await fetch("https://sheetbills-server.vercel.app/api/customers/bulk-delete", {
         method: "DELETE",
@@ -296,6 +307,7 @@ export default function CustomersPage() {
         throw new Error(data.error || data.details || "Failed to delete customers");
       }
 
+      setLoadingState("Refreshing customer list...");
       await fetchCustomers();
       setSelectedCustomers([]);
       setIsBulkDeleteDialogOpen(false);
@@ -312,6 +324,7 @@ export default function CustomersPage() {
       });
     } finally {
       setIsDeleting(false);
+      setLoadingState("");
     }
   };
 
@@ -617,6 +630,15 @@ export default function CustomersPage() {
         mode={sidebarMode}
         initialData={selectedCustomer}
       />
+
+      {loading && (
+        <div className="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="text-center">
+            <LoadingSpinner className="w-8 h-8 mb-4" />
+            <p className="text-gray-600 font-medium">{loadingState || "Loading..."}</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 } 

@@ -2503,7 +2503,7 @@ app.get('/api/customers', async (req, res) => {
     if (!spreadsheetId) {
       throw new Error("Invalid sheet URL");
     }
-
+    
     // Initialize Google Sheets API
     const auth = new google.auth.OAuth2();
     auth.setCredentials({ access_token: session.provider_token });
@@ -2595,7 +2595,7 @@ app.post('/api/customers', async (req, res) => {
     if (!spreadsheetId) {
       throw new Error("Invalid sheet URL");
     }
-
+    
     // Initialize Google Sheets API
     const auth = new google.auth.OAuth2();
     auth.setCredentials({ access_token: session.provider_token });
@@ -2670,7 +2670,7 @@ app.put('/api/customers/:customerId', async (req, res) => {
     if (!spreadsheetId) {
       throw new Error("Invalid sheet URL");
     }
-
+    
     // Initialize Google Sheets API
     const auth = new google.auth.OAuth2();
     auth.setCredentials({ access_token: session.provider_token });
@@ -2733,7 +2733,7 @@ app.delete('/api/customers/:customerId', async (req, res) => {
     }
 
     const { customerId } = req.params;
-
+    
     // Get the SheetBills Invoices sheet URL
     const sheetsResponse = await axios.get("https://sheetbills-server.vercel.app/api/sheets/spreadsheets", {
       headers: {
@@ -2751,7 +2751,7 @@ app.delete('/api/customers/:customerId', async (req, res) => {
     if (!spreadsheetId) {
       throw new Error("Invalid sheet URL");
     }
-
+    
     // Initialize Google Sheets API
     const auth = new google.auth.OAuth2();
     auth.setCredentials({ access_token: session.provider_token });

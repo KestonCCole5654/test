@@ -1238,7 +1238,7 @@ ${businessData.phone}`
             {/* Header Content - Tidy, aligned, simple badge */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div>
-                <h1 className="text-2xl font-semibold text-gray-900 mb-1">
+                <h1 className="text-2xl font-normal text-gray-900 mb-1">
                   {invoiceToEdit ? "Edit Invoice" : "Create New Invoice"}
                 </h1>
                 <p className="text-sm text-gray-500 font-light">

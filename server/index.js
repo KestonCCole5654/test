@@ -2887,7 +2887,7 @@ app.delete('/api/customers/bulk-delete', async (req, res) => {
       range: 'Customers!A:J',
     });
 
-    if (!response.data.values) {
+    if (!response.data.values || response.data.values.length <= 1) {
       return res.status(404).json({ error: "No customer data found" });
     }
 
@@ -2907,25 +2907,33 @@ app.delete('/api/customers/bulk-delete', async (req, res) => {
     }
 
     // 8. Clear the sheet and write back the data
-    // First, clear the sheet
-    await sheets.spreadsheets.values.clear({
-      spreadsheetId: masterSheet.id,
-      range: 'Customers!A:J',
-    });
+    try {
+      // First, clear the sheet
+      await sheets.spreadsheets.values.clear({
+        spreadsheetId: masterSheet.id,
+        range: 'Customers!A:J',
+      });
 
-    // Then, write back the header and remaining rows
-    await sheets.spreadsheets.values.update({
-      spreadsheetId: masterSheet.id,
-      range: 'Customers!A1',
-      valueInputOption: 'RAW',
-      requestBody: {
-        values: [headerRow, ...rowsToKeep]
-      }
-    });
+      // Then, write back the header and remaining rows
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: masterSheet.id,
+        range: 'Customers!A1',
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: [headerRow, ...rowsToKeep]
+        }
+      });
+    } catch (writeError) {
+      console.error('Error writing to sheet:', writeError);
+      return res.status(500).json({
+        error: "Failed to update sheet",
+        details: writeError.message
+      });
+    }
 
     // 9. Return success response
     const deletedCount = dataRows.length - rowsToKeep.length;
-    res.json({
+    return res.json({
       success: true,
       message: `Successfully deleted ${deletedCount} customer(s)`,
       deletedCount,
@@ -2934,7 +2942,7 @@ app.delete('/api/customers/bulk-delete', async (req, res) => {
 
   } catch (error) {
     console.error('Bulk delete error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: "Failed to delete customers",
       details: error.message
     });

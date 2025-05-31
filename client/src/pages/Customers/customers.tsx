@@ -269,16 +269,16 @@ export default function CustomersPage() {
   }
 
   const handleBulkDelete = async () => {
-    if (!selectedCustomers.length) return
+    if (!selectedCustomers.length) return;
 
     try {
-      setIsDeleting(true)
-      const { data: { session } } = await supabase.auth.getSession()
+      setIsDeleting(true);
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        throw new Error("No active session")
+        throw new Error("No active session");
       }
 
-      console.log("Attempting to delete customers:", selectedCustomers)
+      console.log("Attempting to delete customers:", selectedCustomers);
 
       const response = await fetch("https://sheetbills-server.vercel.app/api/customers/bulk-delete", {
         method: "DELETE",
@@ -288,33 +288,32 @@ export default function CustomersPage() {
           "x-supabase-token": session.access_token
         },
         body: JSON.stringify({ customerIds: selectedCustomers })
-      })
+      });
 
-      const data = await response.json()
-      console.log("Delete response:", data)
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || data.details || "Failed to delete customers")
+        throw new Error(data.error || data.details || "Failed to delete customers");
       }
 
-      await fetchCustomers()
-      setSelectedCustomers([])
-      setIsBulkDeleteDialogOpen(false)
+      await fetchCustomers();
+      setSelectedCustomers([]);
+      setIsBulkDeleteDialogOpen(false);
       toast({
         title: "Success",
         description: data.message || "Selected customers deleted successfully.",
-      })
+      });
     } catch (error) {
-      console.error("Error deleting customers:", error)
+      console.error("Error deleting customers:", error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to delete customers. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsDeleting(false)
+      setIsDeleting(false);
     }
-  }
+  };
 
   const toggleCustomerSelection = (customerId: string) => {
     setSelectedCustomers(prev => 

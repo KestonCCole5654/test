@@ -2839,5 +2839,98 @@ app.delete('/api/customers/:customerId', async (req, res) => {
   }
 });
 
+// ==========================
+// Bulk Delete Customers Endpoint
+// ==========================
+/**
+ * Bulk deletes customers from the Customers sheet.
+ * @route DELETE /api/customers/bulk-delete
+ * @access Protected (Supabase + Google Auth)
+ * @body { customerIds: string[] }
+ */
+app.delete('/api/customers/bulk-delete', async (req, res) => {
+  try {
+    const { customerIds } = req.body;
+
+    // Validate input
+    if (!customerIds || !Array.isArray(customerIds) || customerIds.length === 0) {
+      return res.status(400).json({ error: "customerIds array is required" });
+    }
+
+    // Auth: Supabase and Google tokens
+    const supabaseToken = req.headers['x-supabase-token'];
+    const authHeader = req.headers.authorization;
+    if (!supabaseToken) return res.status(401).json({ error: 'Supabase authentication required' });
+    if (!authHeader?.startsWith('Bearer ')) return res.status(401).json({ error: 'Google authentication required' });
+    const googleToken = authHeader.split(' ')[1];
+
+    // Get user info from Supabase
+    const { data: { user }, error: userError } = await supabase.auth.getUser(supabaseToken);
+    if (userError || !user) return res.status(401).json({ error: 'Invalid Supabase session' });
+
+    // Get master sheet
+    const masterSheet = await getOrCreateMasterSheet(googleToken, user.id);
+
+    // Initialize Google Sheets API
+    const auth = new google.auth.OAuth2();
+    auth.setCredentials({ access_token: googleToken });
+    const sheets = google.sheets({ version: 'v4', auth });
+
+    // Get Customers sheet metadata
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId: masterSheet.id });
+    const customerSheet = spreadsheet.data.sheets.find(s => s.properties.title === 'Customers');
+    if (!customerSheet) return res.status(404).json({ error: 'Customers sheet not found' });
+    const sheetId = customerSheet.properties.sheetId;
+
+    // Fetch all customer rows (skip header)
+    const valuesResponse = await sheets.spreadsheets.values.get({
+      spreadsheetId: masterSheet.id,
+      range: 'Customers!A2:J',
+    });
+    const rows = valuesResponse.data.values || [];
+
+    // Find the rows to delete (in reverse order to avoid index shifting)
+    const rowsToDelete = rows
+      .map((row, index) => ({ row, index }))
+      .filter(({ row }) => customerIds.includes(row[0]))
+      .sort((a, b) => b.index - a.index);
+
+    if (rowsToDelete.length === 0) {
+      return res.status(404).json({ error: 'No matching customers found' });
+    }
+
+    // Delete rows in reverse order
+    for (const { index } of rowsToDelete) {
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: masterSheet.id,
+        requestBody: {
+          requests: [
+            {
+              deleteDimension: {
+                range: {
+                  sheetId,
+                  dimension: 'ROWS',
+                  startIndex: index + 1, // +1 because A2 skips header
+                  endIndex: index + 2,
+                },
+              },
+            },
+          ],
+        },
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `${rowsToDelete.length} customer(s) deleted successfully`,
+    });
+  } catch (error) {
+    console.error('Error deleting customers:', error);
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to delete customers',
+    });
+  }
+});
+
 
 

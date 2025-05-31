@@ -563,12 +563,12 @@ export default function Dashboard() {
         .map((invoice: any) => {
           try {
             // Parse customer and items if they are strings
-            let customer = invoice.customer;
-            if (typeof customer === "string") {
+            let customerObj: any = invoice.customer;
+            if (typeof customerObj === "string") {
               try {
-                customer = JSON.parse(customer);
+                customerObj = JSON.parse(customerObj);
               } catch {
-                customer = { name: "", email: "", address: "" };
+                customerObj = { name: customerObj, email: "", address: "" };
               }
             }
             let items = invoice.items;
@@ -590,7 +590,7 @@ export default function Dashboard() {
                 ? invoice.status
                 : "Pending",
               amount: invoice.amount,
-              customer,
+              customer: customerObj,
               items,
               tax: validateFinancialField(invoice.tax),
               discount: validateFinancialField(invoice.discount),
@@ -1208,9 +1208,14 @@ export default function Dashboard() {
                           <TableCell className="px-6 py-4 border-r border-gray-200">
                             <div className="flex items-center gap-3">
                               {(() => {
-                                let customerObj = typeof invoice.customer === "object"
-                                  ? invoice.customer
-                                  : getCustomerById(invoice.customer);
+                                let customerObj: any = invoice.customer;
+                                if (typeof customerObj === "string") {
+                                  try {
+                                    customerObj = JSON.parse(customerObj);
+                                  } catch {
+                                    customerObj = { name: customerObj, email: "", address: "" };
+                                  }
+                                }
                                 const email = customerObj?.email || "";
                                 const domain = email.split("@")[1] || "";
                                 return <ClientLogo domain={domain} />;
@@ -1218,23 +1223,30 @@ export default function Dashboard() {
                               <div className="flex flex-col">
                                 <span className="font-medium text-gray-900">
                                   {(() => {
-                                    let customerObj = typeof invoice.customer === "object" && invoice.customer !== null && !Array.isArray(invoice.customer)
-                                      ? invoice.customer
-                                      : getCustomerById(invoice.customer as unknown as string);
+                                    let customerObj: any = invoice.customer;
+                                    if (typeof customerObj === "string") {
+                                      try {
+                                        customerObj = JSON.parse(customerObj);
+                                      } catch {
+                                        customerObj = { name: customerObj, email: "", address: "" };
+                                      }
+                                    }
                                     if (customerObj && typeof customerObj === "object" && "name" in customerObj) {
                                       return String(customerObj.name || "");
-                                    }
-                                    if (typeof invoice.customer === "string") {
-                                      return invoice.customer;
                                     }
                                     return "";
                                   })()}
                                 </span>
                                 <span className="text-sm text-gray-500">
                                   {(() => {
-                                    let customerObj = typeof invoice.customer === "object" && invoice.customer !== null && !Array.isArray(invoice.customer)
-                                      ? invoice.customer
-                                      : getCustomerById(invoice.customer as unknown as string);
+                                    let customerObj: any = invoice.customer;
+                                    if (typeof customerObj === "string") {
+                                      try {
+                                        customerObj = JSON.parse(customerObj);
+                                      } catch {
+                                        customerObj = { name: customerObj, email: "", address: "" };
+                                      }
+                                    }
                                     if (customerObj && typeof customerObj === "object" && "email" in customerObj) {
                                       return String(customerObj.email || "");
                                     }

@@ -510,7 +510,7 @@ export default function SettingsPage() {
 
       {/* Logout & Delete Account Section */}
       <div className="mb-12 pl-8 pr-8">
-        <h2 className="text-lg font-medium text-gray-900 mb-1">Logout & Delete Account</h2>
+        <h2 className="text-lg font-medium text-gray-900 mb-1">Logout</h2>
         <p className="text-sm text-gray-400 mb-6">You can log out of your account or permanently delete your account and all associated data.</p>
         <div className="flex gap-4">
           <Button onClick={handleLogout} className="border border-gray-300 text-white bg-green-800 hover:bg-green-900 shadow-none">Logout</Button>

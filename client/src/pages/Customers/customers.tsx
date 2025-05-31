@@ -278,6 +278,8 @@ export default function CustomersPage() {
         throw new Error("No active session")
       }
 
+      console.log("Attempting to delete customers:", selectedCustomers)
+
       const response = await fetch("https://sheetbills-server.vercel.app/api/customers/bulk-delete", {
         method: "DELETE",
         headers: {
@@ -289,6 +291,7 @@ export default function CustomersPage() {
       })
 
       const data = await response.json()
+      console.log("Delete response:", data)
 
       if (!response.ok) {
         throw new Error(data.error || data.details || "Failed to delete customers")

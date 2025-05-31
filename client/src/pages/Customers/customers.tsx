@@ -469,14 +469,17 @@ export default function CustomersPage() {
                     <TableRow className="bg-gray-50 border-b border-gray-200">
                       <TableHead className="w-8 px-4 border-r border-gray-200"></TableHead>
                       <TableHead className="w-[56px] px-6 py-4 align-middle text-center border-r border-gray-200">
-                        <input
-                          type="checkbox"
-                          ref={headerCheckboxRef}
-                          checked={selectedCustomers.length === filteredCustomers.length && filteredCustomers.length > 0}
-                          onChange={toggleAllCustomers}
-                          aria-label="Select all customers on this page"
-                          className="mx-auto accent-green-800 h-4 w-4 rounded border-gray-300"
-                        />
+                        <div className="flex items-center justify-center h-full min-h-[40px]">
+                          <input
+                            type="checkbox"
+                            ref={headerCheckboxRef}
+                            checked={selectedCustomers.length === filteredCustomers.length && filteredCustomers.length > 0}
+                            onChange={toggleAllCustomers}
+                            aria-label="Select all customers on this page"
+                            className="accent-green-800 h-4 w-4 rounded border-gray-300"
+                            style={{ display: 'block', margin: 'auto' }}
+                          />
+                        </div>
                       </TableHead>
                       <TableHead className="px-6 py-4 border-r border-gray-200">Name</TableHead>
                       <TableHead className="px-6 py-4 border-r border-gray-200">Phone</TableHead>
@@ -505,6 +508,7 @@ export default function CustomersPage() {
                               onCheckedChange={() => toggleCustomerSelection(customer.id)}
                               aria-label={`Select customer ${customer.id}`}
                               className="mx-auto"
+                              style={{ display: 'block', margin: 'auto' }}
                             />
                           </div>
                         </TableCell>

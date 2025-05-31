@@ -184,9 +184,22 @@ export default function CustomersPage() {
     try {
       setIsCustomerLoading(true)
       setLoadingState(sidebarMode === "create" ? "Creating new customer..." : "Updating customer information...")
-      const { data: { session } } = await supabase.auth.getSession()
+      
+      // Get session from Supabase
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      
+      if (sessionError) {
+        throw new Error("Failed to get session: " + sessionError.message)
+      }
+      
       if (!session) {
         throw new Error("No active session")
+      }
+
+      // Get Google token from session
+      const googleToken = session.provider_token
+      if (!googleToken) {
+        throw new Error("Google authentication required")
       }
 
       const url = sidebarMode === "create" 
@@ -197,7 +210,7 @@ export default function CustomersPage() {
         method: sidebarMode === "create" ? "POST" : "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${session.provider_token}`,
+          "Authorization": `Bearer ${googleToken}`,
           "x-supabase-token": session.access_token
         },
         body: JSON.stringify(data)

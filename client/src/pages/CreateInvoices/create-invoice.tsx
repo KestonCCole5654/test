@@ -667,6 +667,43 @@ export default function InvoiceForm() {
     }
   }
 
+  const [customers, setCustomers] = useState<Customer[]>([])
+  const [open, setOpen] = useState(false)
+  const [value, setValue] = useState("")
+
+  // Add useEffect to fetch customers
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session) {
+          throw new Error("No active session")
+        }
+
+        const response = await fetch("https://sheetbills-server.vercel.app/api/customers", {
+          headers: {
+            "Authorization": `Bearer ${session.provider_token}`,
+            "x-supabase-token": session.access_token
+          }
+        })
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch customers")
+        }
+
+        const data = await response.json()
+        setCustomers(data.customers)
+      } catch (error) {
+        console.error("Error fetching customers:", error)
+      }
+    }
+
+    fetchCustomers()
+  }, [])
+
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+
   const handleSave = async () => {
     try {
       setIsSaving(true)
@@ -676,6 +713,34 @@ export default function InvoiceForm() {
       if (!session?.provider_token) {
         alert("Google authentication required")
         return
+      }
+
+      // Save customer info before saving invoice
+      const customerToSave = {
+        name: invoiceData.customer.name,
+        email: invoiceData.customer.email,
+        address: invoiceData.customer.address,
+        notes: invoiceData.notes || ""
+      }
+      // Check if customer already exists (by email or name)
+      const existingCustomer = customers.find(
+        (c: Customer) => c.email === customerToSave.email || c.name === customerToSave.name
+      )
+      if (!existingCustomer && customerToSave.name && customerToSave.email) {
+        try {
+          await fetch("https://sheetbills-server.vercel.app/api/customers", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${session.provider_token}`,
+              "x-supabase-token": session.access_token
+            },
+            body: JSON.stringify(customerToSave)
+          })
+        } catch (err) {
+          console.error("Error saving customer info:", err)
+          // Optionally show a toast, but don't block invoice save
+        }
       }
 
       // Get the SheetBills Invoices sheet URL
@@ -1044,43 +1109,6 @@ ${businessData.phone}`
       console.log("Processed Invoice Data:", processedInvoiceData)
     }
   }, [invoiceToEdit])
-
-  const [customers, setCustomers] = useState<Customer[]>([])
-  const [open, setOpen] = useState(false)
-  const [value, setValue] = useState("")
-
-  // Add useEffect to fetch customers
-  useEffect(() => {
-    const fetchCustomers = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession()
-        if (!session) {
-          throw new Error("No active session")
-        }
-
-        const response = await fetch("https://sheetbills-server.vercel.app/api/customers", {
-          headers: {
-            "Authorization": `Bearer ${session.provider_token}`,
-            "x-supabase-token": session.access_token
-          }
-        })
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch customers")
-        }
-
-        const data = await response.json()
-        setCustomers(data.customers)
-      } catch (error) {
-        console.error("Error fetching customers:", error)
-      }
-    }
-
-    fetchCustomers()
-  }, [])
-
-  const [showSuggestions, setShowSuggestions] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
 
   return (
     <>

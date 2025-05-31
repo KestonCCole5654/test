@@ -285,7 +285,7 @@ export default function CustomersPage() {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${session?.provider_token}`,
-          "x-supabase-token": session?.access_token || ""
+          "x-supabase-token": session?.access_token || "",
         },
         body: JSON.stringify({ customerIds: selectedCustomers })
       });
@@ -386,7 +386,7 @@ export default function CustomersPage() {
             <div>
               <h1 className="text-2xl font-Normal text-gray-900">Customers</h1>
               <p className="mt-1 text-sm text-gray-500">
-                Manage your customer contacts and information
+                Manage your customer contacts and information in one place.
               </p>
             </div>
             <div className="flex items-center gap-4">

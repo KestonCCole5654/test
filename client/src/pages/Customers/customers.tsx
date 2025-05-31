@@ -495,7 +495,8 @@ export default function CustomersPage() {
                     {filteredCustomers.map((customer) => (
                       <TableRow 
                         key={customer.id}
-                        className="hover:bg-slate-50 border-b border-gray-200"
+                        className="hover:bg-slate-50 border-b border-gray-200 cursor-pointer"
+                        onClick={() => handleEditCustomer(customer)}
                       >
                         <TableCell className="w-[56px] px-6 py-4 align-middle text-center border-r border-gray-200">
                           <div className="flex items-center justify-center h-full min-h-[40px]">

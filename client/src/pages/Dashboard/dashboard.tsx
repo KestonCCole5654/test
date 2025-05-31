@@ -179,8 +179,6 @@ export default function Dashboard() {
   const [showWelcome, setShowWelcome] = useState(false);
   const [isCustomerSidebarOpen, setIsCustomerSidebarOpen] = useState(false)
   const [isCustomerLoading, setIsCustomerLoading] = useState(false)
-  // Add customers state
-  const [customers, setCustomers] = useState([]);
 
   // =====================
   // Table Pagination & Selection (must be above useEffect hooks)
@@ -399,35 +397,6 @@ export default function Dashboard() {
     }
   }, [selectedSpreadsheetUrl]);
 
-  // Fetch customers on mount or when selectedSpreadsheetUrl changes
-  useEffect(() => {
-    const fetchCustomers = async () => {
-      try {
-        if (!selectedSpreadsheetUrl) return;
-        setIsLoading(true);
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) return;
-        const response = await fetch(
-          `https://sheetbills-server.vercel.app/api/customers?sheetUrl=${encodeURIComponent(selectedSpreadsheetUrl)}`,
-          {
-            headers: {
-              "Authorization": `Bearer ${session.provider_token}`,
-              "x-supabase-token": session.access_token
-            }
-          }
-        );
-        if (!response.ok) return;
-        const data = await response.json();
-        setCustomers(data.customers || []);
-      } catch (err) {
-        // Optionally handle error
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchCustomers();
-  }, [selectedSpreadsheetUrl]);
-
   // =====================
   // Utility Functions
   // =====================
@@ -563,12 +532,12 @@ export default function Dashboard() {
         .map((invoice: any) => {
           try {
             // Parse customer and items if they are strings
-            let customerObj: any = invoice.customer;
-            if (typeof customerObj === "string") {
+            let customer = invoice.customer;
+            if (typeof customer === "string") {
               try {
-                customerObj = JSON.parse(customerObj);
+                customer = JSON.parse(customer);
               } catch {
-                customerObj = { name: customerObj, email: "", address: "" };
+                customer = { name: "", email: "", address: "" };
               }
             }
             let items = invoice.items;
@@ -590,7 +559,7 @@ export default function Dashboard() {
                 ? invoice.status
                 : "Pending",
               amount: invoice.amount,
-              customer: customerObj,
+              customer,
               items,
               tax: validateFinancialField(invoice.tax),
               discount: validateFinancialField(invoice.discount),
@@ -961,11 +930,6 @@ export default function Dashboard() {
     }
   }
 
-  // Helper to get customer object by ID
-  function getCustomerById(customerId: string) {
-    return customers.find((c: any) => c.id === customerId);
-  }
-
   return (
     <div className="container bg-gray-50/50 max-w-7xl mx-auto px-4">
       {/* Breadcrumb Navigation */}
@@ -1208,50 +1172,23 @@ export default function Dashboard() {
                           <TableCell className="px-6 py-4 border-r border-gray-200">
                             <div className="flex items-center gap-3">
                               {(() => {
-                                let customerObj: any = invoice.customer;
-                                if (typeof customerObj === "string") {
-                                  try {
-                                    customerObj = JSON.parse(customerObj);
-                                  } catch {
-                                    customerObj = { name: customerObj, email: "", address: "" };
-                                  }
-                                }
-                                const email = customerObj?.email || "";
+                                const email =
+                                  typeof invoice.customer === "object"
+                                    ? invoice.customer.email
+                                    : "";
                                 const domain = email.split("@")[1] || "";
                                 return <ClientLogo domain={domain} />;
                               })()}
                               <div className="flex flex-col">
                                 <span className="font-medium text-gray-900">
-                                  {(() => {
-                                    let customerObj: any = invoice.customer;
-                                    if (typeof customerObj === "string") {
-                                      try {
-                                        customerObj = JSON.parse(customerObj);
-                                      } catch {
-                                        customerObj = { name: customerObj, email: "", address: "" };
-                                      }
-                                    }
-                                    if (customerObj && typeof customerObj === "object" && "name" in customerObj) {
-                                      return String(customerObj.name || "");
-                                    }
-                                    return "";
-                                  })()}
+                                  {typeof invoice.customer === "object"
+                                    ? invoice.customer.name
+                                    : invoice.customer}
                                 </span>
                                 <span className="text-sm text-gray-500">
-                                  {(() => {
-                                    let customerObj: any = invoice.customer;
-                                    if (typeof customerObj === "string") {
-                                      try {
-                                        customerObj = JSON.parse(customerObj);
-                                      } catch {
-                                        customerObj = { name: customerObj, email: "", address: "" };
-                                      }
-                                    }
-                                    if (customerObj && typeof customerObj === "object" && "email" in customerObj) {
-                                      return String(customerObj.email || "");
-                                    }
-                                    return "";
-                                  })()}
+                                  {typeof invoice.customer === "object"
+                                    ? invoice.customer.email
+                                    : ""}
                                 </span>
                               </div>
                             </div>

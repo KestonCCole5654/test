@@ -96,8 +96,7 @@ export default function CustomersPage() {
         throw new Error("No active session")
       }
 
-      // Get the SheetBills Invoices sheet URL
-      const response = await fetch("https://sheetbills-server.vercel.app/api/sheets", {
+      const response = await fetch("https://sheetbills-server.vercel.app/api/customers", {
         headers: {
           "Authorization": `Bearer ${session.provider_token}`,
           "x-supabase-token": session.access_token
@@ -105,38 +104,17 @@ export default function CustomersPage() {
       })
 
       if (!response.ok) {
-        throw new Error("Failed to fetch sheet information")
-      }
-
-      const data = await response.json()
-      const sheetUrl = data.selectedSpreadsheetUrl
-      if (!sheetUrl) {
-        throw new Error("No invoice spreadsheet found")
-      }
-
-      // Fetch customers from the Customers tab
-      const customersResponse = await fetch(
-        `https://sheetbills-server.vercel.app/api/customers?sheetUrl=${encodeURIComponent(sheetUrl)}`,
-        {
-          headers: {
-            "Authorization": `Bearer ${session.provider_token}`,
-            "x-supabase-token": session.access_token
-          }
-        }
-      )
-
-      if (!customersResponse.ok) {
         throw new Error("Failed to fetch customers")
       }
 
-      const customersData = await customersResponse.json()
+      const data = await response.json()
       
       // Fetch invoice counts for each customer
       const customersWithCounts = await Promise.all(
-        customersData.customers.map(async (customer: Customer) => {
+        data.customers.map(async (customer: Customer) => {
           try {
             const invoiceResponse = await fetch(
-              `https://sheetbills-server.vercel.app/api/invoices/customer/${customer.id}/counts?sheetUrl=${encodeURIComponent(sheetUrl)}`,
+              `https://sheetbills-server.vercel.app/api/invoices/customer/${customer.id}/counts`,
               {
                 headers: {
                   "Authorization": `Bearer ${session.provider_token}`,
@@ -185,11 +163,6 @@ export default function CustomersPage() {
       setCustomers(customersWithCounts)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch customers")
-      toast({
-        title: "Error",
-        description: err instanceof Error ? err.message : "Failed to fetch customers",
-        variant: "destructive",
-      })
     } finally {
       setLoading(false)
     }
@@ -209,43 +182,22 @@ export default function CustomersPage() {
         throw new Error("No active session")
       }
 
-      // Get the SheetBills Invoices sheet URL
-      const response = await fetch("https://sheetbills-server.vercel.app/api/sheets", {
-        headers: {
-          "Authorization": `Bearer ${session.provider_token}`,
-          "x-supabase-token": session.access_token
-        }
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch sheet information")
-      }
-
-      const sheetData = await response.json()
-      const sheetUrl = sheetData.selectedSpreadsheetUrl
-      if (!sheetUrl) {
-        throw new Error("No invoice spreadsheet found")
-      }
-
       const url = sidebarMode === "create" 
         ? "https://sheetbills-server.vercel.app/api/customers"
         : `https://sheetbills-server.vercel.app/api/customers/${selectedCustomer?.id}`
 
-      const customerResponse = await fetch(url, {
+      const response = await fetch(url, {
         method: sidebarMode === "create" ? "POST" : "PUT",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${session.provider_token}`,
           "x-supabase-token": session.access_token
         },
-        body: JSON.stringify({
-          ...data,
-          sheetUrl
-        })
+        body: JSON.stringify(data)
       })
 
-      if (!customerResponse.ok) {
-        const errorData = await customerResponse.json()
+      if (!response.ok) {
+        const errorData = await response.json()
         throw new Error(errorData.error || `Failed to ${sidebarMode} customer`)
       }
 
@@ -282,8 +234,8 @@ export default function CustomersPage() {
         throw new Error("No active session")
       }
 
-      // Get the SheetBills Invoices sheet URL
-      const response = await fetch("https://sheetbills-server.vercel.app/api/sheets", {
+      const response = await fetch(`https://sheetbills-server.vercel.app/api/customers/${customerId}`, {
+        method: "DELETE",
         headers: {
           "Authorization": `Bearer ${session.provider_token}`,
           "x-supabase-token": session.access_token
@@ -291,28 +243,7 @@ export default function CustomersPage() {
       })
 
       if (!response.ok) {
-        throw new Error("Failed to fetch sheet information")
-      }
-
-      const sheetData = await response.json()
-      const sheetUrl = sheetData.selectedSpreadsheetUrl
-      if (!sheetUrl) {
-        throw new Error("No invoice spreadsheet found")
-      }
-
-      const deleteResponse = await fetch(
-        `https://sheetbills-server.vercel.app/api/customers/${customerId}?sheetUrl=${encodeURIComponent(sheetUrl)}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Authorization": `Bearer ${session.provider_token}`,
-            "x-supabase-token": session.access_token
-          }
-        }
-      )
-
-      if (!deleteResponse.ok) {
-        const errorData = await deleteResponse.json()
+        const errorData = await response.json()
         throw new Error(errorData.error || "Failed to delete customer")
       }
 

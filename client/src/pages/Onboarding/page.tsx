@@ -95,7 +95,7 @@ const WelcomeScreen = ({ onStart }: { onStart: () => void }) => {
       </p>
       <Button
         onClick={onStart}
-        className="bg-green-800 font-cal-sans hover:bg-green-900 px-8 py-6 text-lg"
+        className="bg-green-600 font-cal-sans hover:bg-green-700 px-8 py-6 text-lg"
       >
         Get Started
         <ArrowRight className="ml-2 h-5 w-5" />
@@ -167,12 +167,12 @@ export default function InitializePage() {
     {
       id: "address",
       question: "What's your business address?",
-      description: "This will appear on your invoices and documents.",
+      description: "Optional: This will appear on your invoices and documents.",
       field: "address",
-      required: true,
+      required: false,
       icon: <MapPin className="h-5 w-5" />,
       placeholder: "e.g. 123 Business St, City, State, ZIP",
-      validate: (value: string) => value.trim().length > 0,
+      validate: () => true, // Always valid since optional
     },
   ]
 
@@ -730,7 +730,7 @@ export default function InitializePage() {
           )}
 
           <Button
-            className="flex-1 bg-green-800 font-cal-sans hover:bg-green-900"
+            className="flex-1 bg-green-600 font-cal-sans hover:bg-green-700"
             onClick={handleNext}
             type="button"
           >
@@ -856,7 +856,7 @@ export default function InitializePage() {
           </Button>
 
           <Button
-            className="flex-1 bg-green-800 hover:bg-green-900 font-cal-sans"
+            className="flex-1 bg-green-600 hover:bg-green-700 font-cal-sans"
             onClick={createBusinessSheet}
             disabled={isSubmitting}
             type="button"
@@ -936,7 +936,7 @@ export default function InitializePage() {
         : (
           <>
             <div className="mb-6">
-              <img src="/sheetbills-logo.svg" alt="SheetBills Logo" className="h-16 w-auto mx-auto" />
+              <img src="/icon.svg" alt="Success Icon" className="h-16 w-16 mx-auto" />
             </div>
             <motion.h2
               initial={{ y: 20, opacity: 0 }}
@@ -944,7 +944,7 @@ export default function InitializePage() {
               transition={{ delay: 0.4, duration: 0.5 }}
               className="text-2xl font-cal-sans font-medium mb-2"
             >
-              Welcome to <span className="font-cal-sans font-medium text-green-800 text-3xl">SheetBills</span>, <br /> Setup Complete!
+              Welcome to <span className=" font-cal-sans font-medium text-green-800 text-3xl">SheetBills</span>, <br /> Setup Complete!
             </motion.h2>
             <motion.p
               initial={{ y: 20, opacity: 0 }}

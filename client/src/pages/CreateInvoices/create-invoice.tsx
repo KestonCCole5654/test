@@ -715,6 +715,34 @@ export default function InvoiceForm() {
         return
       }
 
+      // Save customer info before saving invoice
+      const customerToSave = {
+        name: invoiceData.customer.name,
+        email: invoiceData.customer.email,
+        address: invoiceData.customer.address,
+        notes: invoiceData.notes || ""
+      }
+      // Check if customer already exists (by email or name)
+      const existingCustomer = customers.find(
+        (c: Customer) => c.email === customerToSave.email || c.name === customerToSave.name
+      )
+      if (!existingCustomer && customerToSave.name && customerToSave.email) {
+        try {
+          await fetch("https://sheetbills-server.vercel.app/api/customers", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${session.provider_token}`,
+              "x-supabase-token": session.access_token
+            },
+            body: JSON.stringify(customerToSave)
+          })
+        } catch (err) {
+          console.error("Error saving customer info:", err)
+          // Optionally show a toast, but don't block invoice save
+        }
+      }
+
       // Get the SheetBills Invoices sheet URL
       const response = await axios.get("https://sheetbills-server.vercel.app/api/sheets/spreadsheets", {
         headers: {
@@ -728,78 +756,17 @@ export default function InvoiceForm() {
         throw new Error("SheetBills Invoices sheet not found")
       }
 
-      // Save customer info before saving invoice
-      const customerToSave = {
-        name: invoiceData.customer.name,
-        email: invoiceData.customer.email,
-        address: invoiceData.customer.address,
-        phone: invoiceData.customer.phone || "",
-        company: invoiceData.customer.company || "",
-        notes: invoiceData.notes || "",
-        status: "active"
-      }
-
-      // Check if customer already exists (by email or name)
-      const existingCustomer = customers.find(
-        (c: Customer) => c.email === customerToSave.email || c.name === customerToSave.name
-      )
-
-      let customerId = existingCustomer?.id
-
-      // If customer doesn't exist and we have required fields, create them
-      if (!existingCustomer && customerToSave.name && customerToSave.email) {
-        try {
-          const customerResponse = await fetch("https://sheetbills-server.vercel.app/api/customers", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${session.provider_token}`,
-              "x-supabase-token": session.access_token
-            },
-            body: JSON.stringify({
-              ...customerToSave,
-              sheetUrl: invoicesSheet.sheetUrl
-            })
-          })
-
-          if (!customerResponse.ok) {
-            throw new Error("Failed to create customer")
-          }
-
-          const newCustomer = await customerResponse.json()
-          customerId = newCustomer.customer.id
-
-          // Show success toast for customer creation
-          toast({
-            title: "Customer Created",
-            description: "New customer has been created successfully.",
-            variant: "default",
-          })
-        } catch (err) {
-          console.error("Error saving customer info:", err)
-          toast({
-            title: "Warning",
-            description: "Failed to create customer, but proceeding with invoice creation.",
-            variant: "destructive",
-          })
-        }
-      }
-
       // Calculate totals for the invoice
       const subtotal = calculateTotal()
       const total = calculateTotal()
 
-      // Prepare the save request with customer ID
+      // Prepare the save request
       const saveResponse = await axios.post(
         "https://sheetbills-server.vercel.app/api/saveInvoice",
         {
           accessToken: session.provider_token,
           invoiceData: {
             ...invoiceData,
-            customer: {
-              ...invoiceData.customer,
-              id: customerId // Use the customer ID we got from creation or existing customer
-            },
             amount: total,
             status: 'Pending'
           },
@@ -819,15 +786,11 @@ export default function InvoiceForm() {
         localStorage.removeItem("lastFetchTime")
         navigate('/dashboard', { state: { refresh: true } })
       } else {
-        throw new Error("Failed to save invoice")
+        alert("Failed to save invoice")
       }
     } catch (error) {
       console.error("Error saving invoice:", error)
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to save invoice. Please try again.",
-        variant: "destructive",
-      })
+      alert("Failed to save invoice. Check console for details.")
     } finally {
       setIsSaving(false)
     }

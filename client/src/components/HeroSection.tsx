@@ -51,7 +51,7 @@ const HeroSection = () => {
                 clip-rule="evenodd"
               ></path>
             </svg>
-            1-minute no-code setup
+            No more Scattered Files/Sheets
           </li>
           <li className="flex items-center justify-center lg:justify-start gap-2">
             <svg

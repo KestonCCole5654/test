@@ -342,7 +342,40 @@ export default function CustomersPage() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-          <div className="flex justify-between items-center mb-6">
+       
+
+          <InvoiceStats
+            stats={[
+              {
+                label: "Total Customers",
+                value: customers.length.toString(),
+                percent: 0,
+                trend: "neutral",
+                subLabel: "all time"
+              },
+              {
+                label: "Paid Customers",
+                value: customers.filter(c => (c.invoice_counts?.paid || 0) > 0).length.toString(),
+                percent: 0,
+                trend: "neutral",
+                subLabel: "all time"
+              },
+              {
+                label: "Unpaid Customers",
+                value: customers.filter(c => (c.invoice_counts?.unpaid || 0) > 0).length.toString(),
+                percent: 0,
+                trend: "neutral",
+                subLabel: "all time"
+              }
+            ]}
+            lastUpdated={new Date().toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })}
+          />
+
+<div className="flex justify-between items-center mb-6">
             <div>
               <h1 className="text-2xl font-Normal text-gray-900">Customers</h1>
               <p className="mt-1 text-sm text-gray-500">
@@ -378,37 +411,6 @@ export default function CustomersPage() {
               </Button>
             </div>
           </div>
-
-          <InvoiceStats
-            stats={[
-              {
-                label: "Total Customers",
-                value: customers.length.toString(),
-                percent: 0,
-                trend: "neutral",
-                subLabel: "all time"
-              },
-              {
-                label: "Paid Customers",
-                value: customers.filter(c => (c.invoice_counts?.paid || 0) > 0).length.toString(),
-                percent: 0,
-                trend: "neutral",
-                subLabel: "all time"
-              },
-              {
-                label: "Unpaid Customers",
-                value: customers.filter(c => (c.invoice_counts?.unpaid || 0) > 0).length.toString(),
-                percent: 0,
-                trend: "neutral",
-                subLabel: "all time"
-              }
-            ]}
-            lastUpdated={new Date().toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            })}
-          />
 
           <Card>
             <CardContent className="p-0">
@@ -544,9 +546,9 @@ export default function CustomersPage() {
                               variant="outline"
                               size="icon"
                               onClick={() => handleEditCustomer(customer)}
-                              className="h-8 w-8 border-gray-300 hover:bg-gray-100"
+                              className="h-8 w-8"
                             >
-                              <Edit className="h-4 w-4 text-gray-700" />
+                              <Edit className="h-4 w-4 text-white" />
                             </Button>
                             <Button
                               variant="outline"
@@ -558,9 +560,9 @@ export default function CustomersPage() {
                                   description: "Message functionality will be available soon.",
                                 })
                               }}
-                              className="h-8 w-8 border-gray-300 hover:bg-gray-100"
+                              className="h-8 w-8"
                             >
-                              <Mail className="h-4 w-4 text-gray-700" />
+                              <Mail className="h-4 w-4 text-white" />
                             </Button>
                           </div>
                         </TableCell>

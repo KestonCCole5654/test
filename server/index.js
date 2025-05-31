@@ -2849,135 +2849,94 @@ app.delete('/api/customers/:customerId', async (req, res) => {
  * @body { customerIds: string[] }
  */
 app.delete('/api/customers/bulk-delete', async (req, res) => {
-  console.log('[BULK-DELETE] Starting bulk delete operation');
   try {
-    // 1. Input validation
+    // 1. Basic validation
     const { customerIds } = req.body;
-    console.log('[BULK-DELETE] Received customerIds:', customerIds);
-
-    if (!customerIds || !Array.isArray(customerIds) || customerIds.length === 0) {
-      console.error('[BULK-DELETE] Invalid input:', { customerIds });
-      return res.status(400).json({ 
-        error: "Invalid input",
-        details: "customerIds must be a non-empty array"
-      });
+    if (!customerIds?.length) {
+      return res.status(400).json({ error: "No customer IDs provided" });
     }
 
-    // 2. Authentication validation
+    // 2. Get auth tokens
     const supabaseToken = req.headers['x-supabase-token'];
-    const authHeader = req.headers.authorization;
-    
-    if (!supabaseToken) {
-      console.error('[BULK-DELETE] Missing Supabase token');
-      return res.status(401).json({ error: 'Supabase authentication required' });
-    }
-    if (!authHeader?.startsWith('Bearer ')) {
-      console.error('[BULK-DELETE] Missing or invalid Google token');
-      return res.status(401).json({ error: 'Google authentication required' });
-    }
+    const googleToken = req.headers.authorization?.split(' ')[1];
 
-    const googleToken = authHeader.split(' ')[1];
+    if (!supabaseToken || !googleToken) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
 
     // 3. Verify Supabase session
-    const { data: { user }, error: userError } = await supabase.auth.getUser(supabaseToken);
-    if (userError || !user) {
-      console.error('[BULK-DELETE] Supabase auth error:', userError);
-      return res.status(401).json({ error: 'Invalid Supabase session' });
+    const { data: { user }, error: supabaseError } = await supabase.auth.getUser(supabaseToken);
+    if (supabaseError || !user) {
+      return res.status(401).json({ error: "Invalid session" });
     }
 
-    // 4. Initialize Google Sheets API
+    // 4. Setup Google Sheets
     const auth = new google.auth.OAuth2();
     auth.setCredentials({ access_token: googleToken });
     const sheets = google.sheets({ version: 'v4', auth });
 
     // 5. Get master sheet
     const masterSheet = await getOrCreateMasterSheet(googleToken, user.id);
-    if (!masterSheet) {
-      console.error('[BULK-DELETE] Failed to get master sheet');
-      return res.status(500).json({ error: 'Failed to access master sheet' });
+    if (!masterSheet?.id) {
+      return res.status(500).json({ error: "Failed to access master sheet" });
     }
 
-    // 6. Get Customers sheet
-    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId: masterSheet.id });
-    const customerSheet = spreadsheet.data.sheets.find(s => s.properties.title === 'Customers');
-    if (!customerSheet) {
-      console.error('[BULK-DELETE] Customers sheet not found');
-      return res.status(404).json({ error: 'Customers sheet not found' });
-    }
-
-    const sheetId = customerSheet.properties.sheetId;
-
-    // 7. Fetch customer rows
-    const valuesResponse = await sheets.spreadsheets.values.get({
+    // 6. Get all customer data
+    const response = await sheets.spreadsheets.values.get({
       spreadsheetId: masterSheet.id,
-      range: 'Customers!A2:J',
+      range: 'Customers!A:J',
     });
 
-    const rows = valuesResponse.data.values || [];
-    console.log('[BULK-DELETE] Found rows:', { count: rows.length });
+    if (!response.data.values) {
+      return res.status(404).json({ error: "No customer data found" });
+    }
 
-    // 8. Find rows to delete
-    const rowsToDelete = rows
-      .map((row, index) => ({ row, index }))
-      .filter(({ row }) => customerIds.includes(row[0]))
-      .sort((a, b) => b.index - a.index);
-
-    console.log('[BULK-DELETE] Rows to delete:', {
-      count: rowsToDelete.length,
-      indices: rowsToDelete.map(r => r.index),
-      customerIds: rowsToDelete.map(r => r.row[0])
-    });
-
-    if (rowsToDelete.length === 0) {
-      console.error('[BULK-DELETE] No matching customers found');
+    // 7. Process rows
+    const headerRow = response.data.values[0];
+    const dataRows = response.data.values.slice(1);
+    
+    // Find rows to keep (not in customerIds)
+    const rowsToKeep = dataRows.filter(row => !customerIds.includes(row[0]));
+    
+    // If no rows were found to delete
+    if (rowsToKeep.length === dataRows.length) {
       return res.status(404).json({ 
-        error: 'No matching customers found',
-        details: 'The provided customer IDs do not exist in the sheet'
+        error: "No matching customers found",
+        details: "The provided customer IDs do not exist in the sheet"
       });
     }
 
-    // 9. Delete rows in reverse order
-    const deletePromises = rowsToDelete.map(({ index }) => 
-      sheets.spreadsheets.batchUpdate({
-        spreadsheetId: masterSheet.id,
-        requestBody: {
-          requests: [{
-            deleteDimension: {
-              range: {
-                sheetId,
-                dimension: 'ROWS',
-                startIndex: index + 1,
-                endIndex: index + 2,
-              },
-            },
-          }],
-        },
-      })
-    );
+    // 8. Clear the sheet and write back the data
+    // First, clear the sheet
+    await sheets.spreadsheets.values.clear({
+      spreadsheetId: masterSheet.id,
+      range: 'Customers!A:J',
+    });
 
-    await Promise.all(deletePromises);
+    // Then, write back the header and remaining rows
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: masterSheet.id,
+      range: 'Customers!A1',
+      valueInputOption: 'RAW',
+      requestBody: {
+        values: [headerRow, ...rowsToKeep]
+      }
+    });
 
-    console.log('[BULK-DELETE] Successfully deleted customers');
+    // 9. Return success response
+    const deletedCount = dataRows.length - rowsToKeep.length;
     res.json({
       success: true,
-      message: `${rowsToDelete.length} customer(s) deleted successfully`,
-      deletedCount: rowsToDelete.length,
-      deletedIds: rowsToDelete.map(r => r.row[0])
+      message: `Successfully deleted ${deletedCount} customer(s)`,
+      deletedCount,
+      deletedIds: customerIds.filter(id => !rowsToKeep.some(row => row[0] === id))
     });
 
   } catch (error) {
-    console.error('[BULK-DELETE] Error:', {
-      message: error.message,
-      code: error.code,
-      status: error.status,
-      response: error.response?.data,
-      stack: error.stack
-    });
-
+    console.error('Bulk delete error:', error);
     res.status(500).json({
-      error: 'Failed to delete customers',
-      details: error.message,
-      code: error.code
+      error: "Failed to delete customers",
+      details: error.message
     });
   }
 });

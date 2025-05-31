@@ -272,6 +272,7 @@ export default function CustomersPage() {
     if (!selectedCustomers.length) return
 
     try {
+      setIsDeleting(true)
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
         throw new Error("No active session")
@@ -287,16 +288,18 @@ export default function CustomersPage() {
         body: JSON.stringify({ customerIds: selectedCustomers })
       })
 
+      const data = await response.json()
+
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || "Failed to delete customers")
+        throw new Error(data.error || data.details || "Failed to delete customers")
       }
 
       await fetchCustomers()
       setSelectedCustomers([])
+      setIsBulkDeleteDialogOpen(false)
       toast({
         title: "Success",
-        description: "Selected customers deleted successfully.",
+        description: data.message || "Selected customers deleted successfully.",
       })
     } catch (error) {
       console.error("Error deleting customers:", error)
@@ -305,6 +308,8 @@ export default function CustomersPage() {
         description: error instanceof Error ? error.message : "Failed to delete customers. Please try again.",
         variant: "destructive",
       })
+    } finally {
+      setIsDeleting(false)
     }
   }
 

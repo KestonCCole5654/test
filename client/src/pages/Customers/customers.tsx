@@ -284,8 +284,8 @@ export default function CustomersPage() {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${session.provider_token}`,
-          "x-supabase-token": session.access_token
+          "Authorization": `Bearer ${session?.provider_token}`,
+          "x-supabase-token": session?.access_token || ""
         },
         body: JSON.stringify({ customerIds: selectedCustomers })
       });

@@ -368,7 +368,7 @@ export default function InitializePage() {
 
   const updateOnboardingStatus = async (status: string) => {
     try {
-      const response = await fetch(`${API_URL}/update-onboarding-status`, {
+      const response = await fetch(`${API_URL}/api/update-onboarding-status`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

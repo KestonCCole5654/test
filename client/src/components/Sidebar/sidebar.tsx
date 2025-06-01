@@ -17,6 +17,7 @@ import {
   Mail,
   Scale
 } from "lucide-react"
+import supabase from "../Auth/supabaseClient"
 import { Button } from "../ui/button"
 import {
   DropdownMenu,
@@ -30,7 +31,6 @@ import {
 import { Avatar, AvatarFallback } from "../ui/avatar"
 import { User as SupabaseUser } from '@supabase/supabase-js'
 import { cn } from "../../lib/utils"
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
 
 interface SidebarProps {
   collapsed: boolean;
@@ -41,7 +41,6 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
   const navigate = useNavigate()
   const location = useLocation()
   const [user, setUser] = useState<SupabaseUser | null>(null)
-  const supabase = useSupabaseClient();
 
   useEffect(() => {
     // Get initial session
@@ -57,7 +56,7 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
     return () => {
       subscription.unsubscribe()
     }
-  }, [supabase])
+  }, [])
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut()

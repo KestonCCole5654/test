@@ -30,7 +30,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb"
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import supabase from "../../components/Auth/supabaseClient"
+import { useSession } from '@supabase/auth-helpers-react'
 import { LoadingSpinner } from "../../components/ui/loadingSpinner"
 
 const API_URL = "https://sheetbills-server.vercel.app"
@@ -244,7 +245,7 @@ export default function InitializePage() {
     console.log("=== AUTH TOKEN INITIALIZATION END ===")
   }, [])
 
-  const supabase = useSupabaseClient()
+  const session = useSession()
   const [isOnboarded, setIsOnboarded] = useState<boolean | null>(null)
 
   // Check onboarding status on mount

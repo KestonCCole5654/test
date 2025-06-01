@@ -29,7 +29,7 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import { Skeleton } from "../../components/ui/skeleton";
 import { toast } from "../../components/ui/use-toast";
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import supabase from "../../components/Auth/supabaseClient";
 import type { User } from "@supabase/supabase-js";
 import { Card, CardContent } from "../../components/ui/card";
 import {
@@ -128,10 +128,9 @@ interface Spreadsheet {
 // =====================
 export default function Dashboard() {
   // ----------- State & Constants -----------
-  const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const supabase = useSupabaseClient();
+  const [user, setUser] = useState<User | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>(() => {
     // Try to load cached data on initial render
     const cachedData = localStorage.getItem("cachedInvoices");
@@ -252,7 +251,7 @@ export default function Dashboard() {
       isMounted = false;
       abortController.abort();
     };
-  }, [navigate, location.pathname, supabase]);
+  }, [navigate, location.pathname]);
 
   // Fetch spreadsheets for user
   useEffect(() => {

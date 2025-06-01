@@ -233,7 +233,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
       {/* Footer with branding */}
       <div className="mt-8 pt-4 border-t border-gray-200">
         <div className="text-center text-sm text-gray-500">
-          Powered by <span className="text-green-800 font-medium">SheetBills</span>
+          Powered by <span className="text-green-800 font-bold">SheetBills @sheeqbills.com</span>
         </div>
       </div>
     </div>

@@ -2,13 +2,13 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { useToast } from "../../components/ui/use-toast"
-import { Loader2, Edit, Save, X, Info, Calendar, Mail, User } from "lucide-react"
+import { Loader2, Edit, Save, X, Info, Calendar, Mail, User, Upload, Building2 } from "lucide-react"
 import axios from "axios"
 import supabase from "../../components/Auth/supabaseClient"
 import {
@@ -53,6 +53,7 @@ export default function SettingsPage() {
     phone: "",
     address: "",
     email: "",
+    logo: "",
   })
   const [isUpdatingBusiness, setIsUpdatingBusiness] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -61,6 +62,9 @@ export default function SettingsPage() {
   const [deletePhrase, setDeletePhrase] = useState("")
   const [isDeleting, setIsDeleting] = useState(false)
   const sheetUrl = typeof window !== 'undefined' ? localStorage.getItem("defaultSheetUrl") : ""
+  const [logoFile, setLogoFile] = useState<File | null>(null)
+  const [logoPreview, setLogoPreview] = useState<string>("")
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Brand logo for business (using business email domain)
   const businessDomain = businessData.email?.split("@")[1] || "";
@@ -110,6 +114,7 @@ export default function SettingsPage() {
           email: businessResponse.data.businessDetails["Business Email"] || "",
           phone: businessResponse.data.businessDetails["Phone Number"] || "",
           address: businessResponse.data.businessDetails["Address"] || "",
+          logo: businessResponse.data.businessDetails["Logo"] || "",
         });
       }
 
@@ -155,6 +160,25 @@ export default function SettingsPage() {
     };
   }, []);
 
+  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast({
+          title: "Error",
+          description: "Logo file size must be less than 5MB",
+          variant: "destructive",
+        })
+        return
+      }
+      setLogoFile(file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setLogoPreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
 
   const handleBusinessUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -162,17 +186,38 @@ export default function SettingsPage() {
     try {
       setIsUpdatingBusiness(true);
 
-      // Get session and tokens
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
       if (sessionError || !session) {
         throw new Error("Authentication required");
       }
 
-      // Get the current sheet URL from localStorage
       const currentSheetUrl = localStorage.getItem("defaultSheetUrl");
       if (!currentSheetUrl) {
         throw new Error("No invoice spreadsheet selected");
+      }
+
+      // If there's a new logo file, upload it first
+      let logoUrl = businessData.logo;
+      if (logoFile) {
+        const formData = new FormData();
+        formData.append('logo', logoFile);
+        
+        const uploadResponse = await axios.post(
+          "https://sheetbills-server.vercel.app/api/upload-logo",
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${session.provider_token}`,
+              "X-Supabase-Token": session.access_token,
+              "Content-Type": "multipart/form-data"
+            }
+          }
+        );
+        
+        if (uploadResponse.data.url) {
+          logoUrl = uploadResponse.data.url;
+        }
       }
 
       const response = await axios.put(
@@ -182,6 +227,7 @@ export default function SettingsPage() {
           email: businessData.email,
           phone: businessData.phone,
           address: businessData.address,
+          logo: logoUrl,
           sheetUrl: currentSheetUrl
         },
         {
@@ -199,6 +245,8 @@ export default function SettingsPage() {
         });
         await fetchData();
         setIsEditing(false);
+        setLogoFile(null);
+        setLogoPreview("");
       }
 
     } catch (error) {
@@ -401,19 +449,57 @@ export default function SettingsPage() {
             <form onSubmit={handleBusinessUpdate} className="space-y-6 px-4 py-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="companyName" className="flex items-center gap-3">
-                    {businessLogo && (
-                      <img src={businessLogo} alt="Brand Logo" className="h-8 w-8 rounded-full bg-white border border-gray-200" />
-                    )}
-                    Company Name *
-                  </Label>
-                  <Input
-                    id="companyName"
-                    required
-                    value={businessData.companyName}
-                    onChange={(e) => setBusinessData(prev => ({ ...prev, companyName: e.target.value }))}
-                    placeholder="Your company name"
-                  />
+                  <Label htmlFor="companyName">Company Name *</Label>
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <div className="w-16 h-16 rounded-full border-2 border-gray-200 overflow-hidden">
+                        {logoPreview || businessData.logo ? (
+                          <img
+                            src={logoPreview || businessData.logo}
+                            alt="Company logo"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                            <Building2 className="w-8 h-8 text-gray-400" />
+                          </div>
+                        )}
+                      </div>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleLogoUpload}
+                        accept="image/*"
+                        className="hidden"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="absolute -bottom-1 -right-1 bg-green-800 text-white p-1 rounded-full hover:bg-green-700"
+                      >
+                        <Upload className="w-4 h-4" />
+                      </button>
+                      {logoPreview && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setLogoPreview("")
+                            setLogoFile(null)
+                          }}
+                          className="absolute -top-1 -right-1 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                    <Input
+                      id="companyName"
+                      required
+                      value={businessData.companyName}
+                      onChange={(e) => setBusinessData(prev => ({ ...prev, companyName: e.target.value }))}
+                      placeholder="Your company name"
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Business Email *</Label>

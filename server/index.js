@@ -2017,7 +2017,10 @@ app.get('/api/onboarding/status', async (req, res) => {
     // Get Google access token from headers
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ onboarded: false, error: 'Missing or invalid authorization header' });
+      return res.status(401).json({ 
+        onboarded: false, 
+        error: 'Missing or invalid authorization header' 
+      });
     }
     const accessToken = authHeader.split(' ')[1];
 
@@ -2047,7 +2050,12 @@ app.get('/api/onboarding/status', async (req, res) => {
     }
   } catch (error) {
     console.error('[ONBOARDING STATUS ERROR]', error);
-    return res.status(500).json({ onboarded: false, error: error.message });
+    // Ensure we always return a JSON response
+    return res.status(500).json({ 
+      onboarded: false, 
+      error: error.message || 'Failed to check onboarding status',
+      details: error.response?.data || null
+    });
   }
 });
 /**

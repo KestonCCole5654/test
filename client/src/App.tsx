@@ -175,7 +175,7 @@ function App() {
           <Route
             path="/Onboarding"
             element={
-              <AuthenticatedRoute authenticated={!!user} isLoading={loading}>
+              <AuthenticatedRoute isLoading={loading}>
                 <OnboardingPage />
               </AuthenticatedRoute>
             }
@@ -184,7 +184,7 @@ function App() {
           {/* Protected Routes */}
           <Route
             element={
-              <AuthenticatedRoute authenticated={!!user} isLoading={loading}>
+              <AuthenticatedRoute isLoading={loading}>
                 <SidebarLayout />
               </AuthenticatedRoute>
             }
@@ -203,7 +203,7 @@ function App() {
           <Route
             path="/print-invoice/:invoiceId"
             element={
-              <AuthenticatedRoute authenticated={!!user} isLoading={loading}>
+              <AuthenticatedRoute isLoading={loading}>
                 <PrintInvoice />
               </AuthenticatedRoute>
             }

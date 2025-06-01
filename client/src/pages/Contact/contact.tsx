@@ -8,7 +8,7 @@ import { Textarea } from "../../components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card"
 import { Loader2, Send } from "lucide-react"
 import { toast } from "../../components/ui/use-toast"
-import supabase from "../../components/Auth/supabaseClient"
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -20,6 +20,7 @@ import {
 
 export default function ContactPage() {
   const navigate = useNavigate()
+  const supabase = useSupabaseClient()
   const [user, setUser] = useState<any>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showSummary, setShowSummary] = useState(false)

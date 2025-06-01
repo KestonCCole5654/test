@@ -12,7 +12,7 @@ import jsPDF from "jspdf"
 import { Collapsible, CollapsibleContent } from "../../components/ui/collapsible"
 import axios from "axios"
 import { useLocation, useNavigate } from "react-router-dom"
-import supabase from "../../components/Auth/supabaseClient"
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 import { useToast } from "../../components/ui/use-toast"
 import {
@@ -139,6 +139,7 @@ export default function InvoiceForm() {
   const navigate = useNavigate()
   const { toast } = useToast()
   const invoiceToEdit = location.state?.invoiceToEdit
+  const supabase = useSupabaseClient()
   const [selectedSpreadsheetUrl, setSelectedSpreadsheetUrl] = useState<string | null>(() => {
     // First try to get from location state
     if (location.state?.selectedSpreadsheetUrl) {
@@ -185,7 +186,7 @@ export default function InvoiceForm() {
     }
 
     fetchSpreadsheetUrl()
-  }, [selectedSpreadsheetUrl, toast])
+  }, [selectedSpreadsheetUrl, toast, supabase.auth])
 
   console.log('InvoiceForm mounted with state:', { invoiceToEdit, selectedSpreadsheetUrl, key, hideForm })
 

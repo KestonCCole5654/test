@@ -5,7 +5,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import { Button } from "../../components/ui/button"
 import { ArrowLeft, Printer } from "lucide-react"
 import InvoiceClassic from "../../components/InvoiceClassic"
-import supabase from "../../components/Auth/supabaseClient"
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import axios from "axios"
 import { useToast } from "../../components/ui/use-toast"
 import {
@@ -24,6 +24,7 @@ export default function PrintInvoice() {
   const { invoiceId } = useParams<{ invoiceId: string }>()
   const navigate = useNavigate()
   const { toast } = useToast()
+  const supabase = useSupabaseClient()
 
   // State for invoice and business data
   const [invoiceData, setInvoiceData] = useState<InvoiceData | null>(null)
@@ -111,7 +112,7 @@ export default function PrintInvoice() {
     if (invoiceId) {
       fetchInvoiceData()
     }
-  }, [invoiceId, toast])
+  }, [invoiceId, toast, supabase])
 
   // Handle print action
   const handlePrint = () => {

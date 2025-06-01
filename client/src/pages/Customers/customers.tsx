@@ -37,7 +37,7 @@ import {
 import { LoadingSpinner } from "../../components/ui/loadingSpinner"
 import { CustomerSidebar } from "../../components/Customers/CustomerSidebar"
 import { toast } from "../../components/ui/use-toast"
-import supabase from "../../components/Auth/supabaseClient"
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { Checkbox } from "../../components/ui/checkbox"
 import {
   AlertDialog,
@@ -70,6 +70,7 @@ interface Customer {
 
 export default function CustomersPage() {
   const navigate = useNavigate()
+  const supabase = useSupabaseClient()
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

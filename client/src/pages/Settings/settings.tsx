@@ -23,6 +23,7 @@ import { LoadingSpinner } from "../../components/ui/loadingSpinner"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog'
 import { Checkbox } from '../../components/ui/checkbox'
 import { useBrandLogo } from "../../components/ui/InvoiceStats"
+import LogoUpload from '../../components/LogoUpload'
 
 interface UserData {
   name: string
@@ -361,17 +362,37 @@ export default function SettingsPage() {
 
       {/* Business Information Section */}
       <div className="mb-12 pl-8 pr-8">
-        <div className="flex items-center justify-between mb-1">
-          <h2 className="text-2xl font-normal text-gray-900 flex items-center gap-2">
-            Business Information
-            {/* Google Sheets Icon */}
-           
-          </h2>
-          {!isEditing && (
-            <Button onClick={() => setIsEditing(true)} className="border border-gray-300 text-white bg-green-800 hover:bg-green-900 shadow-none">Edit</Button>
-          )}
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-semibold">Business Details</h2>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsEditing(!isEditing)}
+            className="flex items-center gap-2"
+          >
+            {isEditing ? (
+              <>
+                <X className="h-4 w-4" />
+                Cancel
+              </>
+            ) : (
+              <>
+                <Edit className="h-4 w-4" />
+                Edit
+              </>
+            )}
+          </Button>
         </div>
-        <p className="text-sm text-gray-400 mb-6">These details appear on your invoices and documents.</p>
+
+        {/* Logo Upload Section */}
+        <div className="mb-6 pb-6 border-b">
+          <h3 className="text-lg font-medium mb-4">Company Logo</h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Upload your company logo to be displayed on all your invoices. The logo will be automatically included in every invoice you create.
+          </p>
+          <LogoUpload />
+        </div>
+
         <div className="divide-y divide-gray-200 border-t border-b">
           {!isEditing ? (
             <>

@@ -1218,7 +1218,13 @@ app.put('/api/update-business-details', async (req, res) => {
     // 4. Prepare rows for writing back (Field, Value, Last Updated)
     const updateData = Object.entries(currentDetails).map(([field, value]) => [field, value, now]);
 
-    // 5. Write all fields back to the sheet
+    // 5. Clear the old rows before writing new ones
+    await sheets.spreadsheets.values.clear({
+      spreadsheetId,
+      range: 'Business Details!A2:C',
+    });
+
+    // 6. Write all fields back to the sheet
     await sheets.spreadsheets.values.update({
       spreadsheetId,
       range: `Business Details!A2:C${2 + updateData.length - 1}`,

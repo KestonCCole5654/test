@@ -363,7 +363,7 @@ export default function SettingsPage() {
       {/* Business Information Section */}
       <div className="mb-12 pl-8 pr-8">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold">Business Details</h2>
+          <h2 className="text-xl font-normal">Business Details</h2>
           <Button
             variant="outline"
             size="sm"

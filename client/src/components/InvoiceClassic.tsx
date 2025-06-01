@@ -120,20 +120,28 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
       <div className="w-full h-2 bg-green-800 "></div>
       
       {/* Header with logo */}
-      <div className="flex justify-between mt-6 items-center mb-8 px-6">
+      <div className="flex justify-between mt-6 items-start mb-8 px-6">
         <div>
+          <h1 className="text-2xl font-cal-sans font-semibold text-green-800">INVOICE</h1>
+          <div className="space-y-2 mt-2">
+            <p className="text-sm font-cal-sans font-light text-gray-500">Invoice number: {data.invoiceNumber}</p>
+            <p className="text-sm font-cal font-light text-gray-500">Invoice Created: {formatDate(data.date)}</p>
+          </div>
+        </div>
+
+        {/* Logo on the right side */}
+        <div className="flex flex-col items-end">
           {businessData.logo ? (
             <img 
               src={businessData.logo} 
               alt="Company Logo" 
-              className="h-20 w-auto object-contain mb-4"
+              className="h-20 w-auto object-contain"
             />
           ) : (
-            <div className="mb-4">
+            <div className="text-right">
               <p className="text-sm text-gray-500 mb-2">No logo uploaded</p>
               <LogoUpload 
                 onLogoUploaded={(url) => {
-                  // Update the business data with the new logo URL
                   if (businessData) {
                     businessData.logo = url;
                   }
@@ -143,11 +151,6 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
               />
             </div>
           )}
-          <h1 className="text-2xl font-cal-sans font-semibold text-green-800">INVOICE</h1>
-          <div className="space-y-2 mt-2">
-            <p className="text-sm font-cal-sans font-light text-gray-500">Invoice number: {data.invoiceNumber}</p>
-            <p className="text-sm font-cal font-light text-gray-500">Invoice Created: {formatDate(data.date)}</p>
-          </div>
         </div>
       </div>
 

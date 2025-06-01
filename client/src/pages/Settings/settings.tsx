@@ -10,7 +10,6 @@ import { Label } from "../../components/ui/label"
 import { useToast } from "../../components/ui/use-toast"
 import { Loader2, Edit, Save, X, Info, Calendar, Mail, User } from "lucide-react"
 import axios from "axios"
-import supabase from "../../components/Auth/supabaseClient"
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -24,6 +23,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Checkbox } from '../../components/ui/checkbox'
 import { useBrandLogo } from "../../components/ui/InvoiceStats"
 import LogoUpload from '../../components/LogoUpload'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 
 interface UserData {
   name: string
@@ -36,7 +36,7 @@ interface UserData {
 }
 
 export default function SettingsPage() {
-
+  const supabase = useSupabaseClient()
   const navigate = useNavigate()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(true)

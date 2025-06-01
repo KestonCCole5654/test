@@ -1,42 +1,18 @@
 // src/components/AuthenticatedRoute.tsx
-import { Navigate, useLocation, Outlet } from "react-router-dom";
-import { LoadingSpinner } from "../ui/loadingSpinner";
+import { useUser } from '@supabase/auth-helpers-react';
+import { Navigate } from 'react-router-dom';
+import { LoadingSpinner } from '../ui/loadingSpinner';
 
-interface Props {
-  authenticated: boolean;
-  isLoading?: boolean;
-  children: React.ReactNode;
-}
-
-export default function AuthenticatedRoute({
-  authenticated,
-  isLoading = false,
-  children,
-}: Props) {
-  const location = useLocation();
+export default function AuthenticatedRoute({ children, isLoading }: { children: React.ReactNode, isLoading?: boolean }) {
+  const user = useUser();
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <LoadingSpinner />
-          <p className="mt-4 text-slate-600">Verifying authentication...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
-  if (!authenticated) {
-    return <Navigate to="/login" state={{ from: location.pathname }} />;
+  if (!user) {
+    return <Navigate to="/login" />;
   }
 
-  // For route-based authentication, we should use Outlet
-  // This ensures proper routing behavior
-  if (children) {
-    // If children are provided directly, render them
-    return <>{children}</>;
-  }
-  
-  // Otherwise use Outlet for nested routes
-  return <Outlet />;
+  return <>{children}</>;
 }

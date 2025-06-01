@@ -1186,64 +1186,32 @@ app.put('/api/update-business-details', async (req, res) => {
     const auth = new google.auth.OAuth2();
     auth.setCredentials({ access_token: googleToken });
     const sheets = google.sheets({ version: 'v4', auth });
+    // Update business details in the 'Business Details' tab in the invoice spreadsheet
     const now = new Date().toISOString();
-
-    // 1. Read current business details from the sheet
-    let currentRows = [];
-    try {
-      const response = await sheets.spreadsheets.values.get({
-        spreadsheetId,
-        range: 'Business Details!A2:C',
-      });
-      currentRows = response.data.values || [];
-    } catch (err) {
-      // If the sheet or range doesn't exist, start with empty
-      currentRows = [];
-    }
-
-    // 2. Convert current rows to a key-value map
-    const currentDetails = {};
-    currentRows.forEach(row => {
-      if (row[0]) currentDetails[row[0]] = row[1] || '';
-    });
-
-    // 3. Merge/overwrite with new fields from request
-    // Accept any string key in businessData except sheetUrl
-    Object.keys(businessData).forEach(key => {
-      if (key !== 'sheetUrl') {
-        currentDetails[key] = businessData[key];
-      }
-    });
-
-    // 4. Prepare rows for writing back (Field, Value, Last Updated)
-    const updateData = Object.entries(currentDetails).map(([field, value]) => [field, value, now]);
-
-    // 5. Clear the old rows before writing new ones
-    await sheets.spreadsheets.values.clear({
-      spreadsheetId,
-      range: 'Business Details!A2:C',
-    });
-
-    // 6. Write all fields back to the sheet
+    const updateData = [
+      ['Company Name', businessData.companyName, now],
+      ['Business Email', businessData.email, now],
+      ['Phone Number', businessData.phone, now],
+      ['Address', businessData.address, now],
+      ['Created At', now, now]
+    ];
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: `Business Details!A2:C${2 + updateData.length - 1}`,
+      range: 'Business Details!A2:C6',
       valueInputOption: 'USER_ENTERED',
       requestBody: {
         values: updateData
       },
     });
-
-    res.json({
+    res.json({ 
       success: true,
-      message: 'Business details updated successfully',
-      updatedFields: Object.keys(businessData).filter(k => k !== 'sheetUrl')
+      message: 'Business details updated successfully'
     });
   } catch (error) {
     console.error('Update error:', error);
-    res.status(500).json({
+    res.status(500).json({ 
       error: 'Failed to update business details',
-      details: error.message
+      details: error.message 
     });
   }
 });

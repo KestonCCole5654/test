@@ -19,13 +19,10 @@ const LogoUpload: React.FC<LogoUploadProps> = ({
   const supabase = useSupabaseClient();
   const user = useUser();
 
-  // Fetch existing logo when component mounts and user is available
+  // Fetch existing logo when component mounts
   useEffect(() => {
-    if (user?.id) {
-      fetchExistingLogo();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+    fetchExistingLogo();
+  }, []);
 
   // Function to fetch existing logo
   const fetchExistingLogo = async () => {
@@ -33,8 +30,10 @@ const LogoUpload: React.FC<LogoUploadProps> = ({
       const { data, error } = await supabase
         .from('user_business_settings')
         .select('logo_url')
-        .maybeSingle();
+        .single();
+      
       if (error) throw error;
+      
       if (data?.logo_url) {
         setLogoUrl(data.logo_url);
         onLogoUploaded?.(data.logo_url);

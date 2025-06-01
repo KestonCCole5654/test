@@ -202,6 +202,7 @@ export default function SettingsPage() {
       if (logoFile) {
         const formData = new FormData();
         formData.append('logo', logoFile);
+        formData.append('sheetUrl', currentSheetUrl);
         
         const uploadResponse = await axios.post(
           "https://sheetbills-server.vercel.app/api/upload-logo",

@@ -28,7 +28,7 @@ if (!fs.existsSync(uploadsDir)) {
 // Configure multer for file upload
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/')
+    cb(null, uploadsDir)
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = uuidv4()
@@ -41,13 +41,12 @@ const upload = multer({
   limits: {
     fileSize: 5 * 1024 * 1024 // 5MB limit
   },
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true)
-    } else {
-      cb(new Error('Invalid file type. Only JPEG, PNG, GIF and WebP are allowed.'))
+  fileFilter: function (req, file, cb) {
+    // Accept images only
+    if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
+      return cb(new Error('Only image files are allowed!'), false)
     }
+    cb(null, true)
   }
 })
 
@@ -3052,7 +3051,70 @@ app.post('/api/upload-logo', upload.single('logo'), async (req, res) => {
 })
 
 // Serve static files from the uploads directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(uploadsDir))
+
+// Logo upload endpoint
+app.post('/api/upload-logo', upload.single('logo'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' })
+    }
+
+    // Get authentication tokens
+    const supabaseToken = req.headers['x-supabase-token']
+    const googleToken = req.headers.authorization?.split(' ')[1]
+    if (!supabaseToken || !googleToken) {
+      return res.status(401).json({ error: 'Authentication tokens required' })
+    }
+
+    // Verify Supabase session
+    const { data: { user }, error } = await supabase.auth.getUser(supabaseToken)
+    if (error || !user) {
+      return res.status(401).json({ error: 'Invalid Supabase session' })
+    }
+
+    // Get sheetUrl from request body
+    const { sheetUrl } = req.body
+    if (!sheetUrl) {
+      return res.status(400).json({ error: 'Sheet URL is required' })
+    }
+
+    // Initialize Google Sheets API
+    const auth = new google.auth.OAuth2()
+    auth.setCredentials({ access_token: googleToken })
+    const sheets = google.sheets({ version: 'v4', auth })
+
+    // Generate public URL for the uploaded file
+    const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
+
+    // Update the logo URL in the business details sheet
+    const spreadsheetId = extractSheetIdFromUrl(sheetUrl)
+    if (!spreadsheetId) {
+      return res.status(400).json({ error: 'Invalid sheetUrl format' })
+    }
+
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: 'Business Details!A7:C7',
+      valueInputOption: 'USER_ENTERED',
+      requestBody: {
+        values: [['Logo', fileUrl, new Date().toISOString()]]
+      }
+    })
+
+    res.json({
+      success: true,
+      url: fileUrl
+    })
+
+  } catch (error) {
+    console.error('Logo upload error:', error)
+    res.status(500).json({
+      error: 'Failed to upload logo',
+      details: error.message
+    })
+  }
+})
 
 
 

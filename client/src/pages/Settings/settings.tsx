@@ -54,6 +54,7 @@ export default function SettingsPage() {
     phone: "",
     address: "",
     email: "",
+    logo: ""
   })
   const [isUpdatingBusiness, setIsUpdatingBusiness] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -111,6 +112,7 @@ export default function SettingsPage() {
           email: businessResponse.data.businessDetails["Business Email"] || "",
           phone: businessResponse.data.businessDetails["Phone Number"] || "",
           address: businessResponse.data.businessDetails["Address"] || "",
+          logo: businessResponse.data.businessDetails["Logo"] || ""
         });
       }
 
@@ -296,6 +298,32 @@ export default function SettingsPage() {
     }
   };
 
+  // Helper to update logo in Google Sheet
+  const updateBusinessLogo = async (logoUrl: string) => {
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) return;
+      const currentSheetUrl = localStorage.getItem("defaultSheetUrl");
+      if (!currentSheetUrl) return;
+      await axios.put(
+        "https://sheetbills-server.vercel.app/api/update-business-details",
+        {
+          ...businessData,
+          logo: logoUrl,
+          sheetUrl: currentSheetUrl
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${session.provider_token}`,
+            "X-Supabase-Token": session.access_token
+          }
+        }
+      );
+    } catch (err) {
+      toast({ title: "Logo update failed", description: "Could not update logo in business details.", variant: "destructive" });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -390,7 +418,13 @@ export default function SettingsPage() {
           <p className="text-sm text-gray-600 mb-4">
             Upload your company logo to be displayed on all your invoices. The logo will be automatically included in every invoice you create.
           </p>
-          <LogoUpload />
+          <LogoUpload
+            onLogoUploaded={async (url) => {
+              setBusinessData((prev) => ({ ...prev, logo: url }));
+              await updateBusinessLogo(url);
+              await fetchData();
+            }}
+          />
         </div>
 
         <div className="divide-y divide-gray-200 border-t border-b">

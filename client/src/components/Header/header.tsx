@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Menu, X, ChevronDown, LogOut, Settings, User, Bell, HelpCircle } from "lucide-react"
-import supabase from "../../components/Auth/supabaseClient"
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { Button } from "../ui/button"
 import {
   DropdownMenu,
@@ -20,6 +20,7 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
+  const supabase = useSupabaseClient();
 
   useEffect(() => {
     // Get initial session
@@ -35,7 +36,7 @@ const Header = () => {
     return () => {
       subscription.unsubscribe()
     }
-  }, [])
+  }, [supabase])
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut()

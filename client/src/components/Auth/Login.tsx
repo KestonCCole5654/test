@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom"
 import { Button } from "../../components/ui/button"
 import { Card, CardContent } from "../../components/ui/card"
 import { Loader2, Shield } from "lucide-react"
-import supabase from "./supabaseClient"
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { LoadingSpinner } from "../../components/ui/loadingSpinner"
 
 export default function LoginPage() {
@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [mounted, setMounted] = useState<boolean>(false)
   const navigate = useNavigate()
   const location = useLocation()
+  const supabase = useSupabaseClient();
 
   useEffect(() => {
     setMounted(true)
@@ -32,7 +33,7 @@ export default function LoginPage() {
       }
     }
     checkUser()
-  }, [navigate, location])
+  }, [navigate, location, supabase])
 
   const handleGoogleLogin = useCallback(async () => {
     try {
@@ -91,7 +92,7 @@ export default function LoginPage() {
       setError(err.message || "Login failed. Please try again.")
       setLoading(false)
     }
-  }, [location.state])
+  }, [location, navigate, supabase])
 
   if (!mounted || loading) {
     return (

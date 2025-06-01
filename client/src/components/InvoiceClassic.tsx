@@ -1,4 +1,5 @@
 import React from "react";
+import LogoUpload from "./LogoUpload";
 
 // Types for props
 interface InvoiceItem {
@@ -121,6 +122,27 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
       {/* Header with logo */}
       <div className="flex justify-between mt-6 items-center mb-8 px-6">
         <div>
+          {businessData.logo ? (
+            <img 
+              src={businessData.logo} 
+              alt="Company Logo" 
+              className="h-20 w-auto object-contain mb-4"
+            />
+          ) : (
+            <div className="mb-4">
+              <p className="text-sm text-gray-500 mb-2">No logo uploaded</p>
+              <LogoUpload 
+                onLogoUploaded={(url) => {
+                  // Update the business data with the new logo URL
+                  if (businessData) {
+                    businessData.logo = url;
+                  }
+                }}
+                showPreview={false}
+                className="max-w-xs"
+              />
+            </div>
+          )}
           <h1 className="text-2xl font-cal-sans font-semibold text-green-800">INVOICE</h1>
           <div className="space-y-2 mt-2">
             <p className="text-sm font-cal-sans font-light text-gray-500">Invoice number: {data.invoiceNumber}</p>

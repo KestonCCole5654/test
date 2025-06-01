@@ -121,15 +121,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
       {/* Header with logo */}
       <div className="flex justify-between mt-6 items-center mb-8 px-6">
         <div>
-          {businessData.logo ? (
-            <img
-              src={businessData.logo}
-              alt={`${businessData.companyName} logo`}
-              className="h-16 w-auto object-contain mb-4"
-            />
-          ) : (
-            <h1 className="text-2xl font-cal-sans font-semibold text-green-800">INVOICE</h1>
-          )}
+          <h1 className="text-2xl font-cal-sans font-semibold text-green-800">INVOICE</h1>
           <div className="space-y-2 mt-2">
             <p className="text-sm font-cal-sans font-light text-gray-500">Invoice number: {data.invoiceNumber}</p>
             <p className="text-sm font-cal font-light text-gray-500">Invoice Created: {formatDate(data.date)}</p>
@@ -233,7 +225,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
       {/* Footer with branding */}
       <div className="mt-8 pt-4 border-t border-gray-200">
         <div className="text-center text-sm text-gray-500">
-          Powered by <span className="text-green-800 font-sans font-bold text-lg">SheetBills</span> @sheetbills.com
+          Powered by <span className="text-green-800 font-medium">SheetBills</span>
         </div>
       </div>
     </div>

@@ -54,7 +54,6 @@ function App() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [onboardingChecked, setOnboardingChecked] = useState(false);
-  const [isOnboarded, setIsOnboarded] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -118,36 +117,34 @@ function App() {
     if (!loading && user) {
       const checkOnboardingStatus = async () => {
         try {
-          const session = await supabase.auth.getSession();
-          const googleToken = session.data.session?.provider_token;
-          
-          if (!googleToken) {
-            console.error('No Google token found');
-            return;
-          }
-
+          // Get Supabase session for Google token
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session) return;
+          const googleToken = session.provider_token;
+          if (!googleToken) return;
+          // Call backend onboarding status endpoint
           const response = await fetch('https://sheetbills-server.vercel.app/api/onboarding/status', {
             headers: {
-              'Authorization': `Bearer ${googleToken}`
-            }
+              'Authorization': `Bearer ${googleToken}`,
+            },
           });
-
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Failed to check onboarding status');
-          }
-
           const data = await response.json();
-          setIsOnboarded(data.onboarded);
+          // If not onboarded and not already on onboarding page, redirect
+          if (!data.onboarded && location.pathname !== '/Onboarding') {
+            navigate('/Onboarding', { replace: true });
+          }
+          // If onboarded and on onboarding page, redirect to dashboard
+          if (data.onboarded && location.pathname === '/Onboarding') {
+            navigate('/invoices', { replace: true });
+          }
+          setOnboardingChecked(true);
         } catch (error) {
-          console.error('Error checking onboarding status:', error);
-          // Don't throw the error, just log it and set onboarded to false
-          setIsOnboarded(false);
+          console.error('Onboarding status check failed:', error);
         }
       };
       checkOnboardingStatus();
     }
-  }, [user, loading]);
+  }, [user, loading, location.pathname, navigate]);
 
   if (loading || (user && !onboardingChecked)) {
     // Show loading spinner until onboarding check is done

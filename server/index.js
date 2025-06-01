@@ -8,47 +8,12 @@ import cors from 'cors'; // Cross-Origin Resource Sharing middleware
 import { google } from 'googleapis'; // Google APIs client
 import { createClient } from '@supabase/supabase-js'; // Supabase client
 import { Resend } from 'resend';
-import multer from 'multer';
-import path from 'path';
-import { v4 as uuidv4 } from 'uuid';
-import fs from 'fs';
 
 dotenv.config(); // Load environment variables
 const app = express(); // Create Express app
 const drive = google.drive('v3'); // Google Drive API
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-
-// Create uploads directory if it doesn't exist
-const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-// Configure multer for file upload
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadsDir)
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = uuidv4()
-    cb(null, uniqueSuffix + path.extname(file.originalname))
-  }
-})
-
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
-  },
-  fileFilter: function (req, file, cb) {
-    // Accept images only
-    if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
-      return cb(new Error('Only image files are allowed!'), false)
-    }
-    cb(null, true)
-  }
-})
 
 // ==========================
 // Middleware
@@ -2017,10 +1982,7 @@ app.get('/api/onboarding/status', async (req, res) => {
     // Get Google access token from headers
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ 
-        onboarded: false, 
-        error: 'Missing or invalid authorization header' 
-      });
+      return res.status(401).json({ onboarded: false, error: 'Missing or invalid authorization header' });
     }
     const accessToken = authHeader.split(' ')[1];
 
@@ -2050,12 +2012,7 @@ app.get('/api/onboarding/status', async (req, res) => {
     }
   } catch (error) {
     console.error('[ONBOARDING STATUS ERROR]', error);
-    // Ensure we always return a JSON response
-    return res.status(500).json({ 
-      onboarded: false, 
-      error: error.message || 'Failed to check onboarding status',
-      details: error.response?.data || null
-    });
+    return res.status(500).json({ onboarded: false, error: error.message });
   }
 });
 /**
@@ -2991,138 +2948,6 @@ app.delete('/api/customers/bulk-delete', async (req, res) => {
     });
   }
 });
-
-// Add logo upload endpoint
-app.post('/api/upload-logo', upload.single('logo'), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' })
-    }
-
-    // Get authentication tokens from headers
-    const supabaseToken = req.headers['x-supabase-token']
-    const googleToken = req.headers.authorization?.split(' ')[1]
-
-    if (!supabaseToken || !googleToken) {
-      return res.status(401).json({ error: 'Authentication tokens required' })
-    }
-
-    // Verify Supabase session
-    const { data: { user }, error } = await supabase.auth.getUser(supabaseToken)
-    if (error || !user) {
-      return res.status(401).json({ error: 'Invalid Supabase session' })
-    }
-
-    // Get the current sheet URL from localStorage
-    const sheetUrl = req.body.sheetUrl
-    if (!sheetUrl) {
-      return res.status(400).json({ error: 'Missing sheetUrl parameter' })
-    }
-
-    // Extract spreadsheetId from the URL
-    const spreadsheetId = extractSheetIdFromUrl(sheetUrl)
-    if (!spreadsheetId) {
-      return res.status(400).json({ error: 'Invalid sheetUrl format' })
-    }
-
-    // Initialize Google Sheets API
-    const auth = new google.auth.OAuth2()
-    auth.setCredentials({ access_token: googleToken })
-    const sheets = google.sheets({ version: 'v4', auth })
-
-    // Generate a public URL for the uploaded file
-    const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
-
-    // Update the logo URL in the Business Details sheet
-    await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range: 'Business Details!A7:C7',
-      valueInputOption: 'USER_ENTERED',
-      requestBody: {
-        values: [['Logo', fileUrl, new Date().toISOString()]]
-      }
-    })
-
-    res.json({
-      success: true,
-      url: fileUrl,
-      message: 'Logo uploaded successfully'
-    })
-
-  } catch (error) {
-    console.error('Logo upload error:', error)
-    res.status(500).json({
-      error: 'Failed to upload logo',
-      details: error.message
-    })
-  }
-})
-
-// Serve static files from the uploads directory
-app.use('/uploads', express.static(uploadsDir))
-
-// Logo upload endpoint
-app.post('/api/upload-logo', upload.single('logo'), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' })
-    }
-
-    // Get authentication tokens
-    const supabaseToken = req.headers['x-supabase-token']
-    const googleToken = req.headers.authorization?.split(' ')[1]
-    if (!supabaseToken || !googleToken) {
-      return res.status(401).json({ error: 'Authentication tokens required' })
-    }
-
-    // Verify Supabase session
-    const { data: { user }, error } = await supabase.auth.getUser(supabaseToken)
-    if (error || !user) {
-      return res.status(401).json({ error: 'Invalid Supabase session' })
-    }
-
-    // Get sheetUrl from request body
-    const { sheetUrl } = req.body
-    if (!sheetUrl) {
-      return res.status(400).json({ error: 'Sheet URL is required' })
-    }
-
-    // Initialize Google Sheets API
-    const auth = new google.auth.OAuth2()
-    auth.setCredentials({ access_token: googleToken })
-    const sheets = google.sheets({ version: 'v4', auth })
-
-    // Generate public URL for the uploaded file
-    const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
-
-    // Update the logo URL in the business details sheet
-    const spreadsheetId = extractSheetIdFromUrl(sheetUrl)
-    if (!spreadsheetId) {
-      return res.status(400).json({ error: 'Invalid sheetUrl format' })
-    }
-
-    await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range: 'Business Details!A7:C7',
-      valueInputOption: 'USER_ENTERED',
-      requestBody: {
-        values: [['Logo', fileUrl, new Date().toISOString()]]
-      }
-    })
-
-    res.json({
-      success: true,
-      url: fileUrl
-    })
-
-  } catch (error) {
-    console.error('Logo upload error:', error)
-    res.status(500).json({
-      error: 'Failed to upload logo',
-      details: error.message
-    })
-  }
-})
 
 
 

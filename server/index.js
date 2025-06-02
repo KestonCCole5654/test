@@ -1207,7 +1207,6 @@ app.put('/api/update-business-details', async (req, res) => {
       ['Business Email', businessData.email],
       ['Phone Number', businessData.phone],
       ['Address', businessData.address],
-      ['Created At', now],
     ];
 
     // Add Logo if present

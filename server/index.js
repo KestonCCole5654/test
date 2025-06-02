@@ -764,7 +764,44 @@ app.get('/api/invoices/:invoiceId', async (req, res) => {
       status: row[12] || 'Pending',
     };
 
-    res.json({ invoice });
+    // Get business details
+    const businessResponse = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: 'Business Details!A2:C100',
+    });
+
+    const businessRows = businessResponse.data.values || [];
+    const businessData = {
+      companyName: '',
+      phone: '',
+      address: '',
+      email: '',
+      logo: ''
+    };
+
+    businessRows.forEach(row => {
+      if (row[0] && row[1]) {
+        switch (row[0]) {
+          case 'Company Name':
+            businessData.companyName = row[1];
+            break;
+          case 'Phone Number':
+            businessData.phone = row[1];
+            break;
+          case 'Address':
+            businessData.address = row[1];
+            break;
+          case 'Business Email':
+            businessData.email = row[1];
+            break;
+          case 'Logo':
+            businessData.logo = row[1];
+            break;
+        }
+      }
+    });
+
+    res.json({ invoice, businessData });
   } catch (error) {
     console.error('Error fetching invoice:', error);
     res.status(500).json({ error: 'Failed to fetch invoice', details: error.message });

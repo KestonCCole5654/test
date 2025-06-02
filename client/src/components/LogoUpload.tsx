@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react';
+import axios from 'axios';
 
 interface LogoUploadProps {
   onLogoUploaded?: (url: string) => void; // Callback for when logo is uploaded
@@ -100,6 +101,32 @@ const LogoUpload: React.FC<LogoUploadProps> = ({
         });
 
       if (updateError) throw updateError;
+
+      // --- NEW: Update the business details sheet with the logo URL ---
+      // Get the current sheet URL from localStorage
+      const sheetUrl = typeof window !== 'undefined' ? localStorage.getItem("defaultSheetUrl") : "";
+      if (sheetUrl) {
+        // Get the current session for tokens
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.provider_token) {
+          throw new Error("Google authentication required");
+        }
+        // Call backend API to update the Logo field
+        await axios.put(
+          "https://sheetbills-server.vercel.app/api/update-business-details",
+          {
+            logo: publicUrl,
+            sheetUrl: sheetUrl
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${session.provider_token}`,
+              "X-Supabase-Token": session.access_token
+            }
+          }
+        );
+      }
+      // --- END NEW ---
 
       setLogoUrl(publicUrl);
       onLogoUploaded?.(publicUrl);

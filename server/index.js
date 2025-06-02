@@ -1186,23 +1186,70 @@ app.put('/api/update-business-details', async (req, res) => {
     const auth = new google.auth.OAuth2();
     auth.setCredentials({ access_token: googleToken });
     const sheets = google.sheets({ version: 'v4', auth });
-    // Update business details in the 'Business Details' tab in the invoice spreadsheet
-    const now = new Date().toISOString();
-    const updateData = [
-      ['Company Name', businessData.companyName, now],
-      ['Business Email', businessData.email, now],
-      ['Phone Number', businessData.phone, now],
-      ['Address', businessData.address, now],
-      ['Created At', now, now]
-    ];
-    await sheets.spreadsheets.values.update({
+
+    // Fetch current business details
+    const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: 'Business Details!A2:C6',
-      valueInputOption: 'USER_ENTERED',
-      requestBody: {
-        values: updateData
-      },
+      range: 'Business Details!A2:C100', // Read enough rows to find or add fields
     });
+    const rows = response.data.values || [];
+
+    // Build a map for quick lookup
+    const fieldMap = {};
+    rows.forEach((row, idx) => {
+      if (row[0]) fieldMap[row[0]] = { idx, row };
+    });
+
+    // Prepare update data for known fields
+    const now = new Date().toISOString();
+    const updateFields = [
+      ['Company Name', businessData.companyName],
+      ['Business Email', businessData.email],
+      ['Phone Number', businessData.phone],
+      ['Address', businessData.address],
+      ['Created At', now],
+    ];
+
+    // Add Logo if present
+    if (businessData.logo) {
+      updateFields.push(['Logo', businessData.logo]);
+    }
+
+    // Update existing rows and collect new rows to append
+    const updatedRows = [...rows];
+    const newRows = [];
+    updateFields.forEach(([field, value]) => {
+      if (!field) return;
+      if (fieldMap[field]) {
+        // Update existing row
+        updatedRows[fieldMap[field].idx] = [field, value || '', now];
+      } else {
+        // Add new row
+        newRows.push([field, value || '', now]);
+      }
+    });
+
+    // Write back updated rows
+    if (updatedRows.length > 0) {
+      await sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range: `Business Details!A2:C${updatedRows.length + 1}`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: { values: updatedRows },
+      });
+    }
+
+    // Append new rows if needed
+    if (newRows.length > 0) {
+      await sheets.spreadsheets.values.append({
+        spreadsheetId,
+        range: 'Business Details!A2:C',
+        valueInputOption: 'USER_ENTERED',
+        insertDataOption: 'INSERT_ROWS',
+        requestBody: { values: newRows },
+      });
+    }
+
     res.json({ 
       success: true,
       message: 'Business details updated successfully'

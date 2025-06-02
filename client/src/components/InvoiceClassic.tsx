@@ -1,5 +1,13 @@
 import React from "react";
 import LogoUpload from "./LogoUpload";
+import axios from "axios";
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize Supabase client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 // Types for props
 interface InvoiceItem {
@@ -141,9 +149,41 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
             <div className="text-right">
               <p className="text-sm text-gray-500 mb-2">No logo uploaded</p>
               <LogoUpload 
-                onLogoUploaded={(url) => {
-                  if (businessData) {
-                    businessData.logo = url;
+                onLogoUploaded={async (url) => {
+                  try {
+                    // Get the current session
+                    const { data: { session } } = await supabase.auth.getSession();
+                    if (!session?.provider_token) {
+                      throw new Error("Google authentication required");
+                    }
+
+                    // Get the sheet URL from localStorage
+                    const sheetUrl = localStorage.getItem("defaultSheetUrl");
+                    if (!sheetUrl) {
+                      throw new Error("Sheet URL not found");
+                    }
+
+                    // Update business details with the new logo URL
+                    await axios.put(
+                      "https://sheetbills-server.vercel.app/api/update-business-details",
+                      {
+                        logo: url,
+                        sheetUrl: sheetUrl
+                      },
+                      {
+                        headers: {
+                          Authorization: `Bearer ${session.provider_token}`,
+                          "X-Supabase-Token": session.access_token
+                        }
+                      }
+                    );
+
+                    // Update local state
+                    if (businessData) {
+                      businessData.logo = url;
+                    }
+                  } catch (error) {
+                    console.error("Failed to update logo:", error);
                   }
                 }}
                 showPreview={false}

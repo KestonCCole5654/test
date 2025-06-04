@@ -6,7 +6,7 @@ import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Textarea } from "../../components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
-import { Trash2, Plus, Download, ChevronDown, ArrowLeft, CheckCircle, Clock, Mail, Pencil, Printer, Link2, Loader2 } from "lucide-react"
+import { Trash2, Plus, Download, ChevronDown, ArrowLeft, CheckCircle, Clock, Mail, Pencil, Printer, Link2 } from "lucide-react"
 import html2canvas from "html2canvas"
 import jsPDF from "jspdf"
 import { Collapsible, CollapsibleContent } from "../../components/ui/collapsible"
@@ -1204,14 +1204,7 @@ ${businessData.phone}`
             <div className="flex-1 min-w-0">
               <div className="invoice-preview-print bg-white border border-gray-200 p-4">
                 <div className="w-full overflow-auto">
-                  {isLoading ? (
-                    <div className="flex flex-col items-center justify-center py-20">
-                      <Loader2 className="animate-spin h-8 w-8 text-green-800 mb-4" />
-                      <span className="text-gray-500">Loading business details...</span>
-                    </div>
-                  ) : (
                   <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
-                  )}
                 </div>
               </div>
             </div>

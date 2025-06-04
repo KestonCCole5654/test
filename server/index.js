@@ -1274,10 +1274,10 @@ app.put('/api/update-business-details', async (req, res) => {
 
     // Write back updated rows
     if (updatedRows.length > 0) {
-    await sheets.spreadsheets.values.update({
-      spreadsheetId,
+      await sheets.spreadsheets.values.update({
+        spreadsheetId,
         range: `Business Details!A2:C${updatedRows.length + 1}`,
-      valueInputOption: 'USER_ENTERED',
+        valueInputOption: 'USER_ENTERED',
         requestBody: { values: updatedRows },
       });
     }
@@ -1290,7 +1290,7 @@ app.put('/api/update-business-details', async (req, res) => {
         valueInputOption: 'USER_ENTERED',
         insertDataOption: 'INSERT_ROWS',
         requestBody: { values: newRows },
-    });
+      });
     }
 
     res.json({ 

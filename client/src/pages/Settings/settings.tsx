@@ -8,7 +8,7 @@ import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { useToast } from "../../components/ui/use-toast"
-import { Loader2, Edit, Save, X, Info, Calendar, Mail, User, Building2, Shield, ExternalLink, LogOut, Phone, MapPin, Clock } from "lucide-react"
+import { Loader2, Edit, Save, X, Info, Calendar, Mail, User } from "lucide-react"
 import axios from "axios"
 import {
   Breadcrumb,
@@ -80,9 +80,7 @@ export default function SettingsPage() {
       const headers = {
         Authorization: `Bearer ${session.provider_token}`,
         'X-Supabase-Token': session.access_token
-      };      
-
-
+      };
 
       // Fetch user data
       const userResponse = await axios.get("https://sheetbills-server.vercel.app/api/user", { headers });
@@ -326,123 +324,102 @@ export default function SettingsPage() {
       </div>
 
       {/* Profile Section */}
-      <div className="mb-12 bg-white rounded-xl border border-gray-200 shadow-sm">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-medium text-gray-900 flex items-center gap-2">
-            <User className="h-6 w-6 text-green-800" />
-            Account Profile
-          </h2>
-          <p className="text-sm text-gray-500 mt-1">Manage your personal information and account details.</p>
-        </div>
-        <div className="divide-y divide-gray-200">
-          <div className="flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-            <div className="flex items-center gap-3">
-              <Mail className="h-5 w-5 text-gray-400" />
-              <span className="text-gray-700">Email</span>
-            </div>
-            <span className="text-gray-900">{userData.email || "—"}</span>
+      <div className="mb-12 pl-8 pr-8">
+        <h2 className="text-2xl font-cal-sans font-medium text-gray-900 mb-1 flex items-center gap-2">
+          Account Profile
+          {/* Google Icon */}
+        </h2>
+        <p className="text-sm font-cal-sans font-normal text-gray-400 mb-6">Manage your personal information and account details.</p>
+        <div className="divide-y divide-gray-200 border-t border-b">
+          <div className="flex items-center justify-between py-5">
+            <span className="text-gray-700">Full Name</span>
+            <span className="text-gray-900 flex-1 text-right mr-6">{userData.name || "—"}</span>
           </div>
-          <div className="flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-            <div className="flex items-center gap-3">
-              <Calendar className="h-5 w-5 text-gray-400" />
-              <span className="text-gray-700">Account Created</span>
-            </div>
-            <span className="text-gray-900">{formatDate(userData.createdAt)}</span>
+          <div className="flex items-center justify-between py-5">
+            <span className="text-gray-700">Email</span>
+            <span className="text-gray-900 flex-1 text-right mr-6">{userData.email || "—"}</span>
           </div>
-          <div className="flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-            <div className="flex items-center gap-3">
-              <Clock className="h-5 w-5 text-gray-400" />
-              <span className="text-gray-700">Last Login</span>
-            </div>
-            <span className="text-gray-900">{userData.lastLogin ? formatDate(userData.lastLogin) : "—"}</span>
+          <div className="flex items-center justify-between py-5">
+            <span className="text-gray-700">Account Created</span>
+            <span className="text-gray-900 flex-1 text-right mr-6">{formatDate(userData.createdAt)}</span>
           </div>
-          <div className="flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-            <div className="flex items-center gap-3">
-              <Info className="h-5 w-5 text-gray-400" />
-              <span className="text-gray-700">Account Type</span>
-            </div>
-            <span className="text-gray-900">{userData.accountType || "—"}</span>
+          <div className="flex items-center justify-between py-5">
+            <span className="text-gray-700">Last Login</span>
+            <span className="text-gray-900 flex-1 text-right mr-6">{userData.lastLogin ? formatDate(userData.lastLogin) : "—"}</span>
+          </div>
+          <div className="flex items-center justify-between py-5">
+            <span className="text-gray-700">Account Type</span>
+            <span className="text-gray-900 flex-1 text-right mr-6">{userData.accountType || "—"}</span>
           </div>
           {userData.phone && (
-            <div className="flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-              <div className="flex items-center gap-3">
-                <Phone className="h-5 w-5 text-gray-400" />
-                <span className="text-gray-700">Phone</span>
-              </div>
-              <span className="text-gray-900">{userData.phone}</span>
+            <div className="flex items-center justify-between py-5">
+              <span className="text-gray-700">Phone</span>
+              <span className="text-gray-900 flex-1 text-right mr-6">{userData.phone}</span>
             </div>
           )}
         </div>
       </div>
 
       {/* Business Information Section */}
-      <div className="mb-12 bg-white rounded-xl border border-gray-200 shadow-sm">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-2xl font-medium text-gray-900 flex items-center gap-2">
-                <Building2 className="h-6 w-6 text-green-800" />
-                Business Details
-              </h2>
-              <p className="text-sm text-gray-500 mt-1">Manage your business information and contact details.</p>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditing(!isEditing)}
-              className="flex items-center gap-2"
-            >
-              {isEditing ? (
-                <>
-                  <X className="h-4 w-4" />
-                  Cancel
-                </>
-              ) : (
-                <>
-                  <Edit className="h-4 w-4" />
-                  Edit
-                </>
-              )}
-            </Button>
-          </div>
+      <div className="mb-12 pl-8 pr-8">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-normal">Business Details</h2>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsEditing(!isEditing)}
+            className="flex items-center gap-2"
+          >
+            {isEditing ? (
+              <>
+                <X className="h-4 w-4" />
+                Cancel
+              </>
+            ) : (
+              <>
+                <Edit className="h-4 w-4" />
+                Edit
+              </>
+            )}
+          </Button>
         </div>
 
-        <div className="divide-y divide-gray-200">
+        {/* Logo Upload Section */}
+        <div className="mb-6 pb-6 border-b">
+          <h3 className="text-lg font-medium mb-4">Company Logo</h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Upload your company logo to be displayed on all your invoices. The logo will be automatically included in every invoice you create.
+          </p>
+          <LogoUpload />
+        </div>
+
+        <div className="divide-y divide-gray-200 border-t border-b">
           {!isEditing ? (
             <>
-              <div className="flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center gap-3">
+              <div className="flex items-center justify-between py-5">
+                <span className="text-gray-700 flex items-center gap-3">
                   {businessLogo && (
                     <img src={businessLogo} alt="Brand Logo" className="h-8 w-8 rounded-full bg-white border border-gray-200" />
                   )}
-                  <span className="text-gray-700">Company Name</span>
-                </div>
-                <span className="text-gray-900">{businessData.companyName || "—"}</span>
+                  Company Name
+                </span>
+                <span className="text-gray-900 flex-1 text-right mr-6">{businessData.companyName || "—"}</span>
               </div>
-              <div className="flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center gap-3">
-                  <Mail className="h-5 w-5 text-gray-400" />
-                  <span className="text-gray-700">Business Email</span>
-                </div>
-                <span className="text-gray-900">{businessData.email || "—"}</span>
+              <div className="flex items-center justify-between py-5">
+                <span className="text-gray-700">Business Email</span>
+                <span className="text-gray-900 flex-1 text-right mr-6">{businessData.email || "—"}</span>
               </div>
-              <div className="flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center gap-3">
-                  <Phone className="h-5 w-5 text-gray-400" />
-                  <span className="text-gray-700">Phone Number</span>
-                </div>
-                <span className="text-gray-900">{businessData.phone || "—"}</span>
+              <div className="flex items-center justify-between py-5">
+                <span className="text-gray-700">Phone Number</span>
+                <span className="text-gray-900 flex-1 text-right mr-6">{businessData.phone || "—"}</span>
               </div>
-              <div className="flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center gap-3">
-                  <MapPin className="h-5 w-5 text-gray-400" />
-                  <span className="text-gray-700">Address</span>
-                </div>
-                <span className="text-gray-900">{businessData.address || "—"}</span>
+              <div className="flex items-center justify-between py-5">
+                <span className="text-gray-700">Address</span>
+                <span className="text-gray-900 flex-1 text-right mr-6">{businessData.address || "—"}</span>
               </div>
             </>
           ) : (
-            <form onSubmit={handleBusinessUpdate} className="p-6 space-y-6">
+            <form onSubmit={handleBusinessUpdate} className="space-y-6 px-4 py-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="companyName" className="flex items-center gap-3">
@@ -457,14 +434,10 @@ export default function SettingsPage() {
                     value={businessData.companyName}
                     onChange={(e) => setBusinessData(prev => ({ ...prev, companyName: e.target.value }))}
                     placeholder="Your company name"
-                    className="mt-1.5"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-gray-400" />
-                    Business Email *
-                  </Label>
+                  <Label htmlFor="email">Business Email *</Label>
                   <Input
                     id="email"
                     type="email"
@@ -472,40 +445,31 @@ export default function SettingsPage() {
                     value={businessData.email}
                     onChange={(e) => setBusinessData(prev => ({ ...prev, email: e.target.value }))}
                     placeholder="contact@example.com"
-                    className="mt-1.5"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone" className="flex items-center gap-2">
-                    <Phone className="h-4 w-4 text-gray-400" />
-                    Phone Number
-                  </Label>
+                  <Label htmlFor="phone">Phone Number</Label>
                   <Input
                     id="phone"
                     value={businessData.phone}
                     onChange={(e) => setBusinessData(prev => ({ ...prev, phone: e.target.value }))}
                     placeholder="+1 (555) 123-4567"
-                    className="mt-1.5"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="address" className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-gray-400" />
-                    Address
-                  </Label>
+                  <Label htmlFor="address">Address</Label>
                   <Input
                     id="address"
                     value={businessData.address}
                     onChange={(e) => setBusinessData(prev => ({ ...prev, address: e.target.value }))}
                     placeholder="123 Business St, Suite 100, City, State, ZIP"
-                    className="mt-1.5"
                   />
                 </div>
               </div>
-              <div className="flex justify-end gap-4 pt-4">
+              <div className="flex justify-end gap-4">
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="default"
                   onClick={() => setIsEditing(false)}
                 >
                   Cancel
@@ -513,7 +477,7 @@ export default function SettingsPage() {
                 <Button
                   type="submit"
                   disabled={isUpdatingBusiness}
-                  className="min-w-[120px] bg-green-800 hover:bg-green-900 text-white"
+                  className="min-w-[120px]"
                 >
                   {isUpdatingBusiness ? (
                     <>
@@ -534,63 +498,85 @@ export default function SettingsPage() {
       </div>
 
       {/* Terms & Privacy Policy Section */}
-      <div className="mb-12 bg-white rounded-xl border border-gray-200 shadow-sm">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-medium text-gray-900 flex items-center gap-2">
-            <Shield className="h-6 w-6 text-green-800" />
-            Terms & Privacy Policy
-          </h2>
-          <p className="text-sm text-gray-500 mt-1">View our Terms of Service and Privacy Policy.</p>
-        </div>
-        <div className="divide-y divide-gray-200">
-          <div className="flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
+      <div className="mb-12 pl-8 pr-8">
+        <h2 className="text-2xl font-cal-sans font-medium text-gray-900 mb-1 flex items-center gap-2">
+          Terms & Privacy Policy
+        </h2>
+        <p className="text-sm font-cal-sans font-normal text-gray-400 mb-6">View our Terms of Service and Privacy Policy.</p>
+        <div className="divide-y divide-gray-200 border-t border-b">
+          <div className="flex items-center justify-between py-5">
             <span className="text-gray-700">Terms of Service</span>
             <a
               href="/legal?tab=terms"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-green-800 font-medium hover:underline flex items-center gap-2"
+              className="text-green-800 font-medium hover:underline flex-1 text-right mr-6"
             >
               View Terms of Service
-              <ExternalLink className="h-4 w-4" />
             </a>
           </div>
-          <div className="flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
+          <div className="flex items-center justify-between py-5">
             <span className="text-gray-700">Privacy Policy</span>
             <a
               href="/legal?tab=privacy"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-green-800 font-medium hover:underline flex items-center gap-2"
+              className="text-green-800 font-medium hover:underline flex-1 text-right mr-6"
             >
               View Privacy Policy
-              <ExternalLink className="h-4 w-4" />
             </a>
           </div>
         </div>
       </div>
 
-      {/* Logout Section */}
-      <div className="mb-12 bg-white rounded-xl border border-gray-200 shadow-sm">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-medium text-gray-900 flex items-center gap-2">
-            <LogOut className="h-6 w-6 text-red-600" />
-            Account Actions
-          </h2>
-          <p className="text-sm text-gray-500 mt-1">Manage your account session and data.</p>
-        </div>
-        <div className="p-6">
-          <div className="flex gap-4">
-            <Button 
-              onClick={handleLogout} 
-              className="bg-green-800 hover:bg-green-900 text-white flex items-center gap-2"
-            >
-              <LogOut className="h-4 w-4" />
-              Logout
-            </Button>
-          </div>
+      {/* Logout & Delete Account Section */}
+      <div className="mb-12 pl-8 pr-8">
+        <h2 className="text-lg font-medium text-gray-900 mb-1">Logout</h2>
+        <p className="text-sm text-gray-400 mb-6">You can log out of your account or permanently delete your account and all associated data.</p>
+        <div className="flex gap-4">
+          <Button onClick={handleLogout} className="border border-gray-300 text-white bg-green-800 hover:bg-green-900 shadow-none">Logout</Button>
+          {/* <Button variant="destructive" onClick={() => setShowDeleteModal(true)} className="font-medium">Delete Account</Button> */}
         </div>
       </div>
+
+      {/* Delete Account Modal */}
+      {/* <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Account</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-red-700 font-normal">This action is irreversible. Your account and all associated data will be permanently deleted.</p>
+            <Checkbox id="delete-invoices" checked={deleteInvoices} onCheckedChange={checked => setDeleteInvoices(checked === true)} />
+            <label htmlFor="delete-invoices" className="ml-2 text-gray-700">Also delete all my invoices stored in Google Sheets</label>
+            {sheetUrl && (
+              <div className="mt-2">
+                <span className="text-gray-700">Your SheetBills Invoices Sheet: </span>
+                <a href={sheetUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline break-all">{sheetUrl}</a>
+              </div>
+            )}
+            <div className="mt-4">
+              <label htmlFor="delete-phrase" className="block text-gray-700 mb-1">Type <span className="font-normal text-black">DELETE</span> to confirm:</label>
+              <Input
+                id="delete-phrase"
+                value={deletePhrase}
+                onChange={e => setDeletePhrase(e.target.value)}
+                placeholder="DELETE"
+                className="w-full"
+                autoFocus
+              />
+            </div>
+          </div>
+          <DialogFooter className="mt-6 flex gap-2">
+            <Button variant="outline" onClick={() => setShowDeleteModal(false)} disabled={isDeleting}>Cancel</Button>
+            <Button variant="destructive" onClick={handleDeleteAccount} disabled={deletePhrase !== "DELETE" || isDeleting}>
+              {isDeleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Delete Account
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog> */}
+
     </div>
   )
 }

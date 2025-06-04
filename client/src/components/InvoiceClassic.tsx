@@ -168,7 +168,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
                     }
 
                     // Update business details with the new logo URL
-                    await axios.put(
+                    const response = await axios.put(
                       "https://sheetbills-server.vercel.app/api/update-business-details",
                       {
                         logo: url,
@@ -182,9 +182,9 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
                       }
                     );
 
-                    // Update local state
-                    if (businessData) {
-                      businessData.logo = url;
+                    if (response.data.success) {
+                      // Force a page reload to ensure the logo is updated
+                      window.location.reload();
                     }
                   } catch (error) {
                     console.error("Failed to update logo:", error);

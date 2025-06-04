@@ -1210,7 +1210,7 @@ ${businessData.phone}`
                       <span className="text-gray-500">Loading business details...</span>
                     </div>
                   ) : (
-                    <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
+                  <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
                   )}
                 </div>
               </div>

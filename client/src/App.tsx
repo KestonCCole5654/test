@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Route, Routes, Navigate, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import { createClient } from '@supabase/supabase-js';
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
+import { supabase } from './lib/supabase';
 import Login from './components/Auth/Login';
 import Dashboard from './pages/Dashboard/dashboard';
 import SidebarLayout from './components/Layout/SidebarLayout';
@@ -30,10 +30,6 @@ import AccountStatus from './pages/AccountStatus/AccountStatus';
 import ReportsPage from "./pages/Reports/reports"
 // import TemplateDesignerPage from './components/TemplateDesigner/TemplateDesignerPage';
 // SidebarLayout already includes the Outlet component
-
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL!;
-const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY!;
-const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
 
 async function checkBusinessSheet(supabaseToken: string, googleToken: string) {
   try {
@@ -87,7 +83,7 @@ function App() {
 
     // Get initial session
     console.log('Getting initial session');
-    supabaseClient.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       console.log('Initial session:', { hasSession: !!session });
       if (session) {
         setUser(session.user);
@@ -96,7 +92,7 @@ function App() {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(handleAuthStateChange);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthStateChange);
     authSubscription = subscription;
 
     return () => {
@@ -124,7 +120,7 @@ function App() {
       const checkOnboardingStatus = async () => {
         try {
           // Get Supabase session for Google token
-          const { data: { session } } = await supabaseClient.auth.getSession();
+          const { data: { session } } = await supabase.auth.getSession();
           if (!session) return;
           const googleToken = session.provider_token;
           if (!googleToken) return;
@@ -162,61 +158,61 @@ function App() {
   }
 
   return (
-    <SessionContextProvider supabaseClient={supabaseClient}>
-    <HelmetProvider>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/auth-callback" element={<AuthCallback />} />
-        <Route path="/legal" element={<LegalPage />} />
-        <Route path="/account-status" element={<AccountStatus />} />
-    
-        {/* Onboarding Route */}
-        <Route
-          path="/Onboarding"
-          element={
-              <AuthenticatedRoute isLoading={loading}>
-              <OnboardingPage />
-            </AuthenticatedRoute>
-          }
-        />
+    <SessionContextProvider supabaseClient={supabase}>
+      <HelmetProvider>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/auth-callback" element={<AuthCallback />} />
+          <Route path="/legal" element={<LegalPage />} />
+          <Route path="/account-status" element={<AccountStatus />} />
+      
+          {/* Onboarding Route */}
+          <Route
+            path="/Onboarding"
+            element={
+                <AuthenticatedRoute isLoading={loading}>
+                <OnboardingPage />
+              </AuthenticatedRoute>
+            }
+          />
 
-        {/* Protected Routes */}
-        <Route
-          element={
-              <AuthenticatedRoute isLoading={loading}>
-              <SidebarLayout />
-            </AuthenticatedRoute>
-          }
-        >
-          <Route path="/invoices" element={<Dashboard />} />
-          <Route path="/create-invoice" element={<InvoiceForm />} />
-          <Route path="/email-invoice/:invoiceId" element={<EmailInvoice />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/reports" element={<ReportsPage />} />
-        </Route>
+          {/* Protected Routes */}
+          <Route
+            element={
+                <AuthenticatedRoute isLoading={loading}>
+                <SidebarLayout />
+              </AuthenticatedRoute>
+            }
+          >
+            <Route path="/invoices" element={<Dashboard />} />
+            <Route path="/create-invoice" element={<InvoiceForm />} />
+            <Route path="/email-invoice/:invoiceId" element={<EmailInvoice />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/reports" element={<ReportsPage />} />
+          </Route>
 
-        {/* Public Invoice Route - must be after catch-all to take precedence */}
-        <Route path="/invoice/shared/:token" element={<PublicInvoice />} />
+          {/* Public Invoice Route - must be after catch-all to take precedence */}
+          <Route path="/invoice/shared/:token" element={<PublicInvoice />} />
 
-        {/* Add print-invoice route OUTSIDE the SidebarLayout group */}
-        <Route
-          path="/print-invoice/:invoiceId"
-          element={
-              <AuthenticatedRoute isLoading={loading}>
-              <PrintInvoice />
-            </AuthenticatedRoute>
-          }
-        />
+          {/* Add print-invoice route OUTSIDE the SidebarLayout group */}
+          <Route
+            path="/print-invoice/:invoiceId"
+            element={
+                <AuthenticatedRoute isLoading={loading}>
+                <PrintInvoice />
+              </AuthenticatedRoute>
+            }
+          />
 
-        {/* Catch all route - redirect to landing page for unauthenticated users */}
-        <Route path="*" element={
-          <Navigate to={user ? "/invoices" : "/"} />
-        } />
-      </Routes>
-    </HelmetProvider>
+          {/* Catch all route - redirect to landing page for unauthenticated users */}
+          <Route path="*" element={
+            <Navigate to={user ? "/invoices" : "/"} />
+          } />
+        </Routes>
+      </HelmetProvider>
     </SessionContextProvider>
   );
 }

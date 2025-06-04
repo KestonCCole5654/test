@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { supabase } from '../lib/supabase'
 import { LoadingSpinner } from '../components/ui/loadingSpinner'
 
 export default function AuthCallback() {
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
   const location = useLocation()
-  const supabase = useSupabaseClient();
 
   const checkUserOnboarding = async (userId: string) => {
     try {

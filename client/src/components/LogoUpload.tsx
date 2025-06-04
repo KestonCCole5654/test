@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react';
+import { useUser } from '@supabase/auth-helpers-react';
 import axios from 'axios';
+import { supabase } from '../lib/supabase';
 
 interface LogoUploadProps {
   onLogoUploaded?: (url: string) => void; // Callback for when logo is uploaded
@@ -17,7 +18,6 @@ const LogoUpload: React.FC<LogoUploadProps> = ({
   const [uploading, setUploading] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const supabase = useSupabaseClient();
   const user = useUser();
 
   // Fetch existing logo when component mounts

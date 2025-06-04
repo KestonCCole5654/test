@@ -23,7 +23,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Checkbox } from '../../components/ui/checkbox'
 import { useBrandLogo } from "../../components/ui/InvoiceStats"
 import LogoUpload from '../../components/LogoUpload'
-import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
+import { useUser } from '@supabase/auth-helpers-react'
+import { supabase } from '../../lib/supabase'
+import { useBrandLogo as useBrandLogoHook } from '../../hooks/useBrandLogo'
 
 interface UserData {
   name: string
@@ -36,7 +38,6 @@ interface UserData {
 }
 
 export default function SettingsPage() {
-  const supabase = useSupabaseClient()
   const navigate = useNavigate()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(true)
@@ -69,7 +70,7 @@ export default function SettingsPage() {
 
   // Brand logo for business (using business email domain)
   const businessDomain = businessData.email?.split("@")[1] || "";
-  const businessLogo = useBrandLogo(businessDomain);
+  const businessLogo = useBrandLogoHook(businessDomain);
 
   const fetchData = async () => {
     try {

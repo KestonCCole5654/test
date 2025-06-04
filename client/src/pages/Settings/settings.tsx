@@ -80,7 +80,9 @@ export default function SettingsPage() {
       const headers = {
         Authorization: `Bearer ${session.provider_token}`,
         'X-Supabase-Token': session.access_token
-      };
+      };      
+
+
 
       // Fetch user data
       const userResponse = await axios.get("https://sheetbills-server.vercel.app/api/user", { headers });

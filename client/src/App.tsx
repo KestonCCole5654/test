@@ -27,6 +27,7 @@ import EmailInvoice from './pages/EmailInvoice/email-invoice';
 import LegalPage from './pages/Legal/legal';
 import LandingPage from './pages/Landing/page';
 import AccountStatus from './pages/AccountStatus/AccountStatus';
+import ReportsPage from './pages/Reports';
 // import TemplateDesignerPage from './components/TemplateDesigner/TemplateDesignerPage';
 // SidebarLayout already includes the Outlet component
 
@@ -205,6 +206,16 @@ function App() {
           element={
               <AuthenticatedRoute isLoading={loading}>
               <PrintInvoice />
+            </AuthenticatedRoute>
+          }
+        />
+
+        {/* Reports Route */}
+        <Route
+          path="/reports"
+          element={
+            <AuthenticatedRoute>
+              <ReportsPage />
             </AuthenticatedRoute>
           }
         />

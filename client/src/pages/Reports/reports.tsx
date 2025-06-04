@@ -50,9 +50,17 @@ export default function ReportsPage() {
   })
 
   const fetchData = async () => {
-    if (!dateRange.from || !dateRange.to) return;
+    if (!dateRange.from || !dateRange.to) {
+      toast({
+        title: "Selection Required",
+        description: "Please select both a start and end date for the report.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     setIsGenerating(true)
+    setTaxReport(null); // Clear previous report while generating
     try {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession()
       if (sessionError || !session) {
@@ -129,8 +137,13 @@ export default function ReportsPage() {
   }
 
   useEffect(() => {
-    fetchData()
-  }, [dateRange])
+    // This effect will no longer automatically fetch on dateRange change
+    // The fetch will now be triggered by the Generate button
+  }, []) // Empty dependency array to run only on mount if needed for initial data, or remove if initial data is not required before generating
+
+  const handleGenerateReport = () => {
+    fetchData();
+  }
 
   const handleDownloadCSV = () => {
     if (!taxReport || !dateRange.from || !dateRange.to) return;
@@ -213,6 +226,14 @@ export default function ReportsPage() {
               value={dateRange}
               onChange={setDateRange}
             />
+            <Button
+              onClick={handleGenerateReport}
+              disabled={isGenerating}
+              className="flex items-center gap-2 w-full sm:w-auto bg-green-800 hover:bg-green-900 text-white"
+            >
+              {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {isGenerating ? "Generating..." : "Generate Report"}
+            </Button>
             <Button
               onClick={handleDownloadCSV}
               disabled={!taxReport || isGenerating}

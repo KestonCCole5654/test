@@ -62,6 +62,8 @@ export default function SettingsPage() {
   const [deletePhrase, setDeletePhrase] = useState("")
   const [isDeleting, setIsDeleting] = useState(false)
   const sheetUrl = typeof window !== 'undefined' ? localStorage.getItem("defaultSheetUrl") : ""
+  const [logoUrl, setLogoUrl] = useState<string>("")
+  const [showDeleteLogoDialog, setShowDeleteLogoDialog] = useState(false)
 
   // Brand logo for business (using business email domain)
   const businessDomain = businessData.email?.split("@")[1] || "";
@@ -112,6 +114,7 @@ export default function SettingsPage() {
           phone: businessResponse.data.businessDetails["Phone Number"] || "",
           address: businessResponse.data.businessDetails["Address"] || "",
         });
+        setLogoUrl(businessResponse.data.businessDetails["Logo"] || "");
       }
 
     } catch (error) {
@@ -296,6 +299,37 @@ export default function SettingsPage() {
     }
   };
 
+  // Handler to delete logo
+  const handleDeleteLogo = async () => {
+    try {
+      setIsLoading(true);
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) throw new Error("Authentication required");
+      if (!sheetUrl) throw new Error("No invoice spreadsheet selected");
+      // Update business details to remove logo
+      await axios.put(
+        "https://sheetbills-server.vercel.app/api/update-business-details",
+        {
+          logo: "",
+          sheetUrl: sheetUrl
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${session.provider_token}`,
+            "X-Supabase-Token": session.access_token
+          }
+        }
+      );
+      setLogoUrl("");
+      toast({ title: "Logo removed", description: "Your company logo has been deleted." });
+    } catch (error) {
+      toast({ title: "Failed to delete logo", description: "Could not remove logo. Try again.", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+      setShowDeleteLogoDialog(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -390,7 +424,37 @@ export default function SettingsPage() {
           <p className="text-sm text-gray-600 mb-4">
             Upload your company logo to be displayed on all your invoices. The logo will be automatically included in every invoice you create.
           </p>
-          <LogoUpload />
+          {logoUrl ? (
+            <div className="relative inline-block">
+              <img
+                src={logoUrl}
+                alt="Company Logo"
+                className="h-16 w-16 rounded-lg border border-gray-200 object-contain bg-white shadow-sm"
+              />
+              <button
+                type="button"
+                className="absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full p-1 shadow hover:bg-red-50 hover:text-red-600 transition-colors"
+                aria-label="Delete logo"
+                onClick={() => setShowDeleteLogoDialog(true)}
+              >
+                <X className="h-4 w-4" />
+              </button>
+              <Dialog open={showDeleteLogoDialog} onOpenChange={setShowDeleteLogoDialog}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Delete Logo</DialogTitle>
+                  </DialogHeader>
+                  <div className="py-4">Are you sure you want to delete your company logo?</div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setShowDeleteLogoDialog(false)}>Cancel</Button>
+                    <Button variant="destructive" onClick={handleDeleteLogo}>Delete</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+          ) : (
+            <LogoUpload onLogoUploaded={setLogoUrl} />
+          )}
         </div>
 
         <div className="divide-y divide-gray-200 border-t border-b">

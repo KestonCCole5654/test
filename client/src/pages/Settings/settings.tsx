@@ -23,7 +23,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Checkbox } from '../../components/ui/checkbox'
 import { useBrandLogo } from "../../components/ui/InvoiceStats"
 import LogoUpload from '../../components/LogoUpload'
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
 
 interface UserData {
   name: string
@@ -64,6 +64,8 @@ export default function SettingsPage() {
   const sheetUrl = typeof window !== 'undefined' ? localStorage.getItem("defaultSheetUrl") : ""
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [showLogoUpload, setShowLogoUpload] = useState(false)
+  const [removingLogo, setRemovingLogo] = useState(false)
+  const user = useUser()
 
   // Brand logo for business (using business email domain)
   const businessDomain = businessData.email?.split("@")[1] || "";
@@ -317,6 +319,59 @@ export default function SettingsPage() {
     }
   };
 
+  // Remove logo handler
+  const handleRemoveLogo = async () => {
+    if (!logoUrl || !user?.id) return;
+    setRemovingLogo(true);
+    try {
+      // Extract the file path from the logo URL
+      const urlParts = logoUrl.split('/');
+      const fileName = urlParts[urlParts.length - 1];
+      const filePath = `${user.id}/${fileName}`;
+
+      // Delete from Supabase Storage
+      const { error: storageError } = await supabase.storage
+        .from('company-logos')
+        .remove([filePath]);
+      if (storageError) throw storageError;
+
+      // Remove from user_business_settings
+      const { error: dbError } = await supabase
+        .from('user_business_settings')
+        .update({ logo_url: null, updated_at: new Date().toISOString() })
+        .eq('id', user.id);
+      if (dbError) throw dbError;
+
+      // Remove from Google Sheet business details
+      if (sheetUrl) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.provider_token) {
+          await axios.put(
+            "https://sheetbills-server.vercel.app/api/update-business-details",
+            {
+              logo: '',
+              sheetUrl: sheetUrl
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${session.provider_token}`,
+                "X-Supabase-Token": session.access_token
+              }
+            }
+          );
+        }
+      }
+
+      setLogoUrl(null);
+      setShowLogoUpload(true);
+      toast({ title: 'Logo removed', description: 'You can now upload a new logo.' });
+    } catch (err) {
+      toast({ title: 'Failed to remove logo', description: err instanceof Error ? err.message : 'Unknown error', variant: 'destructive' });
+    } finally {
+      setRemovingLogo(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -415,11 +470,9 @@ export default function SettingsPage() {
             <div className="flex flex-col items-center gap-4">
               <img src={logoUrl} alt="Company Logo" className="h-24 w-auto object-contain border rounded-lg shadow-sm bg-white" />
               <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setShowLogoUpload(true)}>
-                  Change Logo
+                <Button variant="outline" onClick={handleRemoveLogo} disabled={removingLogo}>
+                  {removingLogo ? 'Removing...' : 'Change Logo'}
                 </Button>
-                {/* Optional: Remove Logo button */}
-                {/* <Button variant="destructive" onClick={handleRemoveLogo}>Remove Logo</Button> */}
               </div>
             </div>
           ) : (

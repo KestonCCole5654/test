@@ -81,6 +81,7 @@ import {
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb";
 import { CustomerSidebar } from "../../components/Customers/CustomerSidebar"
+import { supabase } from '../../lib/supabase'
 
 // =====================
 // Types & Interfaces

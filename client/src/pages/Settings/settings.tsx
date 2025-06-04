@@ -21,11 +21,10 @@ import {
 import { LoadingSpinner } from "../../components/ui/loadingSpinner"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog'
 import { Checkbox } from '../../components/ui/checkbox'
-import { useBrandLogo } from "../../components/ui/InvoiceStats"
 import LogoUpload from '../../components/LogoUpload'
 import { useUser } from '@supabase/auth-helpers-react'
 import { supabase } from '../../lib/supabase'
-import { useBrandLogo as useBrandLogoHook } from '../../hooks/useBrandLogo'
+import { useBrandLogo } from '../../hooks/useBrandLogo'
 
 interface UserData {
   name: string
@@ -70,7 +69,7 @@ export default function SettingsPage() {
 
   // Brand logo for business (using business email domain)
   const businessDomain = businessData.email?.split("@")[1] || "";
-  const businessLogo = useBrandLogoHook(businessDomain);
+  const businessLogo = useBrandLogo(businessDomain);
 
   const fetchData = async () => {
     try {

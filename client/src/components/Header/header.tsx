@@ -14,32 +14,33 @@ import {
 } from "../ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { User as SupabaseUser } from '@supabase/supabase-js'
+import { supabase } from '../../lib/supabase'
 
 const Header = () => {
   const navigate = useNavigate()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
-  const supabase = useSupabaseClient();
+  const supabaseClient = useSupabaseClient();
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabaseClient.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
     })
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
     })
 
     return () => {
       subscription.unsubscribe()
     }
-  }, [supabase])
+  }, [supabaseClient])
 
   const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut()
+    const { error } = await supabaseClient.auth.signOut()
     if (!error) {
       navigate("/login")
       setIsMobileMenuOpen(false)

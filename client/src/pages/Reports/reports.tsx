@@ -19,6 +19,7 @@ import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { DateRangePicker } from "../../components/ui/date-range-picker"
 import { addDays } from "date-fns"
 import { DateRange } from "react-day-picker"
+import { supabase } from '../../lib/supabase'
 
 interface TaxReport {
   totalTax: number

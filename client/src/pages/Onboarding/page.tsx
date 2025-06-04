@@ -32,6 +32,7 @@ import {
 } from "../../components/ui/breadcrumb"
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { LoadingSpinner } from "../../components/ui/loadingSpinner"
+import { supabase } from '../../lib/supabase'
 
 const API_URL = "https://sheetbills-server.vercel.app"
 
@@ -103,7 +104,7 @@ const WelcomeScreen = ({ onStart }: { onStart: () => void }) => {
   )
 }
 
-export default function InitializePage() {
+export default function OnboardingPage() {
   const navigate = useNavigate()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string>("")

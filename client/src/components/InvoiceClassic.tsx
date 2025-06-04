@@ -17,6 +17,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 interface InvoiceItem {
   name: string;
   description: string;
+  
   quantity: number;
   price: number | string;
   discount: {

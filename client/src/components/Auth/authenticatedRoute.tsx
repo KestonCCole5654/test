@@ -14,5 +14,5 @@ export default function AuthenticatedRoute({ children, isLoading }: { children: 
     return <Navigate to="/login" />;
   }
 
-  return <>{children}</>;
+    return <>{children}</>;
 }

@@ -28,6 +28,7 @@ import LegalPage from './pages/Legal/legal';
 import LandingPage from './pages/Landing/page';
 import AccountStatus from './pages/AccountStatus/AccountStatus';
 import ReportsPage from './pages/Reports';
+import axios from 'axios';
 // import TemplateDesignerPage from './components/TemplateDesigner/TemplateDesignerPage';
 // SidebarLayout already includes the Outlet component
 
@@ -62,6 +63,31 @@ function App() {
   const [onboardingChecked, setOnboardingChecked] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Add axios interceptor for global auth error handling
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      response => response,
+      async error => {
+        // Check for expired or invalid JWT
+        const isBadJwt = error?.response?.data?.code === 'bad_jwt' ||
+          error?.response?.data?.message?.toLowerCase().includes('token is expired') ||
+          error?.response?.status === 401;
+        if (isBadJwt) {
+          await supabaseClient.auth.signOut();
+          navigate('/login');
+          return Promise.reject(error);
+        }
+        return Promise.reject(error);
+      }
+    );
+    return () => axios.interceptors.response.eject(interceptor);
+  }, [navigate]);
+
+  // Refresh Supabase session on mount to avoid stale tokens
+  useEffect(() => {
+    supabaseClient.auth.refreshSession();
+  }, []);
 
   useEffect(() => {
     let isMounted = true;

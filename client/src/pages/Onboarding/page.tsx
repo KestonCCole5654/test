@@ -94,10 +94,9 @@ const WelcomeScreen = ({ onStart }: { onStart: () => void }) => {
       </p>
       <Button
         onClick={onStart}
-        className="bg-green-600 font-cal-sans hover:bg-green-700 px-8 py-6 text-lg"
+        className="px-6 py-3 bg-green-800 text-white rounded-lg hover:bg-green-900 transition-colors"
       >
-        Get Started
-        <ArrowRight className="ml-2 h-5 w-5" />
+        Start
       </Button>
     </motion.div>
   )
@@ -729,7 +728,12 @@ export default function InitializePage() {
           )}
 
           <Button
-            className="flex-1 bg-green-600 font-cal-sans hover:bg-green-700"
+            disabled={!isCurrentQuestionValid()}
+            className={`px-6 py-3 rounded-lg transition-colors ${
+              isCurrentQuestionValid()
+                ? 'bg-green-800 text-white hover:bg-green-900'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }`}
             onClick={handleNext}
             type="button"
           >
@@ -962,8 +966,8 @@ export default function InitializePage() {
               <p className="text-green-800 font-cal-sans dark:text-green-300 text-sm">You can now continue to your dashboard.</p>
             </motion.div>
             <Button
-              className="bg-green-800 hover:bg-green-900 font-cal-sans px-8 py-3 text-lg"
               onClick={handleContinue}
+              className="px-6 py-3 bg-green-800 text-white rounded-lg hover:bg-green-900 transition-colors"
               disabled={isLoading}
             >
               Continue to Dashboard

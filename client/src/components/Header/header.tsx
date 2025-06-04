@@ -97,15 +97,9 @@ const Header = () => {
                   className="px-3 py-2 rounded-md font-normal text-slate-200 hover:text-slate-300 transition-colors"
                   onClick={handleNavigation}
                 >
-                  Invoices
+                 Invoices
                 </Link>
-                <Link
-                  to="/reports"
-                  className="px-3 py-2 rounded-md font-normal text-slate-200 hover:text-slate-300 transition-colors"
-                  onClick={handleNavigation}
-                >
-                  Reports
-                </Link>
+                
                 <Link
                   to="/settings"
                   className="px-3 py-2 rounded-md font-normal text-slate-200 hover:text-slate-300  transition-colors"
@@ -205,15 +199,9 @@ const Header = () => {
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:text-slate-900 transition-colors"
                   onClick={handleNavigation}
                 >
-                  Invoices
+                 Invoices
                 </Link>
-                <Link
-                  to="/reports"
-                  className="px-3 py-2.5 rounded-md text-slate-700 hover:text-slate-900 transition-colors"
-                  onClick={handleNavigation}
-                >
-                  Reports
-                </Link>
+                
                 <Link
                   to="/settings"
                   className="px-3 py-2.5 rounded-md text-slate-700 hover:text-slate-900 transition-colors"

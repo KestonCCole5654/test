@@ -1239,15 +1239,22 @@ app.put('/api/update-business-details', async (req, res) => {
 
     // Prepare update data for known fields
     const now = new Date().toISOString();
-    const updateFields = [
-      ['Company Name', businessData.companyName],
-      ['Business Email', businessData.email],
-      ['Phone Number', businessData.phone],
-      ['Address', businessData.address],
-    ];
+    const updateFields = [];
 
-    // Add Logo if present
-    if (businessData.logo) {
+    // Only add fields that are present in the request
+    if (businessData.companyName !== undefined) {
+      updateFields.push(['Company Name', businessData.companyName]);
+    }
+    if (businessData.email !== undefined) {
+      updateFields.push(['Business Email', businessData.email]);
+    }
+    if (businessData.phone !== undefined) {
+      updateFields.push(['Phone Number', businessData.phone]);
+    }
+    if (businessData.address !== undefined) {
+      updateFields.push(['Address', businessData.address]);
+    }
+    if (businessData.logo !== undefined) {
       updateFields.push(['Logo', businessData.logo]);
     }
 

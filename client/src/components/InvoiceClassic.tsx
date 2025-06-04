@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import LogoUpload from "./LogoUpload";
 import axios from "axios";
 import { createClient } from '@supabase/supabase-js';
@@ -57,9 +57,17 @@ interface InvoiceClassicProps {
   data: InvoiceData;
   businessData: BusinessData;
   showShadow?: boolean;
+  onBusinessDataUpdate?: (updatedData: BusinessData) => void;
 }
 
-const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, showShadow = true }) => {
+const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ 
+  data, 
+  businessData: initialBusinessData, 
+  showShadow = true,
+  onBusinessDataUpdate 
+}) => {
+  const [businessData, setBusinessData] = useState<BusinessData>(initialBusinessData);
+
   // Calculate all amounts
   const calculateItemTotal = (item: InvoiceItem) => {
     const price = item.price === "" ? 0 : Number(item.price);
@@ -183,8 +191,17 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({ data, businessData, sho
                     );
 
                     if (response.data.success) {
-                      // Force a page reload to ensure the logo is updated
-                      window.location.reload();
+                      // Update local state
+                      const updatedBusinessData = {
+                        ...businessData,
+                        logo: url
+                      };
+                      setBusinessData(updatedBusinessData);
+                      
+                      // Notify parent component if callback exists
+                      if (onBusinessDataUpdate) {
+                        onBusinessDataUpdate(updatedBusinessData);
+                      }
                     }
                   } catch (error) {
                     console.error("Failed to update logo:", error);

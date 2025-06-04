@@ -159,60 +159,60 @@ function App() {
 
   return (
     <SessionContextProvider supabaseClient={supabase}>
-      <HelmetProvider>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/auth-callback" element={<AuthCallback />} />
-          <Route path="/legal" element={<LegalPage />} />
-          <Route path="/account-status" element={<AccountStatus />} />
-      
-          {/* Onboarding Route */}
-          <Route
-            path="/Onboarding"
-            element={
+    <HelmetProvider>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/auth-callback" element={<AuthCallback />} />
+        <Route path="/legal" element={<LegalPage />} />
+        <Route path="/account-status" element={<AccountStatus />} />
+    
+        {/* Onboarding Route */}
+        <Route
+          path="/Onboarding"
+          element={
                 <AuthenticatedRoute isLoading={loading}>
-                <OnboardingPage />
-              </AuthenticatedRoute>
-            }
-          />
+              <OnboardingPage />
+            </AuthenticatedRoute>
+          }
+        />
 
-          {/* Protected Routes */}
-          <Route
-            element={
+        {/* Protected Routes */}
+        <Route
+          element={
                 <AuthenticatedRoute isLoading={loading}>
-                <SidebarLayout />
-              </AuthenticatedRoute>
-            }
-          >
-            <Route path="/invoices" element={<Dashboard />} />
-            <Route path="/create-invoice" element={<InvoiceForm />} />
-            <Route path="/email-invoice/:invoiceId" element={<EmailInvoice />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/contact" element={<ContactPage />} />
+              <SidebarLayout />
+            </AuthenticatedRoute>
+          }
+        >
+          <Route path="/invoices" element={<Dashboard />} />
+          <Route path="/create-invoice" element={<InvoiceForm />} />
+          <Route path="/email-invoice/:invoiceId" element={<EmailInvoice />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/contact" element={<ContactPage />} />
             <Route path="/reports" element={<ReportsPage />} />
-          </Route>
+        </Route>
 
-          {/* Public Invoice Route - must be after catch-all to take precedence */}
-          <Route path="/invoice/shared/:token" element={<PublicInvoice />} />
+        {/* Public Invoice Route - must be after catch-all to take precedence */}
+        <Route path="/invoice/shared/:token" element={<PublicInvoice />} />
 
-          {/* Add print-invoice route OUTSIDE the SidebarLayout group */}
-          <Route
-            path="/print-invoice/:invoiceId"
-            element={
+        {/* Add print-invoice route OUTSIDE the SidebarLayout group */}
+        <Route
+          path="/print-invoice/:invoiceId"
+          element={
                 <AuthenticatedRoute isLoading={loading}>
-                <PrintInvoice />
-              </AuthenticatedRoute>
-            }
-          />
+              <PrintInvoice />
+            </AuthenticatedRoute>
+          }
+        />
 
-          {/* Catch all route - redirect to landing page for unauthenticated users */}
-          <Route path="*" element={
-            <Navigate to={user ? "/invoices" : "/"} />
-          } />
-        </Routes>
-      </HelmetProvider>
+        {/* Catch all route - redirect to landing page for unauthenticated users */}
+        <Route path="*" element={
+          <Navigate to={user ? "/invoices" : "/"} />
+        } />
+      </Routes>
+    </HelmetProvider>
     </SessionContextProvider>
   );
 }

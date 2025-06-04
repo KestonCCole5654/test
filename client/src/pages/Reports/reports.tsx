@@ -1,5 +1,7 @@
 "use client"
 
+import "./reports.css"
+
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { Button } from "../../components/ui/button"
@@ -15,7 +17,6 @@ import {
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb"
 import { LoadingSpinner } from "../../components/ui/loadingSpinner"
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { DateRangePicker } from "../../components/ui/date-range-picker"
 import { addDays } from "date-fns"
 import { DateRange } from "react-day-picker"
@@ -38,7 +39,6 @@ interface TaxReport {
 }
 
 export default function ReportsPage() {
-  const supabase = useSupabaseClient()
   const navigate = useNavigate()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(true)
@@ -196,19 +196,19 @@ export default function ReportsPage() {
       </div>
 
       {/* Page Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Reports</h1>
-        <p className="text-gray-600">Generate and download reports for your business</p>
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-3xl font-cal-sans font-medium text-gray-900">Reports</h1>
+        <p className="text-gray-600 text-md">Generate and download reports for your business</p>
       </div>
 
       {/* Tax Report Section */}
       <div className="bg-white rounded-lg shadow p-6 mb-8">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
           <div>
             <h2 className="text-xl font-semibold text-gray-900">Tax Report</h2>
-            <p className="text-gray-600">View and download tax information for your invoices</p>
+            <p className="text-gray-600 text-sm">View and download tax information for your invoices</p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-4">
             <DateRangePicker
               value={dateRange}
               onChange={setDateRange}
@@ -216,7 +216,7 @@ export default function ReportsPage() {
             <Button
               onClick={handleDownloadCSV}
               disabled={!taxReport || isGenerating}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 w-full sm:w-auto"
             >
               <Download className="h-4 w-4" />
               Download CSV
@@ -227,27 +227,27 @@ export default function ReportsPage() {
         {taxReport && (
           <div className="space-y-6">
             {/* Summary Card */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="grid grid-cols-3 gap-4">
+            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <p className="text-sm text-gray-600">Total Tax Collected</p>
-                  <p className="text-2xl font-semibold">${taxReport.totalTax.toFixed(2)}</p>
+                  <p className="text-2xl font-semibold text-gray-900">${taxReport.totalTax.toFixed(2)}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Period</p>
-                  <p className="text-lg">
+                  <p className="text-lg font-medium text-gray-900">
                     {new Date(taxReport.period.start).toLocaleDateString()} - {new Date(taxReport.period.end).toLocaleDateString()}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Invoices</p>
-                  <p className="text-2xl font-semibold">{taxReport.taxByInvoice.length}</p>
+                  <p className="text-2xl font-semibold text-gray-900">{taxReport.taxByInvoice.length}</p>
                 </div>
               </div>
             </div>
 
             {/* Tax Details Table */}
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto border border-gray-200 rounded-lg">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
@@ -262,12 +262,12 @@ export default function ReportsPage() {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {taxReport.taxByInvoice.map((invoice) => (
                     <tr key={invoice.invoiceId}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{invoice.invoiceId}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{new Date(invoice.date).toLocaleDateString()}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{invoice.customerName}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${invoice.amount.toFixed(2)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${invoice.taxAmount.toFixed(2)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{invoice.taxRate}%</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{invoice.invoiceId}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{new Date(invoice.date).toLocaleDateString()}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{invoice.customerName}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${invoice.amount.toFixed(2)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${invoice.taxAmount.toFixed(2)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{invoice.taxRate}%</td>
                     </tr>
                   ))}
                 </tbody>

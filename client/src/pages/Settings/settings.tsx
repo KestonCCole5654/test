@@ -75,6 +75,7 @@ export default function SettingsPage() {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       if (sessionError || !session) {
         navigate("/sign-in");
+        setIsLoading(false);
         return;
       }
 
@@ -99,9 +100,9 @@ export default function SettingsPage() {
       }
 
       // Fetch business details
-      // Always pass the current invoice spreadsheet URL as sheetUrl
       if (!sheetUrl) {
-        throw new Error("No invoice spreadsheet selected")
+        setIsLoading(false);
+        throw new Error("No invoice spreadsheet selected");
       }
       const businessResponse = await axios.get("https://sheetbills-server.vercel.app/api/business-details", {
         headers,
@@ -126,9 +127,9 @@ export default function SettingsPage() {
 
       if (axios.isAxiosError(error) && error.response?.status === 401) {
         navigate("/sign-in");
+        setIsLoading(false);
         return;
       }
-
 
     } finally {
       setIsLoading(false);

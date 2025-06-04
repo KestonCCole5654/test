@@ -62,6 +62,8 @@ export default function SettingsPage() {
   const [deletePhrase, setDeletePhrase] = useState("")
   const [isDeleting, setIsDeleting] = useState(false)
   const sheetUrl = typeof window !== 'undefined' ? localStorage.getItem("defaultSheetUrl") : ""
+  const [logoUrl, setLogoUrl] = useState<string | null>(null)
+  const [showLogoUpload, setShowLogoUpload] = useState(false)
 
   // Brand logo for business (using business email domain)
   const businessDomain = businessData.email?.split("@")[1] || "";
@@ -156,6 +158,25 @@ export default function SettingsPage() {
     };
   }, []);
 
+  // Fetch logo on mount
+  useEffect(() => {
+    const fetchLogo = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+        const { data, error } = await supabase
+          .from('user_business_settings')
+          .select('logo_url')
+          .single();
+        if (!error && data?.logo_url) {
+          setLogoUrl(data.logo_url);
+        }
+      } catch (err) {
+        // Ignore
+      }
+    };
+    fetchLogo();
+  }, [supabase]);
 
   const handleBusinessUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -390,7 +411,33 @@ export default function SettingsPage() {
           <p className="text-sm text-gray-600 mb-4">
             Upload your company logo to be displayed on all your invoices. The logo will be automatically included in every invoice you create.
           </p>
-          <LogoUpload />
+          {logoUrl && !showLogoUpload ? (
+            <div className="flex flex-col items-center gap-4">
+              <img src={logoUrl} alt="Company Logo" className="h-24 w-auto object-contain border rounded-lg shadow-sm bg-white" />
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setShowLogoUpload(true)}>
+                  Change Logo
+                </Button>
+                {/* Optional: Remove Logo button */}
+                {/* <Button variant="destructive" onClick={handleRemoveLogo}>Remove Logo</Button> */}
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-2">
+              <LogoUpload 
+                onLogoUploaded={(url) => {
+                  setLogoUrl(url);
+                  setShowLogoUpload(false);
+                }}
+                showPreview={false}
+              />
+              {logoUrl && (
+                <Button variant="outline" onClick={() => setShowLogoUpload(false)}>
+                  Cancel
+                </Button>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="divide-y divide-gray-200 border-t border-b">

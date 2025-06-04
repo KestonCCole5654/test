@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import LogoUpload from "./LogoUpload";
 import axios from "axios";
 import { createClient } from '@supabase/supabase-js';
@@ -68,6 +68,23 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({
   onBusinessDataUpdate 
 }) => {
   const [businessData, setBusinessData] = useState<BusinessData>(initialBusinessData);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if business data is loaded
+    if (initialBusinessData && initialBusinessData.companyName) {
+      setBusinessData(initialBusinessData);
+      setIsLoading(false);
+    }
+  }, [initialBusinessData]);
+
+  // Loading spinner component
+  const LoadingSpinner = () => (
+    <div className="flex items-center justify-center space-x-2">
+      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-800"></div>
+      <span className="text-sm text-gray-500">Loading business details...</span>
+    </div>
+  );
 
   // Calculate all amounts
   const calculateItemTotal = (item: InvoiceItem) => {
@@ -152,7 +169,9 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({
 
         {/* Logo on the right side */}
         <div className="flex flex-col items-end">
-          {businessData.logo ? (
+          {isLoading ? (
+            <LoadingSpinner />
+          ) : businessData.logo ? (
             <img 
               src={businessData.logo} 
               alt="Company Logo" 
@@ -221,9 +240,15 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({
         <div>
           <h2 className="text-sm font-cal font-medium text-green-800 uppercase mb-2">From</h2>
           <div className="space-y-2">
-            <p className="font-cal font-medium text-sm">{businessData.companyName || "Loading Company Details..."}</p>
-            <p className="font-cal font-medium text-sm">{businessData.email || "contact@company.com"}</p>
-            <p className="font-cal font-medium text-sm">{businessData.address || "123 Business St"}</p>
+            {isLoading ? (
+              <LoadingSpinner />
+            ) : (
+              <>
+                <p className="font-cal font-medium text-sm">{businessData.companyName || "Company Name Not Set"}</p>
+                <p className="font-cal font-medium text-sm">{businessData.email || "Email Not Set"}</p>
+                <p className="font-cal font-medium text-sm">{businessData.address || "Address Not Set"}</p>
+              </>
+            )}
           </div>
         </div>
 

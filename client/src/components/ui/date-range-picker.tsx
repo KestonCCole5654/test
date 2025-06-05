@@ -51,7 +51,8 @@ export function DateRangePicker({
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
+        <PopoverContent className="max-w-[600px] w-full p-4 rounded-xl shadow-lg border bg-white" align="center" sideOffset={8}>
+          <div className="mb-2 text-sm font-semibold text-gray-700">Select date range</div>
           <Calendar
             initialFocus
             mode="range"

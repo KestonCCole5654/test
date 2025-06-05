@@ -207,7 +207,7 @@ export default function ReportsPage() {
       <Card className="mb-8">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
+           
             Tax Report
           </CardTitle>
           <CardDescription>
@@ -274,7 +274,7 @@ export default function ReportsPage() {
           {!taxReport && !isGenerating && !error && (
             <>
               <Alert>
-                <Info className="h-4 w-4" />
+               
                 <AlertTitle>No Report Generated</AlertTitle>
                 <AlertDescription>
                   Select a date range and click "Generate Report" to view your tax data.

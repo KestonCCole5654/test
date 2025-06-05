@@ -248,13 +248,107 @@ export default function ReportsPage() {
 
           {/* No Data State */}
           {!taxReport && !isGenerating && !error && (
-            <Alert>
-              <Info className="h-4 w-4" />
-              <AlertTitle>No Report Generated</AlertTitle>
-              <AlertDescription>
-                Select a date range and click "Generate Report" to view your tax data.
-              </AlertDescription>
-            </Alert>
+            <>
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertTitle>No Report Generated</AlertTitle>
+                <AlertDescription>
+                  Select a date range and click "Generate Report" to view your tax data.
+                </AlertDescription>
+              </Alert>
+              {/* Mockup Example Report */}
+              <div className="mt-8">
+                <div className="mb-2 text-xs font-semibold text-green-700 uppercase tracking-wide">Example Report (Mock Data)</div>
+                <div className="space-y-6">
+                  {/* Summary Card */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-gray-500">Total Tax Collected</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-2xl font-semibold text-gray-900">$1,234.56</p>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-gray-500">Period</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-lg font-medium text-gray-900">Jun 1, 2025 - Jul 1, 2025</p>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-gray-500">Invoices</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-2xl font-semibold text-gray-900">5</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                  {/* Tax Details Table */}
+                  <div className="rounded-md border">
+                    <div className="overflow-x-auto">
+                      <table className="w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice ID</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tax Amount</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tax Rate</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          <tr className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">INV-001</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2025-06-01</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Acme Corp</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$500.00</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$50.00</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">10%</td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">INV-002</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2025-06-10</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Beta LLC</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$300.00</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$30.00</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">10%</td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">INV-003</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2025-06-15</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Gamma Inc</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$200.00</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$20.00</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">10%</td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">INV-004</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2025-06-20</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Delta Ltd</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$150.00</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$15.00</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">10%</td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">INV-005</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2025-06-25</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Epsilon GmbH</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$84.56</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$8.46</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">10%</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
           )}
 
           {/* Loading State */}

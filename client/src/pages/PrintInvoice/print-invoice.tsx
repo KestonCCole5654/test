@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { Button } from "../../components/ui/button"
 import { ArrowLeft, Printer } from "lucide-react"
 import InvoiceClassic from "../../components/InvoiceClassic"
@@ -24,6 +24,7 @@ import { InvoiceData, BusinessData } from "../CreateInvoices/create-invoice"
 export default function PrintInvoice() {
   const location = useLocation()
   const navigate = useNavigate()
+  const { invoiceId: urlInvoiceId } = useParams()
   const { toast } = useToast()
   const supabase = useSupabaseClient()
 
@@ -33,12 +34,19 @@ export default function PrintInvoice() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // Get invoice ID from either state or URL params
+  const invoiceId = location.state?.invoiceId || urlInvoiceId
+
   // Fetch invoice data when component mounts
   useEffect(() => {
     const fetchInvoiceData = async () => {
       try {
         setIsLoading(true)
         setError(null)
+
+        if (!invoiceId) {
+          throw new Error("No invoice ID provided")
+        }
 
         // Get the current session
         const { data: { session } } = await supabase.auth.getSession()
@@ -54,7 +62,7 @@ export default function PrintInvoice() {
 
         // Fetch the invoice data
         const response = await axios.get(
-          `https://sheetbills-server.vercel.app/api/invoices/${location.state.invoiceId}`,
+          `https://sheetbills-server.vercel.app/api/invoices/${invoiceId}`,
           {
             headers: {
               Authorization: `Bearer ${session.provider_token}`,
@@ -110,10 +118,10 @@ export default function PrintInvoice() {
       }
     }
 
-    if (location.state.invoiceId) {
+    if (invoiceId) {
       fetchInvoiceData()
     }
-  }, [location.state.invoiceId, toast, supabase])
+  }, [invoiceId, toast, supabase])
 
   // Handle print action
   const handlePrint = () => {

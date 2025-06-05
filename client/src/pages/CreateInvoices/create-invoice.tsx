@@ -1160,7 +1160,9 @@ ${businessData.phone}`
                   <Button
                     variant="outline"
                     className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2 rounded-md shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
-                    onClick={() => navigate(`/print-invoice/${invoiceToEdit?.id || invoiceData.invoiceNumber}`)}
+                    onClick={() => navigate(`/print-invoice/${invoiceToEdit?.id || invoiceData.invoiceNumber}`, {
+                      state: { invoiceId: invoiceToEdit?.id || invoiceData.invoiceNumber }
+                    })}
                   >
                     <Printer className="w-4 h-4 mr-2" />
                     Print Invoice

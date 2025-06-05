@@ -136,6 +136,8 @@ export default function ReportsPage() {
     }
   }
 
+  
+
   useEffect(() => {
     // This effect will no longer automatically fetch on dateRange change
     // The fetch will now be triggered by the Generate button

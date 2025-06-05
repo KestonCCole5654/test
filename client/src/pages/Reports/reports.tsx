@@ -15,12 +15,12 @@ import {
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb"
 import { LoadingSpinner } from "../../components/ui/loadingSpinner"
-import { ShadcnDateRangePicker } from "../../components/ui/shadcn-date-range-picker"
-import { addDays } from "date-fns"
-import { DateRange } from "react-day-picker"
-import { supabase } from '../../lib/supabase'
+import { Input } from "../../components/ui/input"
+import { Label } from "../../components/ui/label"
+import { addDays, format } from "date-fns"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert"
+import { supabase } from '../../lib/supabase'
 
 interface TaxReport {
   totalTax: number
@@ -43,14 +43,12 @@ export default function ReportsPage() {
   const { toast } = useToast()
   const [isGenerating, setIsGenerating] = useState(false)
   const [taxReport, setTaxReport] = useState<TaxReport | null>(null)
-  const [dateRange, setDateRange] = useState<DateRange>({
-    from: addDays(new Date(), -30),
-    to: new Date()
-  })
+  const [startDate, setStartDate] = useState<string>(format(addDays(new Date(), -30), 'yyyy-MM-dd'))
+  const [endDate, setEndDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'))
   const [error, setError] = useState<string | null>(null)
 
   const fetchData = async () => {
-    if (!dateRange.from || !dateRange.to) {
+    if (!startDate || !endDate) {
       toast({
         title: "Selection Required",
         description: "Please select both a start and end date for the report.",
@@ -88,7 +86,7 @@ export default function ReportsPage() {
       const data = response.data
       const filteredInvoices = data.filter((invoice: any) => {
         const invoiceDate = new Date(invoice.date)
-        return invoiceDate >= dateRange.from! && invoiceDate <= dateRange.to!
+        return invoiceDate >= new Date(startDate) && invoiceDate <= new Date(endDate)
       })
 
       if (filteredInvoices.length === 0) {
@@ -100,8 +98,8 @@ export default function ReportsPage() {
         totalTax: 0,
         taxByInvoice: [],
         period: {
-          start: dateRange.from.toISOString(),
-          end: dateRange.to.toISOString()
+          start: startDate,
+          end: endDate
         }
       }
 
@@ -141,7 +139,7 @@ export default function ReportsPage() {
   }
 
   const handleDownloadCSV = () => {
-    if (!taxReport || !dateRange.from || !dateRange.to) return
+    if (!taxReport || !startDate || !endDate) return
     
     const headers = [
       "Invoice ID",
@@ -169,7 +167,7 @@ export default function ReportsPage() {
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = `tax-report-${dateRange.from.toISOString().split('T')[0]}-to-${dateRange.to.toISOString().split('T')[0]}.csv`
+    a.download = `tax-report-${startDate}-to-${endDate}.csv`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -213,10 +211,30 @@ export default function ReportsPage() {
         <CardContent>
           {/* Date Range and Actions */}
           <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
-            <ShadcnDateRangePicker
-              value={dateRange}
-              onChange={setDateRange}
-            />
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+              <div>
+                <Label htmlFor="start-date" className="text-sm font-medium">Start Date</Label>
+                <Input
+                  id="start-date"
+                  type="date"
+                  value={startDate}
+                  onChange={e => setStartDate(e.target.value)}
+                  className="mt-1.5 font-inter font-light min-w-[160px]"
+                  max={endDate}
+                />
+              </div>
+              <div>
+                <Label htmlFor="end-date" className="text-sm font-medium">End Date</Label>
+                <Input
+                  id="end-date"
+                  type="date"
+                  value={endDate}
+                  onChange={e => setEndDate(e.target.value)}
+                  className="mt-1.5 font-inter font-light min-w-[160px]"
+                  min={startDate}
+                />
+              </div>
+            </div>
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <Button
                 onClick={handleGenerateReport}

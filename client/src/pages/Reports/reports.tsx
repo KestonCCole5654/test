@@ -74,7 +74,7 @@ export default function ReportsPage() {
       }
 
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/sheets/data?sheetUrl=${encodeURIComponent(sheetUrl)}`,
+        `https://sheetbills-server.vercel.app/api/sheets/data?sheetUrl=${encodeURIComponent(sheetUrl)}`,
         {
           headers: {
             Authorization: `Bearer ${session.provider_token}`,

@@ -84,6 +84,12 @@ export default function ReportsPage() {
       )
 
       const data = response.data
+      console.log('API response data:', data)
+      if (!Array.isArray(data)) {
+        setError('Unexpected API response format. Please contact support.');
+        setIsGenerating(false);
+        return;
+      }
       const filteredInvoices = data.filter((invoice: any) => {
         const invoiceDate = new Date(invoice.date)
         return invoiceDate >= new Date(startDate) && invoiceDate <= new Date(endDate)

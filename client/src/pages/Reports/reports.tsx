@@ -1,6 +1,6 @@
 "use client"
 
-import "./reports.css"
+
 
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
@@ -136,7 +136,7 @@ export default function ReportsPage() {
     }
   }
 
-  
+
 
   useEffect(() => {
     // This effect will no longer automatically fetch on dateRange change

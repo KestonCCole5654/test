@@ -15,7 +15,7 @@ import {
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb"
 import { LoadingSpinner } from "../../components/ui/loadingSpinner"
-import { DateRangePicker } from "../../components/ui/date-range-picker"
+import { ShadcnDateRangePicker } from "../../components/ui/shadcn-date-range-picker"
 import { addDays } from "date-fns"
 import { DateRange } from "react-day-picker"
 import { supabase } from '../../lib/supabase'
@@ -213,7 +213,7 @@ export default function ReportsPage() {
         <CardContent>
           {/* Date Range and Actions */}
           <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
-            <DateRangePicker
+            <ShadcnDateRangePicker
               value={dateRange}
               onChange={setDateRange}
             />

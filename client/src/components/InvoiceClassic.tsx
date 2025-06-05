@@ -2,16 +2,7 @@ import React, { useState, useEffect } from "react";
 import LogoUpload from "./LogoUpload";
 import axios from "axios";
 import { createClient } from '@supabase/supabase-js';
-
-// Initialize Supabase client with environment variables (from .env.local)
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
-const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { supabase } from '../lib/supabase';
 
 // Types for props
 interface InvoiceItem {

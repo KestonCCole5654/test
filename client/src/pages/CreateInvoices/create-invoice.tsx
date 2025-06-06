@@ -1592,17 +1592,7 @@ ${businessData.phone}`
                   </CardContent>
                 </Card>
 
-                {/* Settings Section */}
-                <Card className="border">
-                  <CardHeader className="pb-4">
-                    <CardTitle className="text-lg font-medium">Settings</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {/* Settings content will go here */}
-                    </div>
-                  </CardContent>
-                </Card>
+               
 
                 <div className="flex w-full justify-end no-print">
                   {invoiceToEdit ? (

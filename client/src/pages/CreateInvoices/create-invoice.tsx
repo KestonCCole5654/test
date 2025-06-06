@@ -904,8 +904,8 @@ export default function InvoiceForm() {
                   <div className="text-xl font-cal font-extrabold text-gray-800 mb-2 break-all">{invoiceData.invoiceNumber}</div>
                   <div className="text-xs text-gray-500 font-normal mb-1">Billed To:</div>
                   <div className="text-base font-medium text-gray-800 mb-2">{invoiceData.customer.name || 'Customer Name'}</div>
-                  <div className="text-xs text-gray-500 font-normal mb-4">Amount Due:</div>
-                  <div className="text-xl font-cal font-extrabold text-green-800 mb-0">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
+                  <div className="text-xs text-gray-500 font-normal mb-1">Amount Due:</div>
+                  <div className="text-2xl font-cal font-extrabold text-green-800 mb-12">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
                 </div>
 
                 <div className="flex justify-center mb-10">

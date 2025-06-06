@@ -1425,7 +1425,7 @@ ${businessData.phone}`
                   <CardContent>
                     <div className="space-y-6">
                       {invoiceData.items.map((item, index) => (
-                        <div key={index} className="border  space-y-4">
+                        <div key={index} className="space-y-4">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               <span className="font-medium">Item {index + 1}</span>

@@ -1257,7 +1257,7 @@ ${businessData.phone}`
                 </h1>
                 <p className="text-sm text-gray-500 font-light">
                   {invoiceToEdit
-                    ? `Invoice #${invoiceData.invoiceNumber} - ${new Date(invoiceData.date).toLocaleDateString()}`
+                    ? `Invoice #: ${invoiceData.invoiceNumber} - ${new Date(invoiceData.date).toLocaleDateString()}`
                     : "Create a professional invoice for your client"}
                 </p>
               </div>
@@ -1425,7 +1425,7 @@ ${businessData.phone}`
                   <CardContent>
                     <div className="space-y-6">
                       {invoiceData.items.map((item, index) => (
-                        <div key={index} className="border rounded-lg p-4 space-y-4">
+                        <div key={index} className="border  space-y-4">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               <span className="font-medium">Item {index + 1}</span>

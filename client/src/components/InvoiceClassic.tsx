@@ -143,7 +143,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({
 
   return (
     <div
-      className={`bg-white w-full font-cal max-w-full box-border flex flex-col justify-start${showShadow ? ' shadow-md' : ''}`}
+      className={`bg-white w-full font-cal max-w-full box-border flex flex-col justify-start${showShadow ? ' shadow-md' : ''} pb-8`}
       style={{ minHeight: 'auto', margin: 0 }}
     >
       {/* Color strip at the top */}

@@ -1155,7 +1155,7 @@ ${businessData.phone}`
                 </div>
 
                 <div className="flex flex-col items-center justify-center gap-3 mt-2">
-                  <ul className="flex flex-col items-center justify-center gap-3 mt-2">
+                  <ul className="flex flex-col items-left justify-start gap-3 mt-2">
                     <li className="w-full">
                       <Button
                         variant="default"

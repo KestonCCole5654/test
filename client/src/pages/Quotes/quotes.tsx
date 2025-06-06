@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/components/ui/use-toast';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table';
+import { Badge } from '../../components/ui/badge';
+import { useToast } from '../../components/ui/use-toast';
 import { format } from 'date-fns';
 
 interface Quote {
@@ -22,75 +22,67 @@ export default function Quotes() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [quotes, setQuotes] = useState<Quote[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    fetchQuotes();
+    // TODO: Implement quotes fetching logic
+    // For now, using mock data
+    setQuotes([
+      {
+        quote_id: '1',
+        quote_number: 'Q-2024-001',
+        quote_date: new Date(),
+        valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        status: 'Draft',
+        customer_name: 'John Doe',
+        total_amount: 1500.00
+      },
+      {
+        quote_id: '2',
+        quote_number: 'Q-2024-002',
+        quote_date: new Date(),
+        valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        status: 'Sent',
+        customer_name: 'Jane Smith',
+        total_amount: 2750.00
+      }
+    ]);
+    setLoading(false);
   }, []);
-
-  const fetchQuotes = async () => {
-    try {
-      // TODO: Implement API call to fetch quotes
-      // For now, using mock data
-      const mockQuotes: Quote[] = [
-        {
-          quote_id: '1',
-          quote_number: 'Q-2024-001',
-          quote_date: new Date(),
-          valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-          status: 'Draft',
-          customer_name: 'John Doe',
-          total_amount: 1500.00
-        },
-        {
-          quote_id: '2',
-          quote_number: 'Q-2024-002',
-          quote_date: new Date(),
-          valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-          status: 'Sent',
-          customer_name: 'Jane Smith',
-          total_amount: 2500.00
-        }
-      ];
-      setQuotes(mockQuotes);
-    } catch (error) {
-      toast({
-        title: "Error fetching quotes",
-        description: "There was a problem loading your quotes. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleConvertToInvoice = async (quoteId: string) => {
     try {
-      // TODO: Implement conversion logic
+      // TODO: Implement quote to invoice conversion logic
       toast({
-        title: "Quote converted successfully",
-        description: "The quote has been converted to an invoice.",
+        title: 'Success',
+        description: 'Quote converted to invoice successfully',
       });
       navigate('/invoices');
     } catch (error) {
       toast({
-        title: "Error converting quote",
-        description: "There was a problem converting the quote. Please try again.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to convert quote to invoice',
+        variant: 'destructive',
       });
     }
   };
 
   const getStatusColor = (status: Quote['status']) => {
-    const colors = {
-      Draft: 'bg-gray-100 text-gray-800',
-      Sent: 'bg-blue-100 text-blue-800',
-      Accepted: 'bg-green-100 text-green-800',
-      Rejected: 'bg-red-100 text-red-800',
-      Converted: 'bg-purple-100 text-purple-800'
-    };
-    return colors[status];
+    switch (status) {
+      case 'Draft':
+        return 'bg-gray-100 text-gray-800';
+      case 'Sent':
+        return 'bg-blue-100 text-blue-800';
+      case 'Accepted':
+        return 'bg-green-100 text-green-800';
+      case 'Rejected':
+        return 'bg-red-100 text-red-800';
+      case 'Converted':
+        return 'bg-purple-100 text-purple-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
   };
 
   const filteredQuotes = quotes.filter(quote =>
@@ -100,16 +92,12 @@ export default function Quotes() {
 
   return (
     <div className="container mx-auto py-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Quotes</h1>
-        <Button onClick={() => navigate('/quotes/create')}>
-          Create New Quote
-        </Button>
-      </div>
-
       <Card>
         <CardHeader>
-          <CardTitle>All Quotes</CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle>Quotes</CardTitle>
+            <Button onClick={() => navigate('/create-quote')}>Create Quote</Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="mb-4">
@@ -120,7 +108,6 @@ export default function Quotes() {
               className="max-w-sm"
             />
           </div>
-
           <Table>
             <TableHeader>
               <TableRow>
@@ -128,43 +115,35 @@ export default function Quotes() {
                 <TableHead>Date</TableHead>
                 <TableHead>Valid Until</TableHead>
                 <TableHead>Customer</TableHead>
-                <TableHead>Amount</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredQuotes.map((quote) => (
                 <TableRow key={quote.quote_id}>
                   <TableCell>{quote.quote_number}</TableCell>
-                  <TableCell>{format(quote.quote_date, 'MMM dd, yyyy')}</TableCell>
-                  <TableCell>{format(quote.valid_until, 'MMM dd, yyyy')}</TableCell>
+                  <TableCell>{format(quote.quote_date, 'MMM d, yyyy')}</TableCell>
+                  <TableCell>{format(quote.valid_until, 'MMM d, yyyy')}</TableCell>
                   <TableCell>{quote.customer_name}</TableCell>
-                  <TableCell>${quote.total_amount.toFixed(2)}</TableCell>
                   <TableCell>
                     <Badge className={getStatusColor(quote.status)}>
                       {quote.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => navigate(`/quotes/${quote.quote_id}`)}
-                      >
-                        View
-                      </Button>
-                      {quote.status === 'Accepted' && (
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={() => handleConvertToInvoice(quote.quote_id)}
-                        >
-                          Convert to Invoice
-                        </Button>
-                      )}
-                    </div>
+                  <TableCell className="text-right">
+                    ${quote.total_amount.toFixed(2)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleConvertToInvoice(quote.quote_id)}
+                      disabled={quote.status !== 'Accepted'}
+                    >
+                      Convert to Invoice
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}

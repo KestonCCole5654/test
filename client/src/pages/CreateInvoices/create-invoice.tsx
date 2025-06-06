@@ -297,7 +297,6 @@ export default function InvoiceForm() {
       }
     }
   })
-  const previewRef = useRef<HTMLDivElement>(null)
 
   // Used to update invoice Data
   const updateInvoiceData = (field: string, value: any) => {
@@ -414,12 +413,6 @@ export default function InvoiceForm() {
     lastSynced: "",
   })
 
-  const hasBusinessDetails =
-    businessData.companyName ||
-    businessData.email ||
-    businessData.phone ||
-    businessData.address
-
   // Used to fetch business Details from the server/backend
   const fetchBusinessDetails = async () => {
     try {
@@ -480,16 +473,6 @@ export default function InvoiceForm() {
 
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   // Format date to show month name, day and year for email body
-  const formatDate = (dateString: string) => {
-    const [year, month, day] = dateString.split('-').map(Number);
-    // Month is 0-indexed in Date constructor, so subtract 1 from the month
-    const date = new Date(year, month - 1, day);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  }
 
   const [shareableLink, setShareableLink] = useState<string>("")
   const [isGeneratingLink, setIsGeneratingLink] = useState(false)
@@ -673,9 +656,7 @@ export default function InvoiceForm() {
   }
 
   const [customers, setCustomers] = useState<Customer[]>([])
-  const [open, setOpen] = useState(false)
-  const [value, setValue] = useState("")
-
+ 
   // Add useEffect to fetch customers
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -801,234 +782,7 @@ export default function InvoiceForm() {
     }
   }
 
-  const handleDownloadPDF = async () => {
-    // Use the helper function with forEmail=false
-    await generateAndSavePDF(false)
-  }
 
-  // Function to handle sending email to client using Gmail
-  const handleEmailInvoice = async () => {
-    if (!previewRef.current || !invoiceData.customer.email) {
-      toast({
-        title: "Error",
-        description: "Customer email is required to send the invoice.",
-        variant: "destructive",
-      })
-      return
-    }
-
-    // First, show a loading toast
-    toast({
-      title: "Preparing Email",
-      description: "Generating shareable invoice link...",
-      variant: "default"
-    })
-
-    try {
-      // Get the current session
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-
-      if (sessionError) {
-        throw new Error(sessionError.message)
-      }
-
-      if (!session) {
-        throw new Error("No active session")
-      }
-
-      // Create a shareable link for the invoice
-      const response = await fetch("https://sheetbills-server.vercel.app/api/invoices/shared/create-link", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Supabase-Token": session.access_token || "",
-        },
-        body: JSON.stringify({
-          invoiceId: invoiceData.invoiceNumber,
-        }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || "Failed to create shareable link")
-      }
-
-      const { shareUrl, expiresAt } = await response.json()
-
-      // Format expiration date
-      const expirationDate = new Date(expiresAt)
-      const formattedExpirationDate = expirationDate.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })
-
-      // Create a subject line for the email
-      const subject = `Invoice ${invoiceData.invoiceNumber} from ${businessData.companyName}`
-
-      // Create email body with invoice details and shareable link
-      const body = `Dear ${invoiceData.customer.name},
-
-Please find your invoice ${invoiceData.invoiceNumber} for the amount of ${formatCurrency(invoiceData.amount)}.
-
-You can view and download your invoice by clicking the link below:
-${shareUrl}
-
-Invoice Details:
-- Invoice Number: ${invoiceData.invoiceNumber}
-- Invoice Date: ${formatDate(invoiceData.date)}
-- Due Date: ${formatDate(invoiceData.dueDate)}
-- Amount: ${formatCurrency(invoiceData.amount)}
-
-This link will expire on ${formattedExpirationDate}.
-
-If you have any questions, please don't hesitate to contact us.
-
-Thank you for your business.
-
-Regards,
-${businessData.companyName}
-${businessData.email}
-${businessData.phone}`
-
-      // Open Gmail compose in a new window with prefilled fields
-      const mailtoLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(invoiceData.customer.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-
-      // Open Gmail in a new window
-      window.open(mailtoLink, '_blank')
-
-      // Show success toast
-      toast({
-        title: "Email Ready",
-        description: "Gmail has been opened with a shareable invoice link included in the email.",
-        variant: "default",
-      })
-    } catch (error) {
-      console.error("Error preparing email:", error)
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to prepare email. Please try again.",
-        variant: "destructive",
-      })
-
-      // Fallback to the PDF attachment method if creating a shareable link fails
-      try {
-        await generateAndSavePDF(true)
-
-        // Create a subject line for the email
-        const subject = `Invoice ${invoiceData.invoiceNumber} from ${businessData.companyName}`
-
-        // Create email body with invoice details
-        const body = `Dear ${invoiceData.customer.name},
-
-Please find attached invoice ${invoiceData.invoiceNumber} for the amount of ${formatCurrency(invoiceData.amount)}.
-
-Invoice Date: ${formatDate(invoiceData.date)}
-Due Date: ${formatDate(invoiceData.dueDate)}
-
-If you have any questions, please don't hesitate to contact us.
-
-Thank you for your business.
-
-Regards,
-${businessData.companyName}
-${businessData.email}
-${businessData.phone}`
-
-        // Open Gmail compose in a new window with prefilled fields
-        const mailtoLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(invoiceData.customer.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-
-        // Open Gmail in a new window
-        window.open(mailtoLink, '_blank')
-
-        // Show fallback toast
-        toast({
-          title: "Email Ready (Fallback Mode)",
-          description: "Gmail has been opened. Please attach the downloaded invoice PDF to complete your email.",
-          variant: "default",
-        })
-      } catch (fallbackError) {
-        console.error("Error in fallback email method:", fallbackError)
-        toast({
-          title: "Error",
-          description: "All email methods failed. Please try again later.",
-          variant: "destructive",
-        })
-      }
-    }
-  }
-
-  // Helper function to generate and save PDF
-  const generateAndSavePDF = async (forEmail = false) => {
-    if (!previewRef.current) return
-
-    try {
-      // Create a temporary div to render the invoice without buttons
-      const tempDiv = document.createElement("div")
-      tempDiv.innerHTML = previewRef.current.innerHTML
-      document.body.appendChild(tempDiv)
-
-      // Apply print styles
-      tempDiv.style.width = "210mm" // A4 width
-      tempDiv.style.padding = "10mm"
-      tempDiv.style.backgroundColor = "white"
-
-      // Hide any no-print elements
-      const noPrintElements = tempDiv.querySelectorAll(".no-print")
-      noPrintElements.forEach((el) => {
-        ; (el as HTMLElement).style.display = "none"
-      })
-
-      // Capture the canvas
-      const canvas = await html2canvas(tempDiv, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#ffffff",
-      })
-
-      // Remove the temporary div
-      document.body.removeChild(tempDiv)
-
-      // Create PDF
-      const imgData = canvas.toDataURL("image/png")
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
-      })
-
-      const imgWidth = 210 // A4 width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width
-
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight)
-
-      // Save the PDF with a clear filename that indicates it's for email attachment
-      const filename = forEmail
-        ? `Invoice-${invoiceData.invoiceNumber}-for-${invoiceData.customer.name.replace(/\s+/g, "-")}.pdf`
-        : `Invoice-${invoiceData.invoiceNumber}.pdf`
-
-      pdf.save(filename)
-
-      if (forEmail) {
-        toast({
-          title: "PDF Generated",
-          description: `Invoice PDF saved as "${filename}". Please attach this file to your email.`,
-          variant: "default"
-        })
-      }
-
-      return pdf
-    } catch (error) {
-      console.error("Error generating PDF:", error)
-      toast({
-        title: "Error",
-        description: "Failed to generate PDF. Please try again.",
-        variant: "destructive",
-      })
-      return null
-    }
-  }
 
   // Used to edit invoice
   useEffect(() => {
@@ -1120,7 +874,7 @@ ${businessData.phone}`
     <>
       {/* Preview Mode - Cleaned up */}
       {!isFormExpanded && (
-        <div className="w-full max-w-7xl mx-auto mt-4">
+        <div className="w-full max-w-7xl mx-auto mt-4 px-4">
           {/* Breadcrumb Navigation */}
           <div className="max-w-7xl mb-6">
             <Breadcrumb>
@@ -1230,10 +984,9 @@ ${businessData.phone}`
           </div>
         </div>
       )}
-
       {/* Edit Mode (Form) */}
       {isFormExpanded && (
-        <div className="w-full max-w-7xl mx-auto mt-4 ">
+        <div className="w-full max-w-7xl mx-auto mt-4 px-4 ">
           <div className="mb-6">
             {/* Breadcrumb Navigation */}
             <div className="mt-0 mb-4">

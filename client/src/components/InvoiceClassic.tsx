@@ -254,6 +254,8 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({
             </div>
           </div>
         </div>
+
+        
       </div>
 
       {/* Due amount row - now full width, outside the grid */}
@@ -333,6 +335,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({
           Powered by <span className="font-medium" style={{ color: data.color || '#166534' }}>SheetBills</span> @sheetbills.com
         </div>
       </div>
+
     </div>
   );
 };

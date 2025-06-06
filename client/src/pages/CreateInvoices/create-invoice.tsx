@@ -1215,7 +1215,7 @@ ${businessData.phone}`
             </div>
             {/* Right: Invoice Preview */}
             <div className="flex-1 min-w-0">
-              <div className="invoice-preview-print bg-white border border-gray-200 p-4">
+              <div className="invoice-preview-print bg-white border border-gray-200 ">
                 <div className="w-full overflow-auto">
                   <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
                 </div>
@@ -1262,7 +1262,7 @@ ${businessData.phone}`
                 </p>
               </div>
               {/* Controls: color picker + preview button */}
-              <div className="flex items-center gap-6">
+              <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 md:gap-6 w-full md:w-auto">
                 <label htmlFor="invoiceColorEdit" className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="color"
@@ -1272,12 +1272,12 @@ ${businessData.phone}`
                     className="h-8 w-8 rounded border shadow-sm"
                     style={{ background: 'none' }}
                   />
-                  <span className="text-sm text-gray-600 font-medium">Invoice Color</span>
+                  <span className="text-sm text-gray-600 font-medium">Choose a Invoice Template Color</span>
                 </label>
                 <Button
                   variant="outline"
                   onClick={() => setIsFormExpanded(!isFormExpanded)}
-                  className="bg-green-800 hover:bg-green-900 text-white font-semibold px-6 py-2"
+                  className="bg-green-800 hover:bg-green-900 text-white font-normal px-6 py-2 w-full md:w-auto"
                 >
                   {isFormExpanded ? "Preview Mode" : "Edit Mode"}
                 </Button>

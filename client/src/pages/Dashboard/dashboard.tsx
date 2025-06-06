@@ -933,7 +933,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="container bg-gray-50/50 max-w-7xl mx-auto px-4">
+    <div className="w-full max-w-7xl mx-auto mt-4 bg-gray-50/50">
       {/* Breadcrumb Navigation */}
       <div className="mt-4 mb-6">
         <Breadcrumb>

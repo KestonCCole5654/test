@@ -97,7 +97,7 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen w-full bg-gray-50">
-      <div className="container max-w-7xl mx-auto px-4 py-8">
+      <div className="w-full max-w-7xl mx-auto mt-4">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>

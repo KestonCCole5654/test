@@ -1616,7 +1616,7 @@ ${businessData.phone}`
               <div className="sticky top-4">
                 {/* Add a print-specific wrapper */}
                 <div className="invoice-preview-print" style={{ backgroundColor: 'white' }}>
-                <div className="bg-white border rounded-lg p-6">
+                <div className="bg-white border p-2">
                   <InvoiceClassic data={invoiceData} businessData={businessData} showShadow={false} />
                   </div>
                 </div>

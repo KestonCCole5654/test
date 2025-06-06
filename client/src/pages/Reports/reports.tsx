@@ -38,11 +38,58 @@ interface TaxReport {
   }
 }
 
+interface ProfitLossReport {
+  revenue: number;
+  expenses: number;
+  netProfit: number;
+  period: {
+    start: string;
+    end: string;
+  };
+  details: {
+    revenue: Array<{
+      date: string;
+      invoiceId: string;
+      customerName: string;
+      amount: number;
+    }>;
+    expenses: Array<{
+      date: string;
+      description: string;
+      amount: number;
+    }>;
+  };
+}
+
+interface CashFlowReport {
+  openingBalance: number;
+  closingBalance: number;
+  period: {
+    start: string;
+    end: string;
+  };
+  inflows: Array<{
+    date: string;
+    invoiceId: string;
+    customerName: string;
+    amount: number;
+    status: string;
+  }>;
+  outflows: Array<{
+    date: string;
+    description: string;
+    amount: number;
+    status: string;
+  }>;
+}
+
 export default function ReportsPage() {
   const navigate = useNavigate()
   const { toast } = useToast()
   const [isGenerating, setIsGenerating] = useState(false)
   const [taxReport, setTaxReport] = useState<TaxReport | null>(null)
+  const [profitLossReport, setProfitLossReport] = useState<ProfitLossReport | null>(null)
+  const [cashFlowReport, setCashFlowReport] = useState<CashFlowReport | null>(null)
   const [startDate, setStartDate] = useState<string>(format(addDays(new Date(), -30), 'yyyy-MM-dd'))
   const [endDate, setEndDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'))
   const [error, setError] = useState<string | null>(null)
@@ -139,6 +186,207 @@ export default function ReportsPage() {
       setIsGenerating(false)
     }
   }
+
+  const generateProfitLossReport = async () => {
+    if (!startDate || !endDate) {
+      toast({
+        title: "Selection Required",
+        description: "Please select both a start and end date for the report.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsGenerating(true);
+    setError(null);
+    setProfitLossReport(null);
+    
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/sign-in");
+        return;
+      }
+
+      const sheetUrl = localStorage.getItem("defaultSheetUrl");
+      if (!sheetUrl) {
+        throw new Error("No invoice spreadsheet selected");
+      }
+
+      const response = await axios.get(
+        `https://sheetbills-server.vercel.app/api/sheets/data?sheetUrl=${encodeURIComponent(sheetUrl)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${session.provider_token}`,
+            "x-supabase-token": session.access_token,
+          },
+        }
+      );
+
+      const data = response.data;
+      if (!Array.isArray(data)) {
+        throw new Error('Unexpected API response format');
+      }
+
+      const filteredInvoices = data.filter((invoice: any) => {
+        const invoiceDate = new Date(invoice.date);
+        return invoiceDate >= new Date(startDate) && invoiceDate <= new Date(endDate);
+      });
+
+      if (filteredInvoices.length === 0) {
+        setError("No data found for the selected date range");
+        return;
+      }
+
+      // Calculate revenue from paid invoices
+      const revenue = filteredInvoices
+        .filter((inv: any) => inv.status === "Paid")
+        .reduce((sum: number, inv: any) => sum + (inv.amount || 0), 0);
+
+      // For this example, we'll use a fixed expense amount
+      // In a real implementation, you would fetch actual expenses from your system
+      const expenses = revenue * 0.3; // Example: 30% of revenue as expenses
+
+      const report: ProfitLossReport = {
+        revenue,
+        expenses,
+        netProfit: revenue - expenses,
+        period: {
+          start: startDate,
+          end: endDate
+        },
+        details: {
+          revenue: filteredInvoices
+            .filter((inv: any) => inv.status === "Paid")
+            .map((inv: any) => ({
+              date: inv.date,
+              invoiceId: inv.invoiceNumber,
+              customerName: inv.customer.name,
+              amount: inv.amount
+            })),
+          expenses: [
+            // Example expenses - in a real implementation, these would come from your system
+            {
+              date: startDate,
+              description: "Operating Expenses",
+              amount: expenses
+            }
+          ]
+        }
+      };
+
+      setProfitLossReport(report);
+    } catch (error: any) {
+      console.error("Error generating P&L report:", error);
+      setError(error.message || "Failed to generate P&L report");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const generateCashFlowReport = async () => {
+    if (!startDate || !endDate) {
+      toast({
+        title: "Selection Required",
+        description: "Please select both a start and end date for the report.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsGenerating(true);
+    setError(null);
+    setCashFlowReport(null);
+    
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/sign-in");
+        return;
+      }
+
+      const sheetUrl = localStorage.getItem("defaultSheetUrl");
+      if (!sheetUrl) {
+        throw new Error("No invoice spreadsheet selected");
+      }
+
+      const response = await axios.get(
+        `https://sheetbills-server.vercel.app/api/sheets/data?sheetUrl=${encodeURIComponent(sheetUrl)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${session.provider_token}`,
+            "x-supabase-token": session.access_token,
+          },
+        }
+      );
+
+      const data = response.data;
+      if (!Array.isArray(data)) {
+        throw new Error('Unexpected API response format');
+      }
+
+      const filteredInvoices = data.filter((invoice: any) => {
+        const invoiceDate = new Date(invoice.date);
+        return invoiceDate >= new Date(startDate) && invoiceDate <= new Date(endDate);
+      });
+
+      if (filteredInvoices.length === 0) {
+        setError("No data found for the selected date range");
+        return;
+      }
+
+      // Calculate opening balance (sum of all paid invoices before start date)
+      const openingBalance = data
+        .filter((inv: any) => {
+          const invDate = new Date(inv.date);
+          return invDate < new Date(startDate) && inv.status === "Paid";
+        })
+        .reduce((sum: number, inv: any) => sum + (inv.amount || 0), 0);
+
+      // Calculate inflows (paid invoices in period)
+      const inflows = filteredInvoices
+        .filter((inv: any) => inv.status === "Paid")
+        .map((inv: any) => ({
+          date: inv.date,
+          invoiceId: inv.invoiceNumber,
+          customerName: inv.customer.name,
+          amount: inv.amount,
+          status: "Paid"
+        }));
+
+      // Calculate outflows (example - in real implementation, these would come from your system)
+      const outflows = [
+        {
+          date: startDate,
+          description: "Operating Expenses",
+          amount: inflows.reduce((sum, inv) => sum + inv.amount, 0) * 0.3, // Example: 30% of inflows
+          status: "Paid"
+        }
+      ];
+
+      const totalInflows = inflows.reduce((sum, inv) => sum + inv.amount, 0);
+      const totalOutflows = outflows.reduce((sum, exp) => sum + exp.amount, 0);
+      const closingBalance = openingBalance + totalInflows - totalOutflows;
+
+      const report: CashFlowReport = {
+        openingBalance,
+        closingBalance,
+        period: {
+          start: startDate,
+          end: endDate
+        },
+        inflows,
+        outflows
+      };
+
+      setCashFlowReport(report);
+    } catch (error: any) {
+      console.error("Error generating cash flow report:", error);
+      setError(error.message || "Failed to generate cash flow report");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const handleGenerateReport = () => {
     fetchData()
@@ -439,6 +687,292 @@ export default function ReportsPage() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${invoice.amount.toFixed(2)}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${invoice.taxAmount.toFixed(2)}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{invoice.taxRate}%</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Profit & Loss Report Section */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            Profit & Loss Report
+          </CardTitle>
+          <CardDescription>
+            View your business's profitability over time
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {/* Date Range and Actions */}
+          <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+              <div>
+                <Label htmlFor="start-date" className="text-sm font-medium">Start Date</Label>
+                <Input
+                  id="start-date"
+                  type="date"
+                  value={startDate}
+                  onChange={e => setStartDate(e.target.value)}
+                  className="mt-1.5 font-inter font-light min-w-[160px]"
+                  max={endDate}
+                />
+              </div>
+              <div>
+                <Label htmlFor="end-date" className="text-sm font-medium">End Date</Label>
+                <Input
+                  id="end-date"
+                  type="date"
+                  value={endDate}
+                  onChange={e => setEndDate(e.target.value)}
+                  className="mt-1.5 font-inter font-light min-w-[160px]"
+                  min={startDate}
+                />
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <Button
+                onClick={generateProfitLossReport}
+                disabled={isGenerating}
+                className="flex items-center gap-2 w-full sm:w-auto bg-green-800 hover:bg-green-900 text-white"
+              >
+                {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                {isGenerating ? "Generating..." : "Generate P&L Report"}
+              </Button>
+            </div>
+          </div>
+
+          {/* P&L Report Content */}
+          {profitLossReport && !isGenerating && (
+            <div className="space-y-6">
+              {/* Summary Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-gray-500">Total Revenue</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-semibold text-gray-900">${profitLossReport.revenue.toFixed(2)}</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-gray-500">Total Expenses</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-semibold text-gray-900">${profitLossReport.expenses.toFixed(2)}</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-gray-500">Net Profit</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-semibold text-gray-900">${profitLossReport.netProfit.toFixed(2)}</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Revenue Details */}
+              <div className="rounded-md border">
+                <div className="p-4 border-b">
+                  <h3 className="text-lg font-medium">Revenue Details</h3>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice ID</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {profitLossReport.details.revenue.map((item) => (
+                        <tr key={item.invoiceId} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{new Date(item.date).toLocaleDateString()}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.invoiceId}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.customerName}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${item.amount.toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Expenses Details */}
+              <div className="rounded-md border">
+                <div className="p-4 border-b">
+                  <h3 className="text-lg font-medium">Expenses Details</h3>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {profitLossReport.details.expenses.map((item, index) => (
+                        <tr key={index} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{new Date(item.date).toLocaleDateString()}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.description}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${item.amount.toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Cash Flow Report Section */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            Cash Flow Report
+          </CardTitle>
+          <CardDescription>
+            Track your business's cash movements
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {/* Date Range and Actions */}
+          <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+              <div>
+                <Label htmlFor="start-date" className="text-sm font-medium">Start Date</Label>
+                <Input
+                  id="start-date"
+                  type="date"
+                  value={startDate}
+                  onChange={e => setStartDate(e.target.value)}
+                  className="mt-1.5 font-inter font-light min-w-[160px]"
+                  max={endDate}
+                />
+              </div>
+              <div>
+                <Label htmlFor="end-date" className="text-sm font-medium">End Date</Label>
+                <Input
+                  id="end-date"
+                  type="date"
+                  value={endDate}
+                  onChange={e => setEndDate(e.target.value)}
+                  className="mt-1.5 font-inter font-light min-w-[160px]"
+                  min={startDate}
+                />
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <Button
+                onClick={generateCashFlowReport}
+                disabled={isGenerating}
+                className="flex items-center gap-2 w-full sm:w-auto bg-green-800 hover:bg-green-900 text-white"
+              >
+                {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                {isGenerating ? "Generating..." : "Generate Cash Flow Report"}
+              </Button>
+            </div>
+          </div>
+
+          {/* Cash Flow Report Content */}
+          {cashFlowReport && !isGenerating && (
+            <div className="space-y-6">
+              {/* Summary Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-gray-500">Opening Balance</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-semibold text-gray-900">${cashFlowReport.openingBalance.toFixed(2)}</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-gray-500">Net Cash Flow</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-semibold text-gray-900">
+                      ${(cashFlowReport.closingBalance - cashFlowReport.openingBalance).toFixed(2)}
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-gray-500">Closing Balance</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-semibold text-gray-900">${cashFlowReport.closingBalance.toFixed(2)}</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Cash Inflows */}
+              <div className="rounded-md border">
+                <div className="p-4 border-b">
+                  <h3 className="text-lg font-medium">Cash Inflows</h3>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice ID</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {cashFlowReport.inflows.map((item) => (
+                        <tr key={item.invoiceId} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{new Date(item.date).toLocaleDateString()}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.invoiceId}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.customerName}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${item.amount.toFixed(2)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.status}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Cash Outflows */}
+              <div className="rounded-md border">
+                <div className="p-4 border-b">
+                  <h3 className="text-lg font-medium">Cash Outflows</h3>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {cashFlowReport.outflows.map((item, index) => (
+                        <tr key={index} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{new Date(item.date).toLocaleDateString()}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.description}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${item.amount.toFixed(2)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.status}</td>
                         </tr>
                       ))}
                     </tbody>

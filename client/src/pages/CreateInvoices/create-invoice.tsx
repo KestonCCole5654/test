@@ -1146,11 +1146,11 @@ ${businessData.phone}`
               <div className="bg-white border border-gray-200 p-6 flex flex-col gap-6">
                 <div>
                   <div className="text-xs text-gray-500 font-normal mb-1">Invoice #</div>
-                  <div className="text-lg font-sans font-extrabold text-gray-800 mb-2 break-all">{invoiceData.invoiceNumber}</div>
+                  <div className="text-2xl font-sans font-extrabold text-gray-800 mb-2 break-all">{invoiceData.invoiceNumber}</div>
                   <div className="text-xs text-gray-500 font-normal mb-1">Billed To:</div>
                   <div className="text-base font-medium text-gray-800 mb-2">{invoiceData.customer.name || 'Customer Name'}</div>
                   <div className="text-xs text-gray-500 font-normal mb-1">Amount Due:</div>
-                  <div className="text-2xl font-sans font-extrabold text-green-800 mb-0">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
+                  <div className="text-3xl font-sans font-extrabold text-green-800 mb-0">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
                 </div>
 
                 <div className="flex flex-col gap-3 mt-2">
@@ -1255,7 +1255,7 @@ ${businessData.phone}`
                     : "Create a professional invoice for your client"}
                 </p>
               </div>
-              <div className="flex items-center gap-4 mt-2 sm:mt-0">
+              <div className="flex items-center gap-16 mt-2 sm:mt-0">
                 <div className="flex flex-col items-center ml-2">
                   {/*
                   <label htmlFor="invoiceColorEdit" className="text-xs text-gray-500 font-normal mb-1">Invoice Color</label>
@@ -1269,7 +1269,7 @@ ${businessData.phone}`
                       className="h-8 w-8 rounded cursor-pointer border"
                       style={{ background: 'none' }}
                     />
-                    <span className="text-xs text-gray-500">Invoice Color - Customize template color</span>
+                    <span className="text-sm text-gray-500">Invoice Color - Customize template color</span>
                   </div>
                 </div>
                 <Button

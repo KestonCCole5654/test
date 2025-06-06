@@ -29,6 +29,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../../components/ui/pop
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { supabase } from '../../lib/supabase'
+import { ColorPicker } from '../../components/ui/color-picker'
 
 // Replace the printStyles constant with this updated version
 const printStyles = `
@@ -1288,6 +1289,13 @@ ${businessData.phone}`
                 >
                   {isFormExpanded ? "Preview Mode" : "Edit Mode"}
                 </Button>
+                {/* Color Picker beside the action buttons */}
+                <div className="ml-2">
+                  <ColorPicker
+                    color={invoiceData.color || "#166534"}
+                    onChange={color => updateInvoiceData("color", color)}
+                  />
+                </div>
               </div>
             </div>
           </div>

@@ -835,6 +835,136 @@ export default function ReportsPage() {
               </div>
             </div>
           )}
+
+          {/* P&L Example Report */}
+          {!profitLossReport && !isGenerating && !error && (
+            <>
+              <Alert>
+                <AlertTitle>No P&L Report Generated</AlertTitle>
+                <AlertDescription>
+                  Select a date range and click "Generate P&L Report" to view your profit and loss data.
+                </AlertDescription>
+              </Alert>
+              {/* Mockup Example Report */}
+              <div className="mt-8">
+                <div className="mb-2 text-xs font-semibold text-green-700 uppercase tracking-wide">Example P&L Report (Mock Data)</div>
+                <div className="space-y-6">
+                  {/* Summary Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-gray-500">Total Revenue</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-2xl font-semibold text-gray-900">$15,750.00</p>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-gray-500">Total Expenses</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-2xl font-semibold text-gray-900">$4,725.00</p>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-gray-500">Net Profit</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-2xl font-semibold text-gray-900">$11,025.00</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Revenue Details */}
+                  <div className="rounded-md border">
+                    <div className="p-4 border-b">
+                      <h3 className="text-lg font-medium">Revenue Details</h3>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice ID</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          <tr className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2025-06-01</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">INV-001</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Acme Corp</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$5,000.00</td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2025-06-10</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">INV-002</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Beta LLC</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$3,500.00</td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2025-06-15</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">INV-003</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Gamma Inc</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$4,250.00</td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2025-06-20</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">INV-004</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Delta Ltd</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$3,000.00</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Expenses Details */}
+                  <div className="rounded-md border">
+                    <div className="p-4 border-b">
+                      <h3 className="text-lg font-medium">Expenses Details</h3>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          <tr className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2025-06-05</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Office Rent</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$2,000.00</td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2025-06-12</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Utilities</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$500.00</td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2025-06-18</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Marketing</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$1,225.00</td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2025-06-25</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Software Subscriptions</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$1,000.00</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
 
@@ -980,6 +1110,146 @@ export default function ReportsPage() {
                 </div>
               </div>
             </div>
+          )}
+
+          {/* Cash Flow Example Report */}
+          {!cashFlowReport && !isGenerating && !error && (
+            <>
+              <Alert>
+                <AlertTitle>No Cash Flow Report Generated</AlertTitle>
+                <AlertDescription>
+                  Select a date range and click "Generate Cash Flow Report" to view your cash flow data.
+                </AlertDescription>
+              </Alert>
+              {/* Mockup Example Report */}
+              <div className="mt-8">
+                <div className="mb-2 text-xs font-semibold text-green-700 uppercase tracking-wide">Example Cash Flow Report (Mock Data)</div>
+                <div className="space-y-6">
+                  {/* Summary Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-gray-500">Opening Balance</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-2xl font-semibold text-gray-900">$25,000.00</p>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-gray-500">Net Cash Flow</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-2xl font-semibold text-gray-900">$11,025.00</p>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-gray-500">Closing Balance</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-2xl font-semibold text-gray-900">$36,025.00</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Cash Inflows */}
+                  <div className="rounded-md border">
+                    <div className="p-4 border-b">
+                      <h3 className="text-lg font-medium">Cash Inflows</h3>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice ID</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          <tr className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2025-06-01</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">INV-001</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Acme Corp</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$5,000.00</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Paid</td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2025-06-10</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">INV-002</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Beta LLC</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$3,500.00</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Paid</td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2025-06-15</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">INV-003</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Gamma Inc</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$4,250.00</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Paid</td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2025-06-20</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">INV-004</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Delta Ltd</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$3,000.00</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Paid</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Cash Outflows */}
+                  <div className="rounded-md border">
+                    <div className="p-4 border-b">
+                      <h3 className="text-lg font-medium">Cash Outflows</h3>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          <tr className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2025-06-05</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Office Rent</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$2,000.00</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Paid</td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2025-06-12</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Utilities</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$500.00</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Paid</td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2025-06-18</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Marketing</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$1,225.00</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Paid</td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2025-06-25</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Software Subscriptions</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">$1,000.00</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Paid</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

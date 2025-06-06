@@ -1249,7 +1249,7 @@ ${businessData.phone}`
             </div>
 
             {/* Header Content - Tidy, aligned, simple badge */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-44 gap-2">
               <div>
                 <h1 className="text-2xl font-normal text-gray-900 mb-1">
                   {invoiceToEdit ? "Edit Invoice" : "Create New Invoice"}
@@ -1265,16 +1265,16 @@ ${businessData.phone}`
                   {/*
                   <label htmlFor="invoiceColorEdit" className="text-xs text-gray-500 font-normal mb-1">Invoice Color</label>
                   */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex w-full items-center gap-2">
                     <input
                       type="color"
                       id="invoiceColorEdit"
                       value={invoiceData.color}
                       onChange={e => updateInvoiceData("color", e.target.value)}
-                      className="h-8 w-8 rounded cursor-pointer border"
+                      className="h-8 w-8  rounded cursor-pointer border"
                       style={{ background: 'none' }}
                     />
-                    <span className="text-sm text-gray-500">Invoice Color - Customize template color</span>
+                    <span className="text-sm  text-gray-500">Invoice Color - Customize template color</span>
                   </div>
                 </div>
                 <Button

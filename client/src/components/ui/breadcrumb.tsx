@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
-import { ChevronRight, MoreHorizontal, Home } from "lucide-react"
+import { ChevronRight, MoreHorizontal } from "lucide-react"
 
 import { cn } from "../lib/utils"
 
@@ -65,7 +65,7 @@ const BreadcrumbLink = React.forwardRef<
       )}
       {...props}
     >
-      {isDashboard && <Home className="w-4 h-4" />}
+      {isDashboard}
       {props.children}
     </Comp>
   )
@@ -88,7 +88,7 @@ const BreadcrumbHome = React.forwardRef<
       )}
       {...props}
     >
-      <Home className="w-5 h-5" />
+    
     </Comp>
   )
 })

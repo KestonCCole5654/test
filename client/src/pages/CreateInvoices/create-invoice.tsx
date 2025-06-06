@@ -1185,6 +1185,7 @@ ${businessData.phone}`
                     <Link2 className="w-4 h-4 mr-2" />
                     {isGeneratingLink ? "Generating Link ..." : "Generate Invoice Link"}
                   </Button>
+
                 </div>
                 {/* Shareable Link UI - shown directly under the three buttons */}
                 {shareableLink && (
@@ -1226,7 +1227,7 @@ ${businessData.phone}`
 
       {/* Edit Mode (Form) */}
       {isFormExpanded && (
-        <div className="w-full max-w-7xl mx-auto mt-4">
+        <div className="w-full max-w-7xl mx-auto mt-4 ">
           <div className="mb-6">
             {/* Breadcrumb Navigation */}
             <div className="mt-0 mb-4">
@@ -1248,7 +1249,7 @@ ${businessData.phone}`
             </div>
 
             {/* Header Content - Tidy, aligned, simple badge */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 gap-2">
               <div>
                 <h1 className="text-2xl font-normal text-gray-900 mb-1">
                   {invoiceToEdit ? "Edit Invoice" : "Create New Invoice"}
@@ -1259,7 +1260,7 @@ ${businessData.phone}`
                     : "Create a professional invoice for your client"}
                 </p>
               </div>
-              <div className="flex items-center gap-16 mt-2 sm:mt-0">
+              <div className="flex items-center gap-8 md:gap-16 mt-2 sm:mt-0">
                 <div className="flex flex-col items-center ml-2">
                   {/*
                   <label htmlFor="invoiceColorEdit" className="text-xs text-gray-500 font-normal mb-1">Invoice Color</label>

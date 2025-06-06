@@ -1144,6 +1144,7 @@ ${businessData.phone}`
             {/* Left: Invoice Summary Card */}
             <div className="md:w-80 w-full flex-shrink-0">
               <div className="bg-white border border-gray-200 p-6 flex flex-col gap-6">
+                
                 <div>
                   <div className="text-xs text-gray-500 font-normal mb-1">Invoice #</div>
                   <div className="text-2xl font-sans font-extrabold text-gray-800 mb-2 break-all">{invoiceData.invoiceNumber}</div>
@@ -1153,15 +1154,17 @@ ${businessData.phone}`
                   <div className="text-3xl font-sans font-extrabold text-green-800 mb-0">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
                 </div>
 
-                <div className="flex flex-col gap-3 mt-2">
+                <div className="flex flex-col justify-start gap-3 mt-2">
+
                   <Button
                     variant="default"
-                    className="bg-green-800 hover:bg-green-900 text-white font-normal px-4 py-2  shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
+                    className="bg-green-800 hover:bg-green-900 text-white font-normal px-4 py-2 shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
                     onClick={() => setIsFormExpanded(true)}
                   >
                     <Pencil className="w-4 h-4 mr-2" />
                     Edit Invoice
                   </Button>
+
                   <Button
                     variant="outline"
                     className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2  shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
@@ -1172,6 +1175,7 @@ ${businessData.phone}`
                     <Printer className="w-4 h-4 mr-2" />
                     Print Invoice
                   </Button>
+
                   <Button
                     variant="default"
                     className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2  shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"

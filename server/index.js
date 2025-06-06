@@ -185,6 +185,66 @@ async function getOrCreateMasterSheet(accessToken, userId) {
     throw new Error(`Master sheet initialization failed: ${error.message}`);
   }
 }
+/**
+ * Ensures the SheetBills Invoices tab has the correct headers, including 'Color'.
+ * If the header row is missing or incomplete, it will be updated.
+ * @param {object} sheets - Google Sheets API instance
+ * @param {string} spreadsheetId - The spreadsheet ID
+ * @param {string} sheetName - The name of the invoices sheet
+ */
+async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
+  const correctHeaders = [
+    'Invoice ID',
+    'Date',
+    'Due Date',
+    'Customer Name',
+    'Customer Email',
+    'Customer Address',
+    'Items',
+    'Amount',
+    'Tax',
+    'Discount',
+    'Notes',
+    'Template',
+    'Status',
+    'Color'
+  ];
+  try {
+    const headerResp = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${sheetName}!A1:N1`,
+    });
+    const currentHeaders = headerResp.data.values ? headerResp.data.values[0] : [];
+    // If headers are missing or don't match, update them
+    let needsUpdate = false;
+    if (currentHeaders.length !== correctHeaders.length) {
+      needsUpdate = true;
+    } else {
+      for (let i = 0; i < correctHeaders.length; i++) {
+        if (currentHeaders[i] !== correctHeaders[i]) {
+          needsUpdate = true;
+          break;
+        }
+      }
+    }
+    if (needsUpdate) {
+      await sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range: `${sheetName}!A1:N1`,
+        valueInputOption: 'RAW',
+        resource: { values: [correctHeaders] },
+      });
+    }
+  } catch (err) {
+    // If header row doesn't exist, just set it
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: `${sheetName}!A1:N1`,
+      valueInputOption: 'RAW',
+      resource: { values: [correctHeaders] },
+    });
+  }
+}
 // Helper function to get or create default sheet
 async function getDefaultSheetId(accessToken) {
   const auth = new google.auth.OAuth2();
@@ -267,7 +327,7 @@ async function getDefaultSheetId(accessToken) {
 
     await sheets.spreadsheets.values.update({
       spreadsheetId: newSheet.data.spreadsheetId,
-      range: `'SheetBills Invoices'!A1:M1`,
+      range: `'SheetBills Invoices'!A1:N1`,
       valueInputOption: 'RAW',
       resource: { values: [headers] }
     });
@@ -1107,6 +1167,7 @@ app.post('/api/saveInvoice', async (req, res) => {
     ];
 
     // Append the new invoice to the sheet
+    await ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName);
     await sheets.spreadsheets.values.append({
       spreadsheetId,
       range: `${sheetName}!A:N`,
@@ -1529,6 +1590,7 @@ app.post('/api/update-invoice', async (req, res) => {
     ];
 
     // Update the row
+    await ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName);
     await sheets.spreadsheets.values.update({
       spreadsheetId,
       range: `${sheetName}!A${rowIndex + 1}:N${rowIndex + 1}`,
@@ -2173,11 +2235,11 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
     const invoiceHeaders = [
       'Invoice ID', 'Invoice Date', 'Due Date', 'Customer Name',
       'Customer Email', 'Customer Address', 'Items', 'Amount',
-      'Tax', 'Discount', 'Notes', 'Template', 'Status'
+      'Tax', 'Discount', 'Notes', 'Template', 'Status', 'Color'
     ];
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: 'SheetBills Invoices!A1:M1',
+      range: 'SheetBills Invoices!A1:N1',
       valueInputOption: 'RAW',
       requestBody: { values: [invoiceHeaders] }
     });

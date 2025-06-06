@@ -255,8 +255,9 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({
           </div>
         </div>
       </div>
+
       {/* Due amount row - now full width, outside the grid */}
-      <div className="mt-2 font-medium w-full px-6 py-5">
+      <div className="mt-2 font-medium w-full px-6 pb-5 mb-5 ">
         <p className="text-xl md:text-2xl" style={{ color: data.color || '#166534' }}>
           ${formatCurrency(total)} due <span className="pl-1">{formatDate(data.dueDate)}</span>
         </p>

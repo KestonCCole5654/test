@@ -1152,6 +1152,22 @@ ${businessData.phone}`
                   <div className="text-xs text-gray-500 font-normal mb-1">Amount Due:</div>
                   <div className="text-2xl font-bold text-green-800 mb-0">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
                 </div>
+
+                {/* Color Picker */}
+                <div className="border-t pt-4">
+                  <div className="text-xs text-gray-500 font-normal mb-2">Invoice Color</div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      id="invoiceColor"
+                      value={invoiceData.color}
+                      onChange={(e) => updateInvoiceData("color", e.target.value)}
+                      className="h-8 w-8 rounded cursor-pointer"
+                    />
+                    <span className="text-sm text-gray-500">Customize template color</span>
+                  </div>
+                </div>
+
                 <div className="flex flex-col gap-3 mt-2">
                   <Button
                     variant="default"
@@ -1270,7 +1286,7 @@ ${businessData.phone}`
                   onClick={() => setIsFormExpanded(!isFormExpanded)}
                   className="bg-green-800 hover:bg-green-900 text-white font-medium px-6 py-2"
                 >
-                  {isFormExpanded ? "Hide Form" : "Show Form"}
+                  {isFormExpanded ? "Preview Mode" : "Edit Mode"}
                 </Button>
               </div>
             </div>
@@ -1583,20 +1599,7 @@ ${businessData.phone}`
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {/* Color Picker */}
-                      <div>
-                        <Label htmlFor="invoiceColor" className="text-sm font-medium">Invoice Color</Label>
-                        <div className="mt-1.5 flex items-center gap-2">
-                          <input
-                            type="color"
-                            id="invoiceColor"
-                            value={invoiceData.color}
-                            onChange={(e) => updateInvoiceData("color", e.target.value)}
-                            className="h-8 w-8 rounded cursor-pointer"
-                          />
-                          <span className="text-sm text-gray-500">Choose a color for your invoice template</span>
-                        </div>
-                      </div>
+                      {/* Settings content will go here */}
                     </div>
                   </CardContent>
                 </Card>

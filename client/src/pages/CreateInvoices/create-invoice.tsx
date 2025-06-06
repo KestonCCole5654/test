@@ -1154,45 +1154,44 @@ ${businessData.phone}`
                   <div className="text-3xl font-cal font-extrabold text-green-800 mb-0">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
                 </div>
 
-                <div className="flex flex-col justify-center  gap-3 mt-2">
-                  <ul className="flex flex-col justify-center gap-3 mt-2">
-                    <li>
+                <div className="flex flex-col items-center justify-center gap-3 mt-2">
+                  <ul className="flex flex-col items-center justify-center gap-3 mt-2">
+                    <li className="w-full">
                       <Button
                         variant="default"
-                        className="bg-green-800 hover:bg-green-900 text-white font-normal px-4 py-2 shadow-sm transition-all duration-150 w-full flex items-center justify-start gap-2"
+                        className="bg-green-800 hover:bg-green-900 text-white font-normal px-4 py-2 shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
                         onClick={() => setIsFormExpanded(true)}
                       >
-                        <Pencil className="w-4 h-4 mr-2" />
+                        <Pencil className="w-4 h-4" />
                         Edit Invoice
                       </Button>
                     </li>
 
-                    <li>
+                    <li className="w-full">
                       <Button
                         variant="outline"
-                        className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2 shadow-sm transition-all duration-150 w-full flex items-center justify-start gap-2"
+                        className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2 shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
                         onClick={() => navigate(`/print-invoice/${invoiceToEdit?.id || invoiceData.invoiceNumber}`, {
                           state: { invoiceId: invoiceToEdit?.id || invoiceData.invoiceNumber }
                         })}
                       >
-                        <Printer className="w-4 h-4 mr-2" />
+                        <Printer className="w-4 h-4" />
                         Print Invoice
                       </Button>
                     </li>
 
-                    <li>
+                    <li className="w-full">
                       <Button
                         variant="default"
-                        className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2 shadow-sm transition-all duration-150 w-full flex items-center justify-start gap-2"
+                        className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2 shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
                         onClick={handleGenerateInvoiceLink}
                         disabled={isGeneratingLink}
                       >
-                        <Link2 className="w-4 h-4 mr-2" />
+                        <Link2 className="w-4 h-4" />
                         {isGeneratingLink ? "Generating Public Invoice Link ..." : "Generate Invoice Link"}
                       </Button>
                     </li>
                   </ul>
-
                 </div>
                 {/* Shareable Link UI - shown directly under the three buttons */}
                 {shareableLink && (

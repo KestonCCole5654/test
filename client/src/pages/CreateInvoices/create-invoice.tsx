@@ -1257,13 +1257,6 @@ ${businessData.phone}`
                 </p>
               </div>
               <div className="flex items-center gap-3 mt-2 sm:mt-0">
-                <Button
-                  variant="outline"
-                  onClick={() => setIsFormExpanded(!isFormExpanded)}
-                  className="bg-green-800 hover:bg-green-900 text-white font-medium px-6 py-2"
-                >
-                  {isFormExpanded ? "Preview Mode" : "Edit Mode"}
-                </Button>
                 <div className="flex flex-col items-center ml-2">
                   <label htmlFor="invoiceColorEdit" className="text-xs text-gray-500 font-normal mb-1">Invoice Color</label>
                   <div className="flex items-center gap-2">
@@ -1278,6 +1271,13 @@ ${businessData.phone}`
                     <span className="text-xs text-gray-500">Customize template color</span>
                   </div>
                 </div>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsFormExpanded(!isFormExpanded)}
+                  className="bg-green-800 hover:bg-green-900 text-white font-medium px-6 py-2"
+                >
+                  {isFormExpanded ? "Preview Mode" : "Edit Mode"}
+                </Button>
               </div>
             </div>
           </div>

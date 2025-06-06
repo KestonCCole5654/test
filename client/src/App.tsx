@@ -28,11 +28,6 @@ import LegalPage from './pages/Legal/legal';
 import LandingPage from './pages/Landing/page';
 import AccountStatus from './pages/AccountStatus/AccountStatus';
 import ReportsPage from "./pages/Reports/reports"
-import QuotesPage from "./pages/Quotes/quotes"
-import CreateQuotePage from "./pages/Quotes/create-quote"
-
-// import TemplateDesignerPage from './components/TemplateDesigner/TemplateDesignerPage';
-// SidebarLayout already includes the Outlet component
 
 async function checkBusinessSheet(supabaseToken: string, googleToken: string) {
   try {
@@ -250,8 +245,6 @@ function App() {
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/reports" element={<ReportsPage />} />
-          <Route path="/quotes" element={<QuotesPage />} />
-          <Route path="/create-quote" element={<CreateQuotePage />} />
         </Route>
 
         {/* Public Invoice Route - must be after catch-all to take precedence */}

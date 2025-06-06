@@ -102,14 +102,6 @@ const Header = () => {
                 </Link>
                 
                 <Link
-                  to="/quotes"
-                  className="px-3 py-2 rounded-md font-normal text-slate-200 hover:text-slate-300 transition-colors"
-                  onClick={handleNavigation}
-                >
-                  Quotes
-                </Link>
-                
-                <Link
                   to="/reports"
                   className="px-3 py-2 rounded-md font-normal text-slate-200 hover:text-slate-300 transition-colors"
                   onClick={handleNavigation}
@@ -217,14 +209,6 @@ const Header = () => {
                   onClick={handleNavigation}
                 >
                  Invoices
-                </Link>
-                
-                <Link
-                  to="/quotes"
-                  className="px-3 py-2.5 rounded-md text-slate-700 hover:text-slate-900 transition-colors"
-                  onClick={handleNavigation}
-                >
-                  Quotes
                 </Link>
                 
                 <Link

@@ -1,33 +1,14 @@
 "use client"
 
 import type React from "react"
+
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
-import { Separator } from "../../components/ui/separator"
-import { Badge } from "../../components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar"
 import { useToast } from "../../components/ui/use-toast"
-import {
-  Loader2,
-  Edit,
-  Save,
-  X,
-  User,
-  Building2,
-  Upload,
-  ExternalLink,
-  LogOut,
-  Calendar,
-  Mail,
-  Phone,
-  MapPin,
-  Shield,
-  FileText,
-} from "lucide-react"
+import { Loader2, Edit, Save, X, Info, Calendar, Mail, User } from "lucide-react"
 import axios from "axios"
 import {
   Breadcrumb,
@@ -38,10 +19,12 @@ import {
   BreadcrumbSeparator,
 } from "../../components/ui/breadcrumb"
 import { LoadingSpinner } from "../../components/ui/loadingSpinner"
-import LogoUpload from "../../components/LogoUpload"
-import { useUser } from "@supabase/auth-helpers-react"
-import { supabase } from "../../lib/supabase"
-import { useBrandLogo } from "../../hooks/useBrandLogo"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog'
+import { Checkbox } from '../../components/ui/checkbox'
+import LogoUpload from '../../components/LogoUpload'
+import { useUser } from '@supabase/auth-helpers-react'
+import { supabase } from '../../lib/supabase'
+import { useBrandLogo } from '../../hooks/useBrandLogo'
 
 interface UserData {
   name: string
@@ -74,39 +57,37 @@ export default function SettingsPage() {
   })
   const [isUpdatingBusiness, setIsUpdatingBusiness] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
+  //const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleteInvoices, setDeleteInvoices] = useState(false)
   const [deletePhrase, setDeletePhrase] = useState("")
   const [isDeleting, setIsDeleting] = useState(false)
-  const sheetUrl = typeof window !== "undefined" ? localStorage.getItem("defaultSheetUrl") : ""
+  const sheetUrl = typeof window !== 'undefined' ? localStorage.getItem("defaultSheetUrl") : ""
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [showLogoUpload, setShowLogoUpload] = useState(false)
   const [removingLogo, setRemovingLogo] = useState(false)
   const user = useUser()
 
   // Brand logo for business (using business email domain)
-  const businessDomain = businessData.email?.split("@")[1] || ""
-  const businessLogo = useBrandLogo(businessDomain)
+  const businessDomain = businessData.email?.split("@")[1] || "";
+  const businessLogo = useBrandLogo(businessDomain);
 
   const fetchData = async () => {
     try {
-      setIsLoading(true)
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession()
+      setIsLoading(true);
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       if (sessionError || !session) {
-        navigate("/sign-in")
-        return
+        navigate("/sign-in");
+        return;
       }
 
       // Configure headers with both tokens
       const headers = {
         Authorization: `Bearer ${session.provider_token}`,
-        "X-Supabase-Token": session.access_token,
-      }
+        'X-Supabase-Token': session.access_token
+      };
 
       // Fetch user data
-      const userResponse = await axios.get("https://sheetbills-server.vercel.app/api/user", { headers })
+      const userResponse = await axios.get("https://sheetbills-server.vercel.app/api/user", { headers });
       if (userResponse.data.user) {
         setUserData({
           name: userResponse.data.user.name,
@@ -115,105 +96,107 @@ export default function SettingsPage() {
           createdAt: userResponse.data.user.createdAt,
           lastLogin: userResponse.data.user.lastLogin,
           accountType: userResponse.data.user.accountType,
-          phone: userResponse.data.user.phone,
-        })
+          phone: userResponse.data.user.phone
+        });
       }
 
       // Fetch business details
+      // Always pass the current invoice spreadsheet URL as sheetUrl
       if (!sheetUrl) {
         throw new Error("No invoice spreadsheet selected")
       }
       const businessResponse = await axios.get("https://sheetbills-server.vercel.app/api/business-details", {
         headers,
-        params: { sheetUrl },
-      })
+        params: { sheetUrl }
+      });
       if (businessResponse.data.businessDetails) {
         setBusinessData({
           companyName: businessResponse.data.businessDetails["Company Name"] || "",
           email: businessResponse.data.businessDetails["Business Email"] || "",
           phone: businessResponse.data.businessDetails["Phone Number"] || "",
           address: businessResponse.data.businessDetails["Address"] || "",
-        })
+        });
       }
+
     } catch (error) {
       console.error("Fetch error:", {
         error: axios.isAxiosError(error) ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-        response: axios.isAxiosError(error) ? error.response?.data : undefined,
-      })
+        response: axios.isAxiosError(error) ? error.response?.data : undefined
+      });
 
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        navigate("/sign-in")
-        return
+        navigate("/sign-in");
+        return;
       }
+
+
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    const controller = new AbortController()
-    let isMounted = true
+    const controller = new AbortController();
+    let isMounted = true;
 
     const fetchDataWrapper = async () => {
       try {
-        await fetchData()
+        await fetchData();
       } catch (error) {
         if (isMounted) {
-          console.error("Data fetch error:", error)
+          console.error("Data fetch error:", error);
         }
       }
-    }
+    };
 
     if (isMounted) {
-      fetchDataWrapper()
+      fetchDataWrapper();
     }
 
     return () => {
-      isMounted = false
-      controller.abort()
-    }
-  }, [])
+      isMounted = false;
+      controller.abort();
+    };
+  }, []);
 
   // Fetch logo on mount
   useEffect(() => {
     const fetchLogo = async () => {
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession()
-        if (!session) return
-        const { data, error } = await supabase.from("user_business_settings").select("logo_url").single()
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+        const { data, error } = await supabase
+          .from('user_business_settings')
+          .select('logo_url')
+          .single();
         if (!error && data?.logo_url) {
-          setLogoUrl(data.logo_url)
+          setLogoUrl(data.logo_url);
         }
       } catch (err) {
         // Ignore
       }
-    }
-    fetchLogo()
-  }, [supabase])
+    };
+    fetchLogo();
+  }, [supabase]);
 
   const handleBusinessUpdate = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     try {
-      setIsUpdatingBusiness(true)
+      setIsUpdatingBusiness(true);
 
       // Get session and tokens
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession()
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
       if (sessionError || !session) {
-        throw new Error("Authentication required")
+        throw new Error("Authentication required");
       }
 
       // Get the current sheet URL from localStorage
-      const currentSheetUrl = localStorage.getItem("defaultSheetUrl")
+      const currentSheetUrl = localStorage.getItem("defaultSheetUrl");
       if (!currentSheetUrl) {
-        throw new Error("No invoice spreadsheet selected")
+        throw new Error("No invoice spreadsheet selected");
       }
 
       const response = await axios.put(
@@ -223,37 +206,38 @@ export default function SettingsPage() {
           email: businessData.email,
           phone: businessData.phone,
           address: businessData.address,
-          sheetUrl: currentSheetUrl,
+          sheetUrl: currentSheetUrl
         },
         {
           headers: {
             Authorization: `Bearer ${session.provider_token}`,
-            "X-Supabase-Token": session.access_token,
-          },
-        },
-      )
+            "X-Supabase-Token": session.access_token
+          }
+        }
+      );
 
       if (response.data.success) {
         toast({
           title: "Success",
           description: "Business details updated successfully",
-        })
-        await fetchData()
-        setIsEditing(false)
+        });
+        await fetchData();
+        setIsEditing(false);
       }
+
     } catch (error) {
-      console.error("Update error:", error)
+      console.error("Update error:", error);
       toast({
         title: "Update Failed",
         description: axios.isAxiosError(error)
           ? error.response?.data?.error || "Failed to update business details"
           : "Network error",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsUpdatingBusiness(false)
+      setIsUpdatingBusiness(false);
     }
-  }
+  };
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "—"
@@ -268,75 +252,125 @@ export default function SettingsPage() {
   // Logout handler
   const handleLogout = async () => {
     try {
-      const { error } = await supabase.auth.signOut()
-      if (error) throw error
-      toast({ title: "Logged out", description: "You have been logged out successfully." })
-      navigate("/login")
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      toast({ title: "Logged out", description: "You have been logged out successfully." });
+      navigate("/login");
     } catch (error) {
-      toast({
-        title: "Logout Failed",
-        description: error instanceof Error ? error.message : "Failed to log out.",
-        variant: "destructive",
-      })
+      toast({ title: "Logout Failed", description: error instanceof Error ? error.message : "Failed to log out.", variant: "destructive" });
     }
-  }
+  };
+
+  // Delete account handler
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) throw new Error("Authentication required");
+
+      const response = await axios.delete("https://sheetbills-server.vercel.app/api/delete-account", {
+        headers: {
+          Authorization: `Bearer ${session.provider_token}`,
+          "X-Supabase-Token": session.access_token
+        },
+        data: {
+          deleteInvoices: deleteInvoices,
+          sheetUrl: sheetUrl || undefined
+        }
+      });
+
+      // Check for success explicitly based on backend response
+      if (response.data.success) {
+        // Sign out from Supabase on the client side
+        await supabase.auth.signOut();
+        // Navigate to the new status page with success state
+        navigate("/account-status", { 
+          state: { 
+            success: true, 
+            message: response.data.message || "Your account has been successfully deleted." 
+          } 
+        });
+      } else {
+        // If backend indicates failure but no error was thrown
+        navigate("/account-status", { 
+          state: { 
+            success: false, 
+            message: response.data.error || "Account deletion failed.",
+            errorDetails: response.data.details
+          } 
+        });
+      }
+
+    } catch (error) {
+      console.error("Delete account error:", error);
+      // Navigate to the new status page with error state
+      navigate("/account-status", {
+        state: {
+          success: false,
+          message: error instanceof Error ? error.message : "An unexpected error occurred.",
+          errorDetails: axios.isAxiosError(error) ? error.response?.data?.details || error.response?.data?.error : undefined
+        }
+      });
+    } finally {
+      setIsDeleting(false);
+      //setShowDeleteModal(false);
+      setDeletePhrase("");
+      setDeleteInvoices(false);
+    }
+  };
 
   // Remove logo handler
   const handleRemoveLogo = async () => {
-    if (!logoUrl || !user?.id) return
-    setRemovingLogo(true)
+    if (!logoUrl || !user?.id) return;
+    setRemovingLogo(true);
     try {
       // Extract the file path from the logo URL
-      const urlParts = logoUrl.split("/")
-      const fileName = urlParts[urlParts.length - 1]
-      const filePath = `${user.id}/${fileName}`
+      const urlParts = logoUrl.split('/');
+      const fileName = urlParts[urlParts.length - 1];
+      const filePath = `${user.id}/${fileName}`;
 
       // Delete from Supabase Storage
-      const { error: storageError } = await supabase.storage.from("company-logos").remove([filePath])
-      if (storageError) throw storageError
+      const { error: storageError } = await supabase.storage
+        .from('company-logos')
+        .remove([filePath]);
+      if (storageError) throw storageError;
 
       // Remove from user_business_settings
       const { error: dbError } = await supabase
-        .from("user_business_settings")
+        .from('user_business_settings')
         .update({ logo_url: null, updated_at: new Date().toISOString() })
-        .eq("id", user.id)
-      if (dbError) throw dbError
+        .eq('id', user.id);
+      if (dbError) throw dbError;
 
       // Remove from Google Sheet business details
       if (sheetUrl) {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession()
+        const { data: { session } } = await supabase.auth.getSession();
         if (session?.provider_token) {
           await axios.put(
             "https://sheetbills-server.vercel.app/api/update-business-details",
             {
-              logo: "",
-              sheetUrl: sheetUrl,
+              logo: '',
+              sheetUrl: sheetUrl
             },
             {
               headers: {
                 Authorization: `Bearer ${session.provider_token}`,
-                "X-Supabase-Token": session.access_token,
-              },
-            },
-          )
+                "X-Supabase-Token": session.access_token
+              }
+            }
+          );
         }
       }
 
-      setLogoUrl(null)
-      setShowLogoUpload(true)
-      toast({ title: "Logo removed", description: "You can now upload a new logo." })
+      setLogoUrl(null);
+      setShowLogoUpload(true);
+      toast({ title: 'Logo removed', description: 'You can now upload a new logo.' });
     } catch (err) {
-      toast({
-        title: "Failed to remove logo",
-        description: err instanceof Error ? err.message : "Unknown error",
-        variant: "destructive",
-      })
+      toast({ title: 'Failed to remove logo', description: err instanceof Error ? err.message : 'Unknown error', variant: 'destructive' });
     } finally {
-      setRemovingLogo(false)
+      setRemovingLogo(false);
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -349,414 +383,301 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <div className="container max-w-4xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <Breadcrumb className="mb-4">
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Settings</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+    <div className="container max-w-7xl mx-auto px-4 py-8">
+      {/* Breadcrumb Navigation and Page Title */}
+      <div className="mb-8">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Settings</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
 
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <User className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">Account Settings</h1>
-              <p className="text-muted-foreground">Manage your account and business information</p>
-            </div>
+      {/* Profile Section */}
+      <div className="mb-12 pl-8 pr-8">
+        <h2 className="text-2xl font-cal-sans font-medium text-gray-900 mb-1 flex items-center gap-2">
+          Account Profile
+          {/* Google Icon */}
+        </h2>
+        <p className="text-sm font-cal-sans font-normal text-gray-400 mb-6">Manage your personal information and account details.</p>
+        <div className="divide-y divide-gray-200 border-t border-b">
+          <div className="flex items-center justify-between py-5">
+            <span className="text-gray-700">Full Name</span>
+            <span className="text-gray-900 flex-1 text-right mr-6">{userData.name || "—"}</span>
           </div>
+          <div className="flex items-center justify-between py-5">
+            <span className="text-gray-700">Email</span>
+            <span className="text-gray-900 flex-1 text-right mr-6">{userData.email || "—"}</span>
+          </div>
+          <div className="flex items-center justify-between py-5">
+            <span className="text-gray-700">Account Created</span>
+            <span className="text-gray-900 flex-1 text-right mr-6">{formatDate(userData.createdAt)}</span>
+          </div>
+          <div className="flex items-center justify-between py-5">
+            <span className="text-gray-700">Last Login</span>
+            <span className="text-gray-900 flex-1 text-right mr-6">{userData.lastLogin ? formatDate(userData.lastLogin) : "—"}</span>
+          </div>
+          <div className="flex items-center justify-between py-5">
+            <span className="text-gray-700">Account Type</span>
+            <span className="text-gray-900 flex-1 text-right mr-6">{userData.accountType || "—"}</span>
+          </div>
+          {userData.phone && (
+            <div className="flex items-center justify-between py-5">
+              <span className="text-gray-700">Phone</span>
+              <span className="text-gray-900 flex-1 text-right mr-6">{userData.phone}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Business Information Section */}
+      <div className="mb-12 pl-8 pr-8">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-normal">Business Details</h2>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsEditing(!isEditing)}
+            className="flex items-center gap-2"
+          >
+            {isEditing ? (
+              <>
+                <X className="h-4 w-4" />
+                Cancel
+              </>
+            ) : (
+              <>
+                <Edit className="h-4 w-4" />
+                Edit
+              </>
+            )}
+          </Button>
         </div>
 
-        <div className="space-y-6">
-          {/* Account Profile Card */}
-          <Card>
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-4">
-                <Avatar className="h-16 w-16">
-                  <AvatarImage src={userData.avatarUrl || "/placeholder.svg"} alt={userData.name} />
-                  <AvatarFallback className="text-lg">
-                    {userData.name
-                      ?.split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                      .toUpperCase() || "U"}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <CardTitle className="flex items-center gap-2">
-                    Account Profile
-                    <Badge variant="secondary" className="text-xs">
-                      {userData.accountType || "Free Beta User"}
-                    </Badge>
-                  </CardTitle>
-                  <CardDescription>Your personal account information and preferences</CardDescription>
-                </div>
+        {/* Logo Upload Section */}
+        <div className="mb-6 pb-6 border-b">
+          <h3 className="text-lg font-medium mb-4">Company Logo</h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Upload your company logo to be displayed on all your invoices. The logo will be automatically included in every invoice you create.
+          </p>
+          {logoUrl && !showLogoUpload ? (
+            <div className="flex flex-col items-center gap-4">
+              <img src={logoUrl} alt="Company Logo" className="h-24 w-auto object-contain border rounded-lg shadow-sm bg-white" />
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={handleRemoveLogo} disabled={removingLogo}>
+                  {removingLogo ? 'Removing...' : 'Change Logo'}
+                </Button>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                    <User className="h-4 w-4 text-muted-foreground" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Full Name</p>
-                      <p className="text-sm text-muted-foreground">{userData.name || "—"}</p>
-                    </div>
-                  </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-2">
+              <LogoUpload 
+                onLogoUploaded={(url) => {
+                  setLogoUrl(url);
+                  setShowLogoUpload(false);
+                }}
+                showPreview={false}
+              />
+              {logoUrl && (
+                <Button variant="outline" onClick={() => setShowLogoUpload(false)}>
+                  Cancel
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
 
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Email Address</p>
-                      <p className="text-sm text-muted-foreground">{userData.email || "—"}</p>
-                    </div>
-                  </div>
-
-                  {userData.phone && (
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                      <Phone className="h-4 w-4 text-muted-foreground" />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">Phone Number</p>
-                        <p className="text-sm text-muted-foreground">{userData.phone}</p>
-                      </div>
-                    </div>
+        <div className="divide-y divide-gray-200 border-t border-b">
+          {!isEditing ? (
+            <>
+              <div className="flex items-center justify-between py-5">
+                <span className="text-gray-700 flex items-center gap-3">
+                  {businessLogo && (
+                    <img src={businessLogo} alt="Brand Logo" className="h-8 w-8 rounded-full bg-white border border-gray-200" />
                   )}
+                  Company Name
+                </span>
+                <span className="text-gray-900 flex-1 text-right mr-6">{businessData.companyName || "—"}</span>
+              </div>
+              <div className="flex items-center justify-between py-5">
+                <span className="text-gray-700">Business Email</span>
+                <span className="text-gray-900 flex-1 text-right mr-6">{businessData.email || "—"}</span>
+              </div>
+              <div className="flex items-center justify-between py-5">
+                <span className="text-gray-700">Phone Number</span>
+                <span className="text-gray-900 flex-1 text-right mr-6">{businessData.phone || "—"}</span>
+              </div>
+              <div className="flex items-center justify-between py-5">
+                <span className="text-gray-700">Address</span>
+                <span className="text-gray-900 flex-1 text-right mr-6">{businessData.address || "—"}</span>
+              </div>
+            </>
+          ) : (
+            <form onSubmit={handleBusinessUpdate} className="space-y-6 px-4 py-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="companyName" className="flex items-center gap-3">
+                    {businessLogo && (
+                      <img src={businessLogo} alt="Brand Logo" className="h-8 w-8 rounded-full bg-white border border-gray-200" />
+                    )}
+                    Company Name *
+                  </Label>
+                  <Input
+                    id="companyName"
+                    required
+                    value={businessData.companyName}
+                    onChange={(e) => setBusinessData(prev => ({ ...prev, companyName: e.target.value }))}
+                    placeholder="Your company name"
+                  />
                 </div>
-
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Account Created</p>
-                      <p className="text-sm text-muted-foreground">{formatDate(userData.createdAt)}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Last Login</p>
-                      <p className="text-sm text-muted-foreground">
-                        {userData.lastLogin ? formatDate(userData.lastLogin) : "—"}
-                      </p>
-                    </div>
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Business Email *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    required
+                    value={businessData.email}
+                    onChange={(e) => setBusinessData(prev => ({ ...prev, email: e.target.value }))}
+                    placeholder="contact@example.com"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    value={businessData.phone}
+                    onChange={(e) => setBusinessData(prev => ({ ...prev, phone: e.target.value }))}
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="address">Address</Label>
+                  <Input
+                    id="address"
+                    value={businessData.address}
+                    onChange={(e) => setBusinessData(prev => ({ ...prev, address: e.target.value }))}
+                    placeholder="123 Business St, Suite 100, City, State, ZIP"
+                  />
                 </div>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Business Information Card */}
-          <Card>
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <Building2 className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <CardTitle>Business Information</CardTitle>
-                    <CardDescription>Manage your business details for invoicing</CardDescription>
-                  </div>
-                </div>
+              <div className="flex justify-end gap-4">
                 <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsEditing(!isEditing)}
-                  className="flex items-center gap-2"
+                  type="button"
+                  variant="default"
+                  onClick={() => setIsEditing(false)}
                 >
-                  {isEditing ? (
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isUpdatingBusiness}
+                  className="min-w-[120px]"
+                >
+                  {isUpdatingBusiness ? (
                     <>
-                      <X className="h-4 w-4" />
-                      Cancel
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Saving...
                     </>
                   ) : (
                     <>
-                      <Edit className="h-4 w-4" />
-                      Edit
+                      <Save className="h-4 w-4 mr-2" />
+                      Save Changes
                     </>
                   )}
                 </Button>
               </div>
-            </CardHeader>
-            <CardContent>
-              {/* Logo Section */}
-              <div className="mb-6 p-4 border rounded-lg bg-muted/20">
-                <div className="flex items-center gap-3 mb-3">
-                  <Upload className="h-4 w-4 text-muted-foreground" />
-                  <h4 className="font-medium">Company Logo</h4>
-                </div>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Upload your company logo to be displayed on all your invoices.
-                </p>
-
-                {logoUrl && !showLogoUpload ? (
-                  <div className="flex items-center gap-4">
-                    <div className="p-2 border rounded-lg bg-white">
-                      <img
-                        src={logoUrl || "/placeholder.svg"}
-                        alt="Company Logo"
-                        className="h-12 w-auto object-contain"
-                      />
-                    </div>
-                    <Button variant="outline" size="sm" onClick={handleRemoveLogo} disabled={removingLogo}>
-                      {removingLogo ? "Removing..." : "Change Logo"}
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <LogoUpload
-                      onLogoUploaded={(url) => {
-                        setLogoUrl(url)
-                        setShowLogoUpload(false)
-                      }}
-                      showPreview={false}
-                    />
-                    {logoUrl && (
-                      <Button variant="outline" size="sm" onClick={() => setShowLogoUpload(false)}>
-                        Cancel
-                      </Button>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              <Separator className="my-6" />
-
-              {/* Business Details */}
-              {!isEditing ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                      <div className="flex items-center gap-2">
-                        {businessLogo && (
-                          <img
-                            src={businessLogo || "/placeholder.svg"}
-                            alt="Brand Logo"
-                            className="h-6 w-6 rounded-full bg-white border"
-                          />
-                        )}
-                        <Building2 className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">Company Name</p>
-                        <p className="text-sm text-muted-foreground">{businessData.companyName || "—"}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                      <Mail className="h-4 w-4 text-muted-foreground" />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">Business Email</p>
-                        <p className="text-sm text-muted-foreground">{businessData.email || "—"}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                      <Phone className="h-4 w-4 text-muted-foreground" />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">Phone Number</p>
-                        <p className="text-sm text-muted-foreground">{businessData.phone || "—"}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                      <MapPin className="h-4 w-4 text-muted-foreground" />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">Address</p>
-                        <p className="text-sm text-muted-foreground">{businessData.address || "—"}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <form onSubmit={handleBusinessUpdate} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="companyName" className="flex items-center gap-2">
-                        <Building2 className="h-4 w-4" />
-                        Company Name *
-                      </Label>
-                      <Input
-                        id="companyName"
-                        required
-                        value={businessData.companyName}
-                        onChange={(e) => setBusinessData((prev) => ({ ...prev, companyName: e.target.value }))}
-                        placeholder="Your company name"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="flex items-center gap-2">
-                        <Mail className="h-4 w-4" />
-                        Business Email *
-                      </Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        required
-                        value={businessData.email}
-                        onChange={(e) => setBusinessData((prev) => ({ ...prev, email: e.target.value }))}
-                        placeholder="contact@example.com"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="phone" className="flex items-center gap-2">
-                        <Phone className="h-4 w-4" />
-                        Phone Number
-                      </Label>
-                      <Input
-                        id="phone"
-                        value={businessData.phone}
-                        onChange={(e) => setBusinessData((prev) => ({ ...prev, phone: e.target.value }))}
-                        placeholder="+1 (555) 123-4567"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="address" className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4" />
-                        Address
-                      </Label>
-                      <Input
-                        id="address"
-                        value={businessData.address}
-                        onChange={(e) => setBusinessData((prev) => ({ ...prev, address: e.target.value }))}
-                        placeholder="123 Business St, Suite 100, City, State, ZIP"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end gap-3 pt-4">
-                    <Button type="button" variant="outline" onClick={() => setIsEditing(false)}>
-                      Cancel
-                    </Button>
-                    <Button type="submit" disabled={isUpdatingBusiness} className="min-w-[120px]">
-                      {isUpdatingBusiness ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="h-4 w-4 mr-2" />
-                          Save Changes
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </form>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Legal & Privacy Card */}
-          <Card>
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <Shield className="h-5 w-5 text-purple-600" />
-                </div>
-                <div>
-                  <CardTitle>Legal & Privacy</CardTitle>
-                  <CardDescription>Review our terms of service and privacy policy</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <FileText className="h-4 w-4 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium">Terms of Service</p>
-                      <p className="text-sm text-muted-foreground">Review our terms and conditions</p>
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="sm" asChild>
-                    <a
-                      href="/legal?tab=terms"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2"
-                    >
-                      View
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                  </Button>
-                </div>
-
-                <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <Shield className="h-4 w-4 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium">Privacy Policy</p>
-                      <p className="text-sm text-muted-foreground">How we protect your data</p>
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="sm" asChild>
-                    <a
-                      href="/legal?tab=privacy"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2"
-                    >
-                      View
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Account Actions Card */}
-          <Card>
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-red-100 rounded-lg">
-                  <LogOut className="h-5 w-5 text-red-600" />
-                </div>
-                <div>
-                  <CardTitle>Account Actions</CardTitle>
-                  <CardDescription>Manage your account session and data</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <LogOut className="h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium">Sign Out</p>
-                    <p className="text-sm text-muted-foreground">Sign out of your account on this device</p>
-                  </div>
-                </div>
-                <Button
-                  onClick={handleLogout}
-                  variant="outline"
-                  className="border-red-200 text-red-700 hover:bg-red-50"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+            </form>
+          )}
         </div>
       </div>
+
+      {/* Terms & Privacy Policy Section */}
+      <div className="mb-12 pl-8 pr-8">
+        <h2 className="text-2xl font-cal-sans font-medium text-gray-900 mb-1 flex items-center gap-2">
+          Terms & Privacy Policy
+        </h2>
+        <p className="text-sm font-cal-sans font-normal text-gray-400 mb-6">View our Terms of Service and Privacy Policy.</p>
+        <div className="divide-y divide-gray-200 border-t border-b">
+          <div className="flex items-center justify-between py-5">
+            <span className="text-gray-700">Terms of Service</span>
+            <a
+              href="/legal?tab=terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-800 font-medium hover:underline flex-1 text-right mr-6"
+            >
+              View Terms of Service
+            </a>
+          </div>
+          <div className="flex items-center justify-between py-5">
+            <span className="text-gray-700">Privacy Policy</span>
+            <a
+              href="/legal?tab=privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-800 font-medium hover:underline flex-1 text-right mr-6"
+            >
+              View Privacy Policy
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Logout & Delete Account Section */}
+      <div className="mb-12 pl-8 pr-8">
+        <h2 className="text-lg font-medium text-gray-900 mb-1">Logout</h2>
+        <p className="text-sm text-gray-400 mb-6">You can log out of your account or permanently delete your account and all associated data.</p>
+        <div className="flex gap-4">
+          <Button onClick={handleLogout} className="border border-gray-300 text-white bg-green-800 hover:bg-green-900 shadow-none">Logout</Button>
+          {/* <Button variant="destructive" onClick={() => setShowDeleteModal(true)} className="font-medium">Delete Account</Button> */}
+        </div>
+      </div>
+
+      {/* Delete Account Modal */}
+      {/* <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Account</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-red-700 font-normal">This action is irreversible. Your account and all associated data will be permanently deleted.</p>
+            <Checkbox id="delete-invoices" checked={deleteInvoices} onCheckedChange={checked => setDeleteInvoices(checked === true)} />
+            <label htmlFor="delete-invoices" className="ml-2 text-gray-700">Also delete all my invoices stored in Google Sheets</label>
+            {sheetUrl && (
+              <div className="mt-2">
+                <span className="text-gray-700">Your SheetBills Invoices Sheet: </span>
+                <a href={sheetUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline break-all">{sheetUrl}</a>
+              </div>
+            )}
+            <div className="mt-4">
+              <label htmlFor="delete-phrase" className="block text-gray-700 mb-1">Type <span className="font-normal text-black">DELETE</span> to confirm:</label>
+              <Input
+                id="delete-phrase"
+                value={deletePhrase}
+                onChange={e => setDeletePhrase(e.target.value)}
+                placeholder="DELETE"
+                className="w-full"
+                autoFocus
+              />
+            </div>
+          </div>
+          <DialogFooter className="mt-6 flex gap-2">
+            <Button variant="outline" onClick={() => setShowDeleteModal(false)} disabled={isDeleting}>Cancel</Button>
+            <Button variant="destructive" onClick={handleDeleteAccount} disabled={deletePhrase !== "DELETE" || isDeleting}>
+              {isDeleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Delete Account
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog> */}
+
     </div>
   )
 }
+

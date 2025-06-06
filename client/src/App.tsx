@@ -59,6 +59,42 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Clear any stale auth data on mount
+  useEffect(() => {
+    const clearStaleAuth = () => {
+      const currentSession = sessionStorage.getItem('sb-auth-token');
+      const currentLocalSession = localStorage.getItem('sb-auth-token');
+      
+      if (currentSession) {
+        try {
+          const sessionData = JSON.parse(currentSession);
+          if (new Date(sessionData.expires_at * 1000) < new Date()) {
+            sessionStorage.removeItem('sb-auth-token');
+            localStorage.removeItem('sb-auth-token');
+          }
+        } catch (e) {
+          sessionStorage.removeItem('sb-auth-token');
+          localStorage.removeItem('sb-auth-token');
+        }
+      }
+      
+      if (currentLocalSession) {
+        try {
+          const sessionData = JSON.parse(currentLocalSession);
+          if (new Date(sessionData.expires_at * 1000) < new Date()) {
+            sessionStorage.removeItem('sb-auth-token');
+            localStorage.removeItem('sb-auth-token');
+          }
+        } catch (e) {
+          sessionStorage.removeItem('sb-auth-token');
+          localStorage.removeItem('sb-auth-token');
+        }
+      }
+    };
+
+    clearStaleAuth();
+  }, []);
+
   useEffect(() => {
     let isMounted = true;
     let authSubscription: Subscription;
@@ -69,14 +105,22 @@ function App() {
 
       if (session) {
         console.log('Setting user session');
-        sessionStorage.setItem('sb-auth-token', JSON.stringify(session));
-        localStorage.setItem('sb-auth-token', JSON.stringify(session));
-        setUser(session.user);
+        try {
+          sessionStorage.setItem('sb-auth-token', JSON.stringify(session));
+          localStorage.setItem('sb-auth-token', JSON.stringify(session));
+          setUser(session.user);
+        } catch (e) {
+          console.error('Error setting session storage:', e);
+        }
       } else {
         console.log('Clearing user session');
-        sessionStorage.removeItem('sb-auth-token');
-        localStorage.removeItem('sb-auth-token');
-        setUser(null);
+        try {
+          sessionStorage.removeItem('sb-auth-token');
+          localStorage.removeItem('sb-auth-token');
+          setUser(null);
+        } catch (e) {
+          console.error('Error clearing session storage:', e);
+        }
       }
       setLoading(false);
     };
@@ -89,16 +133,27 @@ function App() {
         setUser(session.user);
       }
       setLoading(false);
+    }).catch((error) => {
+      console.error('Error getting initial session:', error);
+      setLoading(false);
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthStateChange);
     authSubscription = subscription;
 
+    // Cleanup function
     return () => {
       console.log('Cleaning up auth subscription');
       isMounted = false;
       authSubscription?.unsubscribe();
+      // Clear any remaining auth data on unmount
+      try {
+        sessionStorage.removeItem('sb-auth-token');
+        localStorage.removeItem('sb-auth-token');
+      } catch (e) {
+        console.error('Error clearing storage on unmount:', e);
+      }
     };
   }, []);
 

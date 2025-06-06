@@ -1249,7 +1249,8 @@ ${businessData.phone}`
             </div>
 
             {/* Header Content - Tidy, aligned, simple badge */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-44 gap-2">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 px-4 py-2">
+              {/* Title and subtitle */}
               <div>
                 <h1 className="text-2xl font-normal text-gray-900 mb-1">
                   {invoiceToEdit ? "Edit Invoice" : "Create New Invoice"}
@@ -1260,27 +1261,23 @@ ${businessData.phone}`
                     : "Create a professional invoice for your client"}
                 </p>
               </div>
-              <div className="flex items-center gap-8 md:gap-16 mt-2 sm:mt-0">
-                <div className="flex flex-col items-center ml-2">
-                  {/*
-                  <label htmlFor="invoiceColorEdit" className="text-xs text-gray-500 font-normal mb-1">Invoice Color</label>
-                  */}
-                  <div className="flex  items-center gap-2">
-                    <input
-                      type="color"
-                      id="invoiceColorEdit"
-                      value={invoiceData.color}
-                      onChange={e => updateInvoiceData("color", e.target.value)}
-                      className="h-12 w-12 rounded cursor-pointer border"
-                      style={{ background: 'none' }}
-                    />
-                    <span className="text-sm  text-gray-500">Invoice Color - Customize template color</span>
-                  </div>
-                </div>
+              {/* Controls: color picker + preview button */}
+              <div className="flex items-center gap-6">
+                <label htmlFor="invoiceColorEdit" className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="color"
+                    id="invoiceColorEdit"
+                    value={invoiceData.color}
+                    onChange={e => updateInvoiceData("color", e.target.value)}
+                    className="h-8 w-8 rounded border shadow-sm"
+                    style={{ background: 'none' }}
+                  />
+                  <span className="text-sm text-gray-600 font-medium">Invoice Color</span>
+                </label>
                 <Button
                   variant="outline"
                   onClick={() => setIsFormExpanded(!isFormExpanded)}
-                  className="bg-green-800 hover:bg-green-900 text-white font-medium px-6 py-2"
+                  className="bg-green-800 hover:bg-green-900 text-white font-semibold px-6 py-2"
                 >
                   {isFormExpanded ? "Preview Mode" : "Edit Mode"}
                 </Button>

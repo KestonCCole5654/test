@@ -1154,11 +1154,11 @@ ${businessData.phone}`
                   <div className="text-3xl font-sans font-extrabold text-green-800 mb-0">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
                 </div>
 
-                <div className="flex flex-col justify-start gap-3 mt-2">
+                <div className="flex flex-col justify-start  gap-3 mt-2">
 
                   <Button
                     variant="default"
-                    className="bg-green-800 hover:bg-green-900 text-white font-normal px-4 py-2 shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
+                    className="bg-green-800 hover:bg-green-900 text-white font-normal px-4 py-2 shadow-sm transition-all duration-150 w-full flex items-center justify-start gap-2 "
                     onClick={() => setIsFormExpanded(true)}
                   >
                     <Pencil className="w-4 h-4 mr-2" />
@@ -1167,7 +1167,7 @@ ${businessData.phone}`
 
                   <Button
                     variant="outline"
-                    className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2  shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
+                    className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2  shadow-sm transition-all duration-150 w-full flex items-center justify-start gap-2"
                     onClick={() => navigate(`/print-invoice/${invoiceToEdit?.id || invoiceData.invoiceNumber}`, {
                       state: { invoiceId: invoiceToEdit?.id || invoiceData.invoiceNumber }
                     })}
@@ -1178,19 +1178,19 @@ ${businessData.phone}`
 
                   <Button
                     variant="default"
-                    className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2  shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
+                    className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2  shadow-sm transition-all duration-150 w-full flex items-center justify-start gap-2"
                     onClick={handleGenerateInvoiceLink}
                     disabled={isGeneratingLink}
                   >
                     <Link2 className="w-4 h-4 mr-2" />
-                    {isGeneratingLink ? "Generating Link ..." : "Generate Invoice Link"}
+                    {isGeneratingLink ? "Generating Public Invoice Link ..." : "Generate Invoice Link"}
                   </Button>
 
                 </div>
                 {/* Shareable Link UI - shown directly under the three buttons */}
                 {shareableLink && (
                   <div className="mt-2 p-2 bg-gray-50  w-full border border-gray-200 flex flex-col gap-2">
-                    <p className="text-xs text-gray-600">Shareable Link:</p>
+                    <p className="text-xs text-gray-600">Shareable Invoice Link:</p>
                     <input
                       type="text"
                       value={shareableLink}

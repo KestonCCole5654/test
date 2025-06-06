@@ -29,7 +29,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "../../components/ui/pop
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { supabase } from '../../lib/supabase'
-import { ColorPicker } from '../../components/ui/color-picker'
 
 // Replace the printStyles constant with this updated version
 const printStyles = `
@@ -1154,21 +1153,6 @@ ${businessData.phone}`
                   <div className="text-2xl font-bold text-green-800 mb-0">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
                 </div>
 
-                {/* Color Picker */}
-                <div className="border-t pt-4">
-                  <div className="text-xs text-gray-500 font-normal mb-2">Invoice Color</div>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      id="invoiceColor"
-                      value={invoiceData.color}
-                      onChange={(e) => updateInvoiceData("color", e.target.value)}
-                      className="h-8 w-8 rounded cursor-pointer"
-                    />
-                    <span className="text-sm text-gray-500">Customize template color</span>
-                  </div>
-                </div>
-
                 <div className="flex flex-col gap-3 mt-2">
                   <Button
                     variant="default"
@@ -1273,15 +1257,6 @@ ${businessData.phone}`
                 </p>
               </div>
               <div className="flex items-center gap-3 mt-2 sm:mt-0">
-                {invoiceToEdit && (
-                  <Button
-                    type="button"
-                    disabled
-                    className="bg-green-800 hover:bg-green-900 text-white px-7 py-2 font-medium cursor-default shadow-lg"
-                  >
-                    {invoiceToEdit.status}
-                  </Button>
-                )}
                 <Button
                   variant="outline"
                   onClick={() => setIsFormExpanded(!isFormExpanded)}
@@ -1289,12 +1264,19 @@ ${businessData.phone}`
                 >
                   {isFormExpanded ? "Preview Mode" : "Edit Mode"}
                 </Button>
-                {/* Color Picker beside the action buttons */}
-                <div className="ml-2">
-                  <ColorPicker
-                    color={invoiceData.color || "#166534"}
-                    onChange={color => updateInvoiceData("color", color)}
-                  />
+                <div className="flex flex-col items-center ml-2">
+                  <label htmlFor="invoiceColorEdit" className="text-xs text-gray-500 font-normal mb-1">Invoice Color</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      id="invoiceColorEdit"
+                      value={invoiceData.color}
+                      onChange={e => updateInvoiceData("color", e.target.value)}
+                      className="h-8 w-8 rounded cursor-pointer border"
+                      style={{ background: 'none' }}
+                    />
+                    <span className="text-xs text-gray-500">Customize template color</span>
+                  </div>
                 </div>
               </div>
             </div>

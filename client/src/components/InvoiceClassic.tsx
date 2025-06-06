@@ -35,6 +35,7 @@ interface InvoiceData {
   notes: string;
   template: "classic";
   status?: "Paid" | "Pending";
+  color?: string;
 }
 
 interface BusinessData {
@@ -145,13 +146,13 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({
       className={`bg-white w-full font-cal max-w-full box-border flex flex-col justify-start${showShadow ? ' shadow-md' : ''}`}
       style={{ minHeight: 'auto', margin: 0 }}
     >
-      {/* Green strip at the top */}
-      <div className="w-full h-2 bg-green-800 "></div>
+      {/* Color strip at the top */}
+      <div className="w-full h-2" style={{ backgroundColor: data.color || '#166534' }}></div>
       
       {/* Header with logo */}
       <div className="flex justify-between mt-6 items-start mb-8 px-6">
         <div>
-          <h1 className="text-2xl font-cal-sans font-semibold text-green-800">INVOICE</h1>
+          <h1 className="text-2xl font-cal-sans font-semibold" style={{ color: data.color || '#166534' }}>INVOICE</h1>
           <div className="space-y-2 mt-2">
             <p className="text-sm font-cal-sans font-light text-gray-500">Invoice number: {data.invoiceNumber}</p>
             <p className="text-sm font-cal font-light text-gray-500">Invoice Created: {formatDate(data.date)}</p>
@@ -229,7 +230,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({
       {/* Business and Client Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 px-6">
         <div>
-          <h2 className="text-sm font-cal font-medium text-green-800 uppercase mb-2">From</h2>
+          <h2 className="text-sm font-cal font-medium uppercase mb-2" style={{ color: data.color || '#166534' }}>From</h2>
           <div className="space-y-2">
             {isLoading ? (
               <LoadingSpinner />
@@ -245,7 +246,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({
 
         <div>
           <div className="mb-4">
-            <h2 className="text-sm font-cal font-medium text-green-800 uppercase mb-2">Bill To</h2>
+            <h2 className="text-sm font-cal font-medium uppercase mb-2" style={{ color: data.color || '#166534' }}>Bill To</h2>
             <div className="space-y-2">
               <p className="font-cal font-medium text-sm">{data.customer.name}</p>
               <p className="font-cal font-medium text-sm">{data.customer.email}</p>
@@ -255,7 +256,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({
         </div>
 
         <div className="mt-2 font-medium">
-          <p className="text-xl text-green-800">
+          <p className="text-xl" style={{ color: data.color || '#166534' }}>
             ${formatCurrency(total)} due <span className="pl-1">{formatDate(data.dueDate)}</span>
           </p>
         </div>
@@ -264,13 +265,13 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({
       {/* Items Table */}
       <div className="overflow-x-auto font-cal w-full px-6 mb-6">
         <table className="w-full font-cal max-w-full text-sm">
-          <thead className="bg-green-800 text-white">
+          <thead style={{ backgroundColor: data.color || '#166534' }} className="text-white">
             <tr className="border-b font-semibold">
-              <th className="py-2 px-3 first:pl-4 last:pr-4 text-left font-cal font-medium text-sm text-green-100">Item</th>
-              <th className="py-2 px-3 first:pl-4 last:pr-4 text-left font-cal font-medium text-sm text-green-100">Description</th>
-              <th className="py-2 px-3 first:pl-4 last:pr-4 text-right font-cal font-medium text-sm text-green-100">Qty</th>
-              <th className="py-2 px-3 first:pl-4 last:pr-4 text-right font-cal font-medium text-sm text-green-100">Price</th>
-              <th className="py-2 px-3 first:pl-4 last:pr-4 text-right font-cal font-medium text-sm text-green-100">Amount</th>
+              <th className="py-2 px-3 first:pl-4 last:pr-4 text-left font-cal font-medium text-sm text-white">Item</th>
+              <th className="py-2 px-3 first:pl-4 last:pr-4 text-left font-cal font-medium text-sm text-white">Description</th>
+              <th className="py-2 px-3 first:pl-4 last:pr-4 text-right font-cal font-medium text-sm text-white">Qty</th>
+              <th className="py-2 px-3 first:pl-4 last:pr-4 text-right font-cal font-medium text-sm text-white">Price</th>
+              <th className="py-2 px-3 first:pl-4 last:pr-4 text-right font-cal font-medium text-sm text-white">Amount</th>
             </tr>
           </thead>
           <tbody className="divide-y font-cal divide-gray-200">
@@ -309,8 +310,8 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({
                 <td className="py-2 px-2 text-right font-medium text-gray-800 text-sm">+${formatCurrency(totalTax)}</td>
               </tr>
               <tr className="border-t">
-                <td className="py-3 px-2 text-right font-bold text-green-800 text-base">Total</td>
-                <td className="py-3 px-2 text-right font-bold text-green-800 text-lg">${formatCurrency(total)}</td>
+                <td className="py-3 px-2 text-right font-bold text-base" style={{ color: data.color || '#166534' }}>Total</td>
+                <td className="py-3 px-2 text-right font-bold text-lg" style={{ color: data.color || '#166534' }}>${formatCurrency(total)}</td>
               </tr>
             </tbody>
           </table>
@@ -320,7 +321,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({
       {/* Notes */}
       {data.notes && (
         <div className="clear-both mt-4 pt-2 px-4">
-          <h2 className="text-sm font-semibold text-green-800 uppercase mb-1">Notes</h2>
+          <h2 className="text-sm font-semibold uppercase mb-1" style={{ color: data.color || '#166534' }}>Notes</h2>
           <p className="text-gray-600 text-sm whitespace-pre-line">{data.notes}</p>
         </div>
       )}
@@ -328,7 +329,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({
       {/* Footer with branding */}
       <div className="mt-8 pt-4 border-t border-gray-200">
         <div className="text-center text-sm text-gray-500">
-          Powered by <span className="text-green-800 font-medium">SheetBills</span> @sheetbills.com
+          Powered by <span className="font-medium" style={{ color: data.color || '#166534' }}>SheetBills</span> @sheetbills.com
         </div>
       </div>
     </div>

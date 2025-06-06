@@ -101,6 +101,7 @@ export interface InvoiceData {
   notes: string
   template: "classic"
   status?: "Paid" | "Pending"
+  color?: string
 }
 
 export interface InvoiceItem {
@@ -223,7 +224,8 @@ export default function InvoiceForm() {
         amount: 0,
         notes: "",
         template: "classic",
-        status: "Pending"
+        status: "Pending",
+        color: "#166534"
       })
     }
     return () => {
@@ -235,7 +237,7 @@ export default function InvoiceForm() {
   const [invoiceData, setInvoiceData] = useState<InvoiceData>(() => {
     if (invoiceToEdit) {
       return {
-        invoiceNumber: invoiceToEdit.invoiceNumber || invoiceToEdit.id, // Always use the number from the sheet or id
+        invoiceNumber: invoiceToEdit.invoiceNumber || invoiceToEdit.id,
         date: invoiceToEdit.date || new Date().toISOString().split("T")[0],
         dueDate: invoiceToEdit.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
         customer: invoiceToEdit.customer || {
@@ -260,10 +262,10 @@ export default function InvoiceForm() {
         amount: invoiceToEdit.amount || 0,
         notes: invoiceToEdit.notes || "",
         template: invoiceToEdit.template || "classic",
-        status: invoiceToEdit.status || "Pending"
+        status: invoiceToEdit.status || "Pending",
+        color: invoiceToEdit.color || "#166534"
       }
     } else {
-      // Only generate a new invoice number if creating a new invoice
       return {
         invoiceNumber: `INV-${new Date().getFullYear()}-${String(Math.floor(1000 + Math.random() * 9000))}`,
         date: new Date().toISOString().split("T")[0],
@@ -290,7 +292,8 @@ export default function InvoiceForm() {
         amount: 0,
         notes: "",
         template: "classic",
-        status: "Pending"
+        status: "Pending",
+        color: "#166534"
       }
     }
   })
@@ -1101,7 +1104,8 @@ ${businessData.phone}`
         amount: invoiceToEdit.amount || 0,
         notes: typeof invoiceToEdit.notes === "string" ? invoiceToEdit.notes : "",
         template: "classic" as const,
-        status: invoiceToEdit.status === "Paid" ? "Paid" : "Pending"
+        status: invoiceToEdit.status === "Paid" ? "Paid" : "Pending",
+        color: invoiceToEdit.color || "#166534"
       }
 
       setInvoiceData(processedInvoiceData)
@@ -1568,6 +1572,31 @@ ${businessData.phone}`
                         placeholder="Add any additional notes or terms..."
                         className="mt-1.5 min-h-[100px]"
                       />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Settings Section */}
+                <Card className="border">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-lg font-medium">Settings</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {/* Color Picker */}
+                      <div>
+                        <Label htmlFor="invoiceColor" className="text-sm font-medium">Invoice Color</Label>
+                        <div className="mt-1.5 flex items-center gap-2">
+                          <input
+                            type="color"
+                            id="invoiceColor"
+                            value={invoiceData.color}
+                            onChange={(e) => updateInvoiceData("color", e.target.value)}
+                            className="h-8 w-8 rounded cursor-pointer"
+                          />
+                          <span className="text-sm text-gray-500">Choose a color for your invoice template</span>
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

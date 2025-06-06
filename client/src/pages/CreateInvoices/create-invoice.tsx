@@ -1154,37 +1154,44 @@ ${businessData.phone}`
                   <div className="text-3xl font-sans font-extrabold text-green-800 mb-0">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
                 </div>
 
-                <div className="flex flex-col justify-start  gap-3 mt-2">
+                <div className="flex flex-col justify-center  gap-3 mt-2">
+                  <ul className="flex flex-col justify-start gap-3 mt-2">
+                    <li>
+                      <Button
+                        variant="default"
+                        className="bg-green-800 hover:bg-green-900 text-white font-normal px-4 py-2 shadow-sm transition-all duration-150 w-full flex items-center justify-start gap-2"
+                        onClick={() => setIsFormExpanded(true)}
+                      >
+                        <Pencil className="w-4 h-4 mr-2" />
+                        Edit Invoice
+                      </Button>
+                    </li>
 
-                  <Button
-                    variant="default"
-                    className="bg-green-800 hover:bg-green-900 text-white font-normal px-4 py-2 shadow-sm transition-all duration-150 w-full flex items-center justify-start gap-2 "
-                    onClick={() => setIsFormExpanded(true)}
-                  >
-                    <Pencil className="w-4 h-4 mr-2" />
-                    Edit Invoice
-                  </Button>
+                    <li>
+                      <Button
+                        variant="outline"
+                        className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2 shadow-sm transition-all duration-150 w-full flex items-center justify-start gap-2"
+                        onClick={() => navigate(`/print-invoice/${invoiceToEdit?.id || invoiceData.invoiceNumber}`, {
+                          state: { invoiceId: invoiceToEdit?.id || invoiceData.invoiceNumber }
+                        })}
+                      >
+                        <Printer className="w-4 h-4 mr-2" />
+                        Print Invoice
+                      </Button>
+                    </li>
 
-                  <Button
-                    variant="outline"
-                    className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2  shadow-sm transition-all duration-150 w-full flex items-center justify-start gap-2"
-                    onClick={() => navigate(`/print-invoice/${invoiceToEdit?.id || invoiceData.invoiceNumber}`, {
-                      state: { invoiceId: invoiceToEdit?.id || invoiceData.invoiceNumber }
-                    })}
-                  >
-                    <Printer className="w-4 h-4 mr-2" />
-                    Print Invoice
-                  </Button>
-
-                  <Button
-                    variant="default"
-                    className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2  shadow-sm transition-all duration-150 w-full flex items-center justify-start gap-2"
-                    onClick={handleGenerateInvoiceLink}
-                    disabled={isGeneratingLink}
-                  >
-                    <Link2 className="w-4 h-4 mr-2" />
-                    {isGeneratingLink ? "Generating Public Invoice Link ..." : "Generate Invoice Link"}
-                  </Button>
+                    <li>
+                      <Button
+                        variant="default"
+                        className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2 shadow-sm transition-all duration-150 w-full flex items-center justify-start gap-2"
+                        onClick={handleGenerateInvoiceLink}
+                        disabled={isGeneratingLink}
+                      >
+                        <Link2 className="w-4 h-4 mr-2" />
+                        {isGeneratingLink ? "Generating Public Invoice Link ..." : "Generate Invoice Link"}
+                      </Button>
+                    </li>
+                  </ul>
 
                 </div>
                 {/* Shareable Link UI - shown directly under the three buttons */}

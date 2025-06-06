@@ -1531,7 +1531,7 @@ app.post('/api/update-invoice', async (req, res) => {
     // Update the row
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: `${sheetName}!A${rowIndex + 1}:M${rowIndex + 1}`,
+      range: `${sheetName}!A${rowIndex + 1}:N${rowIndex + 1}`,
       valueInputOption: 'USER_ENTERED',
       requestBody: {
         values: [updatedRow]

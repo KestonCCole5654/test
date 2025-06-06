@@ -1222,10 +1222,10 @@ ${businessData.phone}`
 
       {/* Edit Mode (Form) */}
       {isFormExpanded && (
-        <div className=" mt-0 max-w-7xl font-inter py-4 sm:py-8 px-4 mx-auto rounded-b-3xl mb-10">
+        <div className=" mt-0 max-w-7xl font-inter py-4 sm:py-8 px-4 mx-auto rounded-b-3xl mb-9">
           <div className="mb-8">
             {/* Breadcrumb Navigation */}
-            <div className="mt-2 mb-6">
+            <div className="mt-0 mb-6">
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem>
@@ -1256,7 +1256,7 @@ ${businessData.phone}`
                     : "Create a professional invoice for your client"}
                 </p>
               </div>
-              <div className="flex items-center gap-3 mt-2 sm:mt-0">
+              <div className="flex items-center gap-12 mt-2 sm:mt-0">
                 <div className="flex flex-col items-center ml-2">
                   <label htmlFor="invoiceColorEdit" className="text-xs text-gray-500 font-normal mb-1">Invoice Color</label>
                   <div className="flex items-center gap-2">

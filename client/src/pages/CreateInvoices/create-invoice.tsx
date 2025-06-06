@@ -1271,7 +1271,7 @@ ${businessData.phone}`
                       id="invoiceColorEdit"
                       value={invoiceData.color}
                       onChange={e => updateInvoiceData("color", e.target.value)}
-                      className="h-8 w-full rounded cursor-pointer border"
+                      className="h-12 w-12 rounded cursor-pointer border"
                       style={{ background: 'none' }}
                     />
                     <span className="text-sm  text-gray-500">Invoice Color - Customize template color</span>

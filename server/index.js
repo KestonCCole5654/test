@@ -261,7 +261,8 @@ async function getDefaultSheetId(accessToken) {
       'Discount',          // 9
       'Notes',             // 10
       'Template',          // 11
-      'Status'             // 12
+      'Status',            // 12
+      'Color'              // 13 (new last column)
     ];
 
     await sheets.spreadsheets.values.update({
@@ -426,7 +427,8 @@ app.post('/api/create-sheet', async (req, res) => {
     const headers = [
       'Invoice ID', 'Invoice Date', 'Due Date', 'Customer Name',
       'Customer Email', 'Customer Address', 'Items', 'Amount',
-      'Tax', 'Discount', 'Notes', 'Template', 'Status'
+      'Tax', 'Discount', 'Notes', 'Template', 'Status',
+      'Color'
     ];
     // Add headers to the sheet
     await sheets.spreadsheets.values.update({
@@ -1099,14 +1101,15 @@ app.post('/api/saveInvoice', async (req, res) => {
         JSON.stringify(invoiceData.discount),
         invoiceData.notes,
         invoiceData.template || 'classic',
-        invoiceData.status || 'Pending'
+        invoiceData.status || 'Pending',
+        invoiceData.color || '' // Add color as last column
       ]
     ];
 
     // Append the new invoice to the sheet
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: `${sheetName}!A:M`,
+      range: `${sheetName}!A:N`,
       valueInputOption: 'USER_ENTERED',
       insertDataOption: 'INSERT_ROWS',
       resource: { values }
@@ -1521,7 +1524,8 @@ app.post('/api/update-invoice', async (req, res) => {
       JSON.stringify(invoiceData.discount),
       invoiceData.notes,
       invoiceData.template || 'classic',
-      invoiceData.status || 'Pending'
+      invoiceData.status || 'Pending',
+      invoiceData.color || '' // Add color as last column
     ];
 
     // Update the row

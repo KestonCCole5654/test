@@ -1154,8 +1154,8 @@ ${businessData.phone}`
                   <div className="text-3xl font-cal font-extrabold text-green-800 mb-0">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
                 </div>
 
-                <div className="flex flex-col items-center justify-center gap-3 mt-2">
-                  <ul className="flex flex-col items-left justify-start gap-3 mt-2">
+                <div className="flex justify-center mb-10">
+                  <ul className="hidden font-sans font-medium  text-md md:block text-center text-[#5C5B61] leading-relaxed space-y-1 md:-mt-3">
                     <li className="w-full">
                       <Button
                         variant="default"

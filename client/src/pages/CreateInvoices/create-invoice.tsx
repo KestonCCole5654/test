@@ -1222,7 +1222,7 @@ ${businessData.phone}`
 
       {/* Edit Mode (Form) */}
       {isFormExpanded && (
-        <div className="mt-0 max-w-7xl font-inter py-4 sm:py-6 px-4 mx-auto rounded-b-3xl mb-6">
+        <div className="w-full max-w-7xl mx-auto mt-4">
           <div className="mb-6">
             {/* Breadcrumb Navigation */}
             <div className="mt-0 mb-4">

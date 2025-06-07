@@ -30,6 +30,7 @@ import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { supabase } from '../../lib/supabase'
 import ColorSuggestions from '../../components/ColorSuggestions'
+import { EmailInvoiceModal } from '../../components/EmailInvoiceModal'
 
 // Replace the printStyles constant with this updated version
 const printStyles = `
@@ -785,7 +786,44 @@ export default function InvoiceForm() {
     }
   }
 
+  const [showEmailModal, setShowEmailModal] = useState(false)
+  const [isSavingAndEmailing, setIsSavingAndEmailing] = useState(false)
 
+  const handleSaveAndEmail = async () => {
+    setIsSavingAndEmailing(true)
+    try {
+      await handleSave()
+      setShowEmailModal(true)
+    } catch (error) {
+      console.error('Error saving invoice:', error)
+      toast({
+        title: "Error",
+        description: "Failed to save invoice. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSavingAndEmailing(false)
+    }
+  }
+
+  const handleEmailSend = async (emailData: any) => {
+    try {
+      // Here you would implement the email sending logic
+      console.log('Sending email with data:', emailData)
+      toast({
+        title: "Success",
+        description: "Invoice email sent successfully.",
+      })
+      setShowEmailModal(false)
+    } catch (error) {
+      console.error('Error sending email:', error)
+      toast({
+        title: "Error",
+        description: "Failed to send email. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
 
   // Used to edit invoice
   useEffect(() => {
@@ -1366,27 +1404,35 @@ export default function InvoiceForm() {
                   </CardContent>
                 </Card>
 
-               
-
-                <div className="flex w-full justify-end no-print">
+                <div className="flex w-full justify-end gap-4 no-print">
                   {invoiceToEdit ? (
                     <Button
                       variant="outline"
                       onClick={handleUpdate}
-                      className="bg-green-800 hover:bg-green-900 text-white font-inter font-light w-full"
+                      className="bg-green-800 hover:bg-green-900 text-white font-inter font-light"
                       disabled={isUpdating}
                     >
                       {isUpdating ? "Updating Invoice..." : "Update Invoice"}
                     </Button>
                   ) : (
-                    <Button
-                      variant="outline"
-                      onClick={handleSave}
-                      className="bg-green-800 hover:bg-green-900 text-white font-inter font-light w-full"
-                      disabled={isSaving}
-                    >
-                      {isSaving ? "Saving Invoice..." : "Save Invoice"}
-                    </Button>
+                    <>
+                      <Button
+                        variant="outline"
+                        onClick={handleSave}
+                        className="bg-green-800 hover:bg-green-900 text-white font-inter font-light"
+                        disabled={isSaving}
+                      >
+                        {isSaving ? "Saving Invoice..." : "Save Invoice"}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={handleSaveAndEmail}
+                        className="bg-green-800 hover:bg-green-900 text-white font-inter font-light"
+                        disabled={isSavingAndEmailing}
+                      >
+                        {isSavingAndEmailing ? "Saving..." : "Save & Email Invoice"}
+                      </Button>
+                    </>
                   )}
                 </div>
               </CollapsibleContent>
@@ -1418,8 +1464,16 @@ export default function InvoiceForm() {
         </div>
       )}
 
-      
-      
+      {/* Add the email modal */}
+      <EmailInvoiceModal
+        isOpen={showEmailModal}
+        onClose={() => setShowEmailModal(false)}
+        onSend={handleEmailSend}
+        customerEmail={invoiceData.customer.email}
+        businessEmail={businessData.email}
+        invoiceNumber={invoiceData.invoiceNumber}
+        customerName={invoiceData.customer.name}
+      />
     </>
   )
 }

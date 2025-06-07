@@ -8,6 +8,7 @@ import {
   ArrowUpDown,
   X,
   GripVertical,
+  Mail,
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -1221,18 +1222,184 @@ export default function Dashboard() {
                           <TableCell className="text-right font-normal font-cal-sans text-md px-6 py-4 border-r border-gray-200">
                             {formatCurrency(invoice.amount)}
                           </TableCell>
-                          <TableCell className="px-6 py-4 text-center">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="bg-blue-600 text-white hover:bg-blue-700"
-                              onClick={e => {
-                                e.stopPropagation();
-                                navigate(`/email-invoice/${invoice.invoiceNumber}`);
-                              }}
-                            >
-                              Email Invoice
-                            </Button>
+                          <TableCell className="text-center px-6 py-4">
+                            <div className="flex justify-center gap-2">
+                              <Button
+                                onClick={async (e) => {
+                                  e.stopPropagation();
+                                  try {
+                                    const {
+                                      data: { session },
+                                      error: sessionError,
+                                    } = await supabase.auth.getSession();
+                                    if (sessionError) {
+                                      throw new Error(sessionError.message);
+                                    }
+
+                                    // Find the invoices sheet and validate it exists
+                                    const invoicesSheet = spreadsheets.find(
+                                      (sheet) =>
+                                        sheet.name === "SheetBills Invoices"
+                                    );
+                                    if (!invoicesSheet?.sheetUrl) {
+                                      throw new Error(
+                                        "Invoice spreadsheet not found. Please ensure you have access to the SheetBills Invoices spreadsheet."
+                                      );
+                                    }
+
+                                    const response = await fetch(
+                                      "https://sheetbills-server.vercel.app/api/sheets/mark-as-paid",
+                                      {
+                                        method: "PUT",
+                                        headers: {
+                                          "Content-Type": "application/json",
+                                          Authorization: `Bearer ${session?.provider_token}`,
+                                          "X-Supabase-Token":
+                                            session?.access_token || "",
+                                        },
+                                        body: JSON.stringify({
+                                          invoiceId: invoice.id,
+                                          sheetUrl: invoicesSheet.sheetUrl,
+                                        }),
+                                      }
+                                    );
+                                    if (!response.ok) {
+                                      const errorData = await response.json();
+                                      console.error(
+                                        "Mark as paid error:",
+                                        errorData
+                                      );
+                                      toast({
+                                        title: "Error marking as paid",
+                                        description:
+                                          errorData.error ||
+                                          errorData.details ||
+                                          "Failed to mark invoice as paid.",
+                                        variant: "destructive",
+                                      });
+                                      return;
+                                    }
+                                    const updatedInvoices = invoices.map(
+                                      (inv) =>
+                                        inv.id === invoice.id
+                                          ? { ...inv, status: "Paid" as const }
+                                          : inv
+                                    );
+                                    setInvoices(updatedInvoices);
+                                    if (selectedSpreadsheetUrl)
+                                      await fetchInvoices(
+                                        selectedSpreadsheetUrl
+                                      );
+                                    toast({
+                                      title: "Status Updated",
+                                      description:
+                                        "Invoice marked as paid successfully.",
+                                    });
+                                  } catch (error) {
+                                    console.error(
+                                      "Mark as paid error (catch):",
+                                      error
+                                    );
+                                    toast({
+                                      title: "Error marking as paid",
+                                      description:
+                                        error instanceof Error
+                                          ? error.message
+                                          : "Failed to update invoice status.",
+                                      variant: "destructive",
+                                    });
+                                  }
+                                }}
+                                className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
+                                size="sm"
+                                disabled={invoice.status === "Paid"}
+                              >
+                                Mark as Paid
+                              </Button>
+                              <Button
+                                onClick={async (e) => {
+                                  e.stopPropagation();
+                                  try {
+                                    const {
+                                      data: { session },
+                                      error: sessionError,
+                                    } = await supabase.auth.getSession();
+                                    if (sessionError) {
+                                      throw new Error(sessionError.message);
+                                    }
+                                    const response = await fetch(
+                                      "https://sheetbills-server.vercel.app/api/sheets/mark-as-pending",
+                                      {
+                                        method: "PUT",
+                                        headers: {
+                                          "Content-Type": "application/json",
+                                          Authorization: `Bearer ${session?.provider_token}`,
+                                          "X-Supabase-Token":
+                                            session?.access_token || "",
+                                        },
+                                        body: JSON.stringify({
+                                          invoiceId: invoice.id,
+                                          sheetUrl: spreadsheets.find(
+                                            (sheet) =>
+                                              sheet.name ===
+                                              "SheetBills Invoices"
+                                          )?.sheetUrl,
+                                        }),
+                                      }
+                                    );
+                                    if (!response.ok) {
+                                      const errorData = await response.json();
+                                      throw new Error(
+                                        errorData.error ||
+                                          "Failed to mark invoice as pending"
+                                      );
+                                    }
+                                    const updatedInvoices = invoices.map(
+                                      (inv) =>
+                                        inv.id === invoice.id
+                                          ? {
+                                              ...inv,
+                                              status: "Pending" as const,
+                                            }
+                                          : inv
+                                    );
+                                    setInvoices(updatedInvoices);
+                                    if (selectedSpreadsheetUrl)
+                                      await fetchInvoices(
+                                        selectedSpreadsheetUrl
+                                      );
+                                    toast({
+                                      title: "Status Updated",
+                                      description:
+                                        "Invoice marked as pending successfully.",
+                                    });
+                                  } catch (error) {
+                                    toast({
+                                      title: "Error",
+                                      description:
+                                        error instanceof Error
+                                          ? error.message
+                                          : "Failed to update invoice status",
+                                      variant: "destructive",
+                                    });
+                                  }
+                                }}
+                                className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
+                                size="sm"
+                                disabled={invoice.status === "Pending"}
+                              >
+                                Mark as Pending
+                              </Button>
+                              <Button
+                                variant="outline"
+                                className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
+                                size="sm"
+                                onClick={() => navigate(`/email-invoice/${invoice.invoiceNumber}`, { state: { invoice } })}
+                              >
+                                <Mail className="mr-2 h-4 w-4" />
+                                Email Invoice
+                              </Button>
+                            </div>
                           </TableCell>
                         </SortableTableRow>
                       );

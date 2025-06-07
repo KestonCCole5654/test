@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useState } from 'react'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Label } from '../../components/ui/label'
@@ -25,23 +25,22 @@ interface EmailData {
 
 export default function EmailInvoice() {
   const navigate = useNavigate()
-  const { invoiceNumber } = useParams();
-
-  // Example: fetch invoice data by invoiceNumber here if needed
-  // For now, just use invoiceNumber in the subject
-
-  const customerEmail = ''
-  const businessEmail = ''
-  const customerName = ''
-  const amount = 0
-  const dueDate = ''
-  const invoiceDate = ''
-  const companyName = ''
+  const { invoiceNumber } = useParams<{ invoiceNumber: string }>()
+  const location = useLocation()
+  const invoice = location.state?.invoice
+  // Use invoice data from state if available
+  const customerEmail = invoice?.customer?.email || ''
+  const businessEmail = invoice?.businessEmail || ''
+  const customerName = invoice?.customer?.name || ''
+  const amount = invoice?.amount || 0
+  const dueDate = invoice?.dueDate || ''
+  const invoiceDate = invoice?.date || ''
+  const companyName = invoice?.companyName || ''
 
   const [emailData, setEmailData] = useState<EmailData>({
     to: customerEmail,
     from: businessEmail,
-    subject: `Invoice #: ${invoiceNumber || ''}`,
+    subject: `Invoice #: ${invoiceNumber || invoice?.invoiceNumber || ''}`,
     message: `Dear ${customerName},\n\nWe appreciate your business. Please find your invoice details here. Feel free to contact us if you have any questions.\n\nInvoice Date: ${invoiceDate}\nSubtotal: $${amount}\nDue date: ${dueDate}`,
   })
 

@@ -26,7 +26,7 @@ interface EmailData {
 
 export default function EmailInvoice() {
   const navigate = useNavigate()
-  const { invoiceNumber } = useParams<{ invoiceNumber: string }>()
+  const { invoiceId } = useParams<{ invoiceId: string }>()
   const location = useLocation()
   const invoice = location.state?.invoice
 
@@ -42,7 +42,7 @@ export default function EmailInvoice() {
     return {
       to: customerEmail,
       from: businessEmail,
-      subject: `Invoice #: ${invoiceNumber || invoice?.invoiceNumber || ''}`,
+      subject: `Invoice #: ${invoiceId || invoice?.invoiceNumber || ''}`,
       message: `Dear ${customerName},\n\nWe appreciate your business. Please find your invoice details here. Feel free to contact us if you have any questions.\n\nInvoice Date: ${invoiceDate}\nSubtotal: $${amount}\nDue date: ${dueDate}`,
     }
   })

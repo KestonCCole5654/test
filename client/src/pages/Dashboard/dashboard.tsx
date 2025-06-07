@@ -1394,7 +1394,7 @@ export default function Dashboard() {
                                 variant="outline"
                                 className="border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 px-3 shadow-none"
                                 size="sm"
-                                onClick={() => navigate(`/email-invoice/${invoice.invoiceNumber}`, { state: { invoice } })}
+                                onClick={() => navigate(`/email-invoice/${invoice.id}`, { state: { invoice } })}
                               >
                                 <Mail className="mr-2 h-4 w-4" />
                                 Email Invoice

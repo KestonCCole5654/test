@@ -70,7 +70,7 @@ export default function EmailInvoice() {
   };
 
   return (
-    <div className="w-full max-w-7xl bg-gray-50/50 font-onest flex flex-col md:flex-row gap-8 items-stretch md:items-center">
+    <div className="w-full max-w-7xl bg-gray-50/50 font-onest flex flex-col md:flex-row gap-8  items-stretch md:items-center">
       {/* Left: Email Form */}
       <div className="flex-1 flex items-center justify-center min-w-0 py-8">
         <div className="w-full max-w-md">
@@ -172,7 +172,7 @@ export default function EmailInvoice() {
               size="sm"
               onClick={() => window.print()}
             >
-              Print or save
+              View/Print Invoice
             </Button>
 
             <div className="text-xs text-gray-500 mb-1 mt-5">

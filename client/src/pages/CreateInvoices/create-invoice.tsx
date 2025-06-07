@@ -1036,8 +1036,8 @@ export default function InvoiceForm() {
                 </div>
 
                 <div className="flex max-w-full justify-center mb-10">
-                  <ul className="hidden max-w-full  font-sans font-normal  text-md md:block text-center text-[#5C5B61] leading-relaxed space-y-1 md:-mt-3">
-                    <li className="flex  items-center justify-center lg:justify-start gap-2 ">
+                  <ul className="hidden w-full font-sans font-normal text-md md:block text-[#5C5B61] leading-relaxed space-y-1 md:-mt-3">
+                    <li className="flex items-center justify-center lg:justify-start gap-2 w-full">
                       <Button
                         variant="default"
                         className="bg-green-800 hover:bg-green-900 text-white font-normal px-4 py-2 shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
@@ -1048,7 +1048,7 @@ export default function InvoiceForm() {
                       </Button>
                     </li>
 
-                    <li className="flex  items-center justify-center lg:justify-start gap-2">
+                    <li className="flex items-center justify-center lg:justify-start gap-2 w-full">
                       <Button
                         variant="outline"
                         className="bg-green-800 hover:bg-green-900 text-white font-normal px-4 py-2 shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
@@ -1061,7 +1061,7 @@ export default function InvoiceForm() {
                       </Button>
                     </li>
 
-                    <li className="flex  items-center justify-center lg:justify-start gap-2">
+                    <li className="flex items-center justify-center lg:justify-start gap-2 w-full">
                       <Button
                         variant="default"
                         className="bg-green-800 hover:bg-green-900 text-white font-normal px-4 py-2 shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"

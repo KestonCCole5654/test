@@ -58,7 +58,7 @@ export function EmailInvoiceModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-4xl w-full max-w-[95vw]">
+      <DialogContent className="sm:max-w-5xl w-full max-w-[100vw]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Mail className="h-5 w-5" />

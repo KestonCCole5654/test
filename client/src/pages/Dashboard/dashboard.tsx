@@ -1128,7 +1128,7 @@ export default function Dashboard() {
                     />
                   </TableHead>
                   <TableHead className="px-6 py-4 border-r border-gray-200">
-                    Number
+                    Invoice ID
                   </TableHead>
                   <TableHead className="px-6 py-4 border-r border-gray-200">
                     Client

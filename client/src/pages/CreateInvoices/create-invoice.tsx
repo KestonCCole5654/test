@@ -265,7 +265,7 @@ export default function InvoiceForm() {
         notes: invoiceToEdit.notes || "",
         template: invoiceToEdit.template || "classic",
         status: invoiceToEdit.status || "Pending",
-        color: invoiceToEdit.color || "#166534",
+        color: (typeof invoiceToEdit.color === "string" && invoiceToEdit.color.trim() !== "") ? invoiceToEdit.color : "#166534",
         logo: invoiceToEdit.logo || ""
       }
     } else {
@@ -862,7 +862,7 @@ export default function InvoiceForm() {
         notes: typeof invoiceToEdit.notes === "string" ? invoiceToEdit.notes : "",
         template: "classic" as const,
         status: invoiceToEdit.status === "Paid" ? "Paid" : "Pending",
-        color: invoiceToEdit.color || "#166534",
+        color: (typeof invoiceToEdit.color === "string" && invoiceToEdit.color.trim() !== "") ? invoiceToEdit.color : "#166534",
         logo: invoiceToEdit.logo || ""
       }
 
@@ -1031,7 +1031,7 @@ export default function InvoiceForm() {
                     <input
                       type="color"
                       id="invoiceColorEdit"
-                      value={invoiceData.color || '#166534'}
+                      value={(typeof invoiceData.color === "string" && invoiceData.color.trim() !== "") ? invoiceData.color : '#166534'}
                       onChange={e => updateInvoiceData("color", e.target.value)}
                       className="w-8 h-8 rounded cursor-pointer"
                     />

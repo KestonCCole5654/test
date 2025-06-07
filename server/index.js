@@ -824,7 +824,7 @@ app.get('/api/invoices/:invoiceId', async (req, res) => {
       notes: row[10],
       template: row[11] || 'classic',
       status: row[12] || 'Pending',
-      color: row[13] || '#166534', // Add color field
+      color: (row[13] && row[13].trim() !== "") ? row[13] : '#166534', // Add color field
     };
 
     // Get business details
@@ -1009,7 +1009,7 @@ app.get('/api/sheets/data', async (req, res) => {
           notes: row[10]?.toString() || '',
           template: ['classic', 'modern'].includes(row[11]) ? row[11] : 'classic',
           status: ['Pending', 'Paid', 'Overdue'].includes(row[12]) ? row[12] : 'Pending',
-          color: row[13] || '#166534' // Add color field
+          color: (row[13] && row[13].trim() !== "") ? row[13] : '#166534' // Add color field
         };
       } catch (error) {
         console.error(`Error processing row ${index + 1}:`, error);
@@ -2079,7 +2079,7 @@ app.get('/api/invoices/shared/:token', async (req, res) => {
       notes: invoiceRow[10],
       template: invoiceRow[11] || 'classic',
       status: invoiceRow[12] || 'Pending',
-      color: invoiceRow[13] || '#166534', // Add color field
+      color: (invoiceRow[13] && invoiceRow[13].trim() !== "") ? invoiceRow[13] : '#166534', // Add color field
     };
 
     // Get business details

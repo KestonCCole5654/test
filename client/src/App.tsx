@@ -104,18 +104,18 @@ function App() {
       if (session) {
         console.log('Setting user session');
         try {
-          sessionStorage.setItem('sb-auth-token', JSON.stringify(session));
-          localStorage.setItem('sb-auth-token', JSON.stringify(session));
-          setUser(session.user);
+        sessionStorage.setItem('sb-auth-token', JSON.stringify(session));
+        localStorage.setItem('sb-auth-token', JSON.stringify(session));
+        setUser(session.user);
         } catch (e) {
           console.error('Error setting session storage:', e);
         }
       } else {
         console.log('Clearing user session');
         try {
-          sessionStorage.removeItem('sb-auth-token');
-          localStorage.removeItem('sb-auth-token');
-          setUser(null);
+        sessionStorage.removeItem('sb-auth-token');
+        localStorage.removeItem('sb-auth-token');
+        setUser(null);
         } catch (e) {
           console.error('Error clearing session storage:', e);
         }
@@ -244,7 +244,7 @@ function App() {
           <Route path="/email-invoice/:invoiceId" element={<EmailInvoice />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/reports" element={<ReportsPage />} />
         </Route>
 
         {/* Public Invoice Route - must be after catch-all to take precedence */}

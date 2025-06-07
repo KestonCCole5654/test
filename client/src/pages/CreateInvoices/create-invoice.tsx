@@ -1026,7 +1026,7 @@ export default function InvoiceForm() {
                   <input
                     type="color"
                     id="invoiceColorEdit"
-                    value={invoiceData.color}
+                    value={invoiceData.color || '#166534'}
                     onChange={e => updateInvoiceData("color", e.target.value)}
                     className="h-8 w-8 rounded border shadow-sm"
                     style={{ background: 'none' }}

@@ -789,7 +789,7 @@ app.get('/api/invoices/:invoiceId', async (req, res) => {
     // Fetch all invoice rows
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A2:M`,
+      range: `${sheetName}!A2:N`,
     });
 
     const rows = response.data.values || [];
@@ -824,6 +824,7 @@ app.get('/api/invoices/:invoiceId', async (req, res) => {
       notes: row[10],
       template: row[11] || 'classic',
       status: row[12] || 'Pending',
+      color: row[13] || '#166534', // Add color field
     };
 
     // Get business details
@@ -2077,6 +2078,7 @@ app.get('/api/invoices/shared/:token', async (req, res) => {
       notes: invoiceRow[10],
       template: invoiceRow[11] || 'classic',
       status: invoiceRow[12] || 'Pending',
+      color: invoiceRow[13] || '#166534', // Add color field
     };
 
     // Get business details

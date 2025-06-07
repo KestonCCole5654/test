@@ -81,7 +81,7 @@ export default function EmailInvoice() {
   return (
     <div className="w-full  max-w-7xl bg-gray-50/50 font-onest  flex flex-col md:flex-row gap-8">
       {/* Left: Email Form */}
-      <div className="flex-1  w-full min-w-0">
+      <div className="flex-1 w-full min-w-0">
         <div className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="from">From</Label>
@@ -135,7 +135,7 @@ export default function EmailInvoice() {
       </div>
       {/* Right: Invoice Preview */}
       <div className="flex-1 min-w-0">
-        <div className="bg-transparent  p-6  w-full mx-auto">
+        <div className="bg-transparent p-6 w-full mx-auto">
           <div className="text-xs text-gray-500 mb-2 border-b border-gray-200 pb-2">
             From: {emailData.from}
             <br />
@@ -158,10 +158,13 @@ export default function EmailInvoice() {
           </div>
           <div className="bg-gray-100 rounded-lg p-4 flex flex-col items-center mb-4">
             <div className="text-xs text-gray-500 mb-1">
-              DUE {dueDate || "—"}
+              INVOICE # {invoiceId || "—"}
             </div>
             <div className="text-3xl font-medium text-gray-800 mb-2">
               ${amount?.toFixed(2)}
+            </div>
+            <div className="text-xs text-gray-500 mb-1">
+              DUE {dueDate || "—"}
             </div>
             <Button
               variant="default"
@@ -171,14 +174,17 @@ export default function EmailInvoice() {
             >
               Print or save
             </Button>
-            <div className="text-xs text-gray-400 mt-1">
-              Powered by{" "}
-              <span className="font-normal font-green-800">SheetBills</span>
-            </div>
+           
           </div>
           <div className="text-sm whitespace-pre-line mb-2">
             {emailData.message}
           </div>
+
+          <div className="text-xs text-gray-400 mt-5 mb-10">
+              Powered by{" "}
+              <span className="font-normal font-green-800">SheetBills</span>
+            </div>
+
         </div>
         <div className="flex justify-end gap-2 mt-6">
           <Button onClick={handleSend} className="bg-green-700 text-white">

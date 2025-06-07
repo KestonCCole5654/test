@@ -934,7 +934,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto mt-4 bg-gray-50/50">
+    <div className="w-full max-w-7xl mx-auto font-onest mt-4 bg-gray-50/50">
       {/* Breadcrumb Navigation */}
       <div className="mt-4 mb-6">
         <Breadcrumb>
@@ -1657,21 +1657,6 @@ function SortableTableRow({
       className="hover:bg-slate-50 border-b border-gray-200"
       {...props}
     >
-      <td
-        className="w-8 px-4 align-middle text-center border-r border-gray-200"
-        style={{ verticalAlign: "middle" }}
-      >
-        <div className="flex items-center justify-center h-full min-h-[40px]">
-          <span
-            {...attributes}
-            {...listeners}
-            data-draggable="true"
-            className="inline-flex items-center justify-center cursor-grab text-gray-400 hover:text-gray-600 active:text-gray-800"
-          >
-            <GripVertical className="h-6 w-6" />
-          </span>
-        </div>
-      </td>
       <td
         className="w-[56px] px-6 py-4 align-middle text-center border-r border-gray-200"
         style={{ verticalAlign: "middle" }}

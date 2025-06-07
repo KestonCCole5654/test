@@ -149,7 +149,7 @@ export default function EmailInvoice() {
           </div>
           <div className="bg-gray-100 rounded-lg p-4 flex flex-col items-center mb-4">
 
-            <div className="text-xs text-gray-500 mt-5 mb-1">
+            <div className="text-xs text-gray-500 mt-5 mb-5">
               INVOICE # {invoiceId || "—"}
             </div>
 

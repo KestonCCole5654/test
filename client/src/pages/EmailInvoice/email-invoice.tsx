@@ -1,8 +1,11 @@
 "use client"
 
-import { useNavigate } from "react-router-dom"
-import { Button } from "../../components/ui/button"
-import { ArrowLeft, Mail } from "lucide-react"
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Button } from '../../components/ui/button'
+import { Input } from '../../components/ui/input'
+import { Label } from '../../components/ui/label'
+import { Textarea } from '../../components/ui/textarea'
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -13,8 +16,37 @@ import {
 } from "../../components/ui/breadcrumb"
 import { Card, CardContent } from "../../components/ui/card"
 
+interface EmailData {
+  to: string
+  from: string
+  subject: string
+  message: string
+}
+
 export default function EmailInvoice() {
   const navigate = useNavigate()
+  // Example data, replace with real data as needed
+  const customerEmail = ''
+  const businessEmail = ''
+  const invoiceNumber = 'INV-2025-3452'
+  const customerName = ''
+  const amount = 0
+  const dueDate = ''
+  const invoiceDate = ''
+  const companyName = ''
+
+  const [emailData, setEmailData] = useState<EmailData>({
+    to: customerEmail,
+    from: businessEmail,
+    subject: `Invoice #: ${invoiceNumber}`,
+    message: `Dear ${customerName},\n\nWe appreciate your business. Please find your invoice details here. Feel free to contact us if you have any questions.\n\nInvoice Date: ${invoiceDate}\nSubtotal: $${amount}\nDue date: ${dueDate}`,
+  })
+
+  const handleSend = () => {
+    // Implement your send logic here
+    // For now, just navigate back
+    navigate(-1)
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

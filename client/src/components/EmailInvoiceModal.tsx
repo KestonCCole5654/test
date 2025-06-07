@@ -136,9 +136,7 @@ export function EmailInvoiceModal({
               
             </div>
             <div className="flex justify-end gap-2 mt-6">
-              <Button variant="outline" onClick={handlePrint} className="flex items-center gap-2">
-                <Printer className="h-4 w-4" /> Print
-              </Button>
+             
               <Button onClick={handleSend} className="bg-green-700 text-white">
                 Send and close
               </Button>

@@ -126,7 +126,7 @@ export default function EmailInvoice() {
       </div>
       {/* Right: Invoice Preview */}
       <div className="flex-1 min-w-0">
-        <div className="bg-transparent p-6 w-full mx-auto">
+        <div className="bg-transparent p-6 w-full mx-auto overflow-y-auto" style={{ maxHeight: 'calc(100vh - 48px)' }}>
           <div className="text-xs text-gray-500 mb-2 border-b border-gray-200 pb-2">
             From: {emailData.from}
             <br />

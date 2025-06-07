@@ -903,13 +903,13 @@ export default function InvoiceForm() {
                   <div className="text-xs text-gray-500 font-normal mb-1">Invoice #</div>
                   <div className="text-xl font-cal font-extrabold text-gray-800 mb-2 break-all">{invoiceData.invoiceNumber}</div>
                   <div className="text-xs text-gray-500 font-normal mb-1">Billed To:</div>
-                  <div className="text-base font-medium text-gray-800 mb-2">{invoiceData.customer.name || 'Customer Name'}</div>
+                  <div className="text-base font-normal text-gray-800 mb-2">{invoiceData.customer.name || 'Customer Name'}</div>
                   <div className="text-xs text-gray-500 font-normal mb-1">Amount Due:</div>
                   <div className="text-2xl font-cal font-extrabold text-green-800 mb-12">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
                 </div>
 
                 <div className="flex justify-center mb-10">
-                  <ul className="hidden font-sans font-medium  text-md md:block text-center text-[#5C5B61] leading-relaxed space-y-1 md:-mt-3">
+                  <ul className="hidden font-sans font-normal  text-md md:block text-center text-[#5C5B61] leading-relaxed space-y-1 md:-mt-3">
                     <li className="flex  items-center justify-center lg:justify-start gap-2 ">
                       <Button
                         variant="default"
@@ -924,7 +924,7 @@ export default function InvoiceForm() {
                     <li className="flex  items-center justify-center lg:justify-start gap-2">
                       <Button
                         variant="outline"
-                        className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2 shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
+                        className="bg-green-800 hover:bg-green-900 text-white font-normal px-4 py-2 shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
                         onClick={() => navigate(`/print-invoice/${invoiceToEdit?.id || invoiceData.invoiceNumber}`, {
                           state: { invoiceId: invoiceToEdit?.id || invoiceData.invoiceNumber }
                         })}
@@ -937,7 +937,7 @@ export default function InvoiceForm() {
                     <li className="flex  items-center justify-center lg:justify-start gap-2">
                       <Button
                         variant="default"
-                        className="bg-green-800 hover:bg-green-900 text-white font-medium px-4 py-2 shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
+                        className="bg-green-800 hover:bg-green-900 text-white font-normal px-4 py-2 shadow-sm transition-all duration-150 w-full flex items-center justify-center gap-2"
                         onClick={handleGenerateInvoiceLink}
                         disabled={isGeneratingLink}
                       >
@@ -1031,7 +1031,7 @@ export default function InvoiceForm() {
                     className="h-8 w-8 rounded border shadow-sm"
                     style={{ background: 'none' }}
                   />
-                  <span className="text-sm text-gray-600 font-medium">Choose a Invoice Template Color</span>
+                  <span className="text-sm text-gray-600 font-normal">Choose a Invoice Template Color</span>
                 </label>
                 <Button
                   variant="outline"
@@ -1049,12 +1049,12 @@ export default function InvoiceForm() {
               <CollapsibleContent className="space-y-6">
                 <Card className="border">
                   <CardHeader className="pb-4">
-                    <CardTitle className="text-lg font-medium">Invoice Information</CardTitle>
+                    <CardTitle className="text-lg font-normal">Invoice Information</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
-                        <Label htmlFor="invoiceNumber" className="text-sm font-medium">Invoice #</Label>
+                        <Label htmlFor="invoiceNumber" className="text-sm font-normal">Invoice #</Label>
                         <Input
                           id="invoiceNumber"
                           value={invoiceData.invoiceNumber}
@@ -1064,7 +1064,7 @@ export default function InvoiceForm() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="date" className="text-sm font-medium">Date</Label>
+                        <Label htmlFor="date" className="text-sm font-normal">Date</Label>
                         <Input
                           id="date"
                           type="date"
@@ -1074,7 +1074,7 @@ export default function InvoiceForm() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="dueDate" className="text-sm font-medium">Due Date</Label>
+                        <Label htmlFor="dueDate" className="text-sm font-normal">Due Date</Label>
                         <Input
                           id="dueDate"
                           type="date"
@@ -1086,10 +1086,10 @@ export default function InvoiceForm() {
                     </div>
 
                     <div>
-                      <h3 className="text-sm font-medium mb-3">Customer Information</h3>
+                      <h3 className="text-sm font-normal mb-3">Customer Information</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <Label htmlFor="customerName" className="text-sm font-medium">Name</Label>
+                          <Label htmlFor="customerName" className="text-sm font-normal">Name</Label>
                           <div className="relative">
                             <Input
                               id="customerName"
@@ -1145,7 +1145,7 @@ export default function InvoiceForm() {
                           </div>
                         </div>
                         <div>
-                          <Label htmlFor="customerEmail" className="text-sm font-medium">Email</Label>
+                          <Label htmlFor="customerEmail" className="text-sm font-normal">Email</Label>
                           <Input
                             id="customerEmail"
                             type="email"
@@ -1157,7 +1157,7 @@ export default function InvoiceForm() {
                         </div>
                       </div>
                       <div className="mt-4">
-                        <Label htmlFor="customerAddress" className="text-sm font-medium">Address</Label>
+                        <Label htmlFor="customerAddress" className="text-sm font-normal">Address</Label>
                         <Textarea
                           id="customerAddress"
                           value={invoiceData.customer.address}
@@ -1173,9 +1173,9 @@ export default function InvoiceForm() {
 
                 <Card className="border">
                   <CardHeader className="pb-4">
-                    <CardTitle className="text-lg font-medium flex items-center justify-between">
+                    <CardTitle className="text-lg font-normal flex items-center justify-between">
                       <span>Items</span>
-                      <Button variant="outline" type="button" onClick={addItem} size="sm" className="font-medium">
+                      <Button variant="outline" type="button" onClick={addItem} size="sm" className="font-normal">
                         <Plus className="h-4 w-4 mr-2" />
                         Add Item
                       </Button>
@@ -1187,7 +1187,7 @@ export default function InvoiceForm() {
                         <div key={index} className="space-y-4">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <span className="font-medium">Item {index + 1}</span>
+                              <span className="font-normal">Item {index + 1}</span>
                               <span className="text-sm text-gray-500 font-light">
                                 {item.name || "Unnamed Item"}
                               </span>
@@ -1205,7 +1205,7 @@ export default function InvoiceForm() {
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <Label htmlFor={`item-name-${index}`} className="text-sm font-medium">Name</Label>
+                              <Label htmlFor={`item-name-${index}`} className="text-sm font-normal">Name</Label>
                               <Input
                                 id={`item-name-${index}`}
                                 value={item.name}
@@ -1215,7 +1215,7 @@ export default function InvoiceForm() {
                               />
                             </div>
                             <div>
-                              <Label htmlFor={`item-description-${index}`} className="text-sm font-medium">Description</Label>
+                              <Label htmlFor={`item-description-${index}`} className="text-sm font-normal">Description</Label>
                               <Textarea
                                 id={`item-description-${index}`}
                                 value={item.description}
@@ -1227,7 +1227,7 @@ export default function InvoiceForm() {
                           </div>
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <Label htmlFor={`item-quantity-${index}`} className="text-sm font-medium">Quantity</Label>
+                              <Label htmlFor={`item-quantity-${index}`} className="text-sm font-normal">Quantity</Label>
                               <Input
                                 id={`item-quantity-${index}`}
                                 type="number"
@@ -1241,7 +1241,7 @@ export default function InvoiceForm() {
                               />
                             </div>
                             <div>
-                              <Label htmlFor={`item-price-${index}`} className="text-sm font-medium">Price</Label>
+                              <Label htmlFor={`item-price-${index}`} className="text-sm font-normal">Price</Label>
                               <Input
                                 id={`item-price-${index}`}
                                 type="number"
@@ -1258,7 +1258,7 @@ export default function InvoiceForm() {
                           </div>
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <Label htmlFor={`item-discount-${index}`} className="text-sm font-medium">Discount</Label>
+                              <Label htmlFor={`item-discount-${index}`} className="text-sm font-normal">Discount</Label>
                               <div className="flex gap-2 mt-1.5">
                                 <Select
                                   value={item.discount.type}
@@ -1289,7 +1289,7 @@ export default function InvoiceForm() {
                               </div>
                             </div>
                             <div>
-                              <Label htmlFor={`item-tax-${index}`} className="text-sm font-medium">Tax</Label>
+                              <Label htmlFor={`item-tax-${index}`} className="text-sm font-normal">Tax</Label>
                               <div className="flex gap-2 mt-1.5">
                                 <Select
                                   value={item.tax.type}
@@ -1328,11 +1328,11 @@ export default function InvoiceForm() {
 
                 <Card className="border">
                   <CardHeader className="pb-4">
-                    <CardTitle className="text-lg font-medium">Notes</CardTitle>
+                    <CardTitle className="text-lg font-normal">Notes</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div>
-                      <Label htmlFor="notes" className="text-sm font-medium">Additional Notes</Label>
+                      <Label htmlFor="notes" className="text-sm font-normal">Additional Notes</Label>
                       <Textarea
                         id="notes"
                         value={invoiceData.notes}
@@ -1390,7 +1390,7 @@ export default function InvoiceForm() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col items-center">
             {/* Checkmark animation */}
-            <h2 className="text-2xl font-medium mb-2 text-green-800">Invoice Saved</h2>
+            <h2 className="text-2xl font-normal mb-2 text-green-800">Invoice Saved</h2>
             <p className="mb-4 text-gray-600">Your invoice has been saved successfully.</p>
           </div>
         </div>

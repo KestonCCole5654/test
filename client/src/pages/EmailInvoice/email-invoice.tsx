@@ -126,7 +126,10 @@ export default function EmailInvoice() {
       </div>
       {/* Right: Invoice Preview */}
       <div className="flex-1 min-w-0">
-        <div className="bg-transparent p-6 w-full mx-auto overflow-y-auto" style={{ maxHeight: 'calc(100vh - 48px)' }}>
+        <div
+          className="bg-transparent p-6 w-full mx-auto overflow-y-auto"
+          style={{ maxHeight: "calc(100vh - 48px)" }}
+        >
           <div className="text-xs text-gray-500 mb-2 border-b border-gray-200 pb-2">
             From: {emailData.from}
             <br />
@@ -139,16 +142,19 @@ export default function EmailInvoice() {
                 src={invoice.logo}
                 alt="Company Logo"
                 className="h-10 w-auto object-contain"
-                style={{ background: 'none', boxShadow: 'none' }}
+                style={{ background: "none", boxShadow: "none" }}
               />
             )}
             <div className="font-normal text-lg">{emailData.subject}</div>
           </div>
+
           <div className="text-green-800 font-medium text-xl mb-2 text-left">
             {companyName}
           </div>
-          <div className="bg-gray-100 rounded-lg p-4 flex flex-col items-center mb-4">
 
+
+          <div className="bg-gray-100 rounded-lg p-4 flex flex-col items-center mb-4">
+            
             <div className="text-xs text-gray-500 mt-5 mb-5">
               INVOICE # {invoiceId || "—"}
             </div>
@@ -169,25 +175,24 @@ export default function EmailInvoice() {
             <div className="text-xs text-gray-500 mb-1 mt-5">
               DUE {dueDate || "—"}
             </div>
-           
+       
           </div>
+
 
           <div className="text-sm whitespace-pre-line mb-2">
             {emailData.message}
           </div>
 
           <div className="text-sm text-center  text-gray-400 mt-5 mb-10">
-              Powered by{" "}
-              <span className="font-normal font-green-800">SheetBills</span>
-            </div>
+            Powered by{" "}
+            <span className="font-normal font-green-800">SheetBills</span>
+          </div>
 
         </div>
         <div className="flex justify-end gap-2 mt-6">
-
           <Button onClick={handleSend} className="bg-green-700 text-white">
             Send and close
           </Button>
-
         </div>
       </div>
     </div>

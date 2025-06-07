@@ -450,7 +450,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Logo Upload Section */}
-        <div className="mb-6 pb-6 border-b">
+        <div className="mb-6 pb-4">
           <h3 className="text-lg font-medium mb-4">Company Logo</h3>
           <p className="text-sm text-gray-600 mb-4">
             Upload your company logo to be displayed on all your invoices. The

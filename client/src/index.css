@@ -1,3 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Cal+Sans&display=swap');
 
 /* No font-family rules here, global.css sets font-cal-sans globally */
+
+html, body {
+  font-family: "Onest", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+.onest {
+  font-family: "Onest", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}

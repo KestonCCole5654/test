@@ -1082,7 +1082,7 @@ export default function InvoiceForm() {
                       type="text"
                       value={shareableLink}
                       readOnly
-                      className="w-full p-1 border rounded text-xs font-extralight font-cal-sans bg-white"
+                      className="w-full p-1 border rounded text-xs font-extralight font-onest bg-white"
                     />
                     <Button
                       variant="outline"

@@ -953,7 +953,7 @@ export default function Dashboard() {
       {/* Welcome message for newly onboarded users only */}
       {showWelcome && (
         <div className="mb-6 text-center">
-          <span className="text-xl font-cal-sans font-normal text-gray-800">
+          <span className="text-xl font-onest font-normal text-gray-800">
             Hi, welcome aboard!{" "}
             {user?.user_metadata?.name || user?.email?.split("@")[0] || "there"}
             , Create your first invoice by clicking the{" "}
@@ -1105,10 +1105,10 @@ export default function Dashboard() {
         <div className="overflow-x-auto">
           {filteredInvoices.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-              <h3 className="text-lg font-medium text-gray-900 mb-1 font-cal-sans">
+              <h3 className="text-lg font-medium text-gray-900 mb-1 font-onest">
                 No invoices found
               </h3>
-              <p className="text-sm text-gray-500 mb-6 font-cal-sans">
+              <p className="text-sm text-gray-500 mb-6 font-onest">
                 Please refresh to see your invoices or create a new invoice.
               </p>
             </div>
@@ -1196,30 +1196,30 @@ export default function Dashboard() {
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell className="px-6 py-4 whitespace-nowrap font-cal-sans font-normal border-r border-gray-200">
+                          <TableCell className="px-6 py-4 whitespace-nowrap font-onest font-normal border-r border-gray-200">
                             {formatDate(invoice.dueDate)}
                           </TableCell>
                           <TableCell className="px-6 py-4 border-r border-gray-200">
                             {invoice.status === "Paid" ? (
-                              <span className="inline-block px-3 py-1 font-cal-sans font-normal rounded-md border border-green-200 bg-green-50 text-green-700 text-sm">
+                              <span className="inline-block px-3 py-1 font-onest font-normal rounded-md border border-green-200 bg-green-50 text-green-700 text-sm">
                                 Paid
                               </span>
                             ) : invoice.status === "Pending" &&
                               getOverdueDays(invoice.dueDate) > 0 ? (
-                              <span className="inline-block px-3 py-1 font-cal-sans font-normal rounded-md border border-amber-200 bg-amber-50 text-amber-700 text-sm ">
+                              <span className="inline-block px-3 py-1 font-onest font-normal rounded-md border border-amber-200 bg-amber-50 text-amber-700 text-sm ">
                                 Pending
                               </span>
                             ) : invoice.status === "Pending" ? (
-                              <span className="inline-block px-3 py-1 font-cal-sans font-normal rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-sm">
+                              <span className="inline-block px-3 py-1 font-onest font-normal rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-sm">
                                 Pending
                               </span>
                             ) : (
-                              <span className="inline-block px-3 py-1 font-cal-sans font-normal rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-sm">
+                              <span className="inline-block px-3 py-1 font-onest font-normal rounded-md border border-gray-200 bg-gray-50 text-gray-700 text-sm">
                                 {invoice.status}
                               </span>
                             )}
                           </TableCell>
-                          <TableCell className="text-right font-normal font-cal-sans text-md px-6 py-4 border-r border-gray-200">
+                          <TableCell className="text-right font-normal font-onest text-md px-6 py-4 border-r border-gray-200">
                             {formatCurrency(invoice.amount)}
                           </TableCell>
                           <TableCell className="text-center px-6 py-4">
@@ -1453,14 +1453,14 @@ export default function Dashboard() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-cal-sans font-medium">
+            <AlertDialogTitle className="font-onest font-medium">
               Are you sure you want to delete this invoice?
             </AlertDialogTitle>
-            <AlertDialogDescription className="font-cal-sans text-gray-700">
+            <AlertDialogDescription className="font-onest text-gray-700">
               This action cannot be undone. This will permanently delete the
               invoice
               {invoiceToDelete ? (
-                <span className="font-medium font-cal-sans">
+                <span className="font-medium font-onest">
                   {" "}
                   #{invoiceToDelete.id}
                 </span>
@@ -1544,21 +1544,21 @@ export default function Dashboard() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-cal-sans font-medium">
+            <AlertDialogTitle className="font-onest font-medium">
               Are you sure you want to delete these invoices?
             </AlertDialogTitle>
-            <AlertDialogDescription className="font-cal-sans text-gray-700">
+            <AlertDialogDescription className="font-onest text-gray-700">
               This action cannot be undone. This will permanently delete{" "}
               {selectedInvoices.size} selected invoice(s).
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="font-cal-sans">
+            <AlertDialogCancel className="font-onest">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleBulkDelete}
-              className="bg-gray-800 font-cal-sans focus:ring-gray-800"
+              className="bg-gray-800 font-onest focus:ring-gray-800"
               disabled={isDeleting}
             >
               {isDeleting ? "Deleting..." : "Delete"}

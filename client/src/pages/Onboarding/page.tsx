@@ -681,7 +681,7 @@ export default function OnboardingPage() {
                 className="absolute right-3 top-1/2 -translate-y-1/2"
               >
                 {isValid ? (
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <CheckCircle className="h-5 w-5 text-green-800" />
                 ) : (
                   <X className="h-5 w-5 text-red-500" />
                 )}
@@ -730,7 +730,7 @@ export default function OnboardingPage() {
           )}
 
           <Button
-            className="flex-1 bg-green-600 font-cal-sans hover:bg-green-700"
+            className="flex-1 bg-green-800 font-cal-sans hover:bg-green-900"
             onClick={handleNext}
             type="button"
           >
@@ -762,13 +762,13 @@ export default function OnboardingPage() {
           {[
             {
               id: "companyName",
-              icon: <Building2 className="h-5 w-5 text-green-600 dark:text-green-400" />,
+              icon: <Building2 className="h-5 w-5 text-green-800 dark:text-green-400" />,
               label: "Company Name",
               color: "green",
             },
             {
               id: "email",
-              icon: <Mail className="h-5 w-5 text-blue-600 dark:text-blue-400" />,
+              icon: <Mail className="h-5 w-5 text-blue-800 dark:text-blue-400" />,
               label: "Business Email",
               color: "blue",
             },

@@ -376,11 +376,11 @@ export default function SettingsPage() {
 
       {/* Profile Section */}
       <div className="mb-12 pl-8 pr-8">
-        <h2 className="text-2xl font-cal-sans font-medium text-gray-900 mb-1 flex items-center gap-2">
+        <h2 className="text-2xl font-onest font-medium text-gray-900 mb-1 flex items-center gap-2">
           Account Profile
           {/* Google Icon */}
         </h2>
-        <p className="text-sm font-cal-sans font-normal text-gray-400 mb-6">
+        <p className="text-sm font-onest font-normal text-gray-400 mb-6">
           Manage your personal information and account details.
         </p>
         <div className="divide-y divide-gray-200 border-t border-b">
@@ -642,10 +642,10 @@ export default function SettingsPage() {
 
       {/* Terms & Privacy Policy Section */}
       <div className="mb-12 pl-8 pr-8">
-        <h2 className="text-2xl font-cal-sans font-medium text-gray-900 mb-1 flex items-center gap-2">
+        <h2 className="text-2xl font-onest font-medium text-gray-900 mb-1 flex items-center gap-2">
           Terms & Privacy Policy
         </h2>
-        <p className="text-sm font-cal-sans font-normal text-gray-400 mb-6">
+        <p className="text-sm font-onest font-normal text-gray-400 mb-6">
           View our Terms of Service and Privacy Policy.
         </p>
         <div className="divide-y divide-gray-200 border-t border-b">

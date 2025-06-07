@@ -81,7 +81,7 @@ export default function EmailInvoice() {
   return (
     <div className="w-full  max-w-7xl bg-gray-50/50 font-onest  flex flex-col md:flex-row gap-8">
       {/* Left: Email Form */}
-      <div className="flex-1 min-w-0">
+      <div className="flex-1  w-full min-w-0">
         <div className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="from">From</Label>
@@ -135,14 +135,25 @@ export default function EmailInvoice() {
       </div>
       {/* Right: Invoice Preview */}
       <div className="flex-1 min-w-0">
-        <div className="bg-transparent  p-6 w-full max-w-lg mx-auto">
-          <div className="text-xs text-gray-500 mb-2">
+        <div className="bg-transparent  p-6  w-full mx-auto">
+          <div className="text-xs text-gray-500 mb-2 border-b border-gray-200 pb-2">
             From: {emailData.from}
             <br />
             To: {emailData.to}
           </div>
-          <div className="font-normal text-lg mb-1">{emailData.subject}</div>
-          <div className="text-green-800 font-medium text-xl mb-2">
+          {/* Logo and Company Name */}
+          <div className="flex items-center gap-3 mb-2">
+            {invoice.logo && (
+              <img
+                src={invoice.logo}
+                alt="Company Logo"
+                className="h-10 w-auto object-contain"
+                style={{ background: 'none', boxShadow: 'none' }}
+              />
+            )}
+            <div className="font-normal text-lg">{emailData.subject}</div>
+          </div>
+          <div className="text-green-800 font-medium text-xl mb-2 text-left">
             {companyName}
           </div>
           <div className="bg-gray-100 rounded-lg p-4 flex flex-col items-center mb-4">

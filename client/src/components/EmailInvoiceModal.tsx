@@ -43,7 +43,7 @@ export function EmailInvoiceModal({
   const [emailData, setEmailData] = useState<EmailData>({
     to: customerEmail,
     from: businessEmail,
-    subject: `Invoice #${invoiceNumber} from ${companyName || 'SheetBills'}`,
+    subject: `Invoice #: ${invoiceNumber}`,
     message: `Dear ${customerName},\n\nWe appreciate your business. Please find your invoice details here. Feel free to contact us if you have any questions.\n\nInvoice Date: ${invoiceDate}\nSubtotal: $${amount}\nDue date: ${dueDate}`,
   })
  

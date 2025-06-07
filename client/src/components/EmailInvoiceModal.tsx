@@ -128,13 +128,10 @@ export function EmailInvoiceModal({
                 <Button variant="default" className="bg-gray-800 text-white px-6 py-2 mb-1" size="sm">
                   Print or save
                 </Button>
-                <div className="text-xs text-gray-400 mt-1">Powered by SheetBills</div>
+                <div className="text-xs text-gray-400 mt-1">Powered by <span className="font-normal font-green-800">SheetBills</span></div>
               </div>
               <div className="text-sm whitespace-pre-line mb-2">{emailData.message}</div>
-              <div className="flex items-center gap-2 border rounded p-2 bg-gray-50 mt-2">
-                <FileText className="h-4 w-4 text-gray-500" />
-                <span className="text-xs">Invoice_{invoiceNumber}.pdf</span>
-              </div>
+              
             </div>
             <div className="flex justify-end gap-2 mt-6">
               <Button variant="outline" onClick={handlePrint} className="flex items-center gap-2">

@@ -29,6 +29,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../../components/ui/pop
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { supabase } from '../../lib/supabase'
+import ColorSuggestions from '../../components/ColorSuggestions'
 
 // Replace the printStyles constant with this updated version
 const printStyles = `
@@ -102,6 +103,7 @@ export interface InvoiceData {
   template: "classic"
   status?: "Paid" | "Pending"
   color?: string
+  logo?: string
 }
 
 export interface InvoiceItem {
@@ -263,7 +265,8 @@ export default function InvoiceForm() {
         notes: invoiceToEdit.notes || "",
         template: invoiceToEdit.template || "classic",
         status: invoiceToEdit.status || "Pending",
-        color: invoiceToEdit.color || "#166534"
+        color: invoiceToEdit.color || "#166534",
+        logo: invoiceToEdit.logo || ""
       }
     } else {
       return {
@@ -859,7 +862,8 @@ export default function InvoiceForm() {
         notes: typeof invoiceToEdit.notes === "string" ? invoiceToEdit.notes : "",
         template: "classic" as const,
         status: invoiceToEdit.status === "Paid" ? "Paid" : "Pending",
-        color: invoiceToEdit.color || "#166534"
+        color: invoiceToEdit.color || "#166534",
+        logo: invoiceToEdit.logo || ""
       }
 
       setInvoiceData(processedInvoiceData)
@@ -1022,17 +1026,35 @@ export default function InvoiceForm() {
               </div>
               {/* Controls: color picker + preview button */}
               <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 md:gap-6 w-full md:w-auto">
-                <label htmlFor="invoiceColorEdit" className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="color"
-                    id="invoiceColorEdit"
-                    value={invoiceData.color || '#166534'}
-                    onChange={e => updateInvoiceData("color", e.target.value)}
-                    className="h-8 w-8 rounded border shadow-sm"
-                    style={{ background: 'none' }}
+                <div className="flex items-center gap-2">
+                  <label htmlFor="invoiceColorEdit" className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="color"
+                      id="invoiceColorEdit"
+                      value={invoiceData.color || '#166534'}
+                      onChange={e => updateInvoiceData("color", e.target.value)}
+                      className="w-8 h-8 rounded cursor-pointer"
+                    />
+                    <span className="text-sm text-gray-600 font-normal">Choose a Invoice Template Color</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => updateInvoiceData("color", "#166534")}
+                    className="text-sm text-gray-600 hover:text-gray-800 flex items-center gap-1"
+                    title="Reset to default green color"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                    </svg>
+                    Reset
+                  </button>
+                </div>
+                {invoiceData.logo && (
+                  <ColorSuggestions
+                    logoUrl={invoiceData.logo}
+                    onColorSelect={(color) => updateInvoiceData("color", color)}
                   />
-                  <span className="text-sm text-gray-600 font-normal">Choose a Invoice Template Color</span>
-                </label>
+                )}
                 <Button
                   variant="outline"
                   onClick={() => setIsFormExpanded(!isFormExpanded)}

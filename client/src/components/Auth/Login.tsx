@@ -95,10 +95,10 @@ export default function LoginPage() {
 
   if (!mounted || loading) {
     return (
-      <div className="min-h-screen font-cal-sans flex items-center justify-center bg-gradient-to-b from-white to-gray-50">
+      <div className="min-h-screen font-onest flex items-center justify-center bg-gradient-to-b from-white to-gray-50">
         <div className="text-center">
           <LoadingSpinner />
-          <p className="mt-4 text-slate-600 font-cal-sans text-sm font-medium">
+          <p className="mt-4 text-slate-600 font-onest text-sm font-medium">
             {loading ? "Connecting to Google..." : "Loading..."}
           </p>
         </div>
@@ -107,7 +107,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen font-cal-sans flex flex-col bg-gradient-to-b from-white to-gray-50">
+    <div className="min-h-screen font-onest flex flex-col bg-gradient-to-b from-white to-gray-50">
       <div className="flex items-center mb-4 p-10">
         <button 
           onClick={() => navigate('/')} 

@@ -29,26 +29,7 @@ import LandingPage from './pages/Landing/page';
 import AccountStatus from './pages/AccountStatus/AccountStatus';
 import ReportsPage from "./pages/Reports/reports"
 
-async function checkBusinessSheet(supabaseToken: string, googleToken: string) {
-  try {
-    const response = await fetch("https://sheetbills-server.vercel.app/api/check-business-sheet", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-supabase-token": supabaseToken
-      },
-      body: JSON.stringify({ accessToken: googleToken }),
-    });
 
-    if (!response.ok) throw new Error("Business sheet check failed");
-    
-    const { hasBusinessSheet } = await response.json();
-    return hasBusinessSheet;
-  } catch (error) {
-    console.error("Business sheet check error:", error);
-    return false;
-  }
-}
 
 function App() {
   const [user, setUser] = useState<any>(null);

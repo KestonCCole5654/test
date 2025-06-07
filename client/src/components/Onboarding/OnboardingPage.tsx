@@ -105,18 +105,18 @@ const OnboardingPage: React.FC = () => {
   const currentStepData = steps[currentStep - 1];
 
   return (
-    <div className="min-h-screen font-cal-sans bg-background flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen font-onest bg-background flex flex-col items-center justify-center p-4">
       <div className="flex-1 flex items-center justify-center w-full">
-        <Card className="w-full max-w-2xl p-8 font-cal-sans">
+        <Card className="w-full max-w-2xl p-8 font-onest">
           {/* Step header and description */}
           <div className="mb-8">
             <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-cal-sans font-semibold">{currentStepData.title}</h1>
-              <div className="text-sm text-muted-foreground font-cal-sans">
+              <h1 className="text-2xl font-onest font-semibold">{currentStepData.title}</h1>
+              <div className="text-sm text-muted-foreground font-onest">
                 Step {currentStep} of {steps.length}
               </div>
-            </div>
-            <p className="text-muted-foreground font-cal-sans">{currentStepData.description}</p>
+            </div>  
+            <p className="text-muted-foreground font-onest">{currentStepData.description}</p>
           </div>
 
           {/* Step content: either fields or welcome message */}
@@ -129,7 +129,7 @@ const OnboardingPage: React.FC = () => {
               transition={{ duration: 0.2 }}
             >
               {currentStepData.fields.length > 0 ? (
-                <div className="space-y-4 font-cal-sans">
+                <div className="space-y-4 font-onest">
                   {currentStepData.fields.map((field) => (
                     <div key={field.name} className="space-y-2">
                       <Label htmlFor={field.name}>{field.label}</Label>
@@ -146,14 +146,14 @@ const OnboardingPage: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 font-cal-sans">
+                <div className="text-center py-8 font-onest">
                   <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.2 }}
                   >
-                    <div className="text-4xl mb-4 font-cal-sans">👋</div>
-                    <p className="text-lg text-muted-foreground font-cal-sans">
+                    <div className="text-4xl mb-4 font-onest">👋</div>
+                    <p className="text-lg text-muted-foreground font-onest">
                       We're excited to have you on board! Let's set up your business profile.
                     </p>
                   </motion.div>
@@ -163,7 +163,7 @@ const OnboardingPage: React.FC = () => {
           </AnimatePresence>
 
           {/* Navigation buttons */}
-          <div className="flex justify-between mt-8 font-cal-sans">
+          <div className="flex justify-between mt-8 font-onest">
             <Button
               variant="outline"
               onClick={handleBack}
@@ -178,8 +178,8 @@ const OnboardingPage: React.FC = () => {
         </Card>
       </div>
       {/* Footer */}
-      <footer className="w-full font-cal-sans text-center text-md text-gray-400 mt-10 mb-2">
-        Powered by <span className="font-cal-sans font-medium text-green-800">SheetBills™</span>
+      <footer className="w-full font-onest text-center text-md text-gray-400 mt-10 mb-2">
+        Powered by <span className="font-onest font-medium text-green-800">SheetBills™</span>
       </footer>
     </div>
   );

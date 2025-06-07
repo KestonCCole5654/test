@@ -16,7 +16,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
         <meta name="generator" content="v0.dev" />
       </Helmet>
       <Header />
-      <main className="font-inter bg-white p-5">{children}</main>
+      <main className="font-onest bg-white p-5">{children}</main>
     </>
   );
 };

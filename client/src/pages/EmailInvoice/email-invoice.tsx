@@ -165,7 +165,7 @@ export default function EmailInvoice() {
               Print or save
             </Button>
 
-            <div className="text-xs text-gray-500 mb-1">
+            <div className="text-xs text-gray-500 mb-1 mt-5">
               DUE {dueDate || "—"}
             </div>
            

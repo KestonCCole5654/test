@@ -649,26 +649,24 @@ export default function SettingsPage() {
           View our Terms of Service and Privacy Policy.
         </p>
         <div className="divide-y divide-gray-200 border-t border-b">
-          <div className="flex items-center justify-between py-5">
-            <span className="text-gray-700">Terms of Service</span>
+          <div className="py-5">
             <a
               href="/legal?tab=terms"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-green-800 font-medium hover:underline flex-1 text-right mr-6"
+              className="text-green-800 font-medium hover:underline"
             >
-              View Terms of Service
+              Terms of Service
             </a>
           </div>
-          <div className="flex items-center justify-between py-5">
-            <span className="text-gray-700">Privacy Policy</span>
+          <div className="py-5">
             <a
               href="/legal?tab=privacy"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-green-800 font-medium hover:underline flex-1 text-right mr-6"
+              className="text-green-800 font-medium hover:underline"
             >
-              View Privacy Policy
+              Privacy Policy
             </a>
           </div>
         </div>

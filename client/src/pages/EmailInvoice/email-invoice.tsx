@@ -148,14 +148,15 @@ export default function EmailInvoice() {
             {companyName}
           </div>
           <div className="bg-gray-100 rounded-lg p-4 flex flex-col items-center mb-4">
-            <div className="text-xs text-gray-500 mb-1">
+
+            <div className="text-xs text-gray-500 mt-5 mb-1">
               INVOICE # {invoiceId || "—"}
             </div>
+
             <div className="text-3xl font-medium text-gray-800 mb-2">
               ${amount?.toFixed(2)}
             </div>
 
-           
             <Button
               variant="default"
               className="bg-gray-800 text-white px-6 py-2 mb-1"
@@ -170,6 +171,7 @@ export default function EmailInvoice() {
             </div>
            
           </div>
+
           <div className="text-sm whitespace-pre-line mb-2">
             {emailData.message}
           </div>
@@ -181,9 +183,11 @@ export default function EmailInvoice() {
 
         </div>
         <div className="flex justify-end gap-2 mt-6">
+          
           <Button onClick={handleSend} className="bg-green-700 text-white">
             Send and close
           </Button>
+
         </div>
       </div>
     </div>

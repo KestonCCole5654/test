@@ -1001,7 +1001,7 @@ export default function InvoiceForm() {
     <>
       {/* Preview Mode - Cleaned up */}
       {!isFormExpanded && (
-        <div className="w-full max-w-7xl mx-auto mt-4 px-4">
+        <div className="w-full max-w-7xl font-onest mx-auto mt-4 px-4">
           {/* Breadcrumb Navigation */}
           <div className="max-w-7xl mb-6">
             <Breadcrumb>
@@ -1113,7 +1113,7 @@ export default function InvoiceForm() {
       )}
       {/* Edit Mode (Form) */}
       {isFormExpanded && (
-        <div className="w-full max-w-7xl mx-auto mt-4 px-4 ">
+        <div className="w-full max-w-7xl font-onest mx-auto mt-4 px-4 ">
           <div className="mb-6">
             {/* Breadcrumb Navigation */}
             <div className="mt-0 mb-4">

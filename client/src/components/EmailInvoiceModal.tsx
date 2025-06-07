@@ -4,7 +4,7 @@ import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
 import { Textarea } from './ui/textarea'
-import { Mail, X, FileText } from 'lucide-react'
+import { Mail, FileText, Printer } from 'lucide-react'
 
 interface EmailInvoiceModalProps {
   isOpen: boolean
@@ -14,6 +14,10 @@ interface EmailInvoiceModalProps {
   businessEmail: string
   invoiceNumber: string
   customerName: string
+  amount?: number
+  dueDate?: string
+  invoiceDate?: string
+  companyName?: string
 }
 
 interface EmailData {
@@ -31,85 +35,129 @@ export function EmailInvoiceModal({
   businessEmail,
   invoiceNumber,
   customerName,
+  amount = 0,
+  dueDate = '',
+  invoiceDate = '',
+  companyName = '',
 }: EmailInvoiceModalProps) {
   const [emailData, setEmailData] = useState<EmailData>({
     to: customerEmail,
     from: businessEmail,
-    subject: `Invoice #${invoiceNumber} from SheetBills`,
-    message: `Hi ${customerName},\n\nPlease see the attached invoice #${invoiceNumber} for the recent work completed.\n\nLet me know if you have any questions. Thank you.`,
+    subject: `Invoice #${invoiceNumber} from ${companyName || 'SheetBills'}`,
+    message: `Dear ${customerName},\n\nWe appreciate your business. Please find your invoice details here. Feel free to contact us if you have any questions.\n\nInvoice Date: ${invoiceDate}\nSubtotal: $${amount}\nDue date: ${dueDate}`,
   })
+  const [payByCard, setPayByCard] = useState(false)
+  const [payByBank, setPayByBank] = useState(false)
 
   const handleSend = () => {
     onSend(emailData)
   }
 
+  const handlePrint = () => {
+    window.print()
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-4xl w-full max-w-[95vw]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Mail className="h-5 w-5" />
-            Send Invoice
+            Send email
           </DialogTitle>
         </DialogHeader>
-
-        <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <Label htmlFor="to">To</Label>
-            <Input
-              id="to"
-              value={emailData.to}
-              onChange={(e) => setEmailData({ ...emailData, to: e.target.value })}
-              placeholder="recipient@example.com"
-            />
+        <div className="flex flex-col md:flex-row gap-8 w-full">
+          {/* Left: Email Form */}
+          <div className="flex-1 min-w-0">
+            <div className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="from">From</Label>
+                <Input
+                  id="from"
+                  value={emailData.from}
+                  onChange={(e) => setEmailData({ ...emailData, from: e.target.value })}
+                  placeholder="your@email.com"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="to">To</Label>
+                <Input
+                  id="to"
+                  value={emailData.to}
+                  onChange={(e) => setEmailData({ ...emailData, to: e.target.value })}
+                  placeholder="recipient@example.com"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="subject">Subject</Label>
+                <Input
+                  id="subject"
+                  value={emailData.subject}
+                  onChange={(e) => setEmailData({ ...emailData, subject: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="message">Body</Label>
+                <Textarea
+                  id="message"
+                  value={emailData.message}
+                  onChange={(e) => setEmailData({ ...emailData, message: e.target.value })}
+                  className="min-h-[120px]"
+                />
+              </div>
+              <div className="mt-2">
+                <Label className="mb-1 block">Online payments</Label>
+                <div className="flex flex-col gap-2">
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" checked={payByCard} onChange={() => setPayByCard(v => !v)} />
+                    Cards <span className="inline-flex gap-1 ml-1 text-xs"> <span>💳</span> <span>🧾</span> </span>
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" checked={payByBank} onChange={() => setPayByBank(v => !v)} />
+                    Bank transfer <span className="inline-flex gap-1 ml-1 text-xs"> <span>🏦</span> </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-start mt-8">
+              <Button variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+            </div>
           </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="from">From</Label>
-            <Input
-              id="from"
-              value={emailData.from}
-              onChange={(e) => setEmailData({ ...emailData, from: e.target.value })}
-              placeholder="your@email.com"
-            />
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="subject">Subject</Label>
-            <Input
-              id="subject"
-              value={emailData.subject}
-              onChange={(e) => setEmailData({ ...emailData, subject: e.target.value })}
-            />
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="message">Message</Label>
-            <Textarea
-              id="message"
-              value={emailData.message}
-              onChange={(e) => setEmailData({ ...emailData, message: e.target.value })}
-              className="min-h-[150px]"
-            />
-          </div>
-
-          <div className="flex items-center gap-2 rounded-lg border p-3">
-            <FileText className="h-5 w-5 text-gray-500" />
-            <div className="flex-1">
-              <p className="text-sm font-medium">Invoice_{invoiceNumber}.pdf</p>
-              <p className="text-xs text-gray-500">PDF Document</p>
+          {/* Right: Invoice Preview */}
+          <div className="flex-1 min-w-0">
+            <div className="bg-white border rounded-lg shadow p-6 w-full max-w-lg mx-auto">
+              <div className="text-xs text-gray-500 mb-2">
+                From: {emailData.from}<br />
+                To: {emailData.to}
+              </div>
+              <div className="font-semibold text-lg mb-1">{emailData.subject}</div>
+              <div className="text-green-800 font-bold text-xl mb-2">{companyName}</div>
+              <div className="bg-gray-100 rounded-lg p-4 flex flex-col items-center mb-4">
+                <div className="text-xs text-gray-500 mb-1">DUE {dueDate || '—'}</div>
+                <div className="text-3xl font-bold text-gray-800 mb-2">${amount?.toFixed(2)}</div>
+                <Button variant="default" className="bg-gray-800 text-white px-6 py-2 mb-1" size="sm">
+                  Print or save
+                </Button>
+                <div className="text-xs text-gray-400 mt-1">Powered by SheetBills</div>
+              </div>
+              <div className="text-sm whitespace-pre-line mb-2">{emailData.message}</div>
+              <div className="flex items-center gap-2 border rounded p-2 bg-gray-50 mt-2">
+                <FileText className="h-4 w-4 text-gray-500" />
+                <span className="text-xs">Invoice_{invoiceNumber}.pdf</span>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-6">
+              <Button variant="outline" onClick={handlePrint} className="flex items-center gap-2">
+                <Printer className="h-4 w-4" /> Print
+              </Button>
+              <Button onClick={handleSend} className="bg-green-700 text-white">
+                Send and close
+              </Button>
             </div>
           </div>
         </div>
-
-        <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button onClick={handleSend}>
-            Send Invoice
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

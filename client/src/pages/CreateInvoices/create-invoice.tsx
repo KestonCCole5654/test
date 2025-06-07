@@ -1558,6 +1558,10 @@ export default function InvoiceForm() {
         businessEmail={businessData.email}
         invoiceNumber={invoiceData.invoiceNumber}
         customerName={invoiceData.customer.name}
+        amount={invoiceData.amount || calculateTotal()}
+        dueDate={invoiceData.dueDate}
+        invoiceDate={invoiceData.date}
+        companyName={businessData.companyName}
       />
     </>
   )

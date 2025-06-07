@@ -46,8 +46,7 @@ export function EmailInvoiceModal({
     subject: `Invoice #${invoiceNumber} from ${companyName || 'SheetBills'}`,
     message: `Dear ${customerName},\n\nWe appreciate your business. Please find your invoice details here. Feel free to contact us if you have any questions.\n\nInvoice Date: ${invoiceDate}\nSubtotal: $${amount}\nDue date: ${dueDate}`,
   })
-  const [payByCard, setPayByCard] = useState(false)
-  const [payByBank, setPayByBank] = useState(false)
+ 
 
   const handleSend = () => {
     onSend(emailData)
@@ -105,25 +104,14 @@ export function EmailInvoiceModal({
                   className="min-h-[120px]"
                 />
               </div>
-              <div className="mt-2">
-                <Label className="mb-1 block">Online payments</Label>
-                <div className="flex flex-col gap-2">
-                  <label className="flex items-center gap-2 text-sm">
-                    <input type="checkbox" checked={payByCard} onChange={() => setPayByCard(v => !v)} />
-                    Cards <span className="inline-flex gap-1 ml-1 text-xs"> <span>💳</span> <span>🧾</span> </span>
-                  </label>
-                  <label className="flex items-center gap-2 text-sm">
-                    <input type="checkbox" checked={payByBank} onChange={() => setPayByBank(v => !v)} />
-                    Bank transfer <span className="inline-flex gap-1 ml-1 text-xs"> <span>🏦</span> </span>
-                  </label>
-                </div>
-              </div>
+           
             </div>
             <div className="flex justify-start mt-8">
               <Button variant="outline" onClick={onClose}>
                 Cancel
               </Button>
             </div>
+
           </div>
           {/* Right: Invoice Preview */}
           <div className="flex-1 min-w-0">
@@ -132,11 +120,11 @@ export function EmailInvoiceModal({
                 From: {emailData.from}<br />
                 To: {emailData.to}
               </div>
-              <div className="font-semibold text-lg mb-1">{emailData.subject}</div>
-              <div className="text-green-800 font-bold text-xl mb-2">{companyName}</div>
+              <div className="font-normal text-lg mb-1">{emailData.subject}</div>
+              <div className="text-green-800 font-medium text-xl mb-2">{companyName}</div>
               <div className="bg-gray-100 rounded-lg p-4 flex flex-col items-center mb-4">
                 <div className="text-xs text-gray-500 mb-1">DUE {dueDate || '—'}</div>
-                <div className="text-3xl font-bold text-gray-800 mb-2">${amount?.toFixed(2)}</div>
+                <div className="text-3xl font-medium text-gray-800 mb-2">${amount?.toFixed(2)}</div>
                 <Button variant="default" className="bg-gray-800 text-white px-6 py-2 mb-1" size="sm">
                   Print or save
                 </Button>

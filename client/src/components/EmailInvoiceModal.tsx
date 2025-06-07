@@ -58,14 +58,16 @@ export function EmailInvoiceModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-6xl w-full max-w-[98vw]">
+      <DialogContent className="sm:max-w-6xl w-full max-w-[98vw] h-auto">
+
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Mail className="h-5 w-5" />
+           
             Send email
           </DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col md:flex-row gap-8 w-full">
+
+        <div className="flex justify-center align-middle items-center flex-col md:flex-row gap-8 w-full">
           {/* Left: Email Form */}
           <div className="flex-1 min-w-0">
             <div className="grid gap-4">

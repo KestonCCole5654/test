@@ -152,10 +152,10 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({
       {/* Header with logo */}
       <div className="flex justify-between mt-6 items-start mb-8 px-6">
         <div>
-          <h1 className="text-2xl font-cal-sans font-semibold" style={{ color: data.color || '#166534' }}>INVOICE</h1>
+          <h1 className="text-2xl font-onest font-semibold" style={{ color: data.color || '#166534' }}>INVOICE</h1>
           <div className="space-y-2 mt-2">
-            <p className="text-sm font-cal-sans font-light text-gray-500">Invoice number: {data.invoiceNumber}</p>
-            <p className="text-sm font-cal font-light text-gray-500">Invoice Created: {formatDate(data.date)}</p>
+            <p className="text-sm font-onest font-light text-gray-500">Invoice number: {data.invoiceNumber}</p>
+            <p className="text-sm font-onest font-light text-gray-500">Invoice Created: {formatDate(data.date)}</p>
           </div>
         </div>
 
@@ -260,7 +260,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({
 
       {/* Due amount row - now full width, outside the grid */}
       <div className="mt-2 font-medium w-full px-6 pb-5 mb-5 ">
-        <p className="text-xl md:text-3xl" style={{ color: data.color || '#166534' }}>
+        <p className="text-xl md:text-1xl" style={{ color: data.color || '#166534' }}>
           ${formatCurrency(total)} due <span className="pl-1">{formatDate(data.dueDate)}</span>
         </p>
       </div>

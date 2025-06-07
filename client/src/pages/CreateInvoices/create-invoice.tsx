@@ -1035,8 +1035,8 @@ export default function InvoiceForm() {
                   <div className="text-3xl font-cal font-normal text-green-800 mb-12">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
                 </div>
 
-                <div className="flex w-full justify-center mb-10">
-                  <ul className="hidden font-sans font-normal  text-md md:block text-center text-[#5C5B61] leading-relaxed space-y-1 md:-mt-3">
+                <div className="flex max-w-full justify-center mb-10">
+                  <ul className="hidden max-w-full  font-sans font-normal  text-md md:block text-center text-[#5C5B61] leading-relaxed space-y-1 md:-mt-3">
                     <li className="flex  items-center justify-center lg:justify-start gap-2 ">
                       <Button
                         variant="default"

@@ -928,14 +928,14 @@ app.get('/api/sheets/data', async (req, res) => {
     // Fetch data with dynamic sheet name
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A2:M`,
+      range: `${sheetName}!A2:N`,
     });
 
     // Process rows with validation
     const rawRows = response.data.values || [];
     const rows = rawRows
       .filter(row => row.length >= 10) // Minimum required columns
-      .map(row => row.slice(0, 13)); // Ensure max 13 columns
+      .map(row => row.slice(0, 14)); // Ensure max 14 columns (including color)
 
     console.log(`[Google Sheets] Processing ${rows.length} valid invoice rows`);
 
@@ -1008,7 +1008,8 @@ app.get('/api/sheets/data', async (req, res) => {
           discount,
           notes: row[10]?.toString() || '',
           template: ['classic', 'modern'].includes(row[11]) ? row[11] : 'classic',
-          status: ['Pending', 'Paid', 'Overdue'].includes(row[12]) ? row[12] : 'Pending'
+          status: ['Pending', 'Paid', 'Overdue'].includes(row[12]) ? row[12] : 'Pending',
+          color: row[13] || '#166534' // Add color field
         };
       } catch (error) {
         console.error(`Error processing row ${index + 1}:`, error);
@@ -1677,7 +1678,7 @@ app.put('/api/sheets/mark-as-paid', async (req, res) => {
     console.log('Fetching sheet data...');
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: `${sheetName}!A2:M`,
+      range: `${sheetName}!A2:N`,
     });
 
     const rows = response.data.values || [];
@@ -1773,7 +1774,7 @@ app.put('/api/sheets/mark-as-pending', async (req, res) => {
     console.log('Fetching sheet data...');
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: `${sheetName}!A2:M`,
+      range: `${sheetName}!A2:N`,
     });
 
     const rows = response.data.values || [];
@@ -2041,7 +2042,7 @@ app.get('/api/invoices/shared/:token', async (req, res) => {
     // Fetch invoice data
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A2:M`,
+      range: `${sheetName}!A2:N`,
     });
 
     const rows = response.data.values || [];

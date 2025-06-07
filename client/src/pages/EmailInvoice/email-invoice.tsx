@@ -174,7 +174,7 @@ export default function EmailInvoice() {
             {emailData.message}
           </div>
 
-          <div className="text-xs text-gray-400 mt-5 mb-10">
+          <div className="text-sm text-center  text-gray-400 mt-5 mb-10">
               Powered by{" "}
               <span className="font-normal font-green-800">SheetBills</span>
             </div>

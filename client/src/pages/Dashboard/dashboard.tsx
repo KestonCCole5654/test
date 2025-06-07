@@ -1620,11 +1620,12 @@ function SortableTableRow({
   const navigate = useNavigate();
 
   const handleRowClick = (e: React.MouseEvent) => {
-    // Don't navigate if clicking on the checkbox or drag handle
+    // Don't navigate if clicking on the checkbox, drag handle, or email button
     if (e.target instanceof HTMLElement) {
       const isCheckbox = e.target.closest('[role="checkbox"]');
       const isDragHandle = e.target.closest("[data-draggable]");
-      if (isCheckbox || isDragHandle) {
+      const isEmailButton = e.target.closest('button')?.querySelector('.lucide-mail');
+      if (isCheckbox || isDragHandle || isEmailButton) {
         return;
       }
     }

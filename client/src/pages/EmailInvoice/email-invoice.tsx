@@ -30,7 +30,23 @@ export default function EmailInvoice() {
   const location = useLocation()
   const invoice = location.state?.invoice
 
-  // Fallbacks if invoice is missing
+  // Always call hooks first!
+  const [emailData, setEmailData] = useState<EmailData>(() => {
+    const businessEmail = invoice?.businessEmail || ''
+    const companyName = invoice?.companyName || ''
+    const customerEmail = invoice?.customer?.email || ''
+    const customerName = invoice?.customer?.name || ''
+    const amount = invoice?.amount || 0
+    const dueDate = invoice?.dueDate || ''
+    const invoiceDate = invoice?.date || ''
+    return {
+      to: customerEmail,
+      from: businessEmail,
+      subject: `Invoice #: ${invoiceNumber || invoice?.invoiceNumber || ''}`,
+      message: `Dear ${customerName},\n\nWe appreciate your business. Please find your invoice details here. Feel free to contact us if you have any questions.\n\nInvoice Date: ${invoiceDate}\nSubtotal: $${amount}\nDue date: ${dueDate}`,
+    }
+  })
+
   if (!invoice) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -50,13 +66,6 @@ export default function EmailInvoice() {
   const amount = invoice.amount || 0
   const dueDate = invoice.dueDate || ''
   const invoiceDate = invoice.date || ''
-
-  const [emailData, setEmailData] = useState<EmailData>({
-    to: customerEmail,
-    from: businessEmail,
-    subject: `Invoice #: ${invoiceNumber || invoice.invoiceNumber || ''}`,
-    message: `Dear ${customerName},\n\nWe appreciate your business. Please find your invoice details here. Feel free to contact us if you have any questions.\n\nInvoice Date: ${invoiceDate}\nSubtotal: $${amount}\nDue date: ${dueDate}`,
-  })
 
   const handleSend = () => {
     toast({

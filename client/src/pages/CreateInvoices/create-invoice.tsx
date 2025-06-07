@@ -1040,7 +1040,7 @@ export default function InvoiceForm() {
                   <button
                     type="button"
                     onClick={() => updateInvoiceData("color", "#166534")}
-                    className="text-sm text-gray-600 hover:text-gray-800 flex items-center gap-1"
+                    className="text-sm text-green-800 hover:text-gray-800 flex items-center gap-1"
                     title="Reset to default green color"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">

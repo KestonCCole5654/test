@@ -181,7 +181,7 @@ export default function ReportsPage() {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto mt-4">
+    <div className="w-full font-onest max-w-7xl mx-auto mt-4">
       {/* Breadcrumb Navigation */}
       <div className="mb-8">
         <Breadcrumb>
@@ -199,7 +199,7 @@ export default function ReportsPage() {
 
       {/* Page Header */}
       <div className="mb-6 md:mb-8">
-        <h1 className="text-3xl font-cal-sans font-medium text-gray-900">Reports</h1>
+        <h1 className="text-3xl font-onest font-medium text-gray-900">Reports</h1>
         <p className="text-gray-600 text-md">Generate and download reports for your business</p>
       </div>
 

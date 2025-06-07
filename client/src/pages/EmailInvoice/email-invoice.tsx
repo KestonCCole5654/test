@@ -72,7 +72,7 @@ export default function EmailInvoice() {
   return (
     <div className="w-full  max-w-7xl bg-gray-50/50 font-onest  flex flex-col md:flex-row gap-8">
       {/* Left: Email Form */}
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 justify-center  min-w-0">
         <div className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="from">From</Label>
@@ -183,7 +183,7 @@ export default function EmailInvoice() {
 
         </div>
         <div className="flex justify-end gap-2 mt-6">
-          
+
           <Button onClick={handleSend} className="bg-green-700 text-white">
             Send and close
           </Button>

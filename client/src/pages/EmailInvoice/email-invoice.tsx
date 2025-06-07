@@ -172,7 +172,7 @@ export default function EmailInvoice() {
               size="sm"
               onClick={() => window.print()}
             >
-              View/Print Invoice
+              View/Print Invoice 
             </Button>
 
             <div className="text-xs text-gray-500 mb-1 mt-5">

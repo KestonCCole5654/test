@@ -70,60 +70,63 @@ export default function EmailInvoice() {
   };
 
   return (
-    <div className="w-full  max-w-7xl bg-gray-50/50 font-onest  flex flex-col md:flex-row gap-8">
+    <div className="w-full max-w-7xl bg-gray-50/50 font-onest flex flex-col md:flex-row gap-8 items-stretch md:items-center">
       {/* Left: Email Form */}
-      <div className="flex-1 justify-center  min-w-0">
-        <div className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="from">From</Label>
-            <Input
-              id="from"
-              value={emailData.from}
-              onChange={(e) =>
-                setEmailData({ ...emailData, from: e.target.value })
-              }
-              placeholder="your@email.com"
-            />
+      <div className="flex-1 flex items-center justify-center min-w-0 py-8">
+        <div className="w-full max-w-md">
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="from">From</Label>
+              <Input
+                id="from"
+                value={emailData.from}
+                onChange={(e) =>
+                  setEmailData({ ...emailData, from: e.target.value })
+                }
+                placeholder="your@email.com"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="to">To</Label>
+              <Input
+                id="to"
+                value={emailData.to}
+                onChange={(e) =>
+                  setEmailData({ ...emailData, to: e.target.value })
+                }
+                placeholder="recipient@example.com"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="subject">Subject</Label>
+              <Input
+                id="subject"
+                value={emailData.subject}
+                onChange={(e) =>
+                  setEmailData({ ...emailData, subject: e.target.value })
+                }
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="message">Body</Label>
+              <Textarea
+                id="message"
+                value={emailData.message}
+                onChange={(e) =>
+                  setEmailData({ ...emailData, message: e.target.value })
+                }
+                className="min-h-[120px]"
+              />
+            </div>
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="to">To</Label>
-            <Input
-              id="to"
-              value={emailData.to}
-              onChange={(e) =>
-                setEmailData({ ...emailData, to: e.target.value })
-              }
-              placeholder="recipient@example.com"
-            />
+          <div className="flex justify-start mt-8">
+            <Button variant="outline" onClick={() => navigate(-1)}>
+              Cancel
+            </Button>
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="subject">Subject</Label>
-            <Input
-              id="subject"
-              value={emailData.subject}
-              onChange={(e) =>
-                setEmailData({ ...emailData, subject: e.target.value })
-              }
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="message">Body</Label>
-            <Textarea
-              id="message"
-              value={emailData.message}
-              onChange={(e) =>
-                setEmailData({ ...emailData, message: e.target.value })
-              }
-              className="min-h-[120px]"
-            />
-          </div>
-        </div>
-        <div className="flex justify-start mt-8">
-          <Button variant="outline" onClick={() => navigate(-1)}>
-            Cancel
-          </Button>
         </div>
       </div>
+
       {/* Right: Invoice Preview */}
       <div className="flex-1 min-w-0">
         <div
@@ -195,6 +198,8 @@ export default function EmailInvoice() {
           </Button>
         </div>
       </div>
+
+      
     </div>
   );
 }

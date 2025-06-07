@@ -792,8 +792,93 @@ export default function InvoiceForm() {
   const handleSaveAndEmail = async () => {
     setIsSavingAndEmailing(true)
     try {
-      await handleSave()
-      setShowEmailModal(true)
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      if (!session?.provider_token) {
+        alert("Google authentication required")
+        return
+      }
+
+      // Save customer info before saving invoice
+      const customerToSave = {
+        name: invoiceData.customer.name,
+        email: invoiceData.customer.email,
+        address: invoiceData.customer.address,
+        notes: invoiceData.notes || ""
+      }
+      
+      // Check if customer already exists
+      const existingCustomer = customers.find(
+        (c: Customer) => c.email === customerToSave.email || c.name === customerToSave.name
+      )
+      if (!existingCustomer && customerToSave.name && customerToSave.email) {
+        try {
+          await fetch("https://sheetbills-server.vercel.app/api/customers", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${session.provider_token}`,
+              "x-supabase-token": session.access_token
+            },
+            body: JSON.stringify(customerToSave)
+          })
+        } catch (err) {
+          console.error("Error saving customer info:", err)
+        }
+      }
+
+      // Get the SheetBills Invoices sheet URL
+      const response = await axios.get("https://sheetbills-server.vercel.app/api/sheets/spreadsheets", {
+        headers: {
+          Authorization: `Bearer ${session.provider_token}`,
+          "X-Supabase-Token": session.access_token,
+        },
+      })
+
+      const invoicesSheet = response.data.spreadsheets.find((sheet: { name: string; sheetUrl: string }) => sheet.name === "SheetBills Invoices")
+      if (!invoicesSheet) {
+        throw new Error("SheetBills Invoices sheet not found")
+      }
+
+      // Calculate totals for the invoice
+      const total = calculateTotal()
+
+      // Prepare the save request
+      const saveResponse = await axios.post(
+        "https://sheetbills-server.vercel.app/api/saveInvoice",
+        {
+          accessToken: session.provider_token,
+          invoiceData: {
+            ...invoiceData,
+            amount: total,
+            status: 'Pending'
+          },
+          sheetUrl: invoicesSheet.sheetUrl
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        }
+      )
+
+      if (saveResponse.data.success) {
+        // Clear cache
+        localStorage.removeItem("cachedInvoices")
+        localStorage.removeItem("lastFetchTime")
+        
+        // Show success toast
+        toast({
+          title: "Success",
+          description: "Invoice saved successfully.",
+        })
+        
+        // Show email modal
+        setShowEmailModal(true)
+      } else {
+        throw new Error("Failed to save invoice")
+      }
     } catch (error) {
       console.error('Error saving invoice:', error)
       toast({

@@ -1450,7 +1450,7 @@ export default function InvoiceForm() {
                         variant="outline"
                         type="button"
                         onClick={addItem}
-                        className="font-normal w-full bg-green-800 hover:bg-green-900 text-white flex items-center justify-center gap-2 py-4 text-lg"
+                        className="font-normal w-full bg-green-800 hover:bg-green-900 text-white flex items-center justify-center gap-2 py-4 text-sm"
                       >
                         <Plus className="h-5 w-5 mr-2" />
                         Add Item

@@ -207,12 +207,15 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
     'Notes',
     'Template',
     'Status',
-    'Color'
+    'Color',
+    'send_status',
+    'date_sent',
+    'reminders_sent'
   ];
   try {
     const headerResp = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A1:N1`,
+      range: `${sheetName}!A1:Q1`,
     });
     const currentHeaders = headerResp.data.values ? headerResp.data.values[0] : [];
     // If headers are missing or don't match, update them
@@ -230,7 +233,7 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
     if (needsUpdate) {
       await sheets.spreadsheets.values.update({
         spreadsheetId,
-        range: `${sheetName}!A1:N1`,
+        range: `${sheetName}!A1:Q1`,
         valueInputOption: 'RAW',
         resource: { values: [correctHeaders] },
       });
@@ -239,7 +242,7 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
     // If header row doesn't exist, just set it
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: `${sheetName}!A1:N1`,
+      range: `${sheetName}!A1:Q1`,
       valueInputOption: 'RAW',
       resource: { values: [correctHeaders] },
     });
@@ -824,7 +827,10 @@ app.get('/api/invoices/:invoiceId', async (req, res) => {
       notes: row[10],
       template: row[11] || 'classic',
       status: row[12] || 'Pending',
-      color: (row[13] && row[13].trim() !== "") ? row[13] : '#166534', // Add color field
+      color: (row[13] && row[13].trim() !== "") ? row[13] : '#166534',
+      send_status: row[14] || 'no',
+      date_sent: row[15] || '',
+      reminders_sent: parseInt(row[16] || '0')
     };
 
     // Get business details
@@ -1164,7 +1170,10 @@ app.post('/api/saveInvoice', async (req, res) => {
         invoiceData.notes,
         invoiceData.template || 'classic',
         invoiceData.status || 'Pending',
-        invoiceData.color || '' // Add color as last column
+        invoiceData.color || '',
+        'no', // send_status
+        '', // date_sent
+        '0' // reminders_sent
       ]
     ];
 
@@ -1172,7 +1181,7 @@ app.post('/api/saveInvoice', async (req, res) => {
     await ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName);
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: `${sheetName}!A:N`,
+      range: `${sheetName}!A:Q`,
       valueInputOption: 'USER_ENTERED',
       insertDataOption: 'INSERT_ROWS',
       resource: { values }
@@ -1588,14 +1597,17 @@ app.post('/api/update-invoice', async (req, res) => {
       invoiceData.notes,
       invoiceData.template || 'classic',
       invoiceData.status || 'Pending',
-      invoiceData.color || '' // Add color as last column
+      invoiceData.color || '',
+      invoiceData.send_status || 'no', // Preserve existing send_status
+      invoiceData.date_sent || '', // Preserve existing date_sent
+      invoiceData.reminders_sent || '0' // Preserve existing reminders_sent
     ];
 
     // Update the row
     await ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName);
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: `${sheetName}!A${rowIndex + 1}:N${rowIndex + 1}`,
+      range: `${sheetName}!A${rowIndex + 1}:Q${rowIndex + 1}`,
       valueInputOption: 'USER_ENTERED',
       requestBody: {
         values: [updatedRow]

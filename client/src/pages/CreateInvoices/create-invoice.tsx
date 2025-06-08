@@ -890,25 +890,7 @@ export default function InvoiceForm() {
     }
   }
 
-  const handleEmailSend = async (emailData: any) => {
-    try {
-      // Here you would implement the email sending logic
-      console.log('Sending email with data:', emailData)
-      toast({
-        title: "Success",
-        description: "Invoice email sent successfully.",
-      })
-      setShowEmailModal(false)
-    } catch (error) {
-      console.error('Error sending email:', error)
-      toast({
-        title: "Error",
-        description: "Failed to send email. Please try again.",
-        variant: "destructive",
-      })
-    }
-  }
-
+ 
   // Used to edit invoice
   useEffect(() => {
     if (invoiceToEdit) {

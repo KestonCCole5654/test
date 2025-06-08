@@ -209,7 +209,6 @@ export default function InvoiceForm() {
           name: "",
           email: "",
           address: "",
-          phone: "",
         },
         items: [{
           name: "",
@@ -248,7 +247,6 @@ export default function InvoiceForm() {
           name: "",
           email: "",
           address: "",
-          phone: "",
         },
         items: invoiceToEdit.items || [{
           name: "",
@@ -280,7 +278,6 @@ export default function InvoiceForm() {
           name: "",
           email: "",
           address: "",
-          phone: "",
         },
         items: [{
           name: "",
@@ -808,7 +805,6 @@ export default function InvoiceForm() {
         name: invoiceData.customer.name,
         email: invoiceData.customer.email,
         address: invoiceData.customer.address,
-        phone: invoiceData.customer.phone || "",
         notes: invoiceData.notes || ""
       }
       
@@ -1238,14 +1234,60 @@ export default function InvoiceForm() {
                       <h3 className="text-sm font-normal mb-3">Customer Information</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <Label htmlFor="customerName" className="text-sm font-normal">Name</Label>
-                          <Input
-                            id="customerName"
-                            value={invoiceData.customer.name}
-                            onChange={(e) => updateInvoiceData("customer.name", e.target.value)}
-                            placeholder="Customer name"
-                            className="mt-1.5 font-inter font-light"
-                          />
+                          <Label htmlFor="customerName" className="text-sm font-normal">Full Name</Label>
+                          <div className="relative">
+                            <Input
+                              id="customerName"
+                              ref={inputRef}
+                              value={invoiceData.customer.name}
+                              onChange={e => {
+                                updateInvoiceData("customer.name", e.target.value)
+                                setShowSuggestions(true)
+                              }}
+                              onFocus={() => {
+                                if (invoiceData.customer.name.length > 0) setShowSuggestions(true)
+                              }}
+                              onBlur={e => {
+                                // Delay hiding to allow click on suggestion
+                                setTimeout(() => setShowSuggestions(false), 100)
+                              }}
+                              placeholder="Customer name"
+                              className="mt-1.5 font-inter font-light"
+                              autoComplete="off"
+                            />
+                            {showSuggestions && invoiceData.customer.name && (
+                              <div className="absolute z-10 left-0 right-0 mt-1 bg-white border rounded-lg shadow-md max-h-48 overflow-auto">
+                                {customers.filter(customer =>
+                                  customer.name.toLowerCase().includes(invoiceData.customer.name.toLowerCase())
+                                ).length === 0 ? (
+                                  <div className="px-4 py-2 text-gray-500">No customer found.</div>
+                                ) : (
+                                  customers
+                                    .filter(customer =>
+                                      customer.name.toLowerCase().includes(invoiceData.customer.name.toLowerCase())
+                                    )
+                                    .map(customer => (
+                                      <div
+                                        key={customer.id}
+                                        className="px-4 py-2 cursor-pointer hover:bg-green-50 hover:text-green-800 transition-colors"
+                                        onMouseDown={e => {
+                                          // onMouseDown to prevent blur before click
+                                          e.preventDefault()
+                                          updateInvoiceData("customer", {
+                                            name: customer.name,
+                                            email: customer.email,
+                                            address: customer.address
+                                          })
+                                          setShowSuggestions(false)
+                                        }}
+                                      >
+                                        {customer.name}
+                                      </div>
+                                    ))
+                                )}
+                              </div>
+                            )}
+                          </div>
                         </div>
                         <div>
                           <Label htmlFor="customerEmail" className="text-sm font-normal">Email</Label>
@@ -1255,17 +1297,6 @@ export default function InvoiceForm() {
                             value={invoiceData.customer.email}
                             onChange={(e) => updateInvoiceData("customer.email", e.target.value)}
                             placeholder="customer@example.com"
-                            className="mt-1.5 font-inter font-light"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="customerPhone" className="text-sm font-normal">Phone</Label>
-                          <Input
-                            id="customerPhone"
-                            type="tel"
-                            value={invoiceData.customer.phone || ""}
-                            onChange={(e) => updateInvoiceData("customer.phone", e.target.value)}
-                            placeholder="+1 (555) 555-5555"
                             className="mt-1.5 font-inter font-light"
                           />
                         </div>

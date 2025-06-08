@@ -72,10 +72,11 @@ export default function EmailInvoice() {
   return (
     <div className="w-full max-w-7xl bg-gray-50/50 font-onest flex flex-col md:flex-row gap-8  items-stretch md:items-center">
 
-      <div className="text-2xl font-bold text-left">Send Invoice</div>
+     
 
       {/* Left: Email Form */}
       <div className="flex-1 flex items-center justify-center min-w-0 py-8">
+      <div className="   text-2xl font-bold text-left">Send Invoice</div>
         <div className="w-full max-w-md">
           <div className="grid gap-4">
             <div className="grid gap-2">

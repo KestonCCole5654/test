@@ -5,8 +5,8 @@ export default function Footer() {
     <footer className="w-full bg-gray-50 border-t border-green-100 rounded-b-2xl py-12 px-4 flex flex-col items-center justify-center mt-20">
       <div className="flex flex-col items-center mb-4">
         <img src="/sheetbills-logo.svg" alt="SheetBills Logo" className="h-8 w-auto mb-2" />
-        <div className="w-full font-inter text-center text-md text-gray-400">
-          Powered by <span className="font-cal-sans text-md font-medium text-green-800">SheetBills</span>
+        <div className="w-full font-onest text-center text-md text-gray-400">
+          Powered by <span className="font-onest text-md font-medium text-green-800">SheetBills</span>
         </div>
       </div>
       <div className="text-gray-400 text-sm mb-2">© {new Date().getFullYear()} SheetBills. All rights reserved.</div>

@@ -1,74 +1,92 @@
+📘 Code Guide Document – SheetBills Email Notification System
+Feature: Manual Email Send (triggered by user)
 
-# ✅ Action Plan for Cursor – SheetBills Notification Integration
+🔹 Objective
+Enable users to manually send invoice emails via the “Send via Email” button using Make + Mailgun, with data managed through Google Sheets.
 
-> 🎯 **Goal:** Add automated reminders & notifications using Google Sheets + Make + Twilio **without changing** the existing app structure (only extend it where absolutely necessary).
+🛠️ Tools Involved
+Tool	Purpose
+Google Sheets	Stores invoice data
+Make	Handles automation via Webhooks
+Mailgun	Sends the actual email
 
----
-
-## 🔍 Step 1: Analyze Existing System
-- [ ] Review the current project files and architecture
-- [ ] Identify how invoice data is being sent to Google Sheets
-- [ ] Confirm that invoice creation and CRUD operations are working as described
-
----
-
-## 📄 Step 2: Update Google Sheets Structure (if needed)
-- [ ] Add new columns to existing Google Sheet to track:
-  - `sent_status` (Yes/No)
-  - `channel_sent` (Email, SMS, WhatsApp)
-  - `date_sent`
-  - `reminders_sent` (counter)
-- [ ] Make sure these columns don’t break current app logic (keep optional/default values)
-
----
-
-## ⚙️ Step 3: Create Make (Integromat) Scenarios
-- [ ] Scenario 1 – **Send Invoice**
-  - Trigger: New row or update in Google Sheets
-  - Action: Send invoice via Twilio (Email/SMS/WhatsApp)
-  - Update Google Sheet: Fill in `sent_status`, `channel_sent`, `date_sent`
-
-- [ ] Scenario 2 – **Automated Reminders**
-  - Trigger: Time-based (e.g., every day)
-  - Logic:
-    - Read all unpaid invoices from Google Sheets
-    - Compare due date with current date
-    - If unpaid:
-      - Send up to 3 reminders before due date
-      - Send up to 4 reminders after due date
-  - Action: Send reminder via Twilio
-  - Update: Increment `reminders_sent`
-
----
+⚙️ Cursor AI Implementation Steps
+🔍 Step 1: Analyze Existing App Logic: 
+    a.Review how the invoice data is generated when the "Send via Email" button is clicked.
+    b.Understand how the backend interacts with Google Sheets.
+    c.Confirm that the logic supports multi-user use without hardcoded IDs or emails.
+    Note: This is for you to understand how the app works for better implementation
 
 
 
-## 📡 Step 4: Twilio Integration
-- [ ] Ensure Twilio is connected to Make
-- [ ] Use Twilio modules for:
-  - Email (via SendGrid if needed)
-  - SMS
-  - WhatsApp
-- [ ] Format message templates clearly using data from Google Sheets (client name, amount, due date)
+🧾 Step 2: Update Google Sheet Headers
+Open the active invoice Google Sheet.
 
----
+Add the following columns to Row 1, if they don’t already exist:
 
-## 🧪 Step 5: Testing & Verification
-- [ ] Test sending an invoice via all 3 channels
-- [ ] Test reminder logic before and after due date
-- [ ] Confirm that all updates (status, counts) appear correctly in Google Sheets
-- [ ] Check that current app functionality remains **unchanged and working**
+send_status
 
----
+date_sent
 
-## 🧼 Step 6: Clean Integration Practices
-- [ ] Do **not modify frontend or backend structure**
-- [ ] Only add what’s necessary (e.g., Google Sheet columns)
-- [ ] Keep notification logic separate (handled by Make)
-- [ ] Comment or document any change in Make for future reference
+reminders_sent
 
----
+These new columns should be placed at the end of the current headers.
 
-## 🧾 Optional (Nice to Have)
-- [ ] Create a separate tab in the Google Sheet for logging messages sent
-- [ ] Add logs: timestamp, client, invoice ID, channel, message content
+📨 Step 3: Implement Webhook Trigger (Dynamic Sending)
+🔗 Use Make Webhooks instead of polling to make email sending dynamic and responsive to each user action.
+
+In Make, create a new Webhook trigger scenario.
+
+Generate a custom Webhook URL from Make.
+
+In the backend, when a user clicks "Send via Email", call this webhook and pass:
+
+invoice_id
+
+client_name
+
+email
+
+amount
+
+due_date
+
+(any other necessary fields)
+
+The webhook will forward the data to Make in real-time.
+
+✉️ Step 4: Email Delivery via Mailgun
+Use the webhook payload to populate the email.
+
+In Make, send the email using Mailgun’s API.
+
+After sending:
+
+Write/update the corresponding row in the Google Sheet.
+
+Update the following fields:
+
+send_status → "yes"
+
+date_sent → current date
+
+🔄 Step 5: Support for Any User (Not Hardcoded)
+Make sure:
+
+Emails are sent based on data from the webhook, not predefined values.
+
+No hardcoded user emails or invoice info is used.
+
+Each user’s data should be passed dynamically in the webhook body.
+
+🧼 Step 6: Summary Checklist
+Task	Status
+Added send_status, date_sent, reminders_sent columns in Sheet	✅
+Backend sends webhook to Make with invoice data	✅
+Make scenario triggered by webhook, not polling	✅
+Emails sent via Mailgun dynamically using webhook data	✅
+No hardcoded users or email values	✅
+Google Sheet updated after email sent	✅
+Frontend/backend not structurally changed	✅
+All changes are trackable and reversible	✅
+

@@ -7,6 +7,12 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Textarea } from "../../components/ui/textarea";
 import { toast } from "../../components/ui/use-toast";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "../../components/ui/dropdown-menu";
 
 interface EmailData {
   to: string;
@@ -76,7 +82,12 @@ export default function EmailInvoice() {
 
       {/* Left: Email Form */}
       <div className="flex-1 flex items-center justify-center min-w-0 py-8">
-      <div className="   text-2xl font-bold text-left">Send Invoice</div>
+        <div className="w-full max-w-md mb-6">
+          <h1 className="text-3xl font-bold text-left mb-1">Send Invoice</h1>
+          <p className="text-sm text-gray-500 font-normal text-left">
+            You can send this invoice to your customer via WhatsApp, email, or SMS. Simply copy the message or use your preferred channel.
+          </p>
+        </div>
         <div className="w-full max-w-md">
           <div className="grid gap-4">
             <div className="grid gap-2">
@@ -197,9 +208,22 @@ export default function EmailInvoice() {
 
         </div>
         <div className="flex justify-end gap-2 mt-6">
-          <Button onClick={handleSend} className="bg-green-700 text-white">
-            Send and close
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="bg-green-700 text-white">Send Invoice</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => toast({ title: 'WhatsApp', description: 'Pretend to send via WhatsApp!' })}>
+                Send via WhatsApp
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => toast({ title: 'Email', description: 'Pretend to send via Email!' })}>
+                Send via Email
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => toast({ title: 'SMS', description: 'Pretend to send via SMS!' })}>
+                Send via SMS
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 

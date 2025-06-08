@@ -186,7 +186,7 @@ async function getOrCreateMasterSheet(accessToken, userId) {
   }
 }
 /**
- * Ensures the SheetBills Invoices tab has the correct headers, including notification tracking columns.
+ * Ensures the SheetBills Invoices tab has the correct headers, including 'Color'.
  * If the header row is missing or incomplete, it will be updated.
  * @param {object} sheets - Google Sheets API instance
  * @param {string} spreadsheetId - The spreadsheet ID
@@ -207,16 +207,12 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
     'Notes',
     'Template',
     'Status',
-    'Color',
-    'Sent Status',
-    'Channel Sent',
-    'Date Sent',
-    'Reminders Sent'
+    'Color'
   ];
   try {
     const headerResp = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A1:R1`,
+      range: `${sheetName}!A1:N1`,
     });
     const currentHeaders = headerResp.data.values ? headerResp.data.values[0] : [];
     // If headers are missing or don't match, update them
@@ -234,7 +230,7 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
     if (needsUpdate) {
       await sheets.spreadsheets.values.update({
         spreadsheetId,
-        range: `${sheetName}!A1:R1`,
+        range: `${sheetName}!A1:N1`,
         valueInputOption: 'RAW',
         resource: { values: [correctHeaders] },
       });
@@ -243,7 +239,7 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
     // If header row doesn't exist, just set it
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: `${sheetName}!A1:R1`,
+      range: `${sheetName}!A1:N1`,
       valueInputOption: 'RAW',
       resource: { values: [correctHeaders] },
     });
@@ -1168,11 +1164,7 @@ app.post('/api/saveInvoice', async (req, res) => {
         invoiceData.notes,
         invoiceData.template || 'classic',
         invoiceData.status || 'Pending',
-        invoiceData.color || '',
-        'No', // Sent Status
-        '', // Channel Sent
-        '', // Date Sent
-        '0' // Reminders Sent
+        invoiceData.color || '' // Add color as last column
       ]
     ];
 
@@ -1180,29 +1172,11 @@ app.post('/api/saveInvoice', async (req, res) => {
     await ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName);
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: `${sheetName}!A:R`,
+      range: `${sheetName}!A:N`,
       valueInputOption: 'USER_ENTERED',
       insertDataOption: 'INSERT_ROWS',
       resource: { values }
     });
-
-    // After successfully saving to Google Sheets, notify Make
-    if (process.env.MAKE_WEBHOOK_URL) {
-      try {
-        await axios.post(process.env.MAKE_WEBHOOK_URL, {
-          spreadsheetId,
-          invoiceId: invoiceData.invoiceNumber,
-          customerEmail: invoiceData.customer.email,
-          customerName: invoiceData.customer.name,
-          amount: saveTotal,
-          dueDate: invoiceData.dueDate,
-          webhookKey: process.env.MAKE_WEBHOOK_KEY
-        });
-      } catch (webhookError) {
-        console.error('Failed to notify Make:', webhookError);
-        // Don't fail the request if Make notification fails
-      }
-    }
 
     res.json({
       success: true,
@@ -1573,7 +1547,7 @@ app.post('/api/update-invoice', async (req, res) => {
     // Get all data to find the exact row
     const fullResponse = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A:R`, // Get all columns including notification tracking
+      range: `${sheetName}!A:M`, // Get all columns
     });
 
     const rows = fullResponse.data.values || [];
@@ -1592,13 +1566,6 @@ app.post('/api/update-invoice', async (req, res) => {
         rows.slice(1).map(row => row[0]).join(', '));
       return res.status(404).json({ error: 'Invoice not found' });
     }
-
-    // Get existing notification tracking data
-    const existingRow = rows[rowIndex];
-    const sentStatus = existingRow[14] || 'No';
-    const channelSent = existingRow[15] || '';
-    const dateSent = existingRow[16] || '';
-    const remindersSent = existingRow[17] || '0';
 
     // Calculate totals
     const invoiceSubtotal = calculateSubtotal(invoiceData.items);
@@ -1621,18 +1588,14 @@ app.post('/api/update-invoice', async (req, res) => {
       invoiceData.notes,
       invoiceData.template || 'classic',
       invoiceData.status || 'Pending',
-      invoiceData.color || '',
-      sentStatus, // Preserve sent status
-      channelSent, // Preserve channel sent
-      dateSent, // Preserve date sent
-      remindersSent // Preserve reminders sent
+      invoiceData.color || '' // Add color as last column
     ];
 
     // Update the row
     await ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName);
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: `${sheetName}!A${rowIndex + 1}:R${rowIndex + 1}`,
+      range: `${sheetName}!A${rowIndex + 1}:N${rowIndex + 1}`,
       valueInputOption: 'USER_ENTERED',
       requestBody: {
         values: [updatedRow]
@@ -3141,139 +3104,6 @@ app.delete('/api/customers/bulk-delete', async (req, res) => {
     return res.status(500).json({
       error: "Failed to delete customers",
       details: error.message
-    });
-  }
-});
-
-/**
- * Webhook endpoint for Make to update notification status
- * @route POST /api/webhooks/notification-status
- */
-app.post('/api/webhooks/notification-status', async (req, res) => {
-  try {
-    const { 
-      spreadsheetId,
-      invoiceId,
-      sentStatus,
-      channelSent,
-      dateSent,
-      remindersSent,
-      webhookKey 
-    } = req.body;
-
-    // Verify webhook key
-    if (webhookKey !== process.env.MAKE_WEBHOOK_KEY) {
-      return res.status(401).json({ error: 'Invalid webhook key' });
-    }
-
-    // Initialize Google Sheets API with service account
-    const auth = new google.auth.GoogleAuth({
-      credentials: {
-        client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        private_key: process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      },
-      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-    });
-
-    const sheets = google.sheets({ version: 'v4', auth });
-
-    // Get sheet metadata
-    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
-    const invoiceSheet = spreadsheet.data.sheets.find(
-      s => s.properties.title === "SheetBills Invoices"
-    );
-    if (!invoiceSheet) {
-      return res.status(404).json({ error: 'SheetBills Invoices tab not found' });
-    }
-    const sheetName = invoiceSheet.properties.title;
-
-    // Get all data to find the exact row
-    const fullResponse = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: `${sheetName}!A:R`,
-    });
-
-    const rows = fullResponse.data.values || [];
-    if (rows.length < 2) {
-      return res.status(404).json({ error: 'No invoices found in sheet' });
-    }
-
-    // Find the exact row index (skip header row)
-    const rowIndex = rows.findIndex((row) => row[0]?.trim() === invoiceId.trim());
-    if (rowIndex === -1) {
-      return res.status(404).json({ error: 'Invoice not found' });
-    }
-
-    // Get existing row data
-    const existingRow = rows[rowIndex];
-    
-    // Update notification fields while preserving other data
-    const updatedRow = [
-      ...existingRow.slice(0, 14), // Keep existing data up to Color
-      sentStatus || existingRow[14] || 'No',
-      channelSent || existingRow[15] || '',
-      dateSent || existingRow[16] || '',
-      remindersSent || existingRow[17] || '0'
-    ];
-
-    // Update the row
-    await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range: `${sheetName}!A${rowIndex + 1}:R${rowIndex + 1}`,
-      valueInputOption: 'USER_ENTERED',
-      requestBody: {
-        values: [updatedRow]
-      }
-    });
-
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Error updating notification status:', error);
-    res.status(500).json({ 
-      error: 'Failed to update notification status',
-      details: error.message 
-    });
-  }
-});
-
-/**
- * Webhook endpoint for Make to receive new invoice notifications
- * @route POST /api/webhooks/invoice-notification
- */
-app.post('/api/webhooks/invoice-notification', async (req, res) => {
-  try {
-    const { 
-      spreadsheetId,
-      invoiceId,
-      customerEmail,
-      customerName,
-      amount,
-      dueDate,
-      webhookKey 
-    } = req.body;
-
-    // Verify webhook key
-    if (webhookKey !== process.env.MAKE_WEBHOOK_KEY) {
-      return res.status(401).json({ error: 'Invalid webhook key' });
-    }
-
-    // Return the invoice data for Make to process
-    res.json({ 
-      success: true,
-      invoiceData: {
-        spreadsheetId,
-        invoiceId,
-        customerEmail,
-        customerName,
-        amount,
-        dueDate
-      }
-    });
-  } catch (error) {
-    console.error('Error processing invoice notification:', error);
-    res.status(500).json({ 
-      error: 'Failed to process invoice notification',
-      details: error.message 
     });
   }
 });

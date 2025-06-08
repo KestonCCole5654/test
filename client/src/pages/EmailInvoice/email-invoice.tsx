@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -13,6 +13,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "../../components/ui/dropdown-menu";
+import axios from "axios";
+import { useSupabaseClient } from '@supabase/auth-helpers-react';
 
 interface EmailData {
   to: string;
@@ -21,11 +23,57 @@ interface EmailData {
   message: string;
 }
 
+interface BusinessData {
+  companyName: string;
+  phone: string;
+  address: string;
+  email: string;
+  logo?: string;
+}
+
 export default function EmailInvoice() {
   const navigate = useNavigate();
   const { invoiceId } = useParams<{ invoiceId: string }>();
   const location = useLocation();
   const invoice = location.state?.invoice;
+  const supabase = useSupabaseClient();
+  const [businessData, setBusinessData] = useState<BusinessData>({
+    companyName: "",
+    phone: "",
+    address: "",
+    email: "",
+    logo: "",
+  });
+
+  useEffect(() => {
+    const fetchBusinessDetails = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.provider_token) return;
+        const sheetUrl = localStorage.getItem("defaultSheetUrl");
+        if (!sheetUrl) return;
+        const response = await axios.get("https://sheetbills-server.vercel.app/api/business-details", {
+          headers: {
+            Authorization: `Bearer ${session.provider_token}`,
+            "X-Supabase-Token": session.access_token,
+          },
+          params: { sheetUrl },
+        });
+        if (response.data.businessDetails) {
+          setBusinessData({
+            companyName: response.data.businessDetails["Company Name"] || "",
+            email: response.data.businessDetails["Business Email"] || "",
+            phone: response.data.businessDetails["Phone Number"] || "",
+            address: response.data.businessDetails["Address"] || "",
+            logo: response.data.businessDetails["Logo"] || "",
+          });
+        }
+      } catch (error) {
+        // fail silently
+      }
+    };
+    fetchBusinessDetails();
+  }, [supabase]);
 
   // Always call hooks first!
   const [emailData, setEmailData] = useState<EmailData>(() => {
@@ -162,6 +210,15 @@ export default function EmailInvoice() {
           className="bg-transparent w-full mx-auto overflow-y-auto"
           style={{ maxHeight: "calc(100vh - 48px)" }}
         >
+          {/* Company Logo */}
+          { (invoice.logo || invoice.companyLogo || businessData.logo) && (
+            <img
+              src={invoice.logo || invoice.companyLogo || businessData.logo}
+              alt="Company Logo"
+              className="h-12 w-auto object-contain mb-4"
+              style={{ background: 'none', boxShadow: 'none', border: 'none' }}
+            />
+          )}
           <div className="text-xs text-gray-500 mb-2 border-b border-gray-200 pb-2">
             From: {emailData.from}
             <br />

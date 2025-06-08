@@ -157,7 +157,7 @@ export default function EmailInvoice() {
           title: "Success",
           description: "Invoice email has been sent successfully.",
         });
-        navigate(-1);
+        navigate('/email-invoice/confirmation', { state: { invoice } });
       } else {
         throw new Error(response.data.error || "Failed to send invoice email");
       }

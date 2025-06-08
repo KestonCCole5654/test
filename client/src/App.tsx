@@ -28,6 +28,7 @@ import LegalPage from './pages/Legal/legal';
 import LandingPage from './pages/Landing/page';
 import AccountStatus from './pages/AccountStatus/AccountStatus';
 import ReportsPage from "./pages/Reports/reports"
+import EmailInvoiceConfirmation from "./pages/EmailInvoice/EmailInvoiceConfirmation";
 
 
 
@@ -240,6 +241,9 @@ function App() {
             </AuthenticatedRoute>
           }
         />
+
+        {/* Email Invoice Confirmation Route */}
+        <Route path="/email-invoice/confirmation" element={<EmailInvoiceConfirmation />} />
 
         {/* Catch all route - redirect to landing page for unauthenticated users */}
         <Route path="*" element={

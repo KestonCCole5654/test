@@ -1186,6 +1186,24 @@ app.post('/api/saveInvoice', async (req, res) => {
       resource: { values }
     });
 
+    // After successfully saving to Google Sheets, notify Make
+    if (process.env.MAKE_WEBHOOK_URL) {
+      try {
+        await axios.post(process.env.MAKE_WEBHOOK_URL, {
+          spreadsheetId,
+          invoiceId: invoiceData.invoiceNumber,
+          customerEmail: invoiceData.customer.email,
+          customerName: invoiceData.customer.name,
+          amount: saveTotal,
+          dueDate: invoiceData.dueDate,
+          webhookKey: process.env.MAKE_WEBHOOK_KEY
+        });
+      } catch (webhookError) {
+        console.error('Failed to notify Make:', webhookError);
+        // Don't fail the request if Make notification fails
+      }
+    }
+
     res.json({
       success: true,
       invoiceData: {
@@ -3123,6 +3141,139 @@ app.delete('/api/customers/bulk-delete', async (req, res) => {
     return res.status(500).json({
       error: "Failed to delete customers",
       details: error.message
+    });
+  }
+});
+
+/**
+ * Webhook endpoint for Make to update notification status
+ * @route POST /api/webhooks/notification-status
+ */
+app.post('/api/webhooks/notification-status', async (req, res) => {
+  try {
+    const { 
+      spreadsheetId,
+      invoiceId,
+      sentStatus,
+      channelSent,
+      dateSent,
+      remindersSent,
+      webhookKey 
+    } = req.body;
+
+    // Verify webhook key
+    if (webhookKey !== process.env.MAKE_WEBHOOK_KEY) {
+      return res.status(401).json({ error: 'Invalid webhook key' });
+    }
+
+    // Initialize Google Sheets API with service account
+    const auth = new google.auth.GoogleAuth({
+      credentials: {
+        client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+        private_key: process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      },
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+
+    const sheets = google.sheets({ version: 'v4', auth });
+
+    // Get sheet metadata
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
+    const invoiceSheet = spreadsheet.data.sheets.find(
+      s => s.properties.title === "SheetBills Invoices"
+    );
+    if (!invoiceSheet) {
+      return res.status(404).json({ error: 'SheetBills Invoices tab not found' });
+    }
+    const sheetName = invoiceSheet.properties.title;
+
+    // Get all data to find the exact row
+    const fullResponse = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${sheetName}!A:R`,
+    });
+
+    const rows = fullResponse.data.values || [];
+    if (rows.length < 2) {
+      return res.status(404).json({ error: 'No invoices found in sheet' });
+    }
+
+    // Find the exact row index (skip header row)
+    const rowIndex = rows.findIndex((row) => row[0]?.trim() === invoiceId.trim());
+    if (rowIndex === -1) {
+      return res.status(404).json({ error: 'Invoice not found' });
+    }
+
+    // Get existing row data
+    const existingRow = rows[rowIndex];
+    
+    // Update notification fields while preserving other data
+    const updatedRow = [
+      ...existingRow.slice(0, 14), // Keep existing data up to Color
+      sentStatus || existingRow[14] || 'No',
+      channelSent || existingRow[15] || '',
+      dateSent || existingRow[16] || '',
+      remindersSent || existingRow[17] || '0'
+    ];
+
+    // Update the row
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: `${sheetName}!A${rowIndex + 1}:R${rowIndex + 1}`,
+      valueInputOption: 'USER_ENTERED',
+      requestBody: {
+        values: [updatedRow]
+      }
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error updating notification status:', error);
+    res.status(500).json({ 
+      error: 'Failed to update notification status',
+      details: error.message 
+    });
+  }
+});
+
+/**
+ * Webhook endpoint for Make to receive new invoice notifications
+ * @route POST /api/webhooks/invoice-notification
+ */
+app.post('/api/webhooks/invoice-notification', async (req, res) => {
+  try {
+    const { 
+      spreadsheetId,
+      invoiceId,
+      customerEmail,
+      customerName,
+      amount,
+      dueDate,
+      webhookKey 
+    } = req.body;
+
+    // Verify webhook key
+    if (webhookKey !== process.env.MAKE_WEBHOOK_KEY) {
+      return res.status(401).json({ error: 'Invalid webhook key' });
+    }
+
+    // Return the invoice data for Make to process
+    res.json({ 
+      success: true,
+      invoiceData: {
+        spreadsheetId,
+        invoiceId,
+        customerEmail,
+        customerName,
+        amount,
+        dueDate
+      }
+    });
+  } catch (error) {
+    console.error('Error processing invoice notification:', error);
+    res.status(500).json({ 
+      error: 'Failed to process invoice notification',
+      details: error.message 
     });
   }
 });

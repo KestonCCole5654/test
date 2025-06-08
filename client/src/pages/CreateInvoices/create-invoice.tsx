@@ -1234,7 +1234,7 @@ export default function InvoiceForm() {
                       <h3 className="text-sm font-normal mb-3">Customer Information</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <Label htmlFor="customerName" className="text-sm font-normal">Name</Label>
+                          <Label htmlFor="customerName" className="text-sm font-normal">Full Name</Label>
                           <div className="relative">
                             <Input
                               id="customerName"

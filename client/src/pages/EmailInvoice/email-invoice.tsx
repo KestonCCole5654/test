@@ -71,6 +71,9 @@ export default function EmailInvoice() {
 
   return (
     <div className="w-full max-w-7xl bg-gray-50/50 font-onest flex flex-col md:flex-row gap-8  items-stretch md:items-center">
+
+      <div className="text-2xl font-bold text-left">Send Invoice</div>
+
       {/* Left: Email Form */}
       <div className="flex-1 flex items-center justify-center min-w-0 py-8">
         <div className="w-full max-w-md">
@@ -128,9 +131,9 @@ export default function EmailInvoice() {
       </div>
 
       {/* Right: Invoice Preview */}
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 pt-10">
         <div
-          className="bg-transparent p-6 w-full mx-auto overflow-y-auto"
+          className="bg-transparent w-full mx-auto overflow-y-auto"
           style={{ maxHeight: "calc(100vh - 48px)" }}
         >
           <div className="text-xs text-gray-500 mb-2 border-b border-gray-200 pb-2">

@@ -1,72 +1,111 @@
+Revised Action Plan for Cursor – SheetBills Notification Integration
+🎯 Goal: Add automated reminders & notifications using Google Sheets + Make + Twilio without changing the existing app structure (only extend it where absolutely necessary).
 
-# ✅ Action Plan for Cursor – SheetBills Notification Integration
+🛠️ 🔧 Critical Fixes Required from Cursor
+1. 🔁 Correct Webhook Trigger Point
+Issue: The Make webhook is currently triggered when an invoice is saved, which is incorrect.
 
-> 🎯 **Goal:** Add automated reminders & notifications using Google Sheets + Make + Twilio **without changing** the existing app structure (only extend it where absolutely necessary).
+Correct Behavior:
 
----
+✅ The webhook should only be triggered when the “Send Invoice” button is clicked on the email-invoice page.
 
-## 🔍 Step 1: Analyze Existing System
-- [ ] Review the current project files and architecture
-- [ ] Identify how invoice data is being sent to Google Sheets
-- [ ] Confirm that invoice creation and CRUD operations are working as described
+🎯 This ensures that notifications are only sent when explicitly requested.
 
----
+Cursor Tasks:
 
-## 📄 Step 2: Update Google Sheets Structure (if needed)
-- [ ] Add new columns to existing Google Sheet to track:
-  - `sent_status` (Yes/No)
-  - `channel_sent` (Email, SMS, WhatsApp)
-  - `date_sent`
-  - `reminders_sent` (counter)
-- [ ] Make sure these columns don’t break current app logic (keep optional/default values)
+ Move webhook trigger to the event handler of the “Send Invoice” button on the email-invoice page.
 
----
+ Ensure this call sends all necessary invoice + customer data to Make.
 
-## ⚙️ Step 3: Create Make (Integromat) Scenarios
-- [ ] Scenario 1 – **Send Invoice**
-  - Trigger: New row or update in Google Sheets
-  - Action: Send invoice via Twilio (Email/SMS/WhatsApp)
-  - Update Google Sheet: Fill in `sent_status`, `channel_sent`, `date_sent`
+ Add clear comments explaining this logic.
 
-- [ ] Scenario 2 – **Automated Reminders**
-  - Trigger: Time-based (e.g., every day)
-  - Logic:
-    - Read all unpaid invoices from Google Sheets
-    - Compare due date with current date
-    - If unpaid:
-      - Send up to 3 reminders before due date
-      - Send up to 4 reminders after due date
-  - Action: Send reminder via Twilio
-  - Update: Increment `reminders_sent`
+2. 📱 Include Customer Phone Number in Invoice Data
+Issue: While customer name, email, and address are already being captured, phone number is missing from the current data flow.
 
----
+Cursor Tasks:
 
-## 📡 Step 4: Twilio Integration
-- [ ] Ensure Twilio is connected to Make
-- [ ] Use Twilio modules for:
-  - Email (via SendGrid if needed)
-  - SMS
-  - WhatsApp
-- [ ] Format message templates clearly using data from Google Sheets (client name, amount, due date)
+ Update the relevant forms and invoice creation logic to collect and save customer phone number.
 
----
+ Ensure phone number is:
 
-## 🧪 Step 5: Testing & Verification
-- [ ] Test sending an invoice via all 3 channels
-- [ ] Test reminder logic before and after due date
-- [ ] Confirm that all updates (status, counts) appear correctly in Google Sheets
-- [ ] Check that current app functionality remains **unchanged and working**
+Validated properly (basic phone format)
 
----
+Saved to the backend/store (if applicable)
 
-## 🧼 Step 6: Clean Integration Practices
-- [ ] Do **not modify frontend or backend structure**
-- [ ] Only add what’s necessary (e.g., Google Sheet columns)
-- [ ] Keep notification logic separate (handled by Make)
-- [ ] Comment or document any change in Make for future reference
+Included in the payload sent to Google Sheets and Make
 
----
+🔔 This is necessary for Twilio SMS and WhatsApp messaging.
 
-## 🧾 Optional (Nice to Have)
-- [ ] Create a separate tab in the Google Sheet for logging messages sent
-- [ ] Add logs: timestamp, client, invoice ID, channel, message content
+🔍 Step 1: Analyze Existing System
+ Review current architecture and logic
+
+ Verify existing invoice CRUD functionality
+
+ Review Google Sheet syncing logic
+
+📄 Step 2: Google Sheets Structure
+ Added:
+
+sent_status
+
+channel_sent
+
+date_sent
+
+reminders_sent
+
+ Add customer_phone column if not already included
+
+ Ensure backward compatibility with app logic
+
+⚙️ Step 3: Make (Integromat) Scenarios
+ Send Invoice Scenario
+
+Trigger: Webhook (✅ to be fixed)
+
+Action: Send message via Twilio (Email/SMS/WhatsApp)
+
+Update Google Sheet status fields
+
+ Reminder Scenario
+
+Trigger: Time-based (e.g., daily)
+
+Logic:
+
+Identify unpaid invoices by due date
+
+Max 3 reminders before, 4 after due date
+
+Action: Send reminder message via Twilio
+
+Update reminders_sent counter
+
+📡 Step 4: Twilio Integration
+ Ensure all Twilio channels (Email, SMS, WhatsApp) are ready
+
+ Use Google Sheet data, now including phone number, to personalize messages
+
+🧪 Step 5: Testing & Verification
+ Verify “Send Invoice” button triggers webhook correctly
+
+ Ensure invoice is sent over all channels using phone/email
+
+ Test reminders pre- and post-due date
+
+ Confirm all updates appear in Google Sheets
+
+ Ensure app functionality remains unchanged
+
+🧼 Step 6: Clean Integration Practices
+ No core app logic changes unless absolutely needed
+
+ Notification logic remains external (Make)
+
+ Document changes clearly (especially webhook logic and phone number update)
+
+🧾 Optional
+ Logging tab in Google Sheets with:
+
+Timestamp, client, invoice ID, channel, message content
+

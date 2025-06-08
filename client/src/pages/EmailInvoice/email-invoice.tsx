@@ -126,13 +126,66 @@ export default function EmailInvoice() {
   const dueDate = invoice.dueDate || "";
   const invoiceDate = invoice.date || "";
 
-  const handleSend = () => {
-    toast({
-      title: "Email Sent",
-      description: "The invoice email has been sent (simulated).",
-      variant: "default",
-    });
-    navigate(-1);
+  const handleSend = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.provider_token) {
+        throw new Error("Google authentication required");
+      }
+
+      // Get the SheetBills Invoices sheet URL
+      const response = await axios.get("https://sheetbills-server.vercel.app/api/sheets/spreadsheets", {
+        headers: {
+          Authorization: `Bearer ${session.provider_token}`,
+          "X-Supabase-Token": session.access_token,
+        },
+      });
+
+      const invoicesSheet = response.data.spreadsheets.find((sheet: { name: string; sheetUrl: string }) => sheet.name === "SheetBills Invoices");
+      if (!invoicesSheet) {
+        throw new Error("SheetBills Invoices sheet not found");
+      }
+
+      // Trigger webhook for notification
+      await axios.post(
+        "https://sheetbills-server.vercel.app/api/notifications/send",
+        {
+          accessToken: session.provider_token,
+          invoiceData: {
+            ...invoice,
+            customer: {
+              ...invoice.customer,
+              phone: invoice.customer.phone || "", // Include phone number if available
+            },
+            emailData: {
+              to: emailData.to,
+              from: emailData.from,
+              subject: emailData.subject,
+              message: emailData.message,
+            }
+          },
+          sheetUrl: invoicesSheet.sheetUrl
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        }
+      );
+
+      toast({
+        title: "Success",
+        description: "Invoice notification has been sent.",
+      });
+      navigate(-1);
+    } catch (error) {
+      console.error("Error sending invoice notification:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send invoice notification. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   function formatCurrency(amount: number): string {

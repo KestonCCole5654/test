@@ -126,13 +126,49 @@ export default function EmailInvoice() {
   const dueDate = invoice.dueDate || "";
   const invoiceDate = invoice.date || "";
 
-  const handleSend = () => {
-    toast({
-      title: "Email Sent",
-      description: "The invoice email has been sent (simulated).",
-      variant: "default",
-    });
-    navigate(-1);
+  const handleSend = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.provider_token) {
+        throw new Error("Google authentication required");
+      }
+
+      const sheetUrl = localStorage.getItem("defaultSheetUrl");
+      if (!sheetUrl) {
+        throw new Error("No invoice spreadsheet selected");
+      }
+
+      const response = await axios.post(
+        "https://sheetbills-server.vercel.app/api/send-invoice-email",
+        {
+          invoiceId: invoiceId || invoice?.invoiceNumber,
+          sheetUrl
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${session.provider_token}`,
+            "X-Supabase-Token": session.access_token,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        toast({
+          title: "Success",
+          description: "Invoice email has been sent successfully.",
+        });
+        navigate(-1);
+      } else {
+        throw new Error(response.data.error || "Failed to send invoice email");
+      }
+    } catch (error) {
+      console.error("Error sending invoice email:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to send invoice email",
+        variant: "destructive",
+      });
+    }
   };
 
   function formatCurrency(amount: number): string {
@@ -211,7 +247,7 @@ export default function EmailInvoice() {
                 <DropdownMenuItem onClick={() => toast({ title: 'WhatsApp', description: 'Pretend to send via WhatsApp!' })}>
                   Send via WhatsApp
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => toast({ title: 'Email', description: 'Pretend to send via Email!' })}>
+                <DropdownMenuItem onClick={handleSend}>
                   Send via Email
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => toast({ title: 'SMS', description: 'Pretend to send via SMS!' })}>

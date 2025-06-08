@@ -150,10 +150,11 @@ function InvoiceProgressBar({ sendStatus, paidStatus }: { sendStatus?: string, p
   ];
   return (
     <div className="w-full flex flex-col items-center my-6 mb-8">
-      <div className="flex flex-row items-center justify-center w-full max-w-2xl">
+      <div className="flex flex-row items-center justify-center w-full max-w-3xl">
         {steps.map((step, idx) => (
-          <>
-            <div key={step.label} className="flex flex-col items-center flex-shrink-0">
+          <div key={step.label} className="flex flex-row items-center flex-1 min-w-0">
+            {/* Step Circle and Label */}
+            <div className="flex flex-col items-center" style={{ minWidth: 60 }}>
               <div className={`rounded-full w-8 h-8 flex items-center justify-center border-2 text-base font-bold ${step.done ? 'bg-green-100 border-green-600' : 'bg-white border-gray-300'}`}
                 >
                 {step.done ? (
@@ -167,10 +168,11 @@ function InvoiceProgressBar({ sendStatus, paidStatus }: { sendStatus?: string, p
               </div>
               <span className={`text-xs mt-2 text-center ${step.done ? 'text-green-700 font-semibold' : 'text-gray-400'}`}>{step.label}</span>
             </div>
+            {/* Connecting Line */}
             {idx < steps.length - 1 && (
-              <div className={`h-0.5 flex-1 mx-2 ${step.done ? 'bg-green-400' : 'bg-gray-200'}`}></div>
+              <div className={`h-0.5 ${step.done ? 'bg-green-400' : 'bg-gray-200'}`} style={{ flex: 1, minWidth: 40, maxWidth: 80, marginLeft: 0, marginRight: 0 }}></div>
             )}
-          </>
+          </div>
         ))}
       </div>
     </div>

@@ -83,7 +83,7 @@ export default function ContactPage() {
 
   if (showSummary) {
     return (
-      <div className="min-h-screen w-full bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen w-full bg-gray-50 font-onest flex items-center justify-center">
         <div className="max-w-md w-full bg-white rounded-lg shadow p-8 text-center">
           <h2 className="text-2xl font-normal  mb-4">Message Sent!</h2>
           <p className="mb-2">Thank you for contacting us. Our support team will get back to you soon.</p>
@@ -96,7 +96,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-gray-50">
+    <div className="min-h-screen w-full font-onest bg-gray-50">
       <div className="w-full max-w-7xl mx-auto mt-4">
         <Breadcrumb>
           <BreadcrumbList>

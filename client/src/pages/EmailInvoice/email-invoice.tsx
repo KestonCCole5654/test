@@ -135,6 +135,13 @@ export default function EmailInvoice() {
     navigate(-1);
   };
 
+  function formatCurrency(amount: number): string {
+    return amount.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }
+
   return (
     <div className="w-full max-w-7xl bg-gray-50/50 font-onest flex flex-col md:flex-row gap-8  items-stretch md:items-center">
 
@@ -261,7 +268,7 @@ export default function EmailInvoice() {
             </div>
 
             <div className="text-3xl font-medium text-gray-800 mb-2">
-              ${amount?.toFixed(2)}
+              ${formatCurrency(amount)}
             </div>
 
             <Button

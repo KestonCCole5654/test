@@ -15,6 +15,9 @@ const drive = google.drive('v3'); // Google Drive API
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// Add this with other environment variables
+const MAKE_WEBHOOK_URL = process.env.MAKE_WEBHOOK_URL;
+
 // ==========================
 // Middleware
 // ==========================
@@ -3115,6 +3118,159 @@ app.delete('/api/customers/bulk-delete', async (req, res) => {
     console.error('Bulk delete error:', error);
     return res.status(500).json({
       error: "Failed to delete customers",
+      details: error.message
+    });
+  }
+});
+
+// Add this new endpoint
+app.post('/api/send-invoice-email', async (req, res) => {
+  try {
+    const { invoiceId, sheetUrl } = req.body;
+
+    // Validate input
+    if (!invoiceId || !sheetUrl) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Validate Supabase token
+    const supabaseToken = req.headers['x-supabase-token'];
+    if (!supabaseToken) {
+      return res.status(401).json({ error: 'Supabase authentication required' });
+    }
+
+    // Validate Google token
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Google authentication required' });
+    }
+    const googleToken = authHeader.split(' ')[1];
+
+    // Initialize Google Sheets API
+    const auth = new google.auth.OAuth2();
+    auth.setCredentials({ access_token: googleToken });
+    const sheets = google.sheets({ version: 'v4', auth });
+
+    // Extract spreadsheet ID
+    const spreadsheetId = extractSheetIdFromUrl(sheetUrl);
+    if (!spreadsheetId) {
+      return res.status(400).json({ error: 'Invalid sheet URL' });
+    }
+
+    // Get sheet metadata
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
+    const invoiceSheet = spreadsheet.data.sheets.find(
+      s => s.properties.title === "SheetBills Invoices"
+    );
+    if (!invoiceSheet) {
+      return res.status(404).json({ error: 'SheetBills Invoices tab not found' });
+    }
+    const sheetName = invoiceSheet.properties.title;
+
+    // Fetch invoice data
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${sheetName}!A2:Q`,
+    });
+
+    const rows = response.data.values || [];
+    const row = rows.find(r => r[0] === invoiceId);
+    if (!row) {
+      return res.status(404).json({ error: 'Invoice not found' });
+    }
+
+    // Parse items, tax, discount
+    let items = [];
+    let tax = { type: 'percentage', value: 0 };
+    let discount = { type: 'percentage', value: 0 };
+    try { items = JSON.parse(row[6] || '[]'); } catch {}
+    try { tax = JSON.parse(row[8] || '{"type":"percentage","value":0}'); } catch {}
+    try { discount = JSON.parse(row[9] || '{"type":"percentage","value":0}'); } catch {}
+
+    // Get business details
+    const businessResponse = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: 'Business Details!A2:C100',
+    });
+
+    const businessRows = businessResponse.data.values || [];
+    const businessData = {
+      companyName: '',
+      phone: '',
+      address: '',
+      email: '',
+      logo: ''
+    };
+
+    businessRows.forEach(row => {
+      if (row[0] && row[1]) {
+        switch (row[0]) {
+          case 'Company Name':
+            businessData.companyName = row[1];
+            break;
+          case 'Phone Number':
+            businessData.phone = row[1];
+            break;
+          case 'Address':
+            businessData.address = row[1];
+            break;
+          case 'Business Email':
+            businessData.email = row[1];
+            break;
+          case 'Logo':
+            businessData.logo = row[1];
+            break;
+        }
+      }
+    });
+
+    // Prepare webhook payload
+    const webhookPayload = {
+      invoice_id: invoiceId,
+      client_name: row[3],
+      client_email: row[4],
+      client_address: row[5],
+      amount: parseFloat(row[7]) || 0,
+      due_date: row[2],
+      invoice_date: row[1],
+      items: items,
+      tax: tax,
+      discount: discount,
+      notes: row[10],
+      business_name: businessData.companyName,
+      business_email: businessData.email,
+      business_phone: businessData.phone,
+      business_address: businessData.address,
+      business_logo: businessData.logo
+    };
+
+    // Send webhook to Make
+    if (!MAKE_WEBHOOK_URL) {
+      throw new Error('Make webhook URL not configured');
+    }
+
+    const webhookResponse = await axios.post(MAKE_WEBHOOK_URL, webhookPayload);
+
+    if (webhookResponse.status === 200) {
+      // Update invoice status in Google Sheet
+      const rowIndex = rows.findIndex(r => r[0] === invoiceId) + 2; // +2 because we start from A2 and need 1-based index
+      await sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range: `${sheetName}!O${rowIndex}:P${rowIndex}`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+          values: [['yes', new Date().toISOString().split('T')[0]]]
+        }
+      });
+
+      res.json({ success: true, message: 'Invoice email sent successfully' });
+    } else {
+      throw new Error('Failed to send webhook to Make');
+    }
+  } catch (error) {
+    console.error('Error sending invoice email:', error);
+    res.status(500).json({
+      error: 'Failed to send invoice email',
       details: error.message
     });
   }

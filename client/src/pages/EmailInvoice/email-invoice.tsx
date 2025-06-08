@@ -85,7 +85,7 @@ export default function EmailInvoice() {
         <div className="w-full max-w-md">
           <h1 className="text-3xl font-bold text-left mb-1">Send Invoice</h1>
           <p className="text-sm text-gray-500 font-normal text-left mb-6">
-            You can send this invoice to your customer via WhatsApp, email, or SMS. Simply copy the message or use your preferred channel.
+            You can send this invoice to your customer via WhatsApp, email, or SMS. 
           </p>
           <div className="grid gap-4">
             <div className="grid gap-2">
@@ -138,7 +138,7 @@ export default function EmailInvoice() {
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button className="bg-green-700 text-white">Send Invoice</Button>
+                <Button className="bg-green-800 text-white">Send Invoice</Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => toast({ title: 'WhatsApp', description: 'Pretend to send via WhatsApp!' })}>

@@ -30,7 +30,6 @@ import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { supabase } from '../../lib/supabase'
 import ColorSuggestions from '../../components/ColorSuggestions'
-import { EmailInvoiceModal } from '../../components/EmailInvoiceModal'
 
 // Replace the printStyles constant with this updated version
 const printStyles = `
@@ -1541,20 +1540,7 @@ export default function InvoiceForm() {
         </div>
       )}
 
-      {/* Add the email modal */}
-      <EmailInvoiceModal
-        isOpen={showEmailModal}
-        onClose={() => setShowEmailModal(false)}
-        onSend={handleEmailSend}
-        customerEmail={invoiceData.customer.email}
-        businessEmail={businessData.email}
-        invoiceNumber={invoiceData.invoiceNumber}
-        customerName={invoiceData.customer.name}
-        amount={invoiceData.amount || calculateTotal()}
-        dueDate={invoiceData.dueDate}
-        invoiceDate={invoiceData.date}
-        companyName={businessData.companyName}
-      />
+     
     </>
   )
 }

@@ -186,7 +186,7 @@ async function getOrCreateMasterSheet(accessToken, userId) {
   }
 }
 /**
- * Ensures the SheetBills Invoices tab has the correct headers, including 'Color'.
+ * Ensures the SheetBills Invoices tab has the correct headers, including notification tracking columns.
  * If the header row is missing or incomplete, it will be updated.
  * @param {object} sheets - Google Sheets API instance
  * @param {string} spreadsheetId - The spreadsheet ID
@@ -207,12 +207,16 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
     'Notes',
     'Template',
     'Status',
-    'Color'
+    'Color',
+    'Sent Status',
+    'Channel Sent',
+    'Date Sent',
+    'Reminders Sent'
   ];
   try {
     const headerResp = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A1:N1`,
+      range: `${sheetName}!A1:R1`,
     });
     const currentHeaders = headerResp.data.values ? headerResp.data.values[0] : [];
     // If headers are missing or don't match, update them
@@ -230,7 +234,7 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
     if (needsUpdate) {
       await sheets.spreadsheets.values.update({
         spreadsheetId,
-        range: `${sheetName}!A1:N1`,
+        range: `${sheetName}!A1:R1`,
         valueInputOption: 'RAW',
         resource: { values: [correctHeaders] },
       });
@@ -239,7 +243,7 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
     // If header row doesn't exist, just set it
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: `${sheetName}!A1:N1`,
+      range: `${sheetName}!A1:R1`,
       valueInputOption: 'RAW',
       resource: { values: [correctHeaders] },
     });
@@ -1164,7 +1168,11 @@ app.post('/api/saveInvoice', async (req, res) => {
         invoiceData.notes,
         invoiceData.template || 'classic',
         invoiceData.status || 'Pending',
-        invoiceData.color || '' // Add color as last column
+        invoiceData.color || '',
+        'No', // Sent Status
+        '', // Channel Sent
+        '', // Date Sent
+        '0' // Reminders Sent
       ]
     ];
 
@@ -1172,7 +1180,7 @@ app.post('/api/saveInvoice', async (req, res) => {
     await ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName);
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: `${sheetName}!A:N`,
+      range: `${sheetName}!A:R`,
       valueInputOption: 'USER_ENTERED',
       insertDataOption: 'INSERT_ROWS',
       resource: { values }
@@ -1547,7 +1555,7 @@ app.post('/api/update-invoice', async (req, res) => {
     // Get all data to find the exact row
     const fullResponse = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A:M`, // Get all columns
+      range: `${sheetName}!A:R`, // Get all columns including notification tracking
     });
 
     const rows = fullResponse.data.values || [];
@@ -1566,6 +1574,13 @@ app.post('/api/update-invoice', async (req, res) => {
         rows.slice(1).map(row => row[0]).join(', '));
       return res.status(404).json({ error: 'Invoice not found' });
     }
+
+    // Get existing notification tracking data
+    const existingRow = rows[rowIndex];
+    const sentStatus = existingRow[14] || 'No';
+    const channelSent = existingRow[15] || '';
+    const dateSent = existingRow[16] || '';
+    const remindersSent = existingRow[17] || '0';
 
     // Calculate totals
     const invoiceSubtotal = calculateSubtotal(invoiceData.items);
@@ -1588,14 +1603,18 @@ app.post('/api/update-invoice', async (req, res) => {
       invoiceData.notes,
       invoiceData.template || 'classic',
       invoiceData.status || 'Pending',
-      invoiceData.color || '' // Add color as last column
+      invoiceData.color || '',
+      sentStatus, // Preserve sent status
+      channelSent, // Preserve channel sent
+      dateSent, // Preserve date sent
+      remindersSent // Preserve reminders sent
     ];
 
     // Update the row
     await ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName);
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: `${sheetName}!A${rowIndex + 1}:N${rowIndex + 1}`,
+      range: `${sheetName}!A${rowIndex + 1}:R${rowIndex + 1}`,
       valueInputOption: 'USER_ENTERED',
       requestBody: {
         values: [updatedRow]

@@ -330,7 +330,7 @@ const InvoiceClassic: React.FC<InvoiceClassicProps> = ({
       )}
 
       {/* Footer with branding */}
-      <div className="mt-8 pt-4 pb-4 border-t border-gray-200">
+      <div className="mt-8 p-4 border-t text-center flex justify-center border-gray-200">
         <div className="text-center text-sm text-gray-500">
           Powered by <span className="font-medium" style={{ color: data.color || '#166534' }}>SheetBills</span> @sheetbills.com
         </div>

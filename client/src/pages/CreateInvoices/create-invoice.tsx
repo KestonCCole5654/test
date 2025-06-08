@@ -1032,10 +1032,10 @@ export default function InvoiceForm() {
                   <div className="text-sm text-gray-500 font-normal mb-1">Billed To:</div>
                   <div className="text-base font-normal text-gray-800 mb-2">{invoiceData.customer.name || 'Customer Name'}</div>
                   <div className="text-sm text-gray-500 font-normal mb-1">Amount Due:</div>
-                  <div className="text-3xl font-cal font-normal text-green-800 mb-12">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
+                  <div className="text-3xl font-cal font-normal text-green-800 mb-6">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
                 </div>
 
-                <div className="flex max-w-full justify-center mb-10">
+                <div className="flex max-w-full justify-center mb-4">
                   <ul className="hidden w-full font-sans font-normal text-md md:block text-[#5C5B61] leading-relaxed space-y-1 md:-mt-3">
                     <li className="flex items-center justify-center lg:justify-start gap-2 w-full">
                       <Button
@@ -1076,13 +1076,13 @@ export default function InvoiceForm() {
                 </div>
                 {/* Shareable Link UI - shown directly under the three buttons */}
                 {shareableLink && (
-                  <div className="mt-2 p-2 bg-gray-50  w-full border border-gray-200 flex flex-col gap-2">
-                    <p className="text-xs text-gray-600">Shareable Invoice Link:</p>
+                  <div className="mt-2 p-2 bg-gray-50   w-full border border-gray-200 flex flex-col gap-2">
+                    <p className="text-sm text-gray-600 font-onest font-medium">Shareable Invoice Link:</p>
                     <input
                       type="text"
                       value={shareableLink}
                       readOnly
-                      className="w-full p-1 border rounded text-xs font-extralight font-onest bg-white"
+                      className="w-full p-1 border rounded text-sm font-normal font-onest bg-white"
                     />
                     <Button
                       variant="outline"
@@ -1386,7 +1386,7 @@ export default function InvoiceForm() {
                               />
                             </div>
                             <div>
-                              <Label htmlFor={`item-price-${index}`} className="text-sm font-normal">Price</Label>
+                              <Label htmlFor={`item-price-${index}`} className="text-sm font-normal">Unit Price</Label>
                               <Input
                                 id={`item-price-${index}`}
                                 type="number"

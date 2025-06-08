@@ -149,7 +149,7 @@ function InvoiceProgressBar({ sendStatus, paidStatus }: { sendStatus?: string, p
     { label: 'Paid', done: paidStatus === 'Paid' },
   ];
   return (
-    <div className="w-full flex flex-col items-center my-6">
+    <div className="w-full flex flex-col items-center my-6 mb-8">
       <div className="flex flex-row items-center justify-center gap-0 w-full max-w-2xl">
         {steps.map((step, idx) => (
           <div key={step.label} className="flex flex-col items-center flex-1 relative">

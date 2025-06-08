@@ -166,7 +166,7 @@ export default function PrintInvoice() {
 
   return (
     <>
-      <div className="bg-white">
+      <div className="bg-white font-onest">
         {/* Print-friendly header - only visible when not printing */}
         <div className="print:hidden bg-white p-4">
           <div className="max-w-3xl mx-auto flex justify-between items-center">

@@ -149,24 +149,25 @@ function InvoiceProgressBar({ sendStatus, paidStatus }: { sendStatus?: string, p
     { label: 'Paid', done: paidStatus === 'Paid' },
   ];
   return (
-    <div className="w-full flex flex-col items-center my-8">
+    <div className="w-full flex flex-col items-center my-6">
       <div className="flex flex-row items-center justify-center gap-0 w-full max-w-2xl">
         {steps.map((step, idx) => (
-          <div key={step.label} className="flex flex-col items-center flex-1">
-            <div className={`rounded-full w-14 h-14 flex items-center justify-center border-4 text-lg font-bold ${step.done ? 'bg-green-100 border-green-600' : 'bg-white border-gray-300'}`}
+          <div key={step.label} className="flex flex-col items-center flex-1 relative">
+            <div className={`rounded-full w-8 h-8 flex items-center justify-center border-2 text-base font-bold z-10 ${step.done ? 'bg-green-100 border-green-600' : 'bg-white border-gray-300'}`}
               >
               {step.done ? (
-                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                  <circle cx="18" cy="18" r="18" fill="#22c55e" />
-                  <path d="M11 19.5l5 5 9-9" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="10" r="10" fill="#22c55e" />
+                  <path d="M6 10.5l3 3 5-5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               ) : (
-                <span className="w-5 h-5 rounded-full bg-gray-300 block"></span>
+                <span className="w-3 h-3 rounded-full bg-gray-300 block"></span>
               )}
             </div>
-            <span className={`text-base mt-3 mb-0 text-center ${step.done ? 'text-green-700 font-semibold' : 'text-gray-400'}`}>{step.label}</span>
+            <span className={`text-xs mt-2 text-center ${step.done ? 'text-green-700 font-semibold' : 'text-gray-400'}`}>{step.label}</span>
+            {/* Horizontal line between steps */}
             {idx < steps.length - 1 && (
-              <div className={`h-1 w-16 md:w-24 ${step.done ? 'bg-green-400' : 'bg-gray-200'}`}></div>
+              <div className={`absolute top-1/2 right-0 left-full h-0.5 w-full md:w-20 ${step.done ? 'bg-green-400' : 'bg-gray-200'}`} style={{ zIndex: 1, left: '100%', right: undefined, width: '40px', marginLeft: '-4px' }}></div>
             )}
           </div>
         ))}

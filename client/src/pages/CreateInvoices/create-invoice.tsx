@@ -92,41 +92,42 @@ const printStyles = `
   }
 `;
 
-interface InvoiceItem {
-  name: string
-  description: string
-  quantity: number
-  price: string | number
-  discount: {
-    type: 'percentage' | 'fixed'
-    value: string | number
-  }
-  tax: {
-    type: 'percentage' | 'fixed'
-    value: string | number
-  }
-}
-
-interface InvoiceData {
+export interface InvoiceData {
   invoiceNumber: string
   date: string
   dueDate: string
   customer: Customer
+
   items: InvoiceItem[]
   amount: number
   notes: string
-  template: 'classic'
-  status: 'Pending' | 'Paid'
-  color: string
+  template: "classic"
+  status?: "Paid" | "Pending"
+  color?: string
   logo?: string
+}
+
+export interface InvoiceItem {
+  name: string
+  description: string
+  quantity: number
+  price: number | string
+  discount: {
+    type: "percentage" | "fixed"
+    value: number | string
+  }
+  tax: {
+    type: "percentage" | "fixed"
+    value: number | string
+  }
 }
 
 export interface Customer {
   id?: string
   name: string
   email: string
-  phone: string
   address: string
+  phone?: string
   company?: string
 }
 
@@ -207,7 +208,6 @@ export default function InvoiceForm() {
         customer: {
           name: "",
           email: "",
-          phone: "",
           address: "",
         },
         items: [{
@@ -226,9 +226,9 @@ export default function InvoiceForm() {
         }],
         amount: 0,
         notes: "",
-        template: 'classic',
-        status: 'Pending',
-        color: '#166534'
+        template: "classic",
+        status: "Pending",
+        color: "#166534"
       })
     }
     return () => {
@@ -238,35 +238,67 @@ export default function InvoiceForm() {
 
   const [isFormExpanded, setIsFormExpanded] = useState(!location.state?.hideForm)
   const [invoiceData, setInvoiceData] = useState<InvoiceData>(() => {
-    if (location.state?.invoice) {
+    if (invoiceToEdit) {
       return {
-        ...location.state.invoice,
-        customer: {
-          name: location.state.invoice.customer.name || '',
-          email: location.state.invoice.customer.email || '',
-          phone: location.state.invoice.customer.phone || '',
-          address: location.state.invoice.customer.address || ''
+        invoiceNumber: invoiceToEdit.invoiceNumber || invoiceToEdit.id,
+        date: invoiceToEdit.date || new Date().toISOString().split("T")[0],
+        dueDate: invoiceToEdit.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+        customer: invoiceToEdit.customer || {
+          name: "",
+          email: "",
+          address: "",
         },
-        template: 'classic',
-        status: location.state.invoice.status || 'Pending'
+        items: invoiceToEdit.items || [{
+          name: "",
+          description: "",
+          quantity: 1,
+          price: "",
+          discount: {
+            type: "percentage",
+            value: ""
+          },
+          tax: {
+            type: "percentage",
+            value: ""
+          }
+        }],
+        amount: invoiceToEdit.amount || 0,
+        notes: invoiceToEdit.notes || "",
+        template: invoiceToEdit.template || "classic",
+        status: invoiceToEdit.status || "Pending",
+        color: (typeof invoiceToEdit.color === "string" && invoiceToEdit.color.trim() !== "") ? invoiceToEdit.color : "#166534",
+        logo: invoiceToEdit.logo || ""
       }
-    }
-    return {
-      invoiceNumber: '',
-      date: new Date().toISOString().split('T')[0],
-      dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      customer: {
-        name: '',
-        email: '',
-        phone: '',
-        address: ''
-      },
-      items: [],
-      amount: 0,
-      notes: '',
-      template: 'classic',
-      status: 'Pending',
-      color: '#166534'
+    } else {
+      return {
+        invoiceNumber: `INV-${new Date().getFullYear()}-${String(Math.floor(1000 + Math.random() * 9000))}`,
+        date: new Date().toISOString().split("T")[0],
+        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+        customer: {
+          name: "",
+          email: "",
+          address: "",
+        },
+        items: [{
+          name: "",
+          description: "",
+          quantity: 1,
+          price: "",
+          discount: {
+            type: "percentage",
+            value: ""
+          },
+          tax: {
+            type: "percentage",
+            value: ""
+          }
+        }],
+        amount: 0,
+        notes: "",
+        template: "classic",
+        status: "Pending",
+        color: "#166534"
+      }
     }
   })
 
@@ -330,34 +362,42 @@ export default function InvoiceForm() {
     }
   }
   // Used to calculate total
-  const calculateTotal = (items: InvoiceItem[]): number => {
-    return items.reduce((total: number, item: InvoiceItem) => {
-      const price = typeof item.price === 'string' ? parseFloat(item.price) || 0 : item.price
-      const quantity = item.quantity || 0
-      const discountValue = typeof item.discount.value === 'string' ? parseFloat(item.discount.value) || 0 : item.discount.value
-      const taxValue = typeof item.tax.value === 'string' ? parseFloat(item.tax.value) || 0 : item.tax.value
-      
-      let itemTotal = price * quantity
-      
-      if (item.discount.type === 'percentage') {
-        itemTotal -= (itemTotal * discountValue) / 100
-      } else {
-        itemTotal -= discountValue
+  const calculateTotal = () => {
+    return invoiceData.items.reduce((total, item) => {
+      const price = item.price === "" ? 0 : Number(item.price)
+      const itemTotal = item.quantity * price
+
+      // Calculate item discount
+      let itemDiscount = 0
+      if (item.discount.value && item.discount.value !== "") {
+        if (item.discount.type === "percentage") {
+          itemDiscount = (itemTotal * Number(item.discount.value)) / 100
+        } else {
+          itemDiscount = Math.min(itemTotal, Number(item.discount.value))
+        }
       }
-      
-      if (item.tax.type === 'percentage') {
-        itemTotal += (itemTotal * taxValue) / 100
-      } else {
-        itemTotal += taxValue
+
+      // Calculate item tax
+      let itemTax = 0
+      if (item.tax.value && item.tax.value !== "") {
+        const afterDiscount = itemTotal - itemDiscount
+        if (item.tax.type === "percentage") {
+          itemTax = (afterDiscount * Number(item.tax.value)) / 100
+        } else {
+          itemTax = Number(item.tax.value)
+        }
       }
-      
-      return total + itemTotal
+
+      return total + itemTotal - itemDiscount + itemTax
     }, 0)
   }
 
   // Fix the formatCurrency function - it has typos in the property names
   function formatCurrency(amount: number): string {
-    return amount.toFixed(2)
+    return amount.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
   }
 
   const [isLoading, setIsLoading] = useState(true)
@@ -574,8 +614,8 @@ export default function InvoiceForm() {
       }
 
       // Calculate totals for the invoice
-      const subtotal = calculateTotal(invoiceData.items)
-      const total = calculateTotal(invoiceData.items)
+      const subtotal = calculateTotal()
+      const total = calculateTotal()
 
       // Get the original invoice ID
       const originalInvoiceId = invoiceToEdit.id || invoiceToEdit.invoiceNumber
@@ -707,8 +747,8 @@ export default function InvoiceForm() {
       }
 
       // Calculate totals for the invoice
-      const subtotal = calculateTotal(invoiceData.items)
-      const total = calculateTotal(invoiceData.items)
+      const subtotal = calculateTotal()
+      const total = calculateTotal()
 
       // Prepare the save request
       const saveResponse = await axios.post(
@@ -802,7 +842,7 @@ export default function InvoiceForm() {
       }
 
       // Calculate totals for the invoice
-      const total = calculateTotal(invoiceData.items)
+      const total = calculateTotal()
 
       // Prepare the save request
       const saveResponse = await axios.post(
@@ -877,29 +917,46 @@ export default function InvoiceForm() {
 
       // Enhanced parser that handles all possible field states
       interface FinancialField {
-        type: 'percentage' | 'fixed'
-        value: string | number
+        type: "percentage" | "fixed"
+        value: number | string
       }
 
       const parseFinancialField = (
         field: string | FinancialField | null | undefined,
         fieldName: string,
-        defaultValue: FinancialField
+        defaultValue: FinancialField,
       ): FinancialField => {
-        if (!field) return defaultValue
+        // Handle completely missing field
+        if (field === undefined || field === null) {
+          console.warn(`${fieldName} is undefined/null, using defaults`)
+          return defaultValue
+        }
 
-        if (typeof field === 'string') {
-          return {
-            type: 'percentage',
-            value: field
+        // Handle string input (could be JSON string)
+        if (typeof field === "string") {
+          try {
+            const parsed = field.trim() ? JSON.parse(field) : defaultValue
+            if (parsed && typeof parsed === "object") {
+              return {
+                type: ["percentage", "fixed"].includes(parsed.type)
+                  ? (parsed.type as "percentage" | "fixed")
+                  : defaultValue.type,
+                value:
+                  parsed.value === 0 ? "" : !isNaN(Number(parsed.value)) ? Number(parsed.value) : defaultValue.value,
+              }
+            }
+          } catch (e) {
+            console.error(`Failed to parse ${fieldName}:`, field)
           }
         }
 
-        if (typeof field === 'object' && field !== null) {
-          const typedField = field as { type?: 'percentage' | 'fixed', value?: string | number }
+        // Handle direct object input
+        if (typeof field === "object" && field !== null) {
           return {
-            type: typedField.type || defaultValue.type,
-            value: typedField.value !== undefined ? typedField.value : defaultValue.value
+            type: ["percentage", "fixed"].includes(field.type)
+              ? (field.type as "percentage" | "fixed")
+              : defaultValue.type,
+            value: field.value === 0 ? "" : !isNaN(Number(field.value)) ? Number(field.value) : defaultValue.value,
           }
         }
 
@@ -975,7 +1032,7 @@ export default function InvoiceForm() {
                   <div className="text-sm text-gray-500 font-normal mb-1">Billed To:</div>
                   <div className="text-base font-normal text-gray-800 mb-2">{invoiceData.customer.name || 'Customer Name'}</div>
                   <div className="text-sm text-gray-500 font-normal mb-1">Amount Due:</div>
-                  <div className="text-3xl font-cal font-normal text-green-800 mb-6">${formatCurrency(invoiceData.amount || calculateTotal(invoiceData.items))}</div>
+                  <div className="text-3xl font-cal font-normal text-green-800 mb-6">${formatCurrency(invoiceData.amount || calculateTotal())}</div>
                 </div>
 
                 <div className="flex max-w-full justify-center mb-4">
@@ -1219,7 +1276,6 @@ export default function InvoiceForm() {
                                           updateInvoiceData("customer", {
                                             name: customer.name,
                                             email: customer.email,
-                                            phone: customer.phone,
                                             address: customer.address
                                           })
                                           setShowSuggestions(false)
@@ -1245,29 +1301,16 @@ export default function InvoiceForm() {
                           />
                         </div>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                        <div>
-                          <Label htmlFor="customerPhone" className="text-sm font-normal">Phone</Label>
-                          <Input
-                            id="customerPhone"
-                            type="tel"
-                            value={invoiceData.customer.phone}
-                            onChange={(e) => updateInvoiceData("customer.phone", e.target.value)}
-                            placeholder="+1 (555) 000-0000"
-                            className="mt-1.5 font-inter font-light"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="customerAddress" className="text-sm font-normal">Address</Label>
-                          <Textarea
-                            id="customerAddress"
-                            value={invoiceData.customer.address}
-                            onChange={(e) => updateInvoiceData("customer.address", e.target.value)}
-                            placeholder="Customer address"
-                            rows={2}
-                            className="mt-1.5 font-inter font-light"
-                          />
-                        </div>
+                      <div className="mt-4">
+                        <Label htmlFor="customerAddress" className="text-sm font-normal">Address</Label>
+                        <Textarea
+                          id="customerAddress"
+                          value={invoiceData.customer.address}
+                          onChange={(e) => updateInvoiceData("customer.address", e.target.value)}
+                          placeholder="Customer address"
+                          rows={2}
+                          className="mt-1.5  font-inter font-light"
+                        />
                       </div>
                     </div>
                   </CardContent>
@@ -1507,7 +1550,7 @@ export default function InvoiceForm() {
         businessEmail={businessData.email}
         invoiceNumber={invoiceData.invoiceNumber}
         customerName={invoiceData.customer.name}
-        amount={invoiceData.amount || calculateTotal(invoiceData.items)}
+        amount={invoiceData.amount || calculateTotal()}
         dueDate={invoiceData.dueDate}
         invoiceDate={invoiceData.date}
         companyName={businessData.companyName}

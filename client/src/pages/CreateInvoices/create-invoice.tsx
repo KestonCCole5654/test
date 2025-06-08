@@ -104,6 +104,7 @@ export interface InvoiceData {
   status?: "Paid" | "Pending"
   color?: string
   logo?: string
+  send_status?: string
 }
 
 export interface InvoiceItem {
@@ -136,6 +137,40 @@ export interface BusinessData {
   address: string
   email: string
   logo?: string
+}
+
+// Progress bar component for invoice status
+function InvoiceProgressBar({ sendStatus, paidStatus }: { sendStatus?: string, paidStatus?: string }) {
+  // Step completion logic
+  const steps = [
+    { label: 'Invoice Created', done: true },
+    { label: 'Invoice Email Sent', done: sendStatus === 'yes' },
+    { label: 'Invoice Email Opened', done: false },
+    { label: 'Paid', done: paidStatus === 'Paid' },
+  ];
+  return (
+    <div className="flex flex-col items-center mr-6 min-h-[220px]">
+      {steps.map((step, idx) => (
+        <div key={step.label} className="flex flex-col items-center">
+          <div className={`rounded-full w-7 h-7 flex items-center justify-center border-2 ${step.done ? 'bg-green-100 border-green-600' : 'bg-white border-gray-300'}`}
+            >
+            {step.done ? (
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <circle cx="10" cy="10" r="10" fill="#22c55e" />
+                <path d="M6 10.5l3 3 5-5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            ) : (
+              <span className="w-3 h-3 rounded-full bg-gray-300 block"></span>
+            )}
+          </div>
+          <span className={`text-xs mt-2 mb-4 text-center ${step.done ? 'text-green-700 font-semibold' : 'text-gray-400'}`}>{step.label}</span>
+          {idx < steps.length - 1 && (
+            <div className={`w-1 h-8 ${step.done ? 'bg-green-400' : 'bg-gray-200'}`}></div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export default function InvoiceForm() {
@@ -266,7 +301,8 @@ export default function InvoiceForm() {
         template: invoiceToEdit.template || "classic",
         status: invoiceToEdit.status || "Pending",
         color: (typeof invoiceToEdit.color === "string" && invoiceToEdit.color.trim() !== "") ? invoiceToEdit.color : "#166534",
-        logo: invoiceToEdit.logo || ""
+        logo: invoiceToEdit.logo || "",
+        send_status: invoiceToEdit.send_status || ""
       }
     } else {
       return {
@@ -967,7 +1003,8 @@ export default function InvoiceForm() {
         template: "classic" as const,
         status: invoiceToEdit.status === "Paid" ? "Paid" : "Pending",
         color: (typeof invoiceToEdit.color === "string" && invoiceToEdit.color.trim() !== "") ? invoiceToEdit.color : "#166534",
-        logo: invoiceToEdit.logo || ""
+        logo: invoiceToEdit.logo || "",
+        send_status: invoiceToEdit.send_status || ""
       }
 
       setInvoiceData(processedInvoiceData)
@@ -1004,8 +1041,9 @@ export default function InvoiceForm() {
           {/* Two-column layout for preview mode */}
           <div className="flex flex-col md:flex-row gap-8">
             {/* Left: Invoice Summary Card */}
-            <div className="md:w-80 w-full flex-shrink-0">
-              <div className="bg-white border border-gray-200 p-6 flex flex-col gap-6">
+            <div className="md:w-80 w-full flex-shrink-0 flex flex-row">
+              <InvoiceProgressBar sendStatus={invoiceToEdit?.send_status || invoiceData.send_status} paidStatus={invoiceToEdit?.status || invoiceData.status} />
+              <div className="bg-white border border-gray-200 p-6 flex flex-col gap-6 flex-1">
                 
                 <div>
                   <div className="text-sm text-gray-500 font-normal mb-1">Invoice #</div>

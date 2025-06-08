@@ -44,14 +44,20 @@ export default function EmailInvoice() {
     email: "",
     logo: "",
   });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchBusinessDetails = async () => {
       try {
+        setIsLoading(true);
         const { data: { session } } = await supabase.auth.getSession();
-        if (!session?.provider_token) return;
+        if (!session?.provider_token) {
+          throw new Error("Google authentication required");
+        }
         const sheetUrl = localStorage.getItem("defaultSheetUrl");
-        if (!sheetUrl) return;
+        if (!sheetUrl) {
+          throw new Error("No invoice spreadsheet selected");
+        }
         const response = await axios.get("https://sheetbills-server.vercel.app/api/business-details", {
           headers: {
             Authorization: `Bearer ${session.provider_token}`,
@@ -69,11 +75,17 @@ export default function EmailInvoice() {
           });
         }
       } catch (error) {
-        // fail silently
+        toast({
+          title: "Error",
+          description: "Failed to fetch business details from Google Sheet.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchBusinessDetails();
-  }, [supabase]);
+  }, [supabase, toast]);
 
   // Always call hooks first!
   const [emailData, setEmailData] = useState<EmailData>(() => {

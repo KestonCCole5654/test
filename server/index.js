@@ -199,6 +199,7 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
     'Due Date',
     'Customer Name',
     'Customer Email',
+    'Customer Phone',
     'Customer Address',
     'Items',
     'Amount',
@@ -216,7 +217,7 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
   try {
     const headerResp = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A1:R1`,
+      range: `${sheetName}!A1:S1`,
     });
     const currentHeaders = headerResp.data.values ? headerResp.data.values[0] : [];
     // If headers are missing or don't match, update them
@@ -234,7 +235,7 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
     if (needsUpdate) {
       await sheets.spreadsheets.values.update({
         spreadsheetId,
-        range: `${sheetName}!A1:R1`,
+        range: `${sheetName}!A1:S1`,
         valueInputOption: 'RAW',
         resource: { values: [correctHeaders] },
       });
@@ -243,7 +244,7 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
     // If header row doesn't exist, just set it
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: `${sheetName}!A1:R1`,
+      range: `${sheetName}!A1:S1`,
       valueInputOption: 'RAW',
       resource: { values: [correctHeaders] },
     });
@@ -318,15 +319,16 @@ async function getDefaultSheetId(accessToken) {
       'Due Date',          // 2
       'Customer Name',     // 3
       'Customer Email',    // 4
-      'Customer Address',  // 5
-      'Items',             // 6
-      'Amount',            // 7
-      'Tax',               // 8
-      'Discount',          // 9
-      'Notes',             // 10
-      'Template',          // 11
-      'Status',            // 12
-      'Color'              // 13 (new last column)
+      'Customer Phone',    // 5
+      'Customer Address',  // 6
+      'Items',             // 7
+      'Amount',            // 8
+      'Tax',               // 9
+      'Discount',          // 10
+      'Notes',             // 11
+      'Template',          // 12
+      'Status',            // 13
+      'Color'              // 14 (new last column)
     ];
 
     await sheets.spreadsheets.values.update({
@@ -490,7 +492,7 @@ app.post('/api/create-sheet', async (req, res) => {
     // Prepare invoice headers
     const headers = [
       'Invoice ID', 'Invoice Date', 'Due Date', 'Customer Name',
-      'Customer Email', 'Customer Address', 'Items', 'Amount',
+      'Customer Email', 'Customer Phone', 'Customer Address', 'Items', 'Amount',
       'Tax', 'Discount', 'Notes', 'Template', 'Status',
       'Color'
     ];
@@ -819,7 +821,8 @@ app.get('/api/invoices/:invoiceId', async (req, res) => {
       customer: {
         name: row[3],
         email: row[4],
-        address: row[5],
+        phone: row[5],
+        address: row[6],
       },
       items,
       amount: parseFloat(row[7]) || 0,
@@ -970,29 +973,31 @@ app.get('/api/sheets/data', async (req, res) => {
             customer = {
               name: row[3]?.toString() || '',
               email: row[4]?.toString() || '',
-              address: row[5]?.toString() || ''
+              phone: row[5]?.toString() || '',
+              address: row[6]?.toString() || ''
             };
           }
         } catch {
           customer = {
             name: row[3]?.toString() || '',
             email: row[4]?.toString() || '',
-            address: row[5]?.toString() || ''
+            phone: row[5]?.toString() || '',
+            address: row[6]?.toString() || ''
           };
         }
 
         // Parse items
         let items = [];
         try {
-          items = row[6] ? JSON.parse(row[6]) : [];
+          items = row[7] ? JSON.parse(row[7]) : [];
           if (!Array.isArray(items)) items = [];
         } catch {
           items = [];
         }
 
         // Financial calculations
-        const tax = parseFinancialField(row[8]);
-        const discount = parseFinancialField(row[9], { type: "fixed", value: 0 });
+        const tax = parseFinancialField(row[9]);
+        const discount = parseFinancialField(row[10], { type: "fixed", value: 0 });
         
         // Calculate totals using helper functions
         const subtotal = calculateSubtotal(items);
@@ -1010,10 +1015,10 @@ app.get('/api/sheets/data', async (req, res) => {
           amount: parseFloat(amount),
           tax,
           discount,
-          notes: row[10]?.toString() || '',
-          template: ['classic', 'modern'].includes(row[11]) ? row[11] : 'classic',
-          status: ['Pending', 'Paid', 'Overdue'].includes(row[12]) ? row[12] : 'Pending',
-          color: (row[13] && row[13].trim() !== "") ? row[13] : '#166534' // Add color field
+          notes: row[11]?.toString() || '',
+          template: ['classic', 'modern'].includes(row[12]) ? row[12] : 'classic',
+          status: ['Pending', 'Paid', 'Overdue'].includes(row[13]) ? row[13] : 'Pending',
+          color: (row[14] && row[14].trim() !== "") ? row[14] : '#166534' // Add color field
         };
       } catch (error) {
         console.error(`Error processing row ${index + 1}:`, error);
@@ -1160,6 +1165,7 @@ app.post('/api/saveInvoice', async (req, res) => {
         invoiceData.dueDate,
         invoiceData.customer.name,
         invoiceData.customer.email,
+        invoiceData.customer.phone,
         invoiceData.customer.address,
         JSON.stringify(invoiceData.items),
         saveTotal,
@@ -1613,6 +1619,7 @@ app.post('/api/update-invoice', async (req, res) => {
       invoiceData.dueDate,
       invoiceData.customer.name,
       invoiceData.customer.email,
+      invoiceData.customer.phone,
       invoiceData.customer.address,
       JSON.stringify(invoiceData.items),
       invoiceTotal,
@@ -2107,7 +2114,8 @@ app.get('/api/invoices/shared/:token', async (req, res) => {
       customer: {
         name: invoiceRow[3],
         email: invoiceRow[4],
-        address: invoiceRow[5],
+        phone: invoiceRow[5],
+        address: invoiceRow[6],
       },
       items,
       amount: parseFloat(invoiceRow[7]) || 0,
@@ -2274,7 +2282,7 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
     // Add headers to 'SheetBills Invoices' tab
     const invoiceHeaders = [
       'Invoice ID', 'Invoice Date', 'Due Date', 'Customer Name',
-      'Customer Email', 'Customer Address', 'Items', 'Amount',
+      'Customer Email', 'Customer Phone', 'Customer Address', 'Items', 'Amount',
       'Tax', 'Discount', 'Notes', 'Template', 'Status', 'Color'
     ];
     await sheets.spreadsheets.values.update({

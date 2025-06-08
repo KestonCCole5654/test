@@ -457,7 +457,7 @@ export default function SettingsPage() {
             logo will be automatically included in every invoice you create.
           </p>
           {logoUrl && !showLogoUpload ? (
-            <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-col  items-center gap-4">
               <img
                 src={logoUrl}
                 alt="Company Logo"
@@ -474,7 +474,7 @@ export default function SettingsPage() {
               </div>
             </div>
           ) : (
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col font-onest items-center gap-2">
               <LogoUpload
                 onLogoUploaded={(url) => {
                   setLogoUrl(url);

@@ -285,7 +285,7 @@ export default function EmailInvoice() {
           </div>
 
           <div className="text-sm text-center font-onest text-gray-400 mt-5 mb-10">
-            Powered by  <span className="font-bold font-green-800">SheetBills</span> @sheetbills.com
+            Powered by  <span className="font-bold text-green-800">SheetBills</span> @sheetbills.com
           </div>
 
         </div>

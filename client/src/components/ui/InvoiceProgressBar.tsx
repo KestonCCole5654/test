@@ -44,7 +44,7 @@ const InvoiceProgressBar: React.FC<InvoiceProgressBarProps> = ({ sendStatus, pai
 
           {/* Active progress line */}
           <div
-            className="absolute top-5 left-0 h-0.5 bg-gradient-to-r from-emerald-500 to-emerald-400 z-10 transition-all duration-700 ease-out"
+            className="absolute top-5 left-0 h-0.5 bg-gradient-to-r  text-green-900 z-10 transition-all duration-700 ease-out"
             style={{"width": `${(steps.filter(step => step.done).length - 1) / (steps.length - 1) * 100}%`}}
           ></div>
 
@@ -61,10 +61,10 @@ const InvoiceProgressBar: React.FC<InvoiceProgressBarProps> = ({ sendStatus, pai
                   <div className={`
                     relative flex items-center justify-center w-10 h-10 rounded-full border-3 transition-all duration-300 transform
                     ${isCompleted
-                      ? 'bg-emerald-500 border-emerald-500 shadow-lg shadow-emerald-200 scale-110'
+                      ? 'bg-green-800 scale-110'
                       : isNext
-                        ? 'bg-white border-emerald-400 shadow-md ring-4 ring-emerald-100 animate-pulse'
-                        : 'bg-white border-gray-300 shadow-sm'
+                        ? 'bg-white border-green-800 shadow-xs'
+                        : 'bg-white border-gray-300 shadow-xs'
                     }
                     group-hover:scale-105 group-hover:shadow-lg
                   `}>
@@ -73,13 +73,13 @@ const InvoiceProgressBar: React.FC<InvoiceProgressBarProps> = ({ sendStatus, pai
                     ) : (
                       <StepIcon className={`
                         w-4 h-4 transition-colors duration-300
-                        ${isNext ? 'text-emerald-600' : 'text-gray-400'}
+                        ${isNext ? 'text-green-800' : 'text-gray-400'}
                       `} />
                     )}
 
                     {/* Animated ring for next step */}
                     {isNext && (
-                      <div className="absolute inset-0 border-2 border-emerald-300 rounded-full animate-ping opacity-30"></div>
+                      <div className="absolute inset-0 border-2 border-green-800 rounded-full  opacity-30"></div>
                     )}
                   </div>
 
@@ -88,9 +88,9 @@ const InvoiceProgressBar: React.FC<InvoiceProgressBarProps> = ({ sendStatus, pai
                     <h3 className={`
                       text-sm font-semibold transition-colors duration-300 leading-tight
                       ${isCompleted
-                        ? 'text-emerald-700'
+                        ? 'text-green-800'
                         : isNext
-                          ? 'text-emerald-600'
+                          ? 'text-green-800'
                           : 'text-gray-500'
                       }
                     `}>
@@ -106,7 +106,7 @@ const InvoiceProgressBar: React.FC<InvoiceProgressBarProps> = ({ sendStatus, pai
                   {/* Status indicator */}
                   <div className="mt-2">
                     {isCompleted && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 animate-fade-in">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium  text-green-900 animate-fade-in">
                         Complete
                       </span>
                     )}
@@ -126,7 +126,7 @@ const InvoiceProgressBar: React.FC<InvoiceProgressBarProps> = ({ sendStatus, pai
         <div className="mt-4 text-center">
           <div className="inline-flex items-center space-x-4 px-6 py-3 bg-gray-50 rounded-full">
             <div className="flex items-center space-x-2">
-              <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full"></div>
+              <div className="w-2.5 h-2.5 bg-green-900 rounded-full"></div>
               <span className="text-xs text-gray-600">
                 {steps.filter(step => step.done).length} of {steps.length} steps completed
               </span>

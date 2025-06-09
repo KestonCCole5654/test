@@ -134,7 +134,7 @@ const HeroSection = () => {
             onClick={handleGoogleLogin}
             loading={loading}
             disabled={loading}
-            text="Continue with Google"
+            text="Connect SheetsBills"
           />
         </div>
 

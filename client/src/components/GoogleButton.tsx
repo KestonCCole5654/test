@@ -14,7 +14,7 @@ const GoogleButton: React.FC<GoogleButtonProps> = ({
   onClick,
   loading = false,
   disabled = false,
-  text = "Continue with Google",
+  text = "Connect SheetsBills",
   className = "",
 }) => {
   return (
@@ -35,8 +35,8 @@ const GoogleButton: React.FC<GoogleButtonProps> = ({
       `}
     >
       {/* Google Logo Container */}
-      <div className="flex items-center justify-center w-5 h-5 bg-white rounded-full mr-3 flex-shrink-0">
-        <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4">
+      <div className="flex items-center justify-center w-8 h-8 bg-white rounded-full mr-3 flex-shrink-0">
+        <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6">
           <path
             fill="#4285F4"
             d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18Z"

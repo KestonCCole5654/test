@@ -76,14 +76,14 @@ const Header = () => {
   }
 
   return (
-    <header className="sticky no-print font-onest top-0 z-50 bg-slate-800 shadow-xs">
+    <header className="sticky no-print font-onest top-0 z-50 bg-slate-900 shadow-xs">
       <div className="container max-w-8xl mx-auto sm:px-6">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/invoices" className="flex items-center space-x-2">
               <div className="h-9 w-9 rounded flex items-center justify-center">
-                <img src="/sheetbills-logo.svg" alt="SheetBills Logo" className="h-9 w-auto brightness-0 invert" />
+                <img src="/sheetbills-logo.svg" alt="SheetBills Logo" className="h-10 w-auto " />
               </div>
               <span className="text-lg font-semibold text-slate-200">SheetBills </span> 
             </Link>

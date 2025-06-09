@@ -55,6 +55,21 @@ const HeroSection = () => {
         </p>
         <div className="flex justify-center mb-10">
           <ul className="hidden font-sans font-medium  text-md md:block text-center text-[#5C5B61] leading-relaxed space-y-1 md:-mt-3">
+          <li className="flex items-center justify-center lg:justify-start gap-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="w-[20px] h-[20px] text-green-800"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+              Ditch formulas & templates
+            </li>
             <li className="flex  items-center justify-center lg:justify-start gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -85,21 +100,7 @@ const HeroSection = () => {
               </svg>
               Smart syncing with Google Drive
             </li>
-            <li className="flex items-center justify-center lg:justify-start gap-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className="w-[20px] h-[20px] text-green-800"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
-                  clip-rule="evenodd"
-                ></path>
-              </svg>
-              Ditch formulas & templates
-            </li>
+          
           </ul>
         </div>
         <Button

@@ -62,8 +62,8 @@ const IntegrationBadge = () => {
 
           {/* Text section with better typography */}
           <div className="flex flex-col items-start">
-            <span className="text-gray-900 font-bold text-lg leading-tight">3+ Integrations</span>
-            <span className="text-gray-500 font-medium text-sm">Built for Google Sheets</span>
+            <span className="text-gray-900 font-bold text-sm md:text-lg leading-tight">3+ Integrations</span>
+            <span className="text-gray-500 font-medium md:text-sm text-xs ">Built for Google Sheets</span>
           </div>
         </div>
 

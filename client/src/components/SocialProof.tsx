@@ -20,7 +20,7 @@ const SocialProof: React.FC<SocialProofProps> = () => {
             />
             {index === 3 && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
-                <span className="text-white text-xs font-medium">+246</span>
+                <span className="text-white text-xs font-medium">+46</span>
               </div>
             )}
           </div>
@@ -35,7 +35,7 @@ const SocialProof: React.FC<SocialProofProps> = () => {
           ))}
         </div>
         <p className="text-gray-600 text-sm">
-          Join <span className="font-semibold text-gray-900">250+</span> satisfied users
+          Join <span className="font-semibold text-gray-900">46+</span> satisfied users
         </p>
       </div>
     </div>

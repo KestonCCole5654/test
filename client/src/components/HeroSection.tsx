@@ -70,7 +70,7 @@ const HeroSection = () => {
                   clip-rule="evenodd"
                 ></path>
               </svg>
-              No more Scattered Files/Sheets
+              Centralized invoice management
             </li>
             <li className="flex items-center justify-center lg:justify-start gap-2">
               <svg
@@ -85,7 +85,7 @@ const HeroSection = () => {
                   clip-rule="evenodd"
                 ></path>
               </svg>
-              Google Sheets integration
+              Smart syncing with Google Drive
             </li>
             <li className="flex items-center justify-center lg:justify-start gap-2">
               <svg

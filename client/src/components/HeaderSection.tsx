@@ -23,7 +23,7 @@ const HeaderSection = () => {
               alt="Sheetbills"
               src="/SheetBills-logo.svg"
             />
-            <span className="font-bold text-green-800 text-lg">SheetBills</span>
+            <span className="font-bold text-green-800 text-xl">SheetBills</span>
           </div>
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">

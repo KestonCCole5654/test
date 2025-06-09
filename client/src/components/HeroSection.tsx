@@ -49,6 +49,7 @@ const HeroSection = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = React.useState(false);
 
+  
   const handleGoogleLogin = async () => {
     setLoading(true);
     navigate("/login");
@@ -87,15 +88,12 @@ const HeroSection = () => {
               ))}
             </div>
 
-            {/* Plus indicator */}
-            <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-gray-100 to-gray-200  text-gray-600 font-bold text-sm ml-2">
-              +
-            </div>
+        
           </div>
 
           {/* Text section with better typography */}
           <div className="flex flex-col items-start">
-            <span className="text-gray-900 font-bold text-lg leading-tight">4+ Integrations</span>
+            <span className="text-gray-900 font-bold text-lg leading-tight">3+ Integrations</span>
             <span className="text-gray-500 font-medium text-sm">Built for Google Sheets</span>
           </div>
         </div>

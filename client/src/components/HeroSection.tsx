@@ -126,7 +126,7 @@ const HeroSection = () => {
         <Button
                 onClick={handleGoogleLogin}
                 disabled={loading}
-                className="h-12 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 shadow-sm hover:shadow transition-all duration-200 rounded-lg flex items-center justify-center gap-3"
+                className="h-12  bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 shadow-sm hover:shadow transition-all duration-200 rounded-lg flex items-center justify-center gap-3"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24 ">
                   <path
@@ -147,7 +147,7 @@ const HeroSection = () => {
                   />
                 </svg>
                 <span className="font-normal">Continue with Google</span>
-              </Button>
+        </Button>
 
         </div>
 

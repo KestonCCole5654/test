@@ -124,8 +124,8 @@ export default function LoginPage() {
         <div className="max-w-md w-full mx-auto ">
           <div className="flex flex-col text-center justify-center items-center gap-3 ">
             <div className="h-20 w-20 p-2 rounded-sm space-x-2 flex items-center justify-center">
-              <img src="/sheetbills-logo.svg" alt="SheetBills Logo" className="h-12 w-auto" />
-              <span className="text-xl font-medium text-green-800">SheetBills</span>
+              <img src="/SheetBills-logo.svg" alt="SheetBills Logo" className="h-20 w-auto" />
+              <span className="text-2xl font-semibold text-green-800">SheetBills</span>
             </div>
           </div>
           
@@ -136,31 +136,62 @@ export default function LoginPage() {
 
               <div className="flex flex-col mb-8">
 
-                <p className="text-gray-600 font-normal text-left text-lg">
+                <p className="text-gray-600 font-normal text-center text-lg mb-5">
                   Transform Google Sheets into your invoice management system
                 </p>
               </div>
 
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center gap-3 text-gray-600">
-                  <svg className="h-5 w-5 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-sm">No more scattered files</span>
-                </div>
-                <div className="flex items-center gap-3 text-gray-600">
-                  <svg className="h-5 w-5 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-sm">No more formulas</span>
-                </div>
-                <div className="flex items-center gap-3 text-gray-600">
-                  <svg className="h-5 w-5 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-sm">No more copying and pasting</span>
-                </div>
-              </div>
+              <div className="flex justify-center mb-10">
+          <ul className="hidden font-sans font-normal  text-md md:block text-center text-[#5C5B61] leading-relaxed space-y-1 md:-mt-3">
+          <li className="flex items-center justify-center lg:justify-start gap-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="w-[20px] h-[20px] text-green-800"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+              Ditch formulas & templates
+            </li>
+            <li className="flex  items-center justify-center lg:justify-start gap-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="w-[20px] h-[20px] text-green-800"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+              Centralized invoice management
+            </li>
+            <li className="flex items-center justify-center lg:justify-start gap-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="w-[20px] h-[20px] text-green-800"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+              Smart syncing with Google Drive
+            </li>
+          
+          </ul>
+        </div>
+        
 
               {error && (
                 <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100 flex items-center gap-2 mb-6">

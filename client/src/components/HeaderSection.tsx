@@ -19,11 +19,11 @@ const HeaderSection = () => {
           {/* Logo */}
           <div className="flex items-center gap-2">
             <img
-              className="h-14 w-auto"
+              className="h-12 md:h-14 w-auto"
               alt="Sheetbills"
               src="/SheetBills-logo.svg"
             />
-            <span className="font-bold text-green-800 text-xl">SheetBills</span>
+            <span className="font-semibold text-green-800 text-xl">SheetBills</span>
           </div>
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">

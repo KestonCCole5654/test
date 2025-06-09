@@ -14,27 +14,27 @@ const HeroSection = () => {
   return (
     <section className="px-4 pt-8 md:pt-20 pb-12 md:pb-20">
       <div className="max-w-7xl mx-auto text-center">
-        <div className="flex items-center justify-center mb-6">
-          <div className="flex items-center bg-white rounded-full shadow-sm px-4 py-2 space-x-3">
+        <div className="flex items-center justify-center mb-6 w-full">
+          <div className="flex items-center bg-white rounded-full shadow-sm px-4 py-2 space-x-3 mx-auto">
             <div className="flex -space-x-2">
               <img
-                src="/icons/gmail.svg"
+                src="https://cdn.brandfetch.io/google.com:gmail/icon"
                 alt="Gmail"
                 className="w-7 h-7 rounded-full border-2 border-white bg-white"
               />
               <img
-                src="/icons/calendar.svg"
+                src="https://cdn.brandfetch.io/google.com:calendar/icon"
                 alt="Calendar"
                 className="w-7 h-7 rounded-full border-2 border-white bg-white"
               />
               <img
-                src="/icons/drive.svg"
+                src="https://cdn.brandfetch.io/google.com:drive/icon"
                 alt="Drive"
                 className="w-7 h-7 rounded-full border-2 border-white bg-white"
               />
             </div>
-            <span className="text-[#2F303C] font-medium text-md whitespace-nowrap">
-              Recommended for Google Workspace
+            <span className="text-[#2F303C] font-medium text-md whitespace-nowrap text-center">
+              Recommended for Google Sheets/Workspace
             </span>
           </div>
         </div>
@@ -51,9 +51,7 @@ const HeroSection = () => {
           Say goodbye to clunky templates and confusing formulas. SheetBills is
           the easiest way to manage invoices—built right into Google Sheets and
           powered by smart integrations like Make, Google Drive, and WhatsApp.
-          Automatically send invoices via email or WhatsApp and enjoy a fast,
-          professional invoicing experience, all in one simple, user-friendly
-          tool.
+          
         </p>
         <div className="flex justify-center mb-10">
           <ul className="hidden font-sans font-medium  text-md md:block text-center text-[#5C5B61] leading-relaxed space-y-1 md:-mt-3">

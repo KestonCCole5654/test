@@ -45,6 +45,8 @@ export default function EmailInvoice() {
     logo: "",
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [shareableLink, setShareableLink] = useState<string>("");
+  const [isGeneratingLink, setIsGeneratingLink] = useState(false);
 
   useEffect(() => {
     const fetchBusinessDetails = async () => {
@@ -126,6 +128,56 @@ export default function EmailInvoice() {
   const dueDate = invoice.dueDate || "";
   const invoiceDate = invoice.date || "";
 
+  const generateShareableLink = async () => {
+    try {
+      setIsGeneratingLink(true);
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) {
+        throw new Error(sessionError.message);
+      }
+      if (!session) {
+        throw new Error("No active session");
+      }
+
+      const sheetUrl = localStorage.getItem("defaultSheetUrl");
+      if (!sheetUrl) {
+        throw new Error("No invoice spreadsheet selected");
+      }
+
+      const response = await fetch("https://sheetbills-server.vercel.app/api/invoices/shared/create-link", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.provider_token}`,
+          "X-Supabase-Token": session.access_token || "",
+        },
+        body: JSON.stringify({
+          invoiceId: invoiceId || invoice?.invoiceNumber || invoice?.id,
+          sheetUrl: sheetUrl,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to create shareable link");
+      }
+
+      const { shareUrl } = await response.json();
+      setShareableLink(shareUrl);
+      return shareUrl;
+    } catch (error) {
+      console.error("Error generating shareable link:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to generate shareable link",
+        variant: "destructive",
+      });
+      return null;
+    } finally {
+      setIsGeneratingLink(false);
+    }
+  };
+
   const handleSend = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -136,6 +188,13 @@ export default function EmailInvoice() {
       const sheetUrl = localStorage.getItem("defaultSheetUrl");
       if (!sheetUrl) {
         throw new Error("No invoice spreadsheet selected");
+      }
+
+      // Generate the shareable link before sending the email
+      const generatedLink = await generateShareableLink();
+      if (!generatedLink) {
+        // If link generation failed, stop the send process
+        return;
       }
 
       const response = await axios.post(
@@ -157,7 +216,8 @@ export default function EmailInvoice() {
           title: "Success",
           description: "Invoice email has been sent successfully.",
         });
-        navigate('/email-invoice/confirmation', { state: { invoice } });
+        // Pass the generated link to the confirmation page
+        navigate('/email-invoice/confirmation', { state: { invoice, shareableLink: generatedLink } });
       } else {
         throw new Error(response.data.error || "Failed to send invoice email");
       }
@@ -247,7 +307,7 @@ export default function EmailInvoice() {
                 <DropdownMenuItem onClick={() => toast({ title: 'WhatsApp', description: 'Pretend to send via WhatsApp!' })}>
                   Send via WhatsApp
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleSend}>
+                <DropdownMenuItem onClick={handleSend} disabled={isGeneratingLink}>
                   Send via Email
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => toast({ title: 'SMS', description: 'Pretend to send via SMS!' })}>
@@ -311,9 +371,10 @@ export default function EmailInvoice() {
               variant="default"
               className="bg-gray-800 text-white px-6 py-2 mb-1"
               size="sm"
-              onClick={() => window.print()}
+              onClick={() => shareableLink && window.open(shareableLink, '_blank')}
+              disabled={!shareableLink}
             >
-              View/Print Invoice 
+              View/Print Invoice
             </Button>
 
             <div className="text-xs text-gray-500 mb-1 mt-5">

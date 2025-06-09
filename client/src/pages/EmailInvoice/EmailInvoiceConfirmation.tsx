@@ -6,8 +6,10 @@ export default function EmailInvoiceConfirmation() {
   const location = useLocation();
   const navigate = useNavigate();
   const invoice = location.state?.invoice;
+  const shareableLink = location.state?.shareableLink;
 
   console.log('Invoice data in EmailInvoiceConfirmation:', invoice);
+  console.log('Shareable link in EmailInvoiceConfirmation:', shareableLink);
 
   function formatCurrency(amount: number): string {
     return amount?.toLocaleString("en-US", {
@@ -106,7 +108,7 @@ export default function EmailInvoiceConfirmation() {
 
               <div className="bg-gray-100 rounded-lg p-4 flex flex-col items-center mb-4">
                 <div className="text-xs text-gray-500 mt-5 mb-5">
-                  INVOICE # {invoice.invoiceNumber}
+                  INVOICE # {invoice.invoiceNumber || invoice.id || "—"}
                 </div>
 
                 <div className="text-3xl font-medium text-gray-800 mb-2">
@@ -117,7 +119,8 @@ export default function EmailInvoiceConfirmation() {
                   variant="default"
                   className="bg-gray-800 text-white px-6 py-2 mb-1"
                   size="sm"
-                  onClick={handleViewDownloadInvoice}
+                  onClick={() => shareableLink && window.open(shareableLink, '_blank')}
+                  disabled={!shareableLink}
                 >
                   View/Print Invoice
                 </Button>
@@ -127,6 +130,12 @@ export default function EmailInvoiceConfirmation() {
                 </div>
               </div>
 
+              <div className="text-sm whitespace-pre-line mb-2">
+                {invoice.message || `Dear ${invoice.customer?.name || "Customer"},
+
+                Thank you for doing business with us. Feel free to contact us if you have any questions.`}
+              </div>
+
               <div className="text-sm text-center font-onest text-gray-400 mt-5 mb-10">
                 Powered by <span className="font-bold text-green-800">SheetBills</span> @sheetbills.com
               </div>
@@ -134,61 +143,10 @@ export default function EmailInvoiceConfirmation() {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Status Card */}
-            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
-              <div className="flex items-center mb-4">
-                <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mr-3">
-                  <Mail className="w-5 h-5 text-emerald-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Email Status</h3>
-                  <p className="text-sm text-gray-600">Successfully delivered</p>
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Sent to:</span>
-                  <span className="font-medium text-gray-900">{invoice.customer?.email}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Sent at:</span>
-                  <span className="font-medium text-gray-900">Just now</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Quick Actions</h3>
-              <div className="space-y-3">
-                <button className="w-full text-left px-4 py-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors" onClick={() => navigate('/invoices', { state: { invoiceToEdit: invoice }})}>
-                  <div className="flex items-center">
-                    <FileText className="w-4 h-4 text-gray-500 mr-3" />
-                    <span className="text-sm font-medium text-gray-700">View Invoice Details</span>
-                  </div>
-                </button>
-                <button className="w-full text-left px-4 py-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center">
-                    <Mail className="w-4 h-4 text-gray-500 mr-3" />
-                    <span className="text-sm font-medium text-gray-700">Resend Email</span>
-                  </div>
-                </button>
-              </div>
-            </div>
-          </div>
+          <div className="space-y-6"></div>
         </div>
 
-        {/* Bottom Action */}
-        <div className="text-center mt-12">
-          <button 
-            onClick={handleBackToDashboard}
-            className="inline-flex items-center px-8 py-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-          >
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Return to Dashboard
-          </button>
-        </div>
+        
       </div>
     </div>
   );

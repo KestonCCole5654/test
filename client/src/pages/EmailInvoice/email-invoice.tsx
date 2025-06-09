@@ -15,7 +15,6 @@ import {
 } from "../../components/ui/dropdown-menu";
 import axios from "axios";
 import { useSupabaseClient } from '@supabase/auth-helpers-react';
-import { Calendar, Download } from "lucide-react";
 
 interface EmailData {
   to: string;
@@ -94,11 +93,14 @@ export default function EmailInvoice() {
     const companyName = invoice?.companyName || "";
     const customerEmail = invoice?.customer?.email || "";
     const customerName = invoice?.customer?.name || "";
+    const amount = invoice?.amount || 0;
+    const dueDate = invoice?.dueDate || "";
+    const invoiceDate = invoice?.date || "";
     return {
       to: customerEmail,
       from: businessEmail,
       subject: `Invoice #: ${invoiceId || invoice?.invoiceNumber || ""}`,
-      message: `Dear ${customerName},\n\nWe appreciate your business. Please find your invoice details here. Feel free to contact us if you have any questions.`,
+      message: `Dear ${customerName},\n\nThank you for doing business with us. Feel free to contact us if you have any questions.`,
     };
   });
 
@@ -259,84 +261,76 @@ export default function EmailInvoice() {
 
       {/* Right: Invoice Preview */}
       <div className="flex-1 min-w-0 pt-10">
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-          {/* Invoice Header */}
-          <div className="bg-gradient-to-r from-slate-900 to-slate-800 px-8 py-6 text-white">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                {(invoice.logo || invoice.companyLogo) && (
-                  <div className="w-12 h-12 bg-white rounded-lg p-2 flex items-center justify-center">
-                    <img
-                      src={invoice.logo || invoice.companyLogo}
-                      alt="Company Logo"
-                      className="h-8 w-auto object-contain"
-                    />
-                  </div>
-                )}
-                <div>
-                  <h2 className="text-xl font-bold">{invoice.companyName}</h2>
-                  <p className="text-slate-300 text-sm">{invoice.businessEmail}</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-sm text-slate-300">Invoice</div>
-                <div className="text-lg font-semibold">#{invoice.invoiceNumber}</div>
-              </div>
-            </div>
+        <div
+          className="bg-transparent w-full mx-auto overflow-y-auto"
+          style={{ maxHeight: "calc(100vh - 48px)" }}
+        >
+          {/* Company Logo */}
+          { (invoice.logo || invoice.companyLogo || businessData.logo) && (
+            <img
+              src={invoice.logo || invoice.companyLogo || businessData.logo}
+              alt="Company Logo"
+              className="h-12 w-auto object-contain mb-4"
+              style={{ background: 'none', boxShadow: 'none', border: 'none' }}
+            />
+          )}
+          <div className="text-xs text-gray-500 mb-2 border-b border-gray-200 pb-2">
+            From: {emailData.from}
+            <br />
+            To: {emailData.to}
           </div>
-
-          {/* Invoice Body */}
-          <div className="p-8">
-            {/* Recipient Info */}
-            <div className="mb-8">
-              <div className="text-sm text-gray-500 mb-2">Bill To:</div>
-              <div className="font-semibold text-gray-900">{invoice.customer?.name || 'Customer'}</div>
-              <div className="text-gray-600">{invoice.customer?.email}</div>
-            </div>
-
-            {/* Amount Section with Download Button */}
-            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-6 mb-8 border border-emerald-200">
-              <div className="text-center">
-                <div className="text-sm text-emerald-700 font-medium mb-2">Total Amount Due</div>
-                <div className="text-4xl font-bold text-emerald-800 mb-4">
-                  ${formatCurrency(amount)}
-                </div>
-                <div className="inline-flex items-center text-sm text-emerald-700 bg-emerald-200 px-3 py-1 rounded-full mb-4">
-                  <Calendar className="w-4 h-4 mr-1" />
-                  Due: {invoice.dueDate}
-                </div>
-                
-                {/* View/Download Invoice Button */}
-                <div className="mt-4">
-                  <button 
-                    onClick={() => window.print()}
-                    className="inline-flex items-center px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 font-medium"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    View/Download Invoice
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Notes */}
-            {invoice.notes && (
-              <div className="mb-6">
-                <div className="text-sm text-gray-500 mb-2">Notes:</div>
-                <div className="text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-lg">
-                  {invoice.notes}
-                </div>
-              </div>
+          {/* Logo and Company Name */}
+          <div className="flex items-center gap-3 mb-2">
+            {invoice.logo && (
+              <img
+                src={invoice.logo}
+                alt="Company Logo"
+                className="h-10 w-auto object-contain"
+                style={{ background: "none", boxShadow: "none" }}
+              />
             )}
-
-            {/* Footer */}
-            <div className="border-t border-gray-200 pt-6 text-center">
-              <div className="text-sm text-gray-500">
-                Powered by <span className="font-semibold text-emerald-700">SheetBills</span>
-              </div>
-              <div className="text-xs text-gray-400 mt-1">@sheetbills.com</div>
-            </div>
+            <div className="font-normal text-lg">{emailData.subject}</div>
           </div>
+
+          <div className="text-green-800 font-medium text-xl mb-2 text-left">
+            {companyName}
+          </div>
+
+
+          <div className="bg-gray-100 rounded-lg p-4 flex flex-col items-center mb-4">
+            
+            <div className="text-xs text-gray-500 mt-5 mb-5">
+              INVOICE # {invoiceId || "—"}
+            </div>
+
+            <div className="text-3xl font-medium text-gray-800 mb-2">
+              ${formatCurrency(amount)}
+            </div>
+
+            <Button
+              variant="default"
+              className="bg-gray-800 text-white px-6 py-2 mb-1"
+              size="sm"
+              onClick={() => window.print()}
+            >
+              View/Print Invoice 
+            </Button>
+
+            <div className="text-xs text-gray-500 mb-1 mt-5">
+              DUE {dueDate || "—"}
+            </div>
+       
+          </div>
+
+
+          <div className="text-sm whitespace-pre-line mb-2">
+            {emailData.message}
+          </div>
+
+          <div className="text-sm text-center font-onest text-gray-400 mt-5 mb-10">
+            Powered by  <span className="font-bold text-green-800">SheetBills</span> @sheetbills.com
+          </div>
+
         </div>
       </div>
 

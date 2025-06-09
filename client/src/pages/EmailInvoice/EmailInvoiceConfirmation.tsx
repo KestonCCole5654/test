@@ -81,12 +81,12 @@ export default function EmailInvoiceConfirmation() {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="w-full max-w-7xl bg-gray-50/50 font-onest flex flex-col md:flex-row gap-8 items-stretch md:items-center">
           {/* Invoice Preview */}
-          <div className="lg:col-span-2">
-            <div className="bg-transparent w-full mx-auto overflow-y-auto">
+          <div className="flex-1 min-w-0 pt-10">
+            <div className="bg-transparent w-full mx-auto overflow-y-auto" style={{ maxHeight: "calc(100vh - 48px)" }}>
               {/* Company Logo */}
-              { (invoice.logo || invoice.companyLogo) && (
+              {(invoice.logo || invoice.companyLogo) && (
                 <img
                   src={invoice.logo || invoice.companyLogo}
                   alt="Company Logo"
@@ -99,18 +99,6 @@ export default function EmailInvoiceConfirmation() {
                 <br />
                 To: {invoice.customer?.email}
               </div>
-              {/* Logo and Company Name */}
-              <div className="flex items-center gap-3 mb-2">
-                {invoice.logo && (
-                  <img
-                    src={invoice.logo}
-                    alt="Company Logo"
-                    className="h-10 w-auto object-contain"
-                    style={{ background: "none", boxShadow: "none" }}
-                  />
-                )}
-                <div className="font-normal text-lg">Invoice #{invoice.invoiceNumber}</div>
-              </div>
 
               <div className="text-green-800 font-medium text-xl mb-2 text-left">
                 {invoice.companyName}
@@ -118,7 +106,7 @@ export default function EmailInvoiceConfirmation() {
 
               <div className="bg-gray-100 rounded-lg p-4 flex flex-col items-center mb-4">
                 <div className="text-xs text-gray-500 mt-5 mb-5">
-                  INVOICE # {invoice.invoiceNumber || "—"}
+                  INVOICE # {invoice.invoiceNumber}
                 </div>
 
                 <div className="text-3xl font-medium text-gray-800 mb-2">
@@ -131,16 +119,16 @@ export default function EmailInvoiceConfirmation() {
                   size="sm"
                   onClick={handleViewDownloadInvoice}
                 >
-                  View/Print Invoice 
+                  View/Print Invoice
                 </Button>
 
                 <div className="text-xs text-gray-500 mb-1 mt-5">
-                  DUE {invoice.dueDate || "—"}
+                  DUE {invoice.dueDate}
                 </div>
               </div>
 
               <div className="text-sm text-center font-onest text-gray-400 mt-5 mb-10">
-                Powered by  <span className="font-bold text-green-800">SheetBills</span> @sheetbills.com
+                Powered by <span className="font-bold text-green-800">SheetBills</span> @sheetbills.com
               </div>
             </div>
           </div>
@@ -187,25 +175,6 @@ export default function EmailInvoiceConfirmation() {
                   </div>
                 </button>
               </div>
-            </div>
-
-            {/* Next Steps */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-6">
-              <h3 className="font-semibold text-blue-900 mb-3">What's Next?</h3>
-              <ul className="space-y-2 text-sm text-blue-800">
-                <li className="flex items-start">
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                  <span>Customer will receive email notification</span>
-                </li>
-                <li className="flex items-start">
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                  <span>Track when invoice is opened</span>
-                </li>
-                <li className="flex items-start">
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                  <span>Receive payment notifications</span>
-                </li>
-              </ul>
             </div>
           </div>
         </div>

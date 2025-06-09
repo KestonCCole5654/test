@@ -21,7 +21,7 @@ const HeaderSection = () => {
             <img
               className="h-12 md:h-14 w-auto"
               alt="Sheetbills"
-              src="/SheetBills-logo.svg"
+              src="/sheetbills-logo.svg"
             />
             <span className="font-semibold text-green-800 text-xl">SheetBills</span>
           </div>

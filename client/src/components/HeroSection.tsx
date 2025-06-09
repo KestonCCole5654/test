@@ -108,7 +108,7 @@ const HeroSection = () => {
         <div className="flex justify-center w-full">
           <Button
             onClick={() => navigate("/login")}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white rounded-full px-8 py-3 font-medium text-base shadow-none border-none"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white rounded-full px-16 py-10 font-medium text-base shadow-none border-none"
           >
             <svg className="w-6 h-6 mr-2" viewBox="0 0 24 24">
               <g>

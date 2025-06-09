@@ -3,7 +3,7 @@ import React from 'react';
 const FooterSection = () => (
   <footer className="bg-gray-50 border-t border-gray-100 py-8 px-4">
     <div className="max-w-7xl mx-auto text-center">
-      <img src="/sheetbills-logo.svg" alt="SheetBills Logo" className="h-8 mx-auto mb-4" />
+      <img src="/SheetBills-logo.svg" alt="SheetBills Logo" className="h-8 mx-auto mb-4" />
       <p className="text-gray-600 mb-2">
         Powered by <span className="text-green-800">SheetBills</span>
       </p>

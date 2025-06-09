@@ -4,7 +4,7 @@ export default function Login() {
   return (
     <div>
       <div className="flex flex-col items-center justify-center mt-8 mb-4">
-        <img src="/sheetbills-logo.svg" alt="SheetBills Logo" className="h-12 w-auto mb-6" />
+        <img src="/SheetBills-logo.svg" alt="SheetBills Logo" className="h-12 w-auto mb-6" />
       </div>
       <div className="mt-4 text-center">
         <p className="text-sm text-slate-500 font-normal font-cal-sans">

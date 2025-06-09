@@ -11,7 +11,32 @@ const benefitItems = [
 ];
 
 
-
+const integrations = [
+  {
+    src: "/google-sheets.svg",
+    alt: "Google Sheets",
+    name: "Sheets",
+    bgColor: "bg-green-50",
+  },
+  {
+    src: "/google-drive.svg",
+    alt: "Google Drive",
+    name: "Drive",
+    bgColor: "bg-blue-50",
+  },
+  {
+    src: "/make-logo.svg",
+    alt: "Make",
+    name: "Make",
+    bgColor: "bg-purple-50",
+  },
+  {
+    src: "/whatsapp-logo.svg",
+    alt: "WhatsApp",
+    name: "WhatsApp",
+    bgColor: "bg-green-50",
+  },
+]
 
 
 
@@ -33,35 +58,58 @@ const HeroSection = () => {
   return (
     <section className="px-4 pt-8 md:pt-20 pb-12 md:pb-20">
       <div className="max-w-7xl mx-auto text-center">
-        <div className="flex items-center justify-center mb-6 w-full">
-          <div className="flex items-center bg-white rounded-full shadow-md px-8 py-3 h-16 space-x-4 mx-auto">
-            <div className="flex -space-x-3">
-              <img
-                src="/google-sheets.svg"
-                alt="Google Sheets"
-                className="w-9 h-9 rounded-full border-2 border-white bg-white"
-              />
-              <img
-                src="/google-drive.svg"
-                alt="Google Drive"
-                className="w-9 h-9 rounded-full border-2 border-white bg-white"
-              />
-              <img
-                src="/make-logo.svg"
-                alt="Make"
-                className="w-9 h-9 rounded-full border-2 border-white bg-white"
-              />
-              <img
-                src="/whatsapp-logo.svg"
-                alt="WhatsApp"
-                className="w-9 h-9 rounded-full border-2 border-white bg-white"
-              />
+      <div className="flex items-center justify-center mb-8 w-full">
+      <div className="relative group">
+        {/* Main badge container */}
+        <div className="flex items-center bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 px-6 py-4 border border-gray-100/50 group-hover:border-gray-200/80">
+          {/* Logo section with enhanced visibility */}
+          <div className="flex items-center space-x-1 mr-6">
+            <div className="flex -space-x-2">
+              {integrations.map((integration, index) => (
+                <div
+                  key={index}
+                  className={`relative w-12 h-12 rounded-xl ${integration.bgColor} border-2 border-white shadow-md hover:shadow-lg transition-all duration-200 hover:scale-110 hover:-translate-y-1 flex items-center justify-center group/logo`}
+                  style={{
+                    zIndex: integrations.length - index,
+                  }}
+                >
+                  <img
+                    src={integration.src || "/placeholder.svg?height=24&width=24"}
+                    alt={integration.alt}
+                    className="w-7 h-7 transition-transform duration-200 group-hover/logo:scale-110"
+                  />
+
+                  {/* Tooltip on hover */}
+                  <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover/logo:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
+                    {integration.name}
+                  </div>
+                </div>
+              ))}
             </div>
-            <span className="text-[#2F303C] font-semibold text-lg whitespace-nowrap text-center">
-              3+ Integrations & Google Sheets
-            </span>
+
+            {/* Plus indicator */}
+            <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full text-gray-600 font-bold text-sm ml-2">
+              +
+            </div>
+          </div>
+
+          {/* Text section with better typography */}
+          <div className="flex flex-col items-start">
+            <span className="text-gray-900 font-bold text-lg leading-tight">4+ Integrations</span>
+            <span className="text-gray-500 font-medium text-sm">Built for Google Sheets</span>
           </div>
         </div>
+
+        {/* Subtle glow effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-green-400/10 via-blue-400/10 to-purple-400/10 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
+      </div>
+    </div>
+
+
+
+
+
+
         <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
           <span className="text-[#2F303C]">Stop </span>
           <span className="text-green-800">Wrestling</span>

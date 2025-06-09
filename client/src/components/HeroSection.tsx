@@ -151,7 +151,7 @@ const HeroSection = () => {
             {[1, 2, 3, 4].map((n) => (
               <img
                 key={n}
-                src={`/placeholder.svg?height=48&width=48`}
+                src={`https://png.pngtree.com/thumb_back/fh260/background/20230615/pngtree-man-wearing-a-pair-of-yellow-sunglasses-in-front-of-a-image_2898170.jpg`}
                 alt={`User ${n}`}
                 className="w-12 h-12 rounded-full border-3 border-white shadow-sm"
               />

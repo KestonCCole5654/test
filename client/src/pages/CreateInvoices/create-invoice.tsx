@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from "react"
 import { Button } from "../../components/ui/button"
+import {  Eye, DollarSign, FileText } from 'lucide-react';
+
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Textarea } from "../../components/ui/textarea"
@@ -143,39 +145,180 @@ export interface BusinessData {
 function InvoiceProgressBar({ sendStatus, paidStatus }: { sendStatus?: string, paidStatus?: string }) {
   // Step completion logic
   const steps = [
-    { label: 'Invoice Created', done: true },
-    { label: 'Invoice Email Sent', done: sendStatus === 'yes' },
-    { label: 'Invoice Email Opened', done: false },
-    { label: 'Paid', done: paidStatus === 'Paid' },
+    { 
+      label: 'Invoice Created', 
+      done: true,
+      icon: FileText,
+      description: 'Invoice generated successfully'
+    },
+    { 
+      label: 'Email Sent', 
+      done: sendStatus === 'yes',
+      icon: Mail,
+      description: 'Invoice delivered to recipient'
+    },
+    { 
+      label: 'Email Opened', 
+      done: false,
+      icon: Eye,
+      description: 'Recipient viewed the invoice'
+    },
+    { 
+      label: 'Payment Received', 
+      done: paidStatus === 'Paid',
+      icon: DollarSign,
+      description: 'Invoice has been paid'
+    },
   ];
+
   return (
-    <div className="w-full flex flex-col items-center my-6 mb-8">
-      <div className="flex flex-row items-center justify-center w-full max-w-2xl">
-        {steps.map((step, idx) => (
-          <>
-            <div key={step.label} className="flex flex-col items-center flex-shrink-0">
-              <div className={`rounded-full w-8 h-8 flex items-center justify-center border-2 text-base font-bold ${step.done ? 'bg-green-100 border-green-600' : 'bg-white border-gray-300'}`}
-                >
-                {step.done ? (
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <circle cx="10" cy="10" r="10" fill="#22c55e" />
-                    <path d="M6 10.5l3 3 5-5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                ) : (
-                  <span className="w-3 h-3 rounded-full bg-gray-300 block"></span>
-                )}
-              </div>
-              <span className={`text-xs mt-2 text-center ${step.done ? 'text-green-700 font-semibold' : 'text-gray-400'}`}>{step.label}</span>
+    <div className="w-full py-8 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Progress container with relative positioning for the connecting line */}
+        <div className="relative">
+          {/* Background connecting line */}
+          <div className="absolute top-6 left-0 right-0 h-0.5 bg-gray-200 z-0"></div>
+          
+          {/* Active progress line */}
+          <div 
+            className="absolute top-6 left-0 h-0.5 bg-gradient-to-r from-emerald-500 to-emerald-400 z-10 transition-all duration-700 ease-out"
+            style={{ 
+              width: `${(steps.filter(step => step.done).length - 1) / (steps.length - 1) * 100}%` 
+            }}
+          ></div>
+
+          {/* Steps container */}
+          <div className="relative z-20 flex justify-between items-start">
+            {steps.map((step, idx) => {
+              const StepIcon = step.icon;
+              const isCompleted = step.done;
+              const isNext = !isCompleted && steps.slice(0, idx).every(s => s.done);
+              
+              return (
+                <div key={step.label} className="flex flex-col items-center group">
+                  {/* Step circle with icon */}
+                  <div className={`
+                    relative flex items-center justify-center w-12 h-12 rounded-full border-3 transition-all duration-300 transform
+                    ${isCompleted 
+                      ? 'bg-emerald-500 border-emerald-500 shadow-lg shadow-emerald-200 scale-110' 
+                      : isNext 
+                        ? 'bg-white border-emerald-400 shadow-md ring-4 ring-emerald-100 animate-pulse' 
+                        : 'bg-white border-gray-300 shadow-sm'
+                    }
+                    group-hover:scale-105 group-hover:shadow-lg
+                  `}>
+                    {isCompleted ? (
+                      <Check className="w-6 h-6 text-white stroke-[3]" />
+                    ) : (
+                      <StepIcon className={`
+                        w-5 h-5 transition-colors duration-300
+                        ${isNext ? 'text-emerald-600' : 'text-gray-400'}
+                      `} />
+                    )}
+                    
+                    {/* Animated ring for next step */}
+                    {isNext && (
+                      <div className="absolute inset-0 border-2 border-emerald-300 rounded-full animate-ping opacity-30"></div>
+                    )}
+                  </div>
+
+                  {/* Step content */}
+                  <div className="mt-4 text-center max-w-[120px]">
+                    <h3 className={`
+                      text-sm font-semibold transition-colors duration-300 leading-tight
+                      ${isCompleted 
+                        ? 'text-emerald-700' 
+                        : isNext 
+                          ? 'text-emerald-600' 
+                          : 'text-gray-500'
+                      }
+                    `}>
+                      {step.label}
+                    </h3>
+                    <p className={`
+                      text-xs mt-1 transition-colors duration-300 leading-tight
+                      ${isCompleted 
+                        ? 'text-emerald-600' 
+                        : isNext 
+                          ? 'text-emerald-500' 
+                          : 'text-gray-400'
+                      }
+                    `}>
+                      {step.description}
+                    </p>
+                  </div>
+
+                  {/* Status indicator */}
+                  <div className="mt-2">
+                    {isCompleted && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 animate-fade-in">
+                        Complete
+                      </span>
+                    )}
+                    {isNext && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 animate-pulse">
+                        In Progress
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Progress summary */}
+        <div className="mt-8 text-center">
+          <div className="inline-flex items-center space-x-4 px-6 py-3 bg-gray-50 rounded-full">
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-emerald-500 rounded-full"></div>
+              <span className="text-sm text-gray-600">
+                {steps.filter(step => step.done).length} of {steps.length} steps completed
+              </span>
             </div>
-            {idx < steps.length - 1 && (
-              <div className={`h-0.5 flex-1 mx-2 ${step.done ? 'bg-green-400' : 'bg-gray-200'}`}></div>
-            )}
-          </>
-        ))}
+            <div className="w-px h-4 bg-gray-300"></div>
+            <div className="text-sm text-gray-500">
+              {Math.round((steps.filter(step => step.done).length / steps.length) * 100)}% progress
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
+
+function App() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
+      <div className="max-w-6xl mx-auto space-y-12">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Invoice Progress Tracker</h1>
+          <p className="text-gray-600">Track your invoice status from creation to payment</p>
+        </div>
+
+        {/* Demo with different states */}
+        <div className="space-y-8">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">Invoice #INV-001 - Recently Created</h2>
+            <InvoiceProgressBar sendStatus="no" paidStatus="Unpaid" />
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">Invoice #INV-002 - Email Sent</h2>
+            <InvoiceProgressBar sendStatus="yes" paidStatus="Unpaid" />
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">Invoice #INV-003 - Fully Paid</h2>
+            <InvoiceProgressBar sendStatus="yes" paidStatus="Paid" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 
 export default function InvoiceForm() {
   const location = useLocation()

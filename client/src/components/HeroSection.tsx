@@ -117,14 +117,14 @@ const HeroSection = () => {
             Invoices <span className="text-[#2F303C]">in</span> Google Sheets.
           </span>
         </h1>
-        <p className="text-[#5C5B61] font-sans font-medium text-lg md:text-xl max-w-xl mx-auto mb-8">
+        <p className="text-[#5C5B61] font-sans font-medium text-lg md:text-xl max-w-3xl mx-auto mb-8">
           Say goodbye to clunky templates and confusing formulas. 
           SheetBills is the easiest way to manage invoices—built right into Google Sheets and
           powered by smart integrations like Make, Google Drive, and WhatsApp.
           
         </p>
         <div className="flex justify-center mb-10">
-          <ul className="hidden font-sans font-medium  text-md md:block text-center text-[#5C5B61] leading-relaxed space-y-1 md:-mt-3">
+          <ul className="hidden font-sans font-normal  text-md md:block text-center text-[#5C5B61] leading-relaxed space-y-1 md:-mt-3">
           <li className="flex items-center justify-center lg:justify-start gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"

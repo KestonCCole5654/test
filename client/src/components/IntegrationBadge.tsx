@@ -68,7 +68,7 @@ const IntegrationBadge = () => {
         </div>
 
         {/* Subtle glow effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-green-400/10 via-blue-400/10 to-purple-400/10 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-r   from-green-400/10 via-blue-400/10 to-purple-400/10 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
       </div>
     </div>
   )

@@ -56,7 +56,7 @@ const InvoiceProgressBar: React.FC<InvoiceProgressBarProps> = ({ sendStatus, pai
               const isNext = !isCompleted && steps.slice(0, idx).every(s => s.done);
 
               return (
-                <div key={step.label} className="flex flex-col items-center group">
+                <div key={step.label} className="flex flex-col items-center group relative">
                   {/* Step circle with icon */}
                   <div className={`
                     relative flex items-center justify-center w-12 h-12 rounded-full border-3 transition-all duration-300 transform
@@ -96,17 +96,11 @@ const InvoiceProgressBar: React.FC<InvoiceProgressBarProps> = ({ sendStatus, pai
                     `}>
                       {step.label}
                     </h3>
-                    <p className={`
-                      text-xs mt-1 transition-colors duration-300 leading-tight
-                      ${isCompleted
-                        ? 'text-emerald-600'
-                        : isNext
-                          ? 'text-emerald-500'
-                          : 'text-gray-400'
-                      }
-                    `}>
-                      {step.description}
-                    </p>
+                  </div>
+
+                  {/* Tooltip for description */}
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
+                    {step.description}
                   </div>
 
                   {/* Status indicator */}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckIcon } from 'lucide-react';
+import { CheckIcon, Star } from 'lucide-react';
 import { Button } from './ui/button';
 import { useNavigate } from 'react-router-dom';
 
@@ -34,36 +34,31 @@ const HeroSection = () => {
     <section className="px-4 pt-8 md:pt-20 pb-12 md:pb-20">
       <div className="max-w-7xl mx-auto text-center">
         <div className="flex items-center justify-center mb-6 w-full">
-          <div className="flex items-center bg-white rounded-full shadow-sm px-4 py-2 space-x-3 mx-auto">
-            <div className="flex -space-x-2">
+          <div className="flex items-center bg-white rounded-full shadow-md px-8 py-3 h-16 space-x-4 mx-auto">
+            <div className="flex -space-x-3">
               <img
                 src="/google-sheets.svg"
-                alt="Gmail"
-                className="w-7 h-7 rounded-full border-2 border-white bg-white"
+                alt="Google Sheets"
+                className="w-9 h-9 rounded-full border-2 border-white bg-white"
               />
               <img
                 src="/google-drive.svg"
-                alt="Calendar"
-                className="w-7 h-7 rounded-full border-2 border-white bg-white"
-              />
-              <img
-                src="/google-icon.svg"
-                alt="Drive"
-                className="w-7 h-7 rounded-full border-2 border-white bg-white"
+                alt="Google Drive"
+                className="w-9 h-9 rounded-full border-2 border-white bg-white"
               />
               <img
                 src="/make-logo.svg"
-                alt="Drive"
-                className="w-7 h-7 rounded-full border-2 border-white bg-white"
+                alt="Make"
+                className="w-9 h-9 rounded-full border-2 border-white bg-white"
               />
               <img
                 src="/whatsapp-logo.svg"
-                alt="Drive"
-                className="w-7 h-7 rounded-full border-2 border-white bg-white"
+                alt="WhatsApp"
+                className="w-9 h-9 rounded-full border-2 border-white bg-white"
               />
             </div>
-            <span className="text-[#2F303C] font-medium text-md whitespace-nowrap text-center">
-              Recommended for Google Sheets
+            <span className="text-[#2F303C] font-semibold text-lg whitespace-nowrap text-center">
+              3+ Integrations & Google Sheets
             </span>
           </div>
         </div>
@@ -137,7 +132,7 @@ const HeroSection = () => {
         <Button
                 onClick={handleGoogleLogin}
                 disabled={loading}
-                className="h-12 max-w-64 px-5 py-6  bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 shadow-sm hover:shadow transition-all duration-200 rounded-lg flex items-center justify-center gap-3"
+                className="h-12 w-full sm:w-auto px-6 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 shadow-sm hover:shadow transition-all duration-200 rounded-lg flex items-center justify-center gap-3 font-medium"
               >
                 <img
                   src="/google-icon.svg"
@@ -151,31 +146,30 @@ const HeroSection = () => {
 
     
         {/* Social Proof */}
-        <div className="mt-12 flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-          <div className="flex -space-x-2">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 p-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-100 shadow-sm max-w-md mx-auto">
+          <div className="flex -space-x-3">
             {[1, 2, 3, 4].map((n) => (
               <img
                 key={n}
-                src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg"
+                src={`/placeholder.svg?height=48&width=48`}
                 alt={`User ${n}`}
-                className="w-12 h-12 rounded-full border-2 border-white"
+                className="w-12 h-12 rounded-full border-3 border-white shadow-sm"
               />
             ))}
           </div>
           <div className="text-center sm:text-left">
-            <div className="flex text-yellow-400 justify-center sm:justify-start">
+            <div className="flex justify-center sm:justify-start mb-1">
               {[...Array(5)].map((_, i) => (
-                <span key={i} className="text-yellow-400 text-xl">
-                  ★
-                </span>
+                <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
               ))}
             </div>
-            <p className="text-[#5C5B61]">
-              Join <span className="font-medium">250+</span> Satisfied Users
+            <p className="text-gray-600 text-sm">
+              Join <span className="font-semibold text-gray-900">250+</span> satisfied users
             </p>
           </div>
         </div>
       </div>
+      
     </section>
   );
 };

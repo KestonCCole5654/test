@@ -32,7 +32,7 @@ const IntegrationBadge = () => {
     <div className="flex items-center justify-center mb-8 w-full">
       <div className="relative group">
         {/* Main badge container */}
-        <div className="flex items-center bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 px-6 py-4 border border-gray-100/50 group-hover:border-gray-200/80">
+        <div className="flex items-center bg-white/90 backdrop-blur-sm rounded-2xl  hover:shadow-xl transition-all duration-300 px-6 py-4 border border-gray-100/50 group-hover:border-gray-200/80">
           {/* Logo section with enhanced visibility */}
           <div className="flex items-center space-x-1 mr-6">
             <div className="flex -space-x-2">

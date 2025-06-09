@@ -14,16 +14,16 @@ const HeaderSection = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   return (
     <header className="top-0 z-50 w-full bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 py-7 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-12">
           {/* Logo */}
           <div className="flex items-center gap-2">
             <img
-              className="h-8 w-auto"
+              className="h-14 w-auto"
               alt="Sheetbills"
-              src="/sheetbills-logo.svg"
+              src="/SheetBills-logo.svg"
             />
-            <span className="font-normal text-green-800 text-lg">SheetBills</span>
+            <span className="font-bold text-green-800 text-lg">SheetBills</span>
           </div>
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">

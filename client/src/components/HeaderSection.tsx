@@ -43,7 +43,7 @@ const HeaderSection = () => {
               onClick={() => navigate('/login')}
               className="bg-green-800 hover:bg-green-700 rounded-sm text-white px-6"
             >
-              Login
+              Try for free
             </Button>
           </div>
           {/* Mobile Menu Button */}
@@ -74,7 +74,7 @@ const HeaderSection = () => {
               }}
               className="w-full bg-green-800 hover:bg-green-700 rounded-sm text-white mt-4"
             >
-              Login
+              Try for free
             </Button>
           </div>
         )}

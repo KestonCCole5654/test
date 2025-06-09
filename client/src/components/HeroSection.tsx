@@ -104,8 +104,9 @@ const HeroSection = () => {
           </ul>
         </div>
         <Button
+          
           onClick={() => navigate("/login")}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 rounded-sm px-16 py-3"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-green-800  border border-gray-300 hover:bg-gray-50  text-white rounded-lg px-16 py-3"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path
@@ -130,12 +131,12 @@ const HeroSection = () => {
         {/* Social Proof */}
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
           <div className="flex -space-x-2">
-            {[1, 2, 3, 4, 5].map((n) => (
+            {[1, 2, 3, 4].map((n) => (
               <img
                 key={n}
                 src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg"
                 alt={`User ${n}`}
-                className="w-8 h-8 rounded-full border-2 border-white"
+                className="w-12 h-12 rounded-full border-2 border-white"
               />
             ))}
           </div>

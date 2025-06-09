@@ -99,17 +99,13 @@ const InvoiceProgressBar: React.FC<InvoiceProgressBarProps> = ({ sendStatus, pai
                   </div>
 
                   {/* Tooltip for description */}
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-5 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
                     {step.description}
                   </div>
 
                   {/* Status indicator */}
                   <div className="mt-2">
-                    {isCompleted && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium  text-green-900 animate-fade-in">
-                        Complete
-                      </span>
-                    )}
+                    
                     {isNext && (
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 animate-pulse">
                         In Progress

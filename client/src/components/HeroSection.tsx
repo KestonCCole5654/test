@@ -37,17 +37,27 @@ const HeroSection = () => {
           <div className="flex items-center bg-white rounded-full shadow-sm px-4 py-2 space-x-3 mx-auto">
             <div className="flex -space-x-2">
               <img
-                src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico"
+                src="/google-sheets.svg"
                 alt="Gmail"
                 className="w-7 h-7 rounded-full border-2 border-white bg-white"
               />
               <img
-                src="https://ssl.gstatic.com/ui/v1/icons/calendar/rfr/calendar.ico"
+                src="/google-drive.svg"
                 alt="Calendar"
                 className="w-7 h-7 rounded-full border-2 border-white bg-white"
               />
               <img
-                src="https://ssl.gstatic.com/ui/v1/icons/drive/rfr/drive.ico"
+                src="/google-icon.svg"
+                alt="Drive"
+                className="w-7 h-7 rounded-full border-2 border-white bg-white"
+              />
+              <img
+                src="/make-logo.svg"
+                alt="Drive"
+                className="w-7 h-7 rounded-full border-2 border-white bg-white"
+              />
+              <img
+                src="/whatsapp-logo.svg"
                 alt="Drive"
                 className="w-7 h-7 rounded-full border-2 border-white bg-white"
               />

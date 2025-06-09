@@ -7,6 +7,8 @@ export default function EmailInvoiceConfirmation() {
   const navigate = useNavigate();
   const invoice = location.state?.invoice;
 
+  console.log('Invoice data in EmailInvoiceConfirmation:', invoice);
+
   function formatCurrency(amount: number): string {
     return amount?.toLocaleString("en-US", {
       minimumFractionDigits: 2,

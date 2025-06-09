@@ -107,7 +107,7 @@ const HeroSection = () => {
         <Button
           
           onClick={() => navigate("/login")}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-green-800  border border-gray-300 hover:bg-gray-50  text-white rounded-lg px-24 py-3"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-green-800  border border-gray-300 hover:bg-gray-50  text-white rounded-lg px-14 py-12"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path

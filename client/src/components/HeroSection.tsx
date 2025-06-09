@@ -14,27 +14,46 @@ const HeroSection = () => {
   return (
     <section className="px-4 pt-8 md:pt-20 pb-12 md:pb-20">
       <div className="max-w-7xl mx-auto text-center">
-        <div className="flex items-center justify-center space-x-2 mb-6">
-          <span className="text-[#5C5B61] text-sm">Made for</span>
-          <span className="flex items-center bg-gray-50 px-2 py-1 rounded">
-            <img
-              className="w-5 h-5 mr-1"
-              alt="Google Sheets logo"
-              src="/Google_Sheets_logo_(2014-2020).svg"
-            />
-            <span className="text-green-600">Google Sheets</span>
-          </span>
+        <div className="flex items-center justify-center mb-6">
+          <div className="flex items-center bg-white rounded-full shadow-sm px-4 py-2 space-x-3">
+            <div className="flex -space-x-2">
+              <img
+                src="/icons/gmail.svg"
+                alt="Gmail"
+                className="w-7 h-7 rounded-full border-2 border-white bg-white"
+              />
+              <img
+                src="/icons/calendar.svg"
+                alt="Calendar"
+                className="w-7 h-7 rounded-full border-2 border-white bg-white"
+              />
+              <img
+                src="/icons/drive.svg"
+                alt="Drive"
+                className="w-7 h-7 rounded-full border-2 border-white bg-white"
+              />
+            </div>
+            <span className="text-[#2F303C] font-medium text-md whitespace-nowrap">
+              Recommended for Google Workspace
+            </span>
+          </div>
         </div>
         <h1 className="text-3xl md:text-5xl lg:text-6xl font-normal leading-tight mb-6">
           <span className="text-[#2F303C]">Stop </span>
           <span className="text-green-800">Wrestling</span>
           <span className="text-[#2F303C]"> with</span>
           <br className="hidden sm:block" />
-          <span className="text-green-800">Invoices <span className="text-[#2F303C]">in</span> Google Sheets?</span>
+          <span className="text-green-800">
+            Invoices <span className="text-[#2F303C]">in</span> Google Sheets?
+          </span>
         </h1>
         <p className="text-[#5C5B61] font-sans font-medium text-lg md:text-xl max-w-2xl mx-auto mb-8">
-          Ditch the templates, formulas and frustration. SheetBills makes
-          invoicing in Google Sheets fast, simple and professional
+          Say goodbye to clunky templates and confusing formulas. SheetBills is
+          the easiest way to manage invoices—built right into Google Sheets and
+          powered by smart integrations like Make, Google Drive, and WhatsApp.
+          Automatically send invoices via email or WhatsApp and enjoy a fast,
+          professional invoicing experience, all in one simple, user-friendly
+          tool.
         </p>
         <div className="flex justify-center mb-10">
           <ul className="hidden font-sans font-medium  text-md md:block text-center text-[#5C5B61] leading-relaxed space-y-1 md:-mt-3">
@@ -85,12 +104,29 @@ const HeroSection = () => {
             </li>
           </ul>
         </div>
-       
         <Button
           onClick={() => navigate("/login")}
-          className="w-full sm:w-auto bg-green-800 hover:bg-green-700 rounded-sm text-white px-16 py-3"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 rounded-sm px-16 py-3"
         >
-          Try for Free
+          <svg className="w-5 h-5" viewBox="0 0 24 24">
+            <path
+              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+              fill="#4285F4"
+            />
+            <path
+              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+              fill="#34A853"
+            />
+            <path
+              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+              fill="#FBBC05"
+            />
+            <path
+              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+              fill="#EA4335"
+            />
+          </svg>
+          Continue with Google
         </Button>
         {/* Social Proof */}
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">

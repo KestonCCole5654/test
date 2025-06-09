@@ -68,7 +68,7 @@ const HeroSection = () => {
               {integrations.map((integration, index) => (
                 <div
                   key={index}
-                  className={`relative w-12 h-12 rounded-xl ${integration.bgColor} border-2 border-white shadow-md hover:shadow-lg transition-all duration-200 hover:scale-110 hover:-translate-y-1 flex items-center justify-center group/logo`}
+                  className={`relative w-12 h-12  ${integration.bgColor} border-2 border-white shadow-md hover:shadow-lg transition-all duration-200 hover:scale-110 hover:-translate-y-1 flex items-center justify-center group/logo`}
                   style={{
                     zIndex: integrations.length - index,
                   }}
@@ -80,7 +80,7 @@ const HeroSection = () => {
                   />
 
                   {/* Tooltip on hover */}
-                  <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover/logo:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
+                  <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1  opacity-0 group-hover/logo:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
                     {integration.name}
                   </div>
                 </div>
@@ -88,7 +88,7 @@ const HeroSection = () => {
             </div>
 
             {/* Plus indicator */}
-            <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full text-gray-600 font-bold text-sm ml-2">
+            <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-gray-100 to-gray-200  text-gray-600 font-bold text-sm ml-2">
               +
             </div>
           </div>

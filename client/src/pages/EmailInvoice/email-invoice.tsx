@@ -93,14 +93,11 @@ export default function EmailInvoice() {
     const companyName = invoice?.companyName || "";
     const customerEmail = invoice?.customer?.email || "";
     const customerName = invoice?.customer?.name || "";
-    const amount = invoice?.amount || 0;
-    const dueDate = invoice?.dueDate || "";
-    const invoiceDate = invoice?.date || "";
     return {
       to: customerEmail,
       from: businessEmail,
       subject: `Invoice #: ${invoiceId || invoice?.invoiceNumber || ""}`,
-      message: `Dear ${customerName},\n\nWe appreciate your business. Please find your invoice details here. Feel free to contact us if you have any questions.\n\nInvoice Date: ${invoiceDate}\nSubtotal: $${amount}\nDue date: ${dueDate}`,
+      message: `Dear ${customerName},\n\nWe appreciate your business. Please find your invoice details here. Feel free to contact us if you have any questions.`,
     };
   });
 

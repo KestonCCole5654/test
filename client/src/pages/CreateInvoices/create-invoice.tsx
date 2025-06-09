@@ -783,12 +783,6 @@ export default function InvoiceForm() {
     }
   }
 
-  const [showEmailModal, setShowEmailModal] = useState(false)
-  const [isSavingAndEmailing, setIsSavingAndEmailing] = useState(false)
-
- 
-
- 
   // Used to edit invoice
   useEffect(() => {
     if (invoiceToEdit) {

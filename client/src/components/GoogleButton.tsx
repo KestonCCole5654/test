@@ -35,7 +35,7 @@ const GoogleButton: React.FC<GoogleButtonProps> = ({
       `}
     >
       {/* Google Logo Container */}
-      <div className="flex items-center justify-center w-8 h-full bg-white rounded-full mr-3 flex-shrink-0">
+      <div className="flex items-center justify-center w-auto h-full bg-white rounded-full mr-3 flex-shrink-0">
         <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6">
           <path
             fill="#4285F4"

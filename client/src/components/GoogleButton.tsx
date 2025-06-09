@@ -23,7 +23,7 @@ const GoogleButton: React.FC<GoogleButtonProps> = ({
       disabled={disabled || loading}
       className={`
         inline-flex items-center justify-center
-        bg-[#4285F4] hover:bg-[#3367D6] active:bg-[#2C5AA0]
+        bg-green-800 hover:bg-white hover:border border-green-600 active:bg-green-800
         text-white font-medium text-base
         rounded-full
         px-6 py-3

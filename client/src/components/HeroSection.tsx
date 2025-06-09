@@ -37,17 +37,17 @@ const HeroSection = () => {
           <div className="flex items-center bg-white rounded-full shadow-sm px-4 py-2 space-x-3 mx-auto">
             <div className="flex -space-x-2">
               <img
-                src="https://cdn.brandfetch.io/google.com:gmail/icon"
+                src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico"
                 alt="Gmail"
                 className="w-7 h-7 rounded-full border-2 border-white bg-white"
               />
               <img
-                src="https://cdn.brandfetch.io/google.com:calendar/icon"
+                src="https://ssl.gstatic.com/ui/v1/icons/calendar/rfr/calendar.ico"
                 alt="Calendar"
                 className="w-7 h-7 rounded-full border-2 border-white bg-white"
               />
               <img
-                src="https://cdn.brandfetch.io/google.com:drive/icon"
+                src="https://ssl.gstatic.com/ui/v1/icons/drive/rfr/drive.ico"
                 alt="Drive"
                 className="w-7 h-7 rounded-full border-2 border-white bg-white"
               />
@@ -122,6 +122,7 @@ const HeroSection = () => {
           
           </ul>
         </div>
+        
         <div className="flex justify-center mb-10">
         <Button
                 onClick={handleGoogleLogin}

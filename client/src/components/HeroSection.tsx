@@ -3,14 +3,33 @@ import { CheckIcon } from 'lucide-react';
 import { Button } from './ui/button';
 import { useNavigate } from 'react-router-dom';
 
+
 const benefitItems = [
   { text: 'No more Scattered Files/Sheets' },
   { text: 'No more Complex Invoice Generation' },
   { text: 'No more Formulas' },
 ];
 
+
+
+
+
+
+
+
+
+
+
 const HeroSection = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = React.useState(false);
+
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    navigate("/login");
+    setLoading(false);
+  };
+
   return (
     <section className="px-4 pt-8 md:pt-20 pb-12 md:pb-20">
       <div className="max-w-7xl mx-auto text-center">

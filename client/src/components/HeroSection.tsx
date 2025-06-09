@@ -142,7 +142,7 @@ const HeroSection = () => {
           <div className="text-center sm:text-left">
             <div className="flex text-yellow-400 justify-center sm:justify-start">
               {[...Array(5)].map((_, i) => (
-                <span key={i} className="text-yellow-400">
+                <span key={i} className="text-yellow-400 text-md">
                   ★
                 </span>
               ))}

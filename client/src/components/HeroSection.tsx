@@ -3,6 +3,7 @@ import { CheckIcon, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import GoogleButton from './GoogleButton';
 import IntegrationBadge from './IntegrationBadge';
+import SocialProof from './SocialProof';
 
 
 const benefitItems = [
@@ -61,9 +62,6 @@ const HeroSection = () => {
     <section className="px-4 pt-8 md:pt-20 pb-12 md:pb-20">
       <div className="max-w-7xl mx-auto text-center">
       <IntegrationBadge />
-
-
-
 
         <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
           <span className="text-[#2F303C]">Stop </span>
@@ -142,30 +140,7 @@ const HeroSection = () => {
 
     
         {/* Social Proof */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 p-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-100 shadow-sm max-w-md mx-auto">
-          <div className="flex -space-x-3">
-            {[1, 2, 3, 4].map((n) => (
-              <img
-                key={n}
-                src={`https://png.pngtree.com/thumb_back/fh260/background/20230615/pngtree-man-wearing-a-pair-of-yellow-sunglasses-in-front-of-a-image_2898170.jpg`}
-                alt={`User ${n}`}
-                className="w-12 h-12 rounded-full border-3 border-white shadow-sm"
-              />
-            ))}
-          </div>
-          <div className="text-center sm:text-left">
-            <div className="flex justify-center sm:justify-start mb-1">
-              {[...Array(5)].map((_, i) => (
-                <svg key={i} className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#FCD34D" stroke="#FCD34D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              ))}
-            </div>
-            <p className="text-gray-600 text-sm">
-              Join <span className="font-semibold text-gray-900">250+</span> satisfied users
-            </p>
-          </div>
-        </div>
+        <SocialProof />
       </div>
       
     </section>

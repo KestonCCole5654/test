@@ -103,6 +103,7 @@ const HeroSection = () => {
           
           </ul>
         </div>
+        <div className="flex justify-center mb-10">
         <Button
           
           onClick={() => navigate("/login")}
@@ -128,6 +129,10 @@ const HeroSection = () => {
           </svg>
           Continue with Google
         </Button>
+        
+        </div>
+
+    
         {/* Social Proof */}
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
           <div className="flex -space-x-2">

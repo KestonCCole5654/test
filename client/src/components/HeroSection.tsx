@@ -63,16 +63,14 @@ const HeroSection = () => {
       <div className="max-w-7xl mx-auto text-center">
       <IntegrationBadge />
 
-        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
           <span className="text-[#2F303C]">Stop </span>
           <span className="text-green-800">Wrestling</span>
           <span className="text-[#2F303C]"> with</span>
-          <br className="hidden sm:block" />
-          <span className="text-green-800">
-            Invoices <span className="text-[#2F303C]">in</span> Google Sheets.
+          <span className="text-green-800"> Invoices <span className="text-[#2F303C]">in</span> Google Sheets.
           </span>
         </h1>
-        <p className="text-[#5C5B61] font-sans font-medium text-lg md:text-xl max-w-3xl mx-auto mb-8">
+        <p className="text-[#5C5B61] font-sans font-medium text-md md:text-xl max-w-3xl mx-auto mb-0 md:mb-8">
           Say goodbye to clunky templates and confusing formulas. 
           SheetBills is the easiest way to manage invoices—built right into Google Sheets and
           powered by smart integrations like Make, Google Drive, and WhatsApp.

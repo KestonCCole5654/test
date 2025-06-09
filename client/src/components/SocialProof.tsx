@@ -4,7 +4,7 @@ interface SocialProofProps {}
 
 const SocialProof: React.FC<SocialProofProps> = () => {
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-center gap-6 p-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-100 shadow-sm max-w-md mx-auto mt-12">
+    <div className="flex flex-col sm:flex-row items-center justify-center gap-6 p-6 bg-transperent  max-w-md mx-auto mt-12">
       <div className="flex -space-x-3">
         {[1, 2, 3, 4].map((n) => (
           <img

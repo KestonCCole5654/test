@@ -21,8 +21,8 @@ const integrations = [
   },
   {
     src: "/mailgun-seeklogo.svg",
-    alt: "WhatsApp",
-    name: "WhatsApp",
+    alt: "Mailgun",
+    name: "Mailgun",
     bgColor: "bg-green-50",
   },
 ]

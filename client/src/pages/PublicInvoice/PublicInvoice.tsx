@@ -52,7 +52,7 @@ export default function PublicInvoice() {
   }, [token, sheetUrl]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center font-onest justify-center bg-gray-50 py-8 px-2">
+    <div className="min-h-screen flex flex-col items-center font-onest justify-center bg-gray-50 py-0 px-0">
       <Card className="w-full max-w-4xl">
         
         {loading && <div className="text-center text-gray-500">Loading Invoice from link ...</div>}
@@ -66,9 +66,7 @@ export default function PublicInvoice() {
         )}
      
       </Card>
-      <footer className="w-full font-inter  text-center text-md text-gray-400 mt-10 mb-2">
-          Powered by <span className=" font-inter font-medium text-green-800">SheetBills™</span>
-        </footer>
+  
     </div>
   );
 } 

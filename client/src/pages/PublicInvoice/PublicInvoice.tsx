@@ -52,7 +52,7 @@ export default function PublicInvoice() {
   }, [token, sheetUrl]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center font-onest justify-center bg-gray-50 py-0 px-0">
+    <div className="min-h-screen flex flex-col items-center font-onest justify-center bg-gray-50 py-8 px-2">
       <Card className="w-full max-w-4xl">
         
         {loading && <div className="text-center text-gray-500">Loading Invoice from link ...</div>}

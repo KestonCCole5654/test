@@ -50,10 +50,10 @@ export default function EmailInvoiceConfirmation() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-slate-50">
+    <div className="min-h-screen bg-gray-50/50">
       {/* Header Section */}
-      <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-4xl mx-auto px-6 py-4">
+      <div className="bg-transperent border-b border-gray-200 ">
+        <div className="max-w-6xl mx-auto px-6 py-4">
           <button 
             onClick={handleBackToDashboard}
             className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
@@ -78,7 +78,7 @@ export default function EmailInvoiceConfirmation() {
             Invoice Successfully Sent
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Your invoice has been delivered to <span className="font-semibold text-emerald-700">{invoice.customer?.email}</span>
+            Congratulations, your invoice has been delivered to <span className="font-semibold text-emerald-700">{invoice.customer?.email}</span>
           </p>
         </div>
 

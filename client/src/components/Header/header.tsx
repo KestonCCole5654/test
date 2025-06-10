@@ -15,6 +15,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { User as SupabaseUser } from '@supabase/supabase-js'
 import { supabase } from '../../lib/supabase'
+import axios from "axios";
 
 const Header = () => {
   const navigate = useNavigate()
@@ -22,6 +23,7 @@ const Header = () => {
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
   const supabaseClient = useSupabaseClient();
+  const [businessName, setBusinessName] = useState<string>("");
 
   useEffect(() => {
     // Get initial session
@@ -38,6 +40,40 @@ const Header = () => {
       subscription.unsubscribe()
     }
   }, [supabaseClient])
+
+  useEffect(() => {
+    const fetchBusinessDetails = async () => {
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session?.provider_token) {
+          console.warn("Google authentication not available for fetching business details in header.");
+          return;
+        }
+
+        const sheetUrl = localStorage.getItem("defaultSheetUrl");
+        if (!sheetUrl) {
+          console.warn("No defaultSheetUrl found in localStorage for fetching business details in header.");
+          return;
+        }
+
+        const response = await axios.get("https://sheetbills-server.vercel.app/api/business-details", {
+          headers: {
+            Authorization: `Bearer ${session.provider_token}`,
+            "X-Supabase-Token": session.access_token,
+          },
+          params: { sheetUrl },
+        });
+
+        if (response.data.businessDetails && response.data.businessDetails["Company Name"]) {
+          setBusinessName(response.data.businessDetails["Company Name"]);
+        }
+      } catch (error) {
+        console.error("Error fetching business details for header:", error);
+      }
+    };
+
+    fetchBusinessDetails();
+  }, [supabaseClient]);
 
   const handleLogout = async () => {
     const { error } = await supabaseClient.auth.signOut()
@@ -83,9 +119,15 @@ const Header = () => {
           <div className="flex items-center">
             <Link to="/invoices" className="flex items-center space-x-2">
               <div className="h-9 w-9 rounded flex items-center justify-center">
-                <img src="/sheetbills-logo.svg" alt="SheetBills Logo" className="h-10 w-auto " />
+                {businessName ? (
+                  <span className="text-xl font-bold text-slate-200">{businessName.charAt(0)}</span>
+                ) : (
+                  <img src="/sheetbills-logo.svg" alt="SheetBills Logo" className="h-10 w-auto " />
+                )}
               </div>
-              <span className="text-lg font-semibold text-slate-200">SheetBills</span> 
+              <span className="text-lg font-semibold text-slate-200">
+                {businessName || "SheetBills"}
+              </span> 
             </Link>
           </div>
 

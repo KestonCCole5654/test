@@ -64,7 +64,7 @@ export default function EmailInvoiceConfirmation() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-3xl mx-auto px-6 py-12">
         {/* Success Banner */}
         <div className="text-center mb-5">
           <div className="inline-flex items-center justify-center w-20 h-20  rounded-full mb-6 relative">

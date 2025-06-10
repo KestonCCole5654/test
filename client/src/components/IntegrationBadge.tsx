@@ -20,7 +20,7 @@ const integrations = [
     bgColor: "bg-purple-50",
   },
   {
-    src: "/whatsapp-logo.svg",
+    src: "/mailgun-seeklogo.svg",
     alt: "WhatsApp",
     name: "WhatsApp",
     bgColor: "bg-green-50",

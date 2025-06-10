@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckIcon, FileTextIcon, RefreshCwIcon, RocketIcon, ZapIcon, ArrowRightIcon } from 'lucide-react';
+import { CheckIcon, FileTextIcon, RefreshCwIcon, RocketIcon, ZapIcon, ArrowRightIcon, CircleDollarSign, Target, FileCheck, GitFork, Headphones } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from './ui/button';
 
@@ -20,7 +20,7 @@ const FeatureCard = ({ icon, title, description, delay = 0 }: FeatureCardProps) 
   >
     <div className="flex flex-col items-center text-center">
       <div className="mb-5">
-        <div className="bg-green-50 w-16 h-16 rounded-xl flex items-center justify-center text-green-800">
+        <div className="bg-white w-16 h-16 rounded-xl flex items-center justify-center text-blue-600 border border-gray-200 shadow-sm">
           {icon}
         </div>
       </div>
@@ -34,24 +34,29 @@ const FeatureCard = ({ icon, title, description, delay = 0 }: FeatureCardProps) 
 const FeatureSection = () => {
   const featureCards = [
     {
-      icon: <ZapIcon className="w-6 h-6" />,
-      title: "One-Click Invoice Generation",
-      description: "Create professional invoices in seconds, not hours. No more wrestling with formulas or layouts – just enter your data and let SheetBills handle the rest.",
+      icon: <CircleDollarSign className="w-6 h-6" />,
+      title: "Fast Approvals",
+      description: "Get approved in as little as 24 hours—because we know time is valuable.",
     },
     {
-      icon: <FileTextIcon className="w-6 h-6" />,
-      title: "Seamless Google Sheets Integration",
-      description: "Works directly with your existing Google Sheets. No data migration, no new software to learn – just enhanced functionality right where you already work.",
+      icon: <Target className="w-6 h-6" />,
+      title: "Competitive Rates",
+      description: "Affordable interest rates designed to fit your budget and save you more.",
     },
     {
-      icon: <RefreshCwIcon className="w-6 h-6" />,
-      title: "Automated Organization",
-      description: "Say goodbye to scattered invoices across multiple sheets. SheetBills automatically organizes everything in one place with powerful filtering and search.",
+      icon: <FileCheck className="w-6 h-6" />,
+      title: "Transparent Terms",
+      description: "No hidden fees, no surprises. Understand your loan terms from the start.",
     },
     {
-      icon: <RocketIcon className="w-6 h-6" />,
-      title: "Client-Friendly Experience",
-      description: "Provide clients with a professional, branded experience. They complete a simple form, and the invoice data flows directly into your Google Sheet – no errors, no hassle.",
+      icon: <GitFork className="w-6 h-6" />,
+      title: "Flexible Loan Options",
+      description: "Choose from personalized plans tailored to your needs, whether it's for personal, business, or home improvement.",
+    },
+    {
+      icon: <Headphones className="w-6 h-6" />,
+      title: "24/7 Support",
+      description: "Our dedicated team is here to guide you at every step, anytime you need us.",
     },
   ];
 
@@ -63,7 +68,7 @@ const FeatureSection = () => {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="inline-block text-green-800 font-medium px-4 py-1 bg-green-50 rounded-full mb-4"
+            className="inline-block text-gray-700 font-medium px-4 py-1 bg-gray-100 rounded-full mb-4"
           >
             Features
           </motion.span>
@@ -71,24 +76,22 @@ const FeatureSection = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-3xl md:text-4xl font-normal mb-6"
+            className="text-3xl md:text-4xl font-normal mb-6 text-gray-900 leading-tight"
           >
-            <span className="text-[#2F303C]">Simply </span>
-            <span className="text-[#2F303C]">Better Invoicing</span>
+            Loans Made Simple, Fast, and Transparent.
           </motion.h2>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-[#2F303C] font-sans font-medium text-lg max-w-2xl mx-auto"
+            className="text-gray-600 font-sans text-lg max-w-2xl mx-auto"
           >
-            Transform your Google Sheets into a professional invoicing system without any technical skills.
-            Maintain full control of your data while streamlining your workflow.
+            Empowering you to achieve your goals with flexible, reliable, and stress-free financing solutions.
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6  md:gap-8 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6  md:gap-8 mb-16">
           {featureCards.map((card, index) => (
             <FeatureCard 
               key={index} 

@@ -52,7 +52,7 @@ export default function PublicInvoice() {
   }, [token, sheetUrl]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center font-cal-sans justify-center bg-gray-50 py-8 px-2">
+    <div className="min-h-screen flex flex-col items-center font-onest justify-center bg-gray-50 py-8 px-2">
       <Card className="w-full max-w-4xl">
         
         {loading && <div className="text-center text-gray-500">Loading Invoice from link ...</div>}
@@ -60,7 +60,7 @@ export default function PublicInvoice() {
           <div className="text-center text-red-600 mb-4">{error}</div>
         )}
         {invoice && (
-          <div className="bg-white font-cal-sans p-6">
+          <div className="bg-white font-onest p-6">
             <InvoiceClassic data={invoice} businessData={businessData || {}} showShadow={false} />
           </div>
         )}

@@ -118,7 +118,6 @@ const Header = () => {
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/invoices" className="flex items-center space-x-2">
-              
               <span className="text-lg font-semibold text-slate-200">
                 {businessName || "SheetBills"}
               </span> 

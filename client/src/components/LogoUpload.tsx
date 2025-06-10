@@ -172,7 +172,7 @@ const LogoUpload: React.FC<LogoUploadProps> = ({
               />
             </svg>
             <p className="mb-2 text-sm text-gray-500">
-              <span className="font-semibold">Click to upload</span> or drag and drop
+              <span className="font-semibold cursor-pointer">Click to upload</span> or drag and drop
             </p>
             <p className="text-xs text-gray-500">PNG, JPG or GIF (MAX. 5MB)</p>
           </div>

@@ -66,7 +66,7 @@ export default function EmailInvoiceConfirmation() {
 
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Success Banner */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-5">
           <div className="inline-flex items-center justify-center w-20 h-20  rounded-full mb-6 relative">
             <div className="absolute inset-0 bg-green-800 rounded-full "></div>
             <div className="relative bg-green-800 rounded-full p-4">
@@ -83,7 +83,7 @@ export default function EmailInvoiceConfirmation() {
         </div>
 
         {/* Main Content Grid */}
-        <div className="w-full max-w-7xl bg-gray-50/50 font-onest flex flex-col md:flex-row gap-8 items-stretch md:items-center">
+        <div className="w-full max-w-4xl bg-gray-50/50 font-onest flex flex-col md:flex-row gap-8 items-stretch md:items-center">
           {/* Invoice Preview */}
           <div className="flex-1 min-w-0 pt-10">
             <div className="bg-transparent w-full mx-auto overflow-y-auto" style={{ maxHeight: "calc(100vh - 48px)" }}>

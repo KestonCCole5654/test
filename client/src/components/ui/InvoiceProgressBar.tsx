@@ -119,7 +119,7 @@ const InvoiceProgressBar: React.FC<InvoiceProgressBarProps> = ({ sendStatus, pai
         </div>
 
         {/* Progress summary */}
-        <div className="mt-4 text-center">
+        {/* <div className="mt-4 text-center">
           <div className="inline-flex items-center space-x-4 px-6 py-3 bg-gray-50 rounded-full">
             <div className="flex items-center space-x-2">
               <div className="w-2.5 h-2.5 bg-green-900 rounded-full"></div>
@@ -132,7 +132,7 @@ const InvoiceProgressBar: React.FC<InvoiceProgressBarProps> = ({ sendStatus, pai
               {Math.round((steps.filter(step => step.done).length / steps.length) * 100)}% progress
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

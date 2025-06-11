@@ -972,7 +972,7 @@ app.get('/api/invoices/:invoiceId', async (req, res) => {
     // Fetch all invoice rows
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A2:N`,
+      range: `${sheetName}!A2:Q`, // Changed from A2:N to A2:Q to fetch send_status and date_sent
     });
 
     const rows = response.data.values || [];
@@ -1008,9 +1008,9 @@ app.get('/api/invoices/:invoiceId', async (req, res) => {
       template: row[11] || 'classic',
       status: row[12] || 'Pending',
       color: (row[13] && row[13].trim() !== "") ? row[13] : '#166534',
-      send_status: row[14] || 'no',
-      date_sent: row[15] || '',
-      reminders_sent: parseInt(row[16] || '0')
+      send_status: row[14] || 'no', // Added send_status
+      date_sent: row[15] || '',    // Added date_sent
+      reminders_sent: parseInt(row[16] || '0') // Added reminders_sent
     };
 
     // Get business details

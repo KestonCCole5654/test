@@ -3550,6 +3550,11 @@ app.post('/api/send-invoice-email', async (req, res) => {
       return res.status(404).json({ error: 'Invoice not found' });
     }
 
+    // Generate shareable link
+    const expiresAt = Date.now() + 1000 * 60 * 60 * 24; // 24 hours from now
+    const shareToken = Buffer.from(`${invoiceId}:${expiresAt}`).toString('base64');
+    const shareUrl = `https://sheetbills-client.vercel.app/invoice/shared/${shareToken}?sheetUrl=${encodeURIComponent(sheetUrl)}`;
+
     // Parse items, tax, discount
     let items = [];
     let tax = { type: 'percentage', value: 0 };
@@ -3595,24 +3600,19 @@ app.post('/api/send-invoice-email', async (req, res) => {
       }
     });
 
-    // Prepare webhook payload
+    // Prepare webhook payload with keys matching template variables
     const webhookPayload = {
-      invoice_id: invoiceId,
-      client_name: row[3],
-      client_email: row[4],
-      client_address: row[5],
-      amount: parseFloat(row[7]) || 0,
-      due_date: row[2],
-      invoice_date: row[1],
-      items: items,
-      tax: tax,
-      discount: discount,
-      notes: row[10],
-      business_name: businessData.companyName,
-      business_email: businessData.email,
-      business_phone: businessData.phone,
-      business_address: businessData.address,
-      business_logo: businessData.logo
+      invoiceNumber: invoiceId,
+      amount: (parseFloat(row[7]) || 0).toFixed(2), // Ensure string format
+      dueDate: row[2],
+      customerEmail: row[4],
+      message: row[10] || `Dear ${row[3] || "Customer"},
+
+Thank you for doing business with us. Feel free to contact us if you have any questions.`,
+      companyName: businessData.companyName,
+      businessEmail: businessData.email,
+      logo: businessData.logo,
+      shareableLink: shareUrl // Add the generated shareable link
     };
 
     // Send webhook to Make

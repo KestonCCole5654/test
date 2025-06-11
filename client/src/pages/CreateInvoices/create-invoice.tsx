@@ -893,11 +893,12 @@ export default function InvoiceForm() {
                 status: latestInvoice.status === "Paid" ? "Paid" : "Pending",
                 color: (typeof latestInvoice.color === "string" && latestInvoice.color.trim() !== "") ? latestInvoice.color : "#166534",
                 logo: latestInvoice.logo || "",
-                send_status: latestInvoice.send_status || "" // Crucially, use the fetched send_status
+                send_status: latestInvoice.send_status || ""
               };
               setInvoiceData(processedInvoiceData);
               setIsFormExpanded(false); // Hide form by default when viewing an invoice
               console.log("Processed Latest Invoice Data:", processedInvoiceData);
+              console.log("Send Status from fetched data:", processedInvoiceData.send_status);
             } else {
                 // Fallback to initial invoiceToEdit if fetch fails
                 const processedInvoiceData: InvoiceData = {

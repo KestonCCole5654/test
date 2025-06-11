@@ -475,6 +475,54 @@ export default function InvoiceForm() {
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   // Format date to show month name, day and year for email body
 
+  // Enhanced parser that handles all possible field states
+  interface FinancialField {
+    type: "percentage" | "fixed"
+    value: number | string
+  }
+
+  const parseFinancialField = (
+    field: string | FinancialField | null | undefined,
+    fieldName: string,
+    defaultValue: FinancialField,
+  ): FinancialField => {
+    // Handle completely missing field
+    if (field === undefined || field === null) {
+      console.warn(`${fieldName} is undefined/null, using defaults`)
+      return defaultValue
+    }
+
+    // Handle string input (could be JSON string)
+    if (typeof field === "string") {
+      try {
+        const parsed = field.trim() ? JSON.parse(field) : defaultValue
+        if (parsed && typeof parsed === "object") {
+          return {
+            type: ["percentage", "fixed"].includes(parsed.type)
+              ? (parsed.type as "percentage" | "fixed")
+              : defaultValue.type,
+            value:
+              parsed.value === 0 ? "" : !isNaN(Number(parsed.value)) ? Number(parsed.value) : defaultValue.value,
+          }
+        }
+      } catch (e) {
+        console.error(`Failed to parse ${fieldName}:`, field)
+      }
+    }
+
+    // Handle direct object input
+    if (typeof field === "object" && field !== null) {
+      return {
+        type: ["percentage", "fixed"].includes(field.type)
+          ? (field.type as "percentage" | "fixed")
+          : defaultValue.type,
+        value: field.value === 0 ? "" : !isNaN(Number(field.value)) ? Number(field.value) : defaultValue.value,
+      }
+    }
+
+    return defaultValue
+  }
+
   const [shareableLink, setShareableLink] = useState<string>("")
   const [isGeneratingLink, setIsGeneratingLink] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -785,91 +833,136 @@ export default function InvoiceForm() {
 
   // Used to edit invoice
   useEffect(() => {
+    const fetchLatestInvoiceDetails = async (id: string, sheetUrl: string) => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.provider_token) {
+          throw new Error("Google authentication required");
+        }
+
+        const response = await axios.get(
+          `https://sheetbills-server.vercel.app/api/invoices/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${session.provider_token}`,
+            },
+            params: { sheetUrl: sheetUrl },
+          }
+        );
+        return response.data.invoice;
+      } catch (error) {
+        console.error("Error fetching latest invoice details:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch latest invoice details.",
+          variant: "destructive",
+        });
+        return null;
+      }
+    };
+
     if (invoiceToEdit) {
-      console.log("Raw Invoice Data:", invoiceToEdit)
+      console.log("Raw Invoice Data:", invoiceToEdit);
 
-      // Enhanced parser that handles all possible field states
-      interface FinancialField {
-        type: "percentage" | "fixed"
-        value: number | string
-      }
-
-      const parseFinancialField = (
-        field: string | FinancialField | null | undefined,
-        fieldName: string,
-        defaultValue: FinancialField,
-      ): FinancialField => {
-        // Handle completely missing field
-        if (field === undefined || field === null) {
-          console.warn(`${fieldName} is undefined/null, using defaults`)
-          return defaultValue
-        }
-
-        // Handle string input (could be JSON string)
-        if (typeof field === "string") {
-          try {
-            const parsed = field.trim() ? JSON.parse(field) : defaultValue
-            if (parsed && typeof parsed === "object") {
-              return {
-                type: ["percentage", "fixed"].includes(parsed.type)
-                  ? (parsed.type as "percentage" | "fixed")
-                  : defaultValue.type,
-                value:
-                  parsed.value === 0 ? "" : !isNaN(Number(parsed.value)) ? Number(parsed.value) : defaultValue.value,
-              }
+      // Only fetch if selectedSpreadsheetUrl is available
+      if (selectedSpreadsheetUrl) {
+        fetchLatestInvoiceDetails(invoiceToEdit.id || invoiceToEdit.invoiceNumber, selectedSpreadsheetUrl)
+          .then(latestInvoice => {
+            if (latestInvoice) {
+              // Process the fetched data instead of the initial invoiceToEdit
+              const processedInvoiceData: InvoiceData = {
+                invoiceNumber: latestInvoice.invoiceNumber || latestInvoice.id || `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+                date: latestInvoice.date || new Date().toISOString().split("T")[0],
+                dueDate: latestInvoice.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+                customer: latestInvoice.customer || {
+                  name: "",
+                  email: "",
+                  address: "",
+                },
+                items: Array.isArray(latestInvoice.items)
+                  ? latestInvoice.items.map((item: InvoiceItem) => ({
+                    ...item,
+                    price: item.price === 0 ? "" : item.price,
+                    discount: parseFinancialField(item.discount, "discount", { type: "percentage", value: "" }),
+                    tax: parseFinancialField(item.tax, "tax", { type: "percentage", value: "" })
+                  }))
+                  : [{ name: "", description: "", quantity: 1, price: "", discount: { type: "percentage", value: "" }, tax: { type: "percentage", value: "" } }],
+                amount: latestInvoice.amount || 0,
+                notes: typeof latestInvoice.notes === "string" ? latestInvoice.notes : "",
+                template: "classic" as const,
+                status: latestInvoice.status === "Paid" ? "Paid" : "Pending",
+                color: (typeof latestInvoice.color === "string" && latestInvoice.color.trim() !== "") ? latestInvoice.color : "#166534",
+                logo: latestInvoice.logo || "",
+                send_status: latestInvoice.send_status || "" // Crucially, use the fetched send_status
+              };
+              setInvoiceData(processedInvoiceData);
+              setIsFormExpanded(false); // Hide form by default when viewing an invoice
+              console.log("Processed Latest Invoice Data:", processedInvoiceData);
+            } else {
+                // Fallback to initial invoiceToEdit if fetch fails
+                const processedInvoiceData: InvoiceData = {
+                  invoiceNumber: invoiceToEdit.invoiceNumber || invoiceToEdit.id || `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+                  date: invoiceToEdit.date || new Date().toISOString().split("T")[0],
+                  dueDate: invoiceToEdit.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+                  customer: invoiceToEdit.customer || {
+                    name: "",
+                    email: "",
+                    address: "",
+                  },
+                  items: Array.isArray(invoiceToEdit.items)
+                    ? invoiceToEdit.items.map((item: InvoiceItem) => ({
+                      ...item,
+                      price: item.price === 0 ? "" : item.price,
+                      discount: parseFinancialField(item.discount, "discount", { type: "percentage", value: "" }),
+                      tax: parseFinancialField(item.tax, "tax", { type: "percentage", value: "" })
+                    }))
+                    : [{ name: "", description: "", quantity: 1, price: "", discount: { type: "percentage", value: "" }, tax: { type: "percentage", value: "" } }],
+                  amount: invoiceToEdit.amount || 0,
+                  notes: typeof invoiceToEdit.notes === "string" ? invoiceToEdit.notes : "",
+                  template: "classic" as const,
+                  status: invoiceToEdit.status === "Paid" ? "Paid" : "Pending",
+                  color: (typeof invoiceToEdit.color === "string" && invoiceToEdit.color.trim() !== "") ? invoiceToEdit.color : "#166534",
+                  logo: invoiceToEdit.logo || "",
+                  send_status: invoiceToEdit.send_status || ""
+                };
+                setInvoiceData(processedInvoiceData);
+                setIsFormExpanded(false);
+                console.log("Processed Initial Invoice Data (fallback):", processedInvoiceData);
             }
-          } catch (e) {
-            console.error(`Failed to parse ${fieldName}:`, field)
-          }
-        }
-
-        // Handle direct object input
-        if (typeof field === "object" && field !== null) {
-          return {
-            type: ["percentage", "fixed"].includes(field.type)
-              ? (field.type as "percentage" | "fixed")
-              : defaultValue.type,
-            value: field.value === 0 ? "" : !isNaN(Number(field.value)) ? Number(field.value) : defaultValue.value,
-          }
-        }
-
-        return defaultValue
+          });
+      } else {
+        console.warn("selectedSpreadsheetUrl not available, cannot fetch latest invoice details. Using initial invoiceToEdit.");
+        const processedInvoiceData: InvoiceData = {
+          invoiceNumber: invoiceToEdit.invoiceNumber || invoiceToEdit.id || `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+          date: invoiceToEdit.date || new Date().toISOString().split("T")[0],
+          dueDate: invoiceToEdit.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+          customer: invoiceToEdit.customer || {
+            name: "",
+            email: "",
+            address: "",
+          },
+          items: Array.isArray(invoiceToEdit.items)
+            ? invoiceToEdit.items.map((item: InvoiceItem) => ({
+              ...item,
+              price: item.price === 0 ? "" : item.price,
+              discount: parseFinancialField(item.discount, "discount", { type: "percentage", value: "" }),
+              tax: parseFinancialField(item.tax, "tax", { type: "percentage", value: "" })
+            }))
+            : [{ name: "", description: "", quantity: 1, price: "", discount: { type: "percentage", value: "" }, tax: { type: "percentage", value: "" } }],
+          amount: invoiceToEdit.amount || 0,
+          notes: typeof invoiceToEdit.notes === "string" ? invoiceToEdit.notes : "",
+          template: "classic" as const,
+          status: invoiceToEdit.status === "Paid" ? "Paid" : "Pending",
+          color: (typeof invoiceToEdit.color === "string" && invoiceToEdit.color.trim() !== "") ? invoiceToEdit.color : "#166534",
+          logo: invoiceToEdit.logo || "",
+          send_status: invoiceToEdit.send_status || ""
+        };
+        setInvoiceData(processedInvoiceData);
+        setIsFormExpanded(false);
+        console.log("Processed Initial Invoice Data (selectedSpreadsheetUrl missing):", processedInvoiceData);
       }
-
-      // Process invoice data with guaranteed fields
-      const processedInvoiceData: InvoiceData = {
-        invoiceNumber: invoiceToEdit.invoiceNumber || invoiceToEdit.id || `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
-        date: invoiceToEdit.date || new Date().toISOString().split("T")[0],
-        dueDate: invoiceToEdit.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
-        customer: invoiceToEdit.customer || {
-          name: "",
-          email: "",
-          address: "",
-        },
-        items: Array.isArray(invoiceToEdit.items)
-          ? invoiceToEdit.items.map((item: InvoiceItem) => ({
-            ...item,
-            price: item.price === 0 ? "" : item.price,
-            discount: parseFinancialField(item.discount, "discount", { type: "percentage", value: "" }),
-            tax: parseFinancialField(item.tax, "tax", { type: "percentage", value: "" })
-          }))
-          : [{ name: "", description: "", quantity: 1, price: "", discount: { type: "percentage", value: "" }, tax: { type: "percentage", value: "" } }],
-        amount: invoiceToEdit.amount || 0,
-        notes: typeof invoiceToEdit.notes === "string" ? invoiceToEdit.notes : "",
-        template: "classic" as const,
-        status: invoiceToEdit.status === "Paid" ? "Paid" : "Pending",
-        color: (typeof invoiceToEdit.color === "string" && invoiceToEdit.color.trim() !== "") ? invoiceToEdit.color : "#166534",
-        logo: invoiceToEdit.logo || "",
-        send_status: invoiceToEdit.send_status || ""
-      }
-
-      setInvoiceData(processedInvoiceData)
-      setIsFormExpanded(false) // Hide form by default when viewing an invoice
-
-      // Debug log the processed data
-      console.log("Processed Invoice Data:", processedInvoiceData)
     }
-  }, [invoiceToEdit])
+  }, [invoiceToEdit, selectedSpreadsheetUrl, supabase.auth, toast]);
 
   return (
     <>

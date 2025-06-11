@@ -201,7 +201,10 @@ export default function EmailInvoice() {
         "https://sheetbills-server.vercel.app/api/send-invoice-email",
         {
           invoiceId: invoiceId || invoice?.invoiceNumber,
-          sheetUrl
+          sheetUrl,
+          from: emailData.from,
+          to: emailData.to,
+          subject: emailData.subject
         },
         {
           headers: {

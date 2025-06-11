@@ -3497,10 +3497,10 @@ app.delete('/api/customers/bulk-delete', async (req, res) => {
 // Add this new endpoint
 app.post('/api/send-invoice-email', async (req, res) => {
   try {
-    const { invoiceId, sheetUrl } = req.body;
+    const { invoiceId, sheetUrl, from, to, subject } = req.body; // Added from, to, subject
 
     // Validate input
-    if (!invoiceId || !sheetUrl) {
+    if (!invoiceId || !sheetUrl || !from || !to || !subject) { // Updated validation
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
@@ -3603,18 +3603,18 @@ app.post('/api/send-invoice-email', async (req, res) => {
     // Prepare webhook payload with keys matching template variables
     const webhookPayload = {
       invoiceNumber: invoiceId,
-      amount: (parseFloat(row[7]) || 0).toFixed(2), // Ensure string format
+      amount: (parseFloat(row[7]) || 0).toFixed(2),
       dueDate: row[2],
-      customerEmail: row[4],
+      customerEmail: to, // Use 'to' from request body
       message: row[10] || `Dear ${row[3] || "Customer"},
 
 Thank you for doing business with us. Feel free to contact us if you have any questions.`,
       companyName: businessData.companyName,
       businessEmail: businessData.email,
       logo: businessData.logo,
-      shareableLink: shareUrl, // Add the generated shareable link
-      from: businessData.email, // Added for Make
-      subject: `Invoice #: ${invoiceId}` // Added for Make
+      shareableLink: shareUrl,
+      from: from, // Use 'from' from request body
+      subject: subject // Use 'subject' from request body
     };
 
     // Send webhook to Make

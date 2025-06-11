@@ -3612,7 +3612,9 @@ Thank you for doing business with us. Feel free to contact us if you have any qu
       companyName: businessData.companyName,
       businessEmail: businessData.email,
       logo: businessData.logo,
-      shareableLink: shareUrl // Add the generated shareable link
+      shareableLink: shareUrl, // Add the generated shareable link
+      from: businessData.email, // Added for Make
+      subject: `Invoice #: ${invoiceId}` // Added for Make
     };
 
     // Send webhook to Make

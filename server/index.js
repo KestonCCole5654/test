@@ -240,6 +240,183 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
         valueInputOption: 'RAW',
         resource: { values: [correctHeaders] },
       });
+
+      // Apply formatting and data validation
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId,
+        requestBody: {
+          requests: [
+            // Format headers
+            {
+              repeatCell: {
+                range: {
+                  sheetId: 0,
+                  startRowIndex: 0,
+                  endRowIndex: 1,
+                  startColumnIndex: 0,
+                  endColumnIndex: correctHeaders.length
+                },
+                cell: {
+                  userEnteredFormat: {
+                    backgroundColor: { red: 0.2, green: 0.2, blue: 0.2 },
+                    textFormat: { 
+                      bold: true,
+                      foregroundColor: { red: 1, green: 1, blue: 1 }
+                    },
+                    horizontalAlignment: 'CENTER',
+                    verticalAlignment: 'MIDDLE'
+                  }
+                },
+                fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)'
+              }
+            },
+            // Set column widths
+            {
+              updateDimensionProperties: {
+                range: {
+                  sheetId: 0,
+                  dimension: 'COLUMNS',
+                  startIndex: 0,
+                  endIndex: correctHeaders.length
+                },
+                properties: {
+                  pixelSize: 150
+                },
+                fields: 'pixelSize'
+              }
+            },
+            // Format date columns
+            {
+              repeatCell: {
+                range: {
+                  sheetId: 0,
+                  startRowIndex: 1,
+                  startColumnIndex: 1,
+                  endColumnIndex: 3
+                },
+                cell: {
+                  userEnteredFormat: {
+                    numberFormat: {
+                      type: 'DATE',
+                      pattern: 'yyyy-mm-dd'
+                    }
+                  }
+                },
+                fields: 'userEnteredFormat.numberFormat'
+              }
+            },
+            // Format amount column
+            {
+              repeatCell: {
+                range: {
+                  sheetId: 0,
+                  startRowIndex: 1,
+                  startColumnIndex: 7,
+                  endColumnIndex: 8
+                },
+                cell: {
+                  userEnteredFormat: {
+                    numberFormat: {
+                      type: 'CURRENCY',
+                      pattern: '"$"#,##0.00'
+                    }
+                  }
+                },
+                fields: 'userEnteredFormat.numberFormat'
+              }
+            },
+            // Add data validation for status
+            {
+              setDataValidation: {
+                range: {
+                  sheetId: 0,
+                  startRowIndex: 1,
+                  startColumnIndex: 12,
+                  endColumnIndex: 13
+                },
+                rule: {
+                  condition: {
+                    type: 'ONE_OF_LIST',
+                    values: [
+                      { userEnteredValue: 'Pending' },
+                      { userEnteredValue: 'Paid' },
+                      { userEnteredValue: 'Overdue' }
+                    ]
+                  },
+                  showCustomUi: true,
+                  strict: true
+                }
+              }
+            },
+            // Add conditional formatting for status
+            {
+              addConditionalFormatRule: {
+                rule: {
+                  ranges: [{
+                    sheetId: 0,
+                    startRowIndex: 1,
+                    startColumnIndex: 12,
+                    endColumnIndex: 13
+                  }],
+                  booleanRule: {
+                    condition: {
+                      type: 'TEXT_EQ',
+                      values: [{ userEnteredValue: 'Paid' }]
+                    },
+                    format: {
+                      backgroundColor: { red: 0.7, green: 0.9, blue: 0.7 }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              addConditionalFormatRule: {
+                rule: {
+                  ranges: [{
+                    sheetId: 0,
+                    startRowIndex: 1,
+                    startColumnIndex: 12,
+                    endColumnIndex: 13
+                  }],
+                  booleanRule: {
+                    condition: {
+                      type: 'TEXT_EQ',
+                      values: [{ userEnteredValue: 'Overdue' }]
+                    },
+                    format: {
+                      backgroundColor: { red: 0.9, green: 0.7, blue: 0.7 }
+                    }
+                  }
+                }
+              }
+            },
+            // Add conditional formatting for amounts
+            {
+              addConditionalFormatRule: {
+                rule: {
+                  ranges: [{
+                    sheetId: 0,
+                    startRowIndex: 1,
+                    startColumnIndex: 7,
+                    endColumnIndex: 8
+                  }],
+                  gradientRule: {
+                    minpoint: {
+                      color: { red: 0.7, green: 0.9, blue: 0.7 },
+                      type: 'MIN'
+                    },
+                    maxpoint: {
+                      color: { red: 0.9, green: 0.7, blue: 0.7 },
+                      type: 'MAX'
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      });
     }
   } catch (err) {
     // If header row doesn't exist, just set it
@@ -2217,13 +2394,21 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
           {
             properties: {
               title: 'SheetBills Invoices',
-              gridProperties: { rowCount: 1000, columnCount: 15 }
+              gridProperties: { 
+                rowCount: 1000, 
+                columnCount: 17,
+                frozenRowCount: 1
+              }
             }
           },
           {
             properties: {
               title: 'Business Details',
-              gridProperties: { rowCount: 100, columnCount: 3 }
+              gridProperties: { 
+                rowCount: 100, 
+                columnCount: 3,
+                frozenRowCount: 1
+              }
             }
           }
         ]
@@ -2253,13 +2438,14 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
 
     // Add headers to 'SheetBills Invoices' tab
     const invoiceHeaders = [
-      'Invoice ID', 'Invoice Date', 'Due Date', 'Customer Name',
+      'Invoice ID', 'Date', 'Due Date', 'Customer Name',
       'Customer Email', 'Customer Address', 'Items', 'Amount',
-      'Tax', 'Discount', 'Notes', 'Template', 'Status', 'Color'
+      'Tax', 'Discount', 'Notes', 'Template', 'Status', 'Color',
+      'send_status', 'date_sent', 'reminders_sent'
     ];
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: 'SheetBills Invoices!A1:N1',
+      range: 'SheetBills Invoices!A1:Q1',
       valueInputOption: 'RAW',
       requestBody: { values: [invoiceHeaders] }
     });
@@ -2286,7 +2472,7 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
       }
     });
 
-    // Format headers for both tabs
+    // Format both sheets
     const invoiceSheetId = spreadsheet.data.sheets[0].properties.sheetId;
     const businessSheetId = spreadsheet.data.sheets[1].properties.sheetId;
 
@@ -2294,28 +2480,211 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
       spreadsheetId,
       requestBody: {
         requests: [
+          // Format invoice sheet headers
           {
             repeatCell: {
-              range: { sheetId: invoiceSheetId, startRowIndex: 0, endRowIndex: 1 },
+              range: { 
+                sheetId: invoiceSheetId, 
+                startRowIndex: 0, 
+                endRowIndex: 1,
+                startColumnIndex: 0,
+                endColumnIndex: invoiceHeaders.length
+              },
               cell: {
                 userEnteredFormat: {
-                  backgroundColor: { red: 0.8, green: 0.8, blue: 0.8 },
-                  textFormat: { bold: true }
+                  backgroundColor: { red: 0.2, green: 0.2, blue: 0.2 },
+                  textFormat: { 
+                    bold: true,
+                    foregroundColor: { red: 1, green: 1, blue: 1 }
+                  },
+                  horizontalAlignment: 'CENTER',
+                  verticalAlignment: 'MIDDLE'
                 }
               },
-              fields: 'userEnteredFormat(backgroundColor,textFormat)'
+              fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)'
+            }
+          },
+          // Format business details sheet headers
+          {
+            repeatCell: {
+              range: { 
+                sheetId: businessSheetId, 
+                startRowIndex: 0, 
+                endRowIndex: 1,
+                startColumnIndex: 0,
+                endColumnIndex: 3
+              },
+              cell: {
+                userEnteredFormat: {
+                  backgroundColor: { red: 0.2, green: 0.2, blue: 0.2 },
+                  textFormat: { 
+                    bold: true,
+                    foregroundColor: { red: 1, green: 1, blue: 1 }
+                  },
+                  horizontalAlignment: 'CENTER',
+                  verticalAlignment: 'MIDDLE'
+                }
+              },
+              fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)'
+            }
+          },
+          // Set column widths for invoice sheet
+          {
+            updateDimensionProperties: {
+              range: {
+                sheetId: invoiceSheetId,
+                dimension: 'COLUMNS',
+                startIndex: 0,
+                endIndex: invoiceHeaders.length
+              },
+              properties: {
+                pixelSize: 150
+              },
+              fields: 'pixelSize'
+            }
+          },
+          // Set column widths for business details sheet
+          {
+            updateDimensionProperties: {
+              range: {
+                sheetId: businessSheetId,
+                dimension: 'COLUMNS',
+                startIndex: 0,
+                endIndex: 3
+              },
+              properties: {
+                pixelSize: 200
+              },
+              fields: 'pixelSize'
+            }
+          },
+          // Format date columns in invoice sheet
+          {
+            repeatCell: {
+              range: {
+                sheetId: invoiceSheetId,
+                startRowIndex: 1,
+                startColumnIndex: 1,
+                endColumnIndex: 3
+              },
+              cell: {
+                userEnteredFormat: {
+                  numberFormat: {
+                    type: 'DATE',
+                    pattern: 'yyyy-mm-dd'
+                  }
+                }
+              },
+              fields: 'userEnteredFormat.numberFormat'
+            }
+          },
+          // Format amount column in invoice sheet
+          {
+            repeatCell: {
+              range: {
+                sheetId: invoiceSheetId,
+                startRowIndex: 1,
+                startColumnIndex: 7,
+                endColumnIndex: 8
+              },
+              cell: {
+                userEnteredFormat: {
+                  numberFormat: {
+                    type: 'CURRENCY',
+                    pattern: '"$"#,##0.00'
+                  }
+                }
+              },
+              fields: 'userEnteredFormat.numberFormat'
+            }
+          },
+          // Add data validation for status
+          {
+            setDataValidation: {
+              range: {
+                sheetId: invoiceSheetId,
+                startRowIndex: 1,
+                startColumnIndex: 12,
+                endColumnIndex: 13
+              },
+              rule: {
+                condition: {
+                  type: 'ONE_OF_LIST',
+                  values: [
+                    { userEnteredValue: 'Pending' },
+                    { userEnteredValue: 'Paid' },
+                    { userEnteredValue: 'Overdue' }
+                  ]
+                },
+                showCustomUi: true,
+                strict: true
+              }
+            }
+          },
+          // Add conditional formatting for status
+          {
+            addConditionalFormatRule: {
+              rule: {
+                ranges: [{
+                  sheetId: invoiceSheetId,
+                  startRowIndex: 1,
+                  startColumnIndex: 12,
+                  endColumnIndex: 13
+                }],
+                booleanRule: {
+                  condition: {
+                    type: 'TEXT_EQ',
+                    values: [{ userEnteredValue: 'Paid' }]
+                  },
+                  format: {
+                    backgroundColor: { red: 0.7, green: 0.9, blue: 0.7 }
+                  }
+                }
+              }
             }
           },
           {
-            repeatCell: {
-              range: { sheetId: businessSheetId, startRowIndex: 0, endRowIndex: 1 },
-              cell: {
-                userEnteredFormat: {
-                  backgroundColor: { red: 0.8, green: 0.8, blue: 0.8 },
-                  textFormat: { bold: true }
+            addConditionalFormatRule: {
+              rule: {
+                ranges: [{
+                  sheetId: invoiceSheetId,
+                  startRowIndex: 1,
+                  startColumnIndex: 12,
+                  endColumnIndex: 13
+                }],
+                booleanRule: {
+                  condition: {
+                    type: 'TEXT_EQ',
+                    values: [{ userEnteredValue: 'Overdue' }]
+                  },
+                  format: {
+                    backgroundColor: { red: 0.9, green: 0.7, blue: 0.7 }
+                  }
                 }
-              },
-              fields: 'userEnteredFormat(backgroundColor,textFormat)'
+              }
+            }
+          },
+          // Add conditional formatting for amounts
+          {
+            addConditionalFormatRule: {
+              rule: {
+                ranges: [{
+                  sheetId: invoiceSheetId,
+                  startRowIndex: 1,
+                  startColumnIndex: 7,
+                  endColumnIndex: 8
+                }],
+                gradientRule: {
+                  minpoint: {
+                    color: { red: 0.7, green: 0.9, blue: 0.7 },
+                    type: 'MIN'
+                  },
+                  maxpoint: {
+                    color: { red: 0.9, green: 0.7, blue: 0.7 },
+                    type: 'MAX'
+                  }
+                }
+              }
             }
           }
         ]

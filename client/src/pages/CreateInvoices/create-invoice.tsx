@@ -101,10 +101,6 @@ export interface InvoiceData {
   color?: string
   logo?: string
   send_status?: string
-  date_sent?: string
-  reminders_sent?: number
-  opened_status?: string
-  date_opened?: string
 }
 
 export interface InvoiceItem {
@@ -268,11 +264,7 @@ export default function InvoiceForm() {
         status: invoiceToEdit.status || "Pending",
         color: (typeof invoiceToEdit.color === "string" && invoiceToEdit.color.trim() !== "") ? invoiceToEdit.color : "#166534",
         logo: invoiceToEdit.logo || "",
-        send_status: invoiceToEdit.send_status || "",
-        date_sent: invoiceToEdit.date_sent || "",
-        reminders_sent: invoiceToEdit.reminders_sent || 0,
-        opened_status: invoiceToEdit.opened_status || "",
-        date_opened: invoiceToEdit.date_opened || ""
+        send_status: invoiceToEdit.send_status || ""
       }
     } else {
       return {
@@ -901,11 +893,7 @@ export default function InvoiceForm() {
                 status: latestInvoice.status === "Paid" ? "Paid" : "Pending",
                 color: (typeof latestInvoice.color === "string" && latestInvoice.color.trim() !== "") ? latestInvoice.color : "#166534",
                 logo: latestInvoice.logo || "",
-                send_status: latestInvoice.send_status || "",
-                date_sent: latestInvoice.date_sent || "",
-                reminders_sent: latestInvoice.reminders_sent || 0,
-                opened_status: latestInvoice.opened_status || "",
-                date_opened: latestInvoice.date_opened || ""
+                send_status: latestInvoice.send_status || ""
               };
               setInvoiceData(processedInvoiceData);
               setIsFormExpanded(false); // Hide form by default when viewing an invoice
@@ -936,11 +924,7 @@ export default function InvoiceForm() {
                   status: invoiceToEdit.status === "Paid" ? "Paid" : "Pending",
                   color: (typeof invoiceToEdit.color === "string" && invoiceToEdit.color.trim() !== "") ? invoiceToEdit.color : "#166534",
                   logo: invoiceToEdit.logo || "",
-                  send_status: invoiceToEdit.send_status || "",
-                  date_sent: invoiceToEdit.date_sent || "",
-                  reminders_sent: invoiceToEdit.reminders_sent || 0,
-                  opened_status: invoiceToEdit.opened_status || "",
-                  date_opened: invoiceToEdit.date_opened || ""
+                  send_status: invoiceToEdit.send_status || ""
                 };
                 setInvoiceData(processedInvoiceData);
                 setIsFormExpanded(false);
@@ -972,11 +956,7 @@ export default function InvoiceForm() {
           status: invoiceToEdit.status === "Paid" ? "Paid" : "Pending",
           color: (typeof invoiceToEdit.color === "string" && invoiceToEdit.color.trim() !== "") ? invoiceToEdit.color : "#166534",
           logo: invoiceToEdit.logo || "",
-          send_status: invoiceToEdit.send_status || "",
-          date_sent: invoiceToEdit.date_sent || "",
-          reminders_sent: invoiceToEdit.reminders_sent || 0,
-          opened_status: invoiceToEdit.opened_status || "",
-          date_opened: invoiceToEdit.date_opened || ""
+          send_status: invoiceToEdit.send_status || ""
         };
         setInvoiceData(processedInvoiceData);
         setIsFormExpanded(false);

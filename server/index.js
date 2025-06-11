@@ -213,14 +213,12 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
     'Color',
     'send_status',
     'date_sent',
-    'reminders_sent',
-    'opened_status', // Added for email opened tracking
-    'date_opened'    // Added for email opened tracking
+    'reminders_sent'
   ];
   try {
     const headerResp = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A1:S1`, // Adjusted range to include new headers
+      range: `${sheetName}!A1:Q1`,
     });
     const currentHeaders = headerResp.data.values ? headerResp.data.values[0] : [];
     // If headers are missing or don't match, update them
@@ -238,7 +236,7 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
     if (needsUpdate) {
       await sheets.spreadsheets.values.update({
         spreadsheetId,
-        range: `${sheetName}!A1:S1`, // Adjusted range to include new headers
+        range: `${sheetName}!A1:Q1`,
         valueInputOption: 'RAW',
         resource: { values: [correctHeaders] },
       });
@@ -247,73 +245,184 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
       await sheets.spreadsheets.batchUpdate({
         spreadsheetId,
         requestBody: {
-          requests: [{
-            updateSheetProperties: {
-              properties: {
-                sheetId: 0,
-                title: 'My Sheets',
-                gridProperties: { 
-                  rowCount: 1000, 
-                  columnCount: 19, // Adjusted columnCount
-                  frozenRowCount: 1
-                }
-              },
-              fields: 'title,gridProperties'
-            }
-          }]
-        },
-        auth: auth,
-        key: process.env.GOOGLE_API_KEY
-      });
-      // 4. Add headers
-      await sheets.spreadsheets.values.update({
-        spreadsheetId,
-        range: 'My Sheets!A1:E1',
-        valueInputOption: 'USER_ENTERED',
-        requestBody: {
-          values: [[
-            'Created At', 
-            'Sheet Name', 
-            'Sheet Type', 
-            'Status', 
-            'URL'
-          ]]
-        },
-        auth: auth,
-        key: process.env.GOOGLE_API_KEY
-      });
-      // 5. Add basic protection to header row
-      await sheets.spreadsheets.batchUpdate({
-        spreadsheetId,
-        requestBody: {
-          requests: [{
-            addProtectedRange: {
-              protectedRange: {
+          requests: [
+            // Format headers
+            {
+              repeatCell: {
                 range: {
                   sheetId: 0,
                   startRowIndex: 0,
-                  endRowIndex: 1
+                  endRowIndex: 1,
+                  startColumnIndex: 0,
+                  endColumnIndex: correctHeaders.length
                 },
-                description: 'Header row protection',
-                warningOnly: true
+                cell: {
+                  userEnteredFormat: {
+                    backgroundColor: { red: 0.2, green: 0.2, blue: 0.2 },
+                    textFormat: { 
+                      bold: true,
+                      foregroundColor: { red: 1, green: 1, blue: 1 }
+                    },
+                    horizontalAlignment: 'CENTER',
+                    verticalAlignment: 'MIDDLE'
+                  }
+                },
+                fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)'
+              }
+            },
+            // Set column widths
+            {
+              updateDimensionProperties: {
+                range: {
+                  sheetId: 0,
+                  dimension: 'COLUMNS',
+                  startIndex: 0,
+                  endIndex: correctHeaders.length
+                },
+                properties: {
+                  pixelSize: 150
+                },
+                fields: 'pixelSize'
+              }
+            },
+            // Format date columns
+            {
+              repeatCell: {
+                range: {
+                  sheetId: 0,
+                  startRowIndex: 1,
+                  startColumnIndex: 1,
+                  endColumnIndex: 3
+                },
+                cell: {
+                  userEnteredFormat: {
+                    numberFormat: {
+                      type: 'DATE',
+                      pattern: 'yyyy-mm-dd'
+                    }
+                  }
+                },
+                fields: 'userEnteredFormat.numberFormat'
+              }
+            },
+            // Format amount column
+            {
+              repeatCell: {
+                range: {
+                  sheetId: 0,
+                  startRowIndex: 1,
+                  startColumnIndex: 7,
+                  endColumnIndex: 8
+                },
+                cell: {
+                  userEnteredFormat: {
+                    numberFormat: {
+                      type: 'CURRENCY',
+                      pattern: '"$"#,##0.00'
+                    }
+                  }
+                },
+                fields: 'userEnteredFormat.numberFormat'
+              }
+            },
+            // Add data validation for status
+            {
+              setDataValidation: {
+                range: {
+                  sheetId: 0,
+                  startRowIndex: 1,
+                  startColumnIndex: 12,
+                  endColumnIndex: 13
+                },
+                rule: {
+                  condition: {
+                    type: 'ONE_OF_LIST',
+                    values: [
+                      { userEnteredValue: 'Pending' },
+                      { userEnteredValue: 'Paid' },
+                      { userEnteredValue: 'Overdue' }
+                    ]
+                  },
+                  showCustomUi: true,
+                  strict: true
+                }
+              }
+            },
+            // Add conditional formatting for status
+            {
+              addConditionalFormatRule: {
+                rule: {
+                  ranges: [{
+                    sheetId: 0,
+                    startRowIndex: 1,
+                    startColumnIndex: 12,
+                    endColumnIndex: 13
+                  }],
+                  booleanRule: {
+                    condition: {
+                      type: 'TEXT_EQ',
+                      values: [{ userEnteredValue: 'Paid' }]
+                    },
+                    format: {
+                      backgroundColor: { red: 0.7, green: 0.9, blue: 0.7 }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              addConditionalFormatRule: {
+                rule: {
+                  ranges: [{
+                    sheetId: 0,
+                    startRowIndex: 1,
+                    startColumnIndex: 12,
+                    endColumnIndex: 13
+                  }],
+                  booleanRule: {
+                    condition: {
+                      type: 'TEXT_EQ',
+                      values: [{ userEnteredValue: 'Overdue' }]
+                    },
+                    format: {
+                      backgroundColor: { red: 0.9, green: 0.7, blue: 0.7 }
+                    }
+                  }
+                }
+              }
+            },
+            // Add conditional formatting for amounts
+            {
+              addConditionalFormatRule: {
+                rule: {
+                  ranges: [{
+                    sheetId: 0,
+                    startRowIndex: 1,
+                    startColumnIndex: 7,
+                    endColumnIndex: 8
+                  }],
+                  gradientRule: {
+                    minpoint: {
+                      color: { red: 0.7, green: 0.9, blue: 0.7 },
+                      type: 'MIN'
+                    },
+                    maxpoint: {
+                      color: { red: 0.9, green: 0.7, blue: 0.7 },
+                      type: 'MAX'
+                    }
+                  }
+                }
               }
             }
-          }]
-        },
-        auth: auth,
-        key: process.env.GOOGLE_API_KEY
+          ]
+        }
       });
-      return {
-        id: spreadsheetId,
-        url: spreadsheetUrl,
-        created: true
-      };
     }
-  } catch (error) {
+  } catch (err) {
     // If header row doesn't exist, just set it
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: `${sheetName}!A1:S1`, // Adjusted range to include new headers
+      range: `${sheetName}!A1:Q1`,
       valueInputOption: 'RAW',
       resource: { values: [correctHeaders] },
     });
@@ -358,7 +467,7 @@ async function getDefaultSheetId(accessToken) {
             title: 'SheetBills Invoices',
             gridProperties: {
               rowCount: 1000,
-              columnCount: 19 // Adjusted columnCount
+              columnCount: 15
             }
           }
         }]
@@ -396,17 +505,12 @@ async function getDefaultSheetId(accessToken) {
       'Notes',             // 10
       'Template',          // 11
       'Status',            // 12
-      'Color',             // 13
-      'send_status',       // 14
-      'date_sent',         // 15
-      'reminders_sent',    // 16
-      'opened_status',     // 17 (new)
-      'date_opened'        // 18 (new)
+      'Color'              // 13 (new last column)
     ];
 
     await sheets.spreadsheets.values.update({
       spreadsheetId: newSheet.data.spreadsheetId,
-      range: `'SheetBills Invoices'!A1:S1`, // Adjusted range
+      range: `'SheetBills Invoices'!A1:N1`,
       valueInputOption: 'RAW',
       resource: { values: [headers] }
     });
@@ -1249,9 +1353,7 @@ app.post('/api/saveInvoice', async (req, res) => {
         invoiceData.color || '',
         'no', // send_status
         '', // date_sent
-        '0', // reminders_sent
-        'no', // opened_status
-        ''  // date_opened
+        '0' // reminders_sent
       ]
     ];
 
@@ -1259,7 +1361,7 @@ app.post('/api/saveInvoice', async (req, res) => {
     await ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName);
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: `${sheetName}!A:S`, // Adjusted range to include new columns
+      range: `${sheetName}!A:Q`,
       valueInputOption: 'USER_ENTERED',
       insertDataOption: 'INSERT_ROWS',
       resource: { values }
@@ -1680,16 +1782,14 @@ app.post('/api/update-invoice', async (req, res) => {
       invoiceData.color || '',
       invoiceData.send_status || 'no', // Preserve existing send_status
       invoiceData.date_sent || '', // Preserve existing date_sent
-      invoiceData.reminders_sent || '0', // Preserve existing reminders_sent
-      invoiceData.opened_status || 'no', // Preserve existing opened_status, default to 'no'
-      invoiceData.date_opened || ''  // Preserve existing date_opened, default to empty string
+      invoiceData.reminders_sent || '0' // Preserve existing reminders_sent
     ];
 
     // Update the row
     await ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName);
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: `${sheetName}!A${rowIndex + 1}:S${rowIndex + 1}`, // Adjusted range to include new columns
+      range: `${sheetName}!A${rowIndex + 1}:Q${rowIndex + 1}`,
       valueInputOption: 'USER_ENTERED',
       requestBody: {
         values: [updatedRow]
@@ -2296,7 +2396,7 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
               title: 'SheetBills Invoices',
               gridProperties: { 
                 rowCount: 1000, 
-                columnCount: 19, // Adjusted columnCount
+                columnCount: 17,
                 frozenRowCount: 1
               }
             }
@@ -2341,13 +2441,11 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
       'Invoice ID', 'Date', 'Due Date', 'Customer Name',
       'Customer Email', 'Customer Address', 'Items', 'Amount',
       'Tax', 'Discount', 'Notes', 'Template', 'Status', 'Color',
-      'send_status', 'date_sent', 'reminders_sent',
-      'opened_status', // Added
-      'date_opened'    // Added
+      'send_status', 'date_sent', 'reminders_sent'
     ];
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: 'SheetBills Invoices!A1:S1', // Adjusted range
+      range: 'SheetBills Invoices!A1:Q1',
       valueInputOption: 'RAW',
       requestBody: { values: [invoiceHeaders] }
     });
@@ -2554,7 +2652,7 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
                   startColumnIndex: 12,
                   endColumnIndex: 13
                 }],
-                  booleanRule: {
+                booleanRule: {
                   condition: {
                     type: 'TEXT_EQ',
                     values: [{ userEnteredValue: 'Overdue' }]
@@ -3516,10 +3614,7 @@ Thank you for doing business with us. Feel free to contact us if you have any qu
       logo: businessData.logo,
       shareableLink: shareUrl,
       from: from, // Use 'from' from request body
-      subject: subject, // Use 'subject' from request body
-      // Add invoiceId and sheetUrl as custom variables for Mailgun webhook tracking
-      'v:invoiceId': invoiceId,
-      'v:sheetUrl': sheetUrl
+      subject: subject // Use 'subject' from request body
     };
 
     // Send webhook to Make
@@ -3534,7 +3629,7 @@ Thank you for doing business with us. Feel free to contact us if you have any qu
       const rowIndex = rows.findIndex(r => r[0] === invoiceId) + 2; // +2 because we start from A2 and need 1-based index
       await sheets.spreadsheets.values.update({
         spreadsheetId,
-        range: `${sheetName}!O${rowIndex}:P${rowIndex}`, // Only update send_status and date_sent here
+        range: `${sheetName}!O${rowIndex}:P${rowIndex}`,
         valueInputOption: 'USER_ENTERED',
         requestBody: {
           values: [['yes', new Date().toISOString().split('T')[0]]]
@@ -3550,100 +3645,6 @@ Thank you for doing business with us. Feel free to contact us if you have any qu
     res.status(500).json({
       error: 'Failed to send invoice email',
       details: error.message
-    });
-  }
-});
-
-// New Mailgun Webhook Endpoint for 'Opened' events
-app.post('/api/mailgun-webhook-opened', async (req, res) => {
-  console.log('Mailgun Webhook Received:', req.body);
-
-  // IMPORTANT: For this to work, Make.com (or direct Mailgun integration)
-  // needs to pass 'invoiceId' and 'sheetUrl' as Mailgun User Variables (e.g., v:invoiceId, v:sheetUrl)
-  // when the email is initially sent.
-  const invoiceId = req.body['user-variables']?.invoiceId;
-  const sheetUrl = req.body['user-variables']?.sheetUrl;
-  const recipientEmail = req.body.recipient;
-
-  if (!invoiceId || !sheetUrl) {
-    console.warn('Mailgun webhook received, but missing invoiceId or sheetUrl in user-variables.', {
-      invoiceId: invoiceId,
-      sheetUrl: sheetUrl,
-      recipient: recipientEmail,
-      body: req.body
-    });
-    // Attempt to infer sheetUrl if not provided (less reliable)
-    // This would require fetching all master sheets and all invoices to find a match.
-    // For now, we'll return a 200 to avoid Mailgun retries for a valid format but missing data.
-    return res.status(200).json({ success: false, message: 'Missing required user-variables' });
-  }
-
-  try {
-    // Extract spreadsheet ID
-    const spreadsheetId = extractSheetIdFromUrl(sheetUrl);
-    if (!spreadsheetId) {
-      console.error('Invalid sheetUrl received from Mailgun webhook:', sheetUrl);
-      return res.status(400).json({ error: 'Invalid sheet URL' });
-    }
-
-    // Initialize Google Sheets API using service account (public endpoint)
-    const auth = new google.auth.GoogleAuth({
-      credentials: {
-        client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        private_key: process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      },
-      scopes: ['https://www.googleapis.com/auth/spreadsheets'], // Need write access
-    });
-    const sheets = google.sheets({ version: 'v4', auth });
-
-    // Get sheet metadata to determine the sheet name
-    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
-    const invoiceSheet = spreadsheet.data.sheets.find(
-      s => s.properties.title === "SheetBills Invoices"
-    );
-    if (!invoiceSheet) {
-      console.error('SheetBills Invoices tab not found in spreadsheet for Mailgun webhook:', spreadsheetId);
-      return res.status(404).json({ error: 'SheetBills Invoices tab not found' });
-    }
-    const sheetName = invoiceSheet.properties.title;
-
-    // Fetch invoice data to find the row index
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: `${sheetName}!A2:S`, // Fetch all relevant columns
-    });
-
-    const rows = response.data.values || [];
-    // Find the row by invoiceId and recipient email for robustness
-    const rowIndex = rows.findIndex(r => r[0] === invoiceId && r[4] === recipientEmail);
-
-    if (rowIndex === -1) {
-      console.warn('Invoice not found for Mailgun webhook (or recipient mismatch):', { invoiceId, recipientEmail });
-      return res.status(200).json({ success: false, message: 'Invoice not found or recipient mismatch' });
-    }
-
-    // Update opened_status and date_opened
-    const actualRowIndex = rowIndex + 2; // +2 because A2 is the first data row (0-indexed array + 1 for header)
-    const updateRange = `${sheetName}!R${actualRowIndex}:S${actualRowIndex}`;
-
-    await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range: updateRange,
-      valueInputOption: 'USER_ENTERED',
-      requestBody: {
-        values: [['yes', new Date().toISOString().split('T')[0]]] // Set opened_status to 'yes' and date_opened
-      },
-    });
-
-    console.log(`Invoice ${invoiceId} marked as opened.`);
-    res.status(200).json({ success: true, message: 'Invoice marked as opened' });
-
-  } catch (error) {
-    console.error('Error processing Mailgun opened webhook:', error);
-    res.status(500).json({ 
-      error: 'Failed to process webhook',
-      details: error.message,
-      googleError: error.response?.data || null
     });
   }
 });

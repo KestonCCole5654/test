@@ -4,9 +4,10 @@ import { Eye, DollarSign, FileText, Mail, Check } from 'lucide-react';
 interface InvoiceProgressBarProps {
   sendStatus?: string;
   paidStatus?: string;
+  openedStatus?: string;
 }
 
-const InvoiceProgressBar: React.FC<InvoiceProgressBarProps> = ({ sendStatus, paidStatus }) => {
+const InvoiceProgressBar: React.FC<InvoiceProgressBarProps> = ({ sendStatus, paidStatus, openedStatus }) => {
   const steps = [
     {
       label: 'Invoice Created',
@@ -22,7 +23,7 @@ const InvoiceProgressBar: React.FC<InvoiceProgressBarProps> = ({ sendStatus, pai
     },
     {
       label: 'Email Opened',
-      done: false,
+      done: openedStatus === 'yes',
       icon: Eye,
       description: 'Recipient viewed the invoice'
     },

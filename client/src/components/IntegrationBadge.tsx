@@ -23,7 +23,7 @@ const integrations = [
     src: "/mailgun-seeklogo.svg",
     alt: "Mailgun",
     name: "Mailgun",
-    bgColor: "bg-green-50",
+    bgColor: "bg-red-50",
   },
 ]
 

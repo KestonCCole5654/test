@@ -8,6 +8,7 @@ import cors from 'cors'; // Cross-Origin Resource Sharing middleware
 import { google } from 'googleapis'; // Google APIs client
 import { createClient } from '@supabase/supabase-js'; // Supabase client
 import { Resend } from 'resend';
+import crypto from 'crypto'; // For webhook signature verification
 
 dotenv.config(); // Load environment variables
 const app = express(); // Create Express app
@@ -17,6 +18,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Add this with other environment variables
 const MAKE_WEBHOOK_URL = process.env.MAKE_WEBHOOK_URL;
+const MAILGUN_SIGNING_KEY = process.env.MAILGUN_SIGNING_KEY;
 
 // ==========================
 // Middleware
@@ -30,6 +32,7 @@ app.use(cors({
 }));
 
 app.use(express.json()); // Parse JSON request bodies
+app.use(express.urlencoded({ extended: true }));
 // ==========================
 // Supabase Client
 // ==========================
@@ -213,12 +216,15 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
     'Color',
     'send_status',
     'date_sent',
-    'reminders_sent'
+    'reminders_sent',
+    'email_opened',
+    'email_opened_at',
+    'email_opened_count'
   ];
   try {
     const headerResp = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A1:Q1`,
+      range: `${sheetName}!A1:T1`,
     });
     const currentHeaders = headerResp.data.values ? headerResp.data.values[0] : [];
     // If headers are missing or don't match, update them
@@ -236,7 +242,7 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
     if (needsUpdate) {
       await sheets.spreadsheets.values.update({
         spreadsheetId,
-        range: `${sheetName}!A1:Q1`,
+        range: `${sheetName}!A1:T1`,
         valueInputOption: 'RAW',
         resource: { values: [correctHeaders] },
       });
@@ -343,8 +349,7 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
                       { userEnteredValue: 'Overdue' }
                     ]
                   },
-                  showCustomUi: true,
-                  strict: true
+                  showCustomUi: true
                 }
               }
             },
@@ -422,9 +427,9 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
     // If header row doesn't exist, just set it
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: `${sheetName}!A1:Q1`,
+      range: `${sheetName}!A1:T1`,
       valueInputOption: 'RAW',
-      resource: { values: [correctHeaders] },
+      resource: { values: [correctHeaders] }
     });
   }
 }
@@ -1353,7 +1358,10 @@ app.post('/api/saveInvoice', async (req, res) => {
         invoiceData.color || '',
         'no', // send_status
         '', // date_sent
-        '0' // reminders_sent
+        '0', // reminders_sent
+        'no', // email_opened
+        '', // email_opened_at
+        '0' // email_opened_count
       ]
     ];
 
@@ -1782,7 +1790,10 @@ app.post('/api/update-invoice', async (req, res) => {
       invoiceData.color || '',
       invoiceData.send_status || 'no', // Preserve existing send_status
       invoiceData.date_sent || '', // Preserve existing date_sent
-      invoiceData.reminders_sent || '0' // Preserve existing reminders_sent
+      invoiceData.reminders_sent || '0', // Preserve existing reminders_sent
+      invoiceData.email_opened || 'no', // Preserve existing email_opened
+      invoiceData.email_opened_at || '', // Preserve existing email_opened_at
+      invoiceData.email_opened_count || '0' // Preserve existing email_opened_count
     ];
 
     // Update the row
@@ -2441,11 +2452,12 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
       'Invoice ID', 'Date', 'Due Date', 'Customer Name',
       'Customer Email', 'Customer Address', 'Items', 'Amount',
       'Tax', 'Discount', 'Notes', 'Template', 'Status', 'Color',
-      'send_status', 'date_sent', 'reminders_sent'
+      'send_status', 'date_sent', 'reminders_sent',
+      'email_opened', 'email_opened_at', 'email_opened_count'
     ];
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: 'SheetBills Invoices!A1:Q1',
+      range: 'SheetBills Invoices!A1:T1',
       valueInputOption: 'RAW',
       requestBody: { values: [invoiceHeaders] }
     });
@@ -2616,8 +2628,7 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
                     { userEnteredValue: 'Overdue' }
                   ]
                 },
-                showCustomUi: true,
-                strict: true
+                showCustomUi: true
               }
             }
           },
@@ -3629,10 +3640,17 @@ Thank you for doing business with us. Feel free to contact us if you have any qu
       const rowIndex = rows.findIndex(r => r[0] === invoiceId) + 2; // +2 because we start from A2 and need 1-based index
       await sheets.spreadsheets.values.update({
         spreadsheetId,
-        range: `${sheetName}!O${rowIndex}:P${rowIndex}`,
+        range: `${sheetName}!O${rowIndex}:T${rowIndex}`,
         valueInputOption: 'USER_ENTERED',
         requestBody: {
-          values: [['yes', new Date().toISOString().split('T')[0]]]
+          values: [[
+            'yes', // send_status
+            new Date().toISOString().split('T')[0], // date_sent
+            '0', // reminders_sent
+            'no', // email_opened
+            '', // email_opened_at
+            '0' // email_opened_count
+          ]]
         }
       });
 
@@ -3645,6 +3663,118 @@ Thank you for doing business with us. Feel free to contact us if you have any qu
     res.status(500).json({
       error: 'Failed to send invoice email',
       details: error.message
+    });
+  }
+});
+
+// Add Mailgun webhook endpoint
+app.post('/api/mailgun/webhook', async (req, res) => {
+  try {
+    // Verify Mailgun webhook signature
+    const timestamp = req.body.timestamp;
+    const token = req.body.token;
+    const signature = req.body.signature;
+    
+    if (!timestamp || !token || !signature) {
+      return res.status(400).json({ error: 'Missing required signature parameters' });
+    }
+
+    // Verify signature using Mailgun signing key
+    const encodedToken = crypto
+      .createHmac('sha256', MAILGUN_SIGNING_KEY)
+      .update(timestamp.concat(token))
+      .digest('hex');
+    
+    if (encodedToken !== signature) {
+      console.error('Invalid webhook signature');
+      return res.status(401).json({ error: 'Invalid signature' });
+    }
+
+    // Process the tracking event
+    const { event, recipient, timestamp: eventTimestamp, message_id } = req.body;
+    
+    if (event === 'opened') {
+      // Extract invoice ID from message_id or custom variables
+      const invoiceId = req.body['user-variables']?.invoice_id;
+      
+      if (!invoiceId) {
+        console.error('No invoice ID found in webhook payload');
+        return res.status(400).json({ error: 'No invoice ID found' });
+      }
+
+      // Get Google token from request headers
+      const authHeader = req.headers.authorization;
+      if (!authHeader?.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Google authentication required' });
+      }
+      const googleToken = authHeader.split(' ')[1];
+
+      // Initialize Google Sheets API
+      const auth = new google.auth.OAuth2();
+      auth.setCredentials({ access_token: googleToken });
+      const sheets = google.sheets({ version: 'v4', auth });
+
+      // Get the sheet URL from the request or use a default
+      const sheetUrl = req.body['user-variables']?.sheet_url;
+      if (!sheetUrl) {
+        return res.status(400).json({ error: 'No sheet URL found' });
+      }
+
+      // Extract spreadsheet ID
+      const spreadsheetId = extractSheetIdFromUrl(sheetUrl);
+      if (!spreadsheetId) {
+        return res.status(400).json({ error: 'Invalid sheet URL' });
+      }
+
+      // Get sheet metadata
+      const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
+      const invoiceSheet = spreadsheet.data.sheets.find(
+        s => s.properties.title === "SheetBills Invoices"
+      );
+      if (!invoiceSheet) {
+        return res.status(404).json({ error: 'SheetBills Invoices tab not found' });
+      }
+      const sheetName = invoiceSheet.properties.title;
+
+      // Fetch current invoice data
+      const response = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: `${sheetName}!A2:T`,
+      });
+
+      const rows = response.data.values || [];
+      const rowIndex = rows.findIndex(r => r[0] === invoiceId);
+      
+      if (rowIndex === -1) {
+        return res.status(404).json({ error: 'Invoice not found' });
+      }
+
+      // Update tracking information
+      const updateRowIndex = rowIndex + 2; // +2 because we start from A2 and need 1-based index
+      const currentOpenCount = parseInt(rows[rowIndex][19] || '0');
+      
+      await sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range: `${sheetName}!R${updateRowIndex}:T${updateRowIndex}`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+          values: [[
+            'yes', // email_opened
+            new Date().toISOString(), // email_opened_at
+            (currentOpenCount + 1).toString() // email_opened_count
+          ]]
+        }
+      });
+
+      console.log(`Updated tracking info for invoice ${invoiceId}`);
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error processing Mailgun webhook:', error);
+    res.status(500).json({ 
+      error: 'Failed to process webhook',
+      details: error.message 
     });
   }
 });

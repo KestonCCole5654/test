@@ -344,13 +344,57 @@ export default function ReportsPage() {
               <AlertTitle>Error</AlertTitle>
               <AlertDescription>{revenueError}</AlertDescription>
             </Alert>
-          ) : (
+          ) : chartData && chartData.labels && chartData.labels.length > 0 ? (
             <div className="w-full min-h-[320px]">
-              {chartData && (revenueChartType === 'bar' ? (
+              {revenueChartType === 'bar' ? (
                 <Bar data={chartData} options={chartOptions} />
               ) : (
                 <Line data={chartData} options={chartOptions} />
-              ))}
+              )}
+            </div>
+          ) : (
+            <div className="w-full min-h-[320px] flex flex-col items-center justify-center">
+              <div className="mb-2 text-xs font-semibold text-green-700 uppercase tracking-wide">Example Revenue Chart (Mock Data)</div>
+              <div className="w-full max-w-2xl">
+                {revenueChartType === 'bar' ? (
+                  <Bar
+                    data={{
+                      labels: ['2025-06', '2025-07', '2025-08', '2025-09', '2025-10', '2025-11'],
+                      datasets: [
+                        {
+                          label: 'Revenue',
+                          data: [1200, 1800, 950, 2100, 1750, 2000],
+                          backgroundColor: 'rgba(16, 185, 129, 0.5)',
+                          borderColor: 'rgba(16, 185, 129, 1)',
+                          borderWidth: 2,
+                          fill: true,
+                          tension: 0.4,
+                        },
+                      ],
+                    }}
+                    options={chartOptions}
+                  />
+                ) : (
+                  <Line
+                    data={{
+                      labels: ['2025-06', '2025-07', '2025-08', '2025-09', '2025-10', '2025-11'],
+                      datasets: [
+                        {
+                          label: 'Revenue',
+                          data: [1200, 1800, 950, 2100, 1750, 2000],
+                          backgroundColor: 'rgba(16, 185, 129, 0.5)',
+                          borderColor: 'rgba(16, 185, 129, 1)',
+                          borderWidth: 2,
+                          fill: true,
+                          tension: 0.4,
+                        },
+                      ],
+                    }}
+                    options={chartOptions}
+                  />
+                )}
+              </div>
+              <div className="mt-4 text-gray-500 text-sm">No revenue data found for the selected period. Showing example chart.</div>
             </div>
           )}
         </CardContent>

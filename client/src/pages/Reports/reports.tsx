@@ -180,6 +180,19 @@ export default function ReportsPage() {
     window.URL.revokeObjectURL(url)
   }
 
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      title: { display: false },
+      tooltip: { mode: 'index' as const, intersect: false },
+    },
+    scales: {
+      x: { title: { display: true, text: 'Period' } },
+      y: { title: { display: true, text: 'Revenue ($)' }, beginAtZero: true },
+    },
+  };
+
   return (
     <div className="w-full font-onest max-w-7xl mx-auto mt-4">
       {/* Breadcrumb Navigation */}

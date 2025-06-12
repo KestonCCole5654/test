@@ -8,7 +8,6 @@ import cors from 'cors'; // Cross-Origin Resource Sharing middleware
 import { google } from 'googleapis'; // Google APIs client
 import { createClient } from '@supabase/supabase-js'; // Supabase client
 import { Resend } from 'resend';
-import crypto from 'crypto'; // For webhook signature verification
 
 dotenv.config(); // Load environment variables
 const app = express(); // Create Express app
@@ -18,7 +17,6 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Add this with other environment variables
 const MAKE_WEBHOOK_URL = process.env.MAKE_WEBHOOK_URL;
-const MAILGUN_SIGNING_KEY = process.env.MAILGUN_SIGNING_KEY;
 
 // ==========================
 // Middleware
@@ -32,7 +30,6 @@ app.use(cors({
 }));
 
 app.use(express.json()); // Parse JSON request bodies
-app.use(express.urlencoded({ extended: true }));
 // ==========================
 // Supabase Client
 // ==========================
@@ -216,202 +213,218 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
     'Color',
     'send_status',
     'date_sent',
-    'reminders_sent',
-    'email_opened',
-    'email_opened_at',
-    'email_opened_count'
+    'reminders_sent'
   ];
   try {
-    // Always update the header row to ensure correctness
-    await sheets.spreadsheets.values.update({
+    const headerResp = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A1:T1`,
-      valueInputOption: 'RAW',
-      resource: { values: [correctHeaders] },
+      range: `${sheetName}!A1:Q1`,
     });
+    const currentHeaders = headerResp.data.values ? headerResp.data.values[0] : [];
+    // If headers are missing or don't match, update them
+    let needsUpdate = false;
+    if (currentHeaders.length !== correctHeaders.length) {
+      needsUpdate = true;
+    } else {
+      for (let i = 0; i < correctHeaders.length; i++) {
+        if (currentHeaders[i] !== correctHeaders[i]) {
+          needsUpdate = true;
+          break;
+        }
+      }
+    }
+    if (needsUpdate) {
+      await sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range: `${sheetName}!A1:Q1`,
+        valueInputOption: 'RAW',
+        resource: { values: [correctHeaders] },
+      });
 
-    // Apply formatting and data validation
-    await sheets.spreadsheets.batchUpdate({
-      spreadsheetId,
-      requestBody: {
-        requests: [
-          // Format headers
-          {
-            repeatCell: {
-              range: {
-                sheetId: 0,
-                startRowIndex: 0,
-                endRowIndex: 1,
-                startColumnIndex: 0,
-                endColumnIndex: correctHeaders.length
-              },
-              cell: {
-                userEnteredFormat: {
-                  backgroundColor: { red: 0.2, green: 0.2, blue: 0.2 },
-                  textFormat: { 
-                    bold: true,
-                    foregroundColor: { red: 1, green: 1, blue: 1 }
-                  },
-                  horizontalAlignment: 'CENTER',
-                  verticalAlignment: 'MIDDLE'
-                }
-              },
-              fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)'
-            }
-          },
-          // Set column widths
-          {
-            updateDimensionProperties: {
-              range: {
-                sheetId: 0,
-                dimension: 'COLUMNS',
-                startIndex: 0,
-                endIndex: correctHeaders.length
-              },
-              properties: {
-                pixelSize: 150
-              },
-              fields: 'pixelSize'
-            }
-          },
-          // Format date columns
-          {
-            repeatCell: {
-              range: {
-                sheetId: 0,
-                startRowIndex: 1,
-                startColumnIndex: 1,
-                endColumnIndex: 3
-              },
-              cell: {
-                userEnteredFormat: {
-                  numberFormat: {
-                    type: 'DATE',
-                    pattern: 'yyyy-mm-dd'
-                  }
-                }
-              },
-              fields: 'userEnteredFormat.numberFormat'
-            }
-          },
-          // Format amount column
-          {
-            repeatCell: {
-              range: {
-                sheetId: 0,
-                startRowIndex: 1,
-                startColumnIndex: 7,
-                endColumnIndex: 8
-              },
-              cell: {
-                userEnteredFormat: {
-                  numberFormat: {
-                    type: 'CURRENCY',
-                    pattern: '"$"#,##0.00'
-                  }
-                }
-              },
-              fields: 'userEnteredFormat.numberFormat'
-            }
-          },
-          // Add data validation for status
-          {
-            setDataValidation: {
-              range: {
-                sheetId: 0,
-                startRowIndex: 1,
-                startColumnIndex: 12,
-                endColumnIndex: 13
-              },
-              rule: {
-                condition: {
-                  type: 'ONE_OF_LIST',
-                  values: [
-                    { userEnteredValue: 'Pending' },
-                    { userEnteredValue: 'Paid' },
-                    { userEnteredValue: 'Overdue' }
-                  ]
+      // Apply formatting and data validation
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId,
+        requestBody: {
+          requests: [
+            // Format headers
+            {
+              repeatCell: {
+                range: {
+                  sheetId: 0,
+                  startRowIndex: 0,
+                  endRowIndex: 1,
+                  startColumnIndex: 0,
+                  endColumnIndex: correctHeaders.length
                 },
-                showCustomUi: true
+                cell: {
+                  userEnteredFormat: {
+                    backgroundColor: { red: 0.2, green: 0.2, blue: 0.2 },
+                    textFormat: { 
+                      bold: true,
+                      foregroundColor: { red: 1, green: 1, blue: 1 }
+                    },
+                    horizontalAlignment: 'CENTER',
+                    verticalAlignment: 'MIDDLE'
+                  }
+                },
+                fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)'
               }
-            }
-          },
-          // Add conditional formatting for status
-          {
-            addConditionalFormatRule: {
-              rule: {
-                ranges: [{
+            },
+            // Set column widths
+            {
+              updateDimensionProperties: {
+                range: {
+                  sheetId: 0,
+                  dimension: 'COLUMNS',
+                  startIndex: 0,
+                  endIndex: correctHeaders.length
+                },
+                properties: {
+                  pixelSize: 150
+                },
+                fields: 'pixelSize'
+              }
+            },
+            // Format date columns
+            {
+              repeatCell: {
+                range: {
                   sheetId: 0,
                   startRowIndex: 1,
-                  startColumnIndex: 12,
-                  endColumnIndex: 13
-                }],
-                booleanRule: {
-                  condition: {
-                    type: 'TEXT_EQ',
-                    values: [{ userEnteredValue: 'Paid' }]
-                  },
-                  format: {
-                    backgroundColor: { red: 0.7, green: 0.9, blue: 0.7 }
+                  startColumnIndex: 1,
+                  endColumnIndex: 3
+                },
+                cell: {
+                  userEnteredFormat: {
+                    numberFormat: {
+                      type: 'DATE',
+                      pattern: 'yyyy-mm-dd'
+                    }
                   }
-                }
+                },
+                fields: 'userEnteredFormat.numberFormat'
               }
-            }
-          },
-          {
-            addConditionalFormatRule: {
-              rule: {
-                ranges: [{
-                  sheetId: 0,
-                  startRowIndex: 1,
-                  startColumnIndex: 12,
-                  endColumnIndex: 13
-                }],
-                booleanRule: {
-                  condition: {
-                    type: 'TEXT_EQ',
-                    values: [{ userEnteredValue: 'Overdue' }]
-                  },
-                  format: {
-                    backgroundColor: { red: 0.9, green: 0.7, blue: 0.7 }
-                  }
-                }
-              }
-            }
-          },
-          // Add conditional formatting for amounts
-          {
-            addConditionalFormatRule: {
-              rule: {
-                ranges: [{
+            },
+            // Format amount column
+            {
+              repeatCell: {
+                range: {
                   sheetId: 0,
                   startRowIndex: 1,
                   startColumnIndex: 7,
                   endColumnIndex: 8
-                }],
-                gradientRule: {
-                  minpoint: {
-                    color: { red: 0.7, green: 0.9, blue: 0.7 },
-                    type: 'MIN'
+                },
+                cell: {
+                  userEnteredFormat: {
+                    numberFormat: {
+                      type: 'CURRENCY',
+                      pattern: '"$"#,##0.00'
+                    }
+                  }
+                },
+                fields: 'userEnteredFormat.numberFormat'
+              }
+            },
+            // Add data validation for status
+            {
+              setDataValidation: {
+                range: {
+                  sheetId: 0,
+                  startRowIndex: 1,
+                  startColumnIndex: 12,
+                  endColumnIndex: 13
+                },
+                rule: {
+                  condition: {
+                    type: 'ONE_OF_LIST',
+                    values: [
+                      { userEnteredValue: 'Pending' },
+                      { userEnteredValue: 'Paid' },
+                      { userEnteredValue: 'Overdue' }
+                    ]
                   },
-                  maxpoint: {
-                    color: { red: 0.9, green: 0.7, blue: 0.7 },
-                    type: 'MAX'
+                  showCustomUi: true,
+                  strict: true
+                }
+              }
+            },
+            // Add conditional formatting for status
+            {
+              addConditionalFormatRule: {
+                rule: {
+                  ranges: [{
+                    sheetId: 0,
+                    startRowIndex: 1,
+                    startColumnIndex: 12,
+                    endColumnIndex: 13
+                  }],
+                  booleanRule: {
+                    condition: {
+                      type: 'TEXT_EQ',
+                      values: [{ userEnteredValue: 'Paid' }]
+                    },
+                    format: {
+                      backgroundColor: { red: 0.7, green: 0.9, blue: 0.7 }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              addConditionalFormatRule: {
+                rule: {
+                  ranges: [{
+                    sheetId: 0,
+                    startRowIndex: 1,
+                    startColumnIndex: 12,
+                    endColumnIndex: 13
+                  }],
+                  booleanRule: {
+                    condition: {
+                      type: 'TEXT_EQ',
+                      values: [{ userEnteredValue: 'Overdue' }]
+                    },
+                    format: {
+                      backgroundColor: { red: 0.9, green: 0.7, blue: 0.7 }
+                    }
+                  }
+                }
+              }
+            },
+            // Add conditional formatting for amounts
+            {
+              addConditionalFormatRule: {
+                rule: {
+                  ranges: [{
+                    sheetId: 0,
+                    startRowIndex: 1,
+                    startColumnIndex: 7,
+                    endColumnIndex: 8
+                  }],
+                  gradientRule: {
+                    minpoint: {
+                      color: { red: 0.7, green: 0.9, blue: 0.7 },
+                      type: 'MIN'
+                    },
+                    maxpoint: {
+                      color: { red: 0.9, green: 0.7, blue: 0.7 },
+                      type: 'MAX'
+                    }
                   }
                 }
               }
             }
-          }
-        ]
-      }
-    });
+          ]
+        }
+      });
+    }
   } catch (err) {
     // If header row doesn't exist, just set it
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: `${sheetName}!A1:T1`,
+      range: `${sheetName}!A1:Q1`,
       valueInputOption: 'RAW',
-      resource: { values: [correctHeaders] }
+      resource: { values: [correctHeaders] },
     });
   }
 }
@@ -1340,10 +1353,7 @@ app.post('/api/saveInvoice', async (req, res) => {
         invoiceData.color || '',
         'no', // send_status
         '', // date_sent
-        '0', // reminders_sent
-        'no', // email_opened
-        '', // email_opened_at
-        '0' // email_opened_count
+        '0' // reminders_sent
       ]
     ];
 
@@ -1728,7 +1738,7 @@ app.post('/api/update-invoice', async (req, res) => {
     // Get all data to find the exact row
     const fullResponse = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A:Q`, // Get all columns up to Q (17 columns)
+      range: `${sheetName}!A:M`, // Get all columns
     });
 
     const rows = fullResponse.data.values || [];
@@ -1772,10 +1782,7 @@ app.post('/api/update-invoice', async (req, res) => {
       invoiceData.color || '',
       invoiceData.send_status || 'no', // Preserve existing send_status
       invoiceData.date_sent || '', // Preserve existing date_sent
-      invoiceData.reminders_sent || '0', // Preserve existing reminders_sent
-      invoiceData.email_opened || 'no', // Preserve existing email_opened
-      invoiceData.email_opened_at || '', // Preserve existing email_opened_at
-      invoiceData.email_opened_count || '0' // Preserve existing email_opened_count
+      invoiceData.reminders_sent || '0' // Preserve existing reminders_sent
     ];
 
     // Update the row
@@ -2434,12 +2441,11 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
       'Invoice ID', 'Date', 'Due Date', 'Customer Name',
       'Customer Email', 'Customer Address', 'Items', 'Amount',
       'Tax', 'Discount', 'Notes', 'Template', 'Status', 'Color',
-      'send_status', 'date_sent', 'reminders_sent',
-      'email_opened', 'email_opened_at', 'email_opened_count'
+      'send_status', 'date_sent', 'reminders_sent'
     ];
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: 'SheetBills Invoices!A1:T1',
+      range: 'SheetBills Invoices!A1:Q1',
       valueInputOption: 'RAW',
       requestBody: { values: [invoiceHeaders] }
     });
@@ -2610,7 +2616,8 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
                     { userEnteredValue: 'Overdue' }
                   ]
                 },
-                showCustomUi: true
+                showCustomUi: true,
+                strict: true
               }
             }
           },
@@ -3600,7 +3607,8 @@ app.post('/api/send-invoice-email', async (req, res) => {
       dueDate: row[2],
       customerEmail: to, // Use 'to' from request body
       message: row[10] || `Dear ${row[3] || "Customer"},
-      Thank you for doing business with us. Feel free to contact us if you have any questions.`,
+
+Thank you for doing business with us. Feel free to contact us if you have any questions.`,
       companyName: businessData.companyName,
       businessEmail: businessData.email,
       logo: businessData.logo,
@@ -3621,17 +3629,10 @@ app.post('/api/send-invoice-email', async (req, res) => {
       const rowIndex = rows.findIndex(r => r[0] === invoiceId) + 2; // +2 because we start from A2 and need 1-based index
       await sheets.spreadsheets.values.update({
         spreadsheetId,
-        range: `${sheetName}!O${rowIndex}:T${rowIndex}`,
+        range: `${sheetName}!O${rowIndex}:P${rowIndex}`,
         valueInputOption: 'USER_ENTERED',
         requestBody: {
-          values: [[
-            'yes', // send_status
-            new Date().toISOString().split('T')[0], // date_sent
-            '0', // reminders_sent
-            'no', // email_opened
-            '', // email_opened_at
-            '0' // email_opened_count
-          ]]
+          values: [['yes', new Date().toISOString().split('T')[0]]]
         }
       });
 
@@ -3644,118 +3645,6 @@ app.post('/api/send-invoice-email', async (req, res) => {
     res.status(500).json({
       error: 'Failed to send invoice email',
       details: error.message
-    });
-  }
-});
-
-// Add Mailgun webhook endpoint
-app.post('/api/mailgun/webhook', async (req, res) => {
-  try {
-    // Verify Mailgun webhook signature
-    const timestamp = req.body.timestamp;
-    const token = req.body.token;
-    const signature = req.body.signature;
-    
-    if (!timestamp || !token || !signature) {
-      return res.status(400).json({ error: 'Missing required signature parameters' });
-    }
-
-    // Verify signature using Mailgun signing key
-    const encodedToken = crypto
-      .createHmac('sha256', MAILGUN_SIGNING_KEY)
-      .update(timestamp.concat(token))
-      .digest('hex');
-    
-    if (encodedToken !== signature) {
-      console.error('Invalid webhook signature');
-      return res.status(401).json({ error: 'Invalid signature' });
-    }
-
-    // Process the tracking event
-    const { event, recipient, timestamp: eventTimestamp, message_id } = req.body;
-    
-    if (event === 'opened') {
-      // Extract invoice ID from message_id or custom variables
-      const invoiceId = req.body['user-variables']?.invoice_id;
-      
-      if (!invoiceId) {
-        console.error('No invoice ID found in webhook payload');
-        return res.status(400).json({ error: 'No invoice ID found' });
-      }
-
-      // Get Google token from request headers
-      const authHeader = req.headers.authorization;
-      if (!authHeader?.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'Google authentication required' });
-      }
-      const googleToken = authHeader.split(' ')[1];
-
-      // Initialize Google Sheets API
-      const auth = new google.auth.OAuth2();
-      auth.setCredentials({ access_token: googleToken });
-      const sheets = google.sheets({ version: 'v4', auth });
-
-      // Get the sheet URL from the request or use a default
-      const sheetUrl = req.body['user-variables']?.sheet_url;
-      if (!sheetUrl) {
-        return res.status(400).json({ error: 'No sheet URL found' });
-      }
-
-      // Extract spreadsheet ID
-      const spreadsheetId = extractSheetIdFromUrl(sheetUrl);
-      if (!spreadsheetId) {
-        return res.status(400).json({ error: 'Invalid sheet URL' });
-      }
-
-      // Get sheet metadata
-      const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
-      const invoiceSheet = spreadsheet.data.sheets.find(
-        s => s.properties.title === "SheetBills Invoices"
-      );
-      if (!invoiceSheet) {
-        return res.status(404).json({ error: 'SheetBills Invoices tab not found' });
-      }
-      const sheetName = invoiceSheet.properties.title;
-
-      // Fetch current invoice data
-      const response = await sheets.spreadsheets.values.get({
-        spreadsheetId,
-        range: `${sheetName}!A2:T`,
-      });
-
-      const rows = response.data.values || [];
-      const rowIndex = rows.findIndex(r => r[0] === invoiceId);
-      
-      if (rowIndex === -1) {
-        return res.status(404).json({ error: 'Invoice not found' });
-      }
-
-      // Update tracking information
-      const updateRowIndex = rowIndex + 2; // +2 because we start from A2 and need 1-based index
-      const currentOpenCount = parseInt(rows[rowIndex][19] || '0');
-      
-      await sheets.spreadsheets.values.update({
-        spreadsheetId,
-        range: `${sheetName}!R${updateRowIndex}:T${updateRowIndex}`,
-        valueInputOption: 'USER_ENTERED',
-        requestBody: {
-          values: [[
-            'yes', // email_opened
-            new Date().toISOString(), // email_opened_at
-            (currentOpenCount + 1).toString() // email_opened_count
-          ]]
-        }
-      });
-
-      console.log(`Updated tracking info for invoice ${invoiceId}`);
-    }
-
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Error processing Mailgun webhook:', error);
-    res.status(500).json({ 
-      error: 'Failed to process webhook',
-      details: error.message 
     });
   }
 });

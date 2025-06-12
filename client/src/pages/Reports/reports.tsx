@@ -367,8 +367,6 @@ export default function ReportsPage() {
                           backgroundColor: 'rgba(16, 185, 129, 0.5)',
                           borderColor: 'rgba(16, 185, 129, 1)',
                           borderWidth: 2,
-                          fill: true,
-                          tension: 0.4,
                         },
                       ],
                     }}
@@ -385,8 +383,6 @@ export default function ReportsPage() {
                           backgroundColor: 'rgba(16, 185, 129, 0.5)',
                           borderColor: 'rgba(16, 185, 129, 1)',
                           borderWidth: 2,
-                          fill: true,
-                          tension: 0.4,
                         },
                       ],
                     }}

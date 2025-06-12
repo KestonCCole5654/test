@@ -20,12 +20,12 @@ const InvoiceProgressBar: React.FC<InvoiceProgressBarProps> = ({ sendStatus, pai
       icon: Mail,
       description: 'Invoice delivered to recipient'
     },
-    {
-      label: 'Email Opened',
-      done: false,
-      icon: Eye,
-      description: 'Recipient viewed the invoice'
-    },
+    // {
+    //   label: 'Email Opened',
+    //   done: false,
+    //   icon: Eye,
+    //   description: 'Recipient viewed the invoice'
+    // },
     {
       label: 'Payment Received',
       done: paidStatus === 'Paid',

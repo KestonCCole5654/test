@@ -91,6 +91,13 @@ export default function EmailInvoice() {
     fetchBusinessDetails();
   }, [supabase, toast]);
 
+  // Auto-fill emailData.from when businessData.email is loaded and not empty
+  useEffect(() => {
+    if (businessData.email && businessData.email !== emailData.from) {
+      setEmailData((prev) => ({ ...prev, from: businessData.email }));
+    }
+  }, [businessData.email]);
+
   // Always call hooks first!
   const [emailData, setEmailData] = useState<EmailData>(() => {
     const businessEmail = invoice?.businessEmail || "";
@@ -100,13 +107,24 @@ export default function EmailInvoice() {
     const amount = invoice?.amount || 0;
     const dueDate = invoice?.dueDate || "";
     const invoiceDate = invoice?.date || "";
+    const invoiceNumber = invoiceId || invoice?.invoiceNumber || "";
     return {
       to: customerEmail,
       from: businessEmail,
-      subject: `Invoice #: ${invoiceId || invoice?.invoiceNumber || ""}`,
+      subject: `${companyName} INVOICE #: ${invoiceNumber}`,
       message: `Dear ${customerName},\n\nThank you for doing business with us. Feel free to contact us if you have any questions.`,
     };
   });
+
+  // Keep subject in sync with business name and invoice number
+  useEffect(() => {
+    const companyName = invoice?.companyName || businessData.companyName || "";
+    const invoiceNumber = invoiceId || invoice?.invoiceNumber || "";
+    const newSubject = `${companyName} Invoice #: ${invoiceNumber}`;
+    if (emailData.subject !== newSubject) {
+      setEmailData((prev) => ({ ...prev, subject: newSubject }));
+    }
+  }, [businessData.companyName, invoiceId, invoice?.invoiceNumber]);
 
   if (!invoice) {
     return (

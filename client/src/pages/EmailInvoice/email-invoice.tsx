@@ -15,6 +15,7 @@ import {
 } from "../../components/ui/dropdown-menu";
 import axios from "axios";
 import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import { LoadingSpinner } from "../../components/ui/loadingSpinner";
 
 interface EmailData {
   to: string;
@@ -47,6 +48,7 @@ export default function EmailInvoice() {
   const [isLoading, setIsLoading] = useState(true);
   const [shareableLink, setShareableLink] = useState<string>("");
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   useEffect(() => {
     const fetchBusinessDetails = async () => {
@@ -179,24 +181,22 @@ export default function EmailInvoice() {
   };
 
   const handleSend = async () => {
+    setIsSendingEmail(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.provider_token) {
         throw new Error("Google authentication required");
       }
-
       const sheetUrl = localStorage.getItem("defaultSheetUrl");
       if (!sheetUrl) {
         throw new Error("No invoice spreadsheet selected");
       }
-
       // Generate the shareable link before sending the email
       const generatedLink = await generateShareableLink();
       if (!generatedLink) {
-        // If link generation failed, stop the send process
+        setIsSendingEmail(false);
         return;
       }
-
       const response = await axios.post(
         "https://sheetbills-server.vercel.app/api/send-invoice-email",
         {
@@ -213,18 +213,18 @@ export default function EmailInvoice() {
           },
         }
       );
-
       if (response.data.success) {
         toast({
           title: "Success",
           description: "Invoice email has been sent successfully.",
         });
-        // Pass the generated link to the confirmation page
+        setIsSendingEmail(false);
         navigate('/email-invoice/confirmation', { state: { invoice, shareableLink: generatedLink } });
       } else {
         throw new Error(response.data.error || "Failed to send invoice email");
       }
     } catch (error) {
+      setIsSendingEmail(false);
       console.error("Error sending invoice email:", error);
       toast({
         title: "Error",
@@ -302,22 +302,29 @@ export default function EmailInvoice() {
             <Button variant="outline" onClick={() => navigate(-1)}>
               Cancel
             </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button className="bg-green-800 text-white">Send Invoice</Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => toast({ title: 'WhatsApp', description: 'Pretend to send via WhatsApp!' })}>
-                  Send via WhatsApp
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleSend} disabled={isGeneratingLink}>
-                  Send via Email
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => toast({ title: 'SMS', description: 'Pretend to send via SMS!' })}>
-                  Send via SMS
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {isSendingEmail ? (
+              <div className="flex items-center justify-center px-4 py-2">
+                <LoadingSpinner />
+                <span className="ml-2 text-green-800 font-medium">Sending Email...</span>
+              </div>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button className="bg-green-800 text-white">Send Invoice</Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => toast({ title: 'WhatsApp', description: 'Pretend to send via WhatsApp!' })}>
+                    Send via WhatsApp
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSend} disabled={isGeneratingLink || isSendingEmail}>
+                    Send via Email
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => toast({ title: 'SMS', description: 'Pretend to send via SMS!' })}>
+                    Send via SMS
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
       </div>

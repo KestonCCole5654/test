@@ -1728,7 +1728,7 @@ app.post('/api/update-invoice', async (req, res) => {
     // Get all data to find the exact row
     const fullResponse = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A:M`, // Get all columns
+      range: `${sheetName}!A:Q`, // Get all columns up to Q (17 columns)
     });
 
     const rows = fullResponse.data.values || [];

@@ -21,6 +21,7 @@ import { addDays, format } from "date-fns"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert"
 import { supabase } from '../../lib/supabase'
+import { Bar, Line } from "react-chartjs-2"
 
 interface TaxReport {
   totalTax: number
@@ -46,6 +47,11 @@ export default function ReportsPage() {
   const [startDate, setStartDate] = useState<string>(format(addDays(new Date(), -30), 'yyyy-MM-dd'))
   const [endDate, setEndDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'))
   const [error, setError] = useState<string | null>(null)
+  const [revenuePeriod, setRevenuePeriod] = useState<string>("monthly")
+  const [revenueChartType, setRevenueChartType] = useState<string>("bar")
+  const [revenueLoading, setRevenueLoading] = useState<boolean>(false)
+  const [revenueError, setRevenueError] = useState<string | null>(null)
+  const [chartData, setChartData] = useState<any>(null)
 
   const fetchData = async () => {
     if (!startDate || !endDate) {
@@ -193,6 +199,77 @@ export default function ReportsPage() {
     },
   };
 
+  const fetchRevenueData = async () => {
+    setRevenueLoading(true)
+    setRevenueError(null)
+    setChartData(null)
+    
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      if (sessionError || !session) {
+        navigate("/sign-in")
+        return
+      }
+
+      const response = await axios.get(
+        `https://sheetbills-server.vercel.app/api/sheets/data?sheetUrl=${encodeURIComponent(localStorage.getItem("defaultSheetUrl") || "")}`,
+        {
+          headers: {
+            Authorization: `Bearer ${session.provider_token}`,
+            "x-supabase-token": session.access_token,
+          },
+        }
+      )
+
+      const data = response.data
+      console.log('API response data:', data)
+      if (!Array.isArray(data)) {
+        setRevenueError('Unexpected API response format. Please contact support.');
+        setRevenueLoading(false);
+        return;
+      }
+      const filteredInvoices = data.filter((invoice: any) => {
+        const invoiceDate = new Date(invoice.date)
+        return invoiceDate >= new Date(startDate) && invoiceDate <= new Date(endDate)
+      })
+
+      if (filteredInvoices.length === 0) {
+        setRevenueError("No invoices found for the selected date range")
+        return
+      }
+
+      const chartData = {
+        labels: filteredInvoices.map((invoice: any) => invoice.date),
+        datasets: [
+          {
+            label: 'Revenue',
+            data: filteredInvoices.map((invoice: any) => invoice.amount),
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1,
+          },
+        ],
+      }
+
+      setChartData(chartData)
+
+    } catch (error: any) {
+      console.error("Fetch error:", error)
+      setRevenueError(error.message || "Failed to generate revenue data")
+      toast({
+        title: "Error",
+        description: error.message || "Failed to generate revenue data",
+        variant: "destructive",
+      })
+    } finally {
+      setRevenueLoading(false)
+    }
+  }
+
+  const handleRevenueGenerate = () => {
+    fetchRevenueData()
+  }
+
   return (
     <div className="w-full font-onest max-w-7xl mx-auto mt-4">
       {/* Breadcrumb Navigation */}
@@ -215,6 +292,69 @@ export default function ReportsPage() {
         <h1 className="text-3xl font-onest font-medium text-gray-900">Reports</h1>
         <p className="text-gray-600 text-md">Generate and download reports for your business</p>
       </div>
+
+      {/* Revenue Report Section */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">Revenue Report</CardTitle>
+          <CardDescription>Visualize your revenue over time. Toggle between bar and line chart, and select the period granularity.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+            <div className="flex gap-2 items-center">
+              <Label htmlFor="revenue-period">Period:</Label>
+              <select
+                id="revenue-period"
+                value={revenuePeriod}
+                onChange={e => setRevenuePeriod(e.target.value as any)}
+                className="border rounded px-2 py-1 text-sm"
+              >
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="yearly">Yearly</option>
+              </select>
+            </div>
+            <div className="flex gap-2 items-center">
+              <Label htmlFor="revenue-chart-type">Chart Type:</Label>
+              <Button
+                variant={revenueChartType === 'bar' ? 'default' : 'outline'}
+                onClick={() => setRevenueChartType('bar')}
+                className="px-4"
+              >
+                Bar
+              </Button>
+              <Button
+                variant={revenueChartType === 'line' ? 'default' : 'outline'}
+                onClick={() => setRevenueChartType('line')}
+                className="px-4"
+              >
+                Line
+              </Button>
+            </div>
+          </div>
+          {revenueLoading ? (
+            <div className="flex flex-col items-center justify-center py-8">
+              <LoadingSpinner />
+              <p className="mt-4 text-sm text-gray-600">Loading revenue data...</p>
+            </div>
+          ) : revenueError ? (
+            <Alert variant="destructive" className="mb-6">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{revenueError}</AlertDescription>
+            </Alert>
+          ) : (
+            <div className="w-full min-h-[320px]">
+              {revenueChartType === 'bar' ? (
+                <Bar data={chartData} options={chartOptions} />
+              ) : (
+                <Line data={chartData} options={chartOptions} />
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Tax Report Section */}
       <Card className="mb-8">

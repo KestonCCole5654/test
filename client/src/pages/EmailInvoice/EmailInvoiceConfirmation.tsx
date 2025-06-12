@@ -11,6 +11,9 @@ export default function EmailInvoiceConfirmation() {
   console.log('Invoice data in EmailInvoiceConfirmation:', invoice);
   console.log('Shareable link in EmailInvoiceConfirmation:', shareableLink);
 
+  const subject = location.state?.subject || `${invoice.companyName} INVOICE #: ${invoice.invoiceNumber || invoice.id || ''}`;
+  const from = location.state?.from || invoice.businessEmail;
+
   function formatCurrency(amount: number): string {
     return amount?.toLocaleString("en-US", {
       minimumFractionDigits: 2,
@@ -97,9 +100,11 @@ export default function EmailInvoiceConfirmation() {
                 />
               )}
               <div className="text-xs text-gray-500 mb-2 border-b border-gray-200 pb-2">
-                From: {invoice.businessEmail}
+                From: {from}
                 <br />
                 To: {invoice.customer?.email}
+                <br />
+                <span className="block mt-1">Subject: {subject}</span>
               </div>
 
               <div className="text-green-800 font-medium text-xl mb-2 text-left">

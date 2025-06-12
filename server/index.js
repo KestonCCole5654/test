@@ -3561,7 +3561,7 @@ app.post('/api/send-invoice-email', async (req, res) => {
     // Fetch invoice data
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A2:Q`,
+      range: `${sheetName}!A2:T`, // Corrected range to A2:T
     });
 
     const rows = response.data.values || [];
@@ -3623,15 +3623,15 @@ app.post('/api/send-invoice-email', async (req, res) => {
     // Prepare webhook payload with keys matching template variables
     const webhookPayload = {
       invoiceNumber: invoiceId,
-      amount: (parseFloat(row[7]) || 0).toFixed(2),
-      dueDate: row[2],
+      amount: (parseFloat(row[7] || '0') || 0).toFixed(2), // Ensure amount is always a valid number
+      dueDate: row[2] || '', // Provide empty string if dueDate is undefined
       customerEmail: to, // Use 'to' from request body
       message: row[10] || `Dear ${row[3] || "Customer"},
 
 Thank you for doing business with us. Feel free to contact us if you have any questions.`,
-      companyName: businessData.companyName,
-      businessEmail: businessData.email,
-      logo: businessData.logo,
+      companyName: businessData.companyName || '', // Ensure empty string if undefined
+      businessEmail: businessData.email || '',     // Ensure empty string if undefined
+      logo: businessData.logo || '',             // Ensure empty string if undefined
       shareableLink: shareUrl,
       from: from, // Use 'from' from request body
       subject: subject // Use 'subject' from request body

@@ -346,11 +346,11 @@ export default function ReportsPage() {
             </Alert>
           ) : (
             <div className="w-full min-h-[320px]">
-              {revenueChartType === 'bar' ? (
+              {chartData && (revenueChartType === 'bar' ? (
                 <Bar data={chartData} options={chartOptions} />
               ) : (
                 <Line data={chartData} options={chartOptions} />
-              )}
+              ))}
             </div>
           )}
         </CardContent>

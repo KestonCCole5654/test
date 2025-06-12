@@ -977,7 +977,7 @@ app.get('/api/invoices/:invoiceId', async (req, res) => {
     // Fetch all invoice rows
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A2:T`, // Changed range to A2:T to fetch email tracking columns
+      range: `${sheetName}!A2:Q`, // Changed from A2:N to A2:Q to fetch send_status and date_sent
     });
 
     const rows = response.data.values || [];
@@ -1013,12 +1013,9 @@ app.get('/api/invoices/:invoiceId', async (req, res) => {
       template: row[11] || 'classic',
       status: row[12] || 'Pending',
       color: (row[13] && row[13].trim() !== "") ? row[13] : '#166534',
-      send_status: row[14] || 'no',
-      date_sent: row[15] || '',
-      reminders_sent: parseInt(row[16] || '0'),
-      email_opened: row[17] || 'no', // Added email_opened
-      email_opened_at: row[18] || '', // Added email_opened_at
-      email_opened_count: parseInt(row[19] || '0') // Added email_opened_count
+      send_status: row[14] || 'no', // Added send_status
+      date_sent: row[15] || '',    // Added date_sent
+      reminders_sent: parseInt(row[16] || '0') // Added reminders_sent
     };
 
     // Get business details
@@ -1122,14 +1119,14 @@ app.get('/api/sheets/data', async (req, res) => {
     // Fetch data with dynamic sheet name
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A2:T`, // Updated range to A2:T
+      range: `${sheetName}!A2:N`,
     });
 
     // Process rows with validation
     const rawRows = response.data.values || [];
     const rows = rawRows
-      .filter(row => row.length >= 10) // Minimum required columns (still 10 for basic invoice data)
-      .map(row => row.slice(0, 20)); // Ensure max 20 columns (including new tracking columns)
+      .filter(row => row.length >= 10) // Minimum required columns
+      .map(row => row.slice(0, 14)); // Ensure max 14 columns (including color)
 
     console.log(`[Google Sheets] Processing ${rows.length} valid invoice rows`);
 
@@ -1203,13 +1200,7 @@ app.get('/api/sheets/data', async (req, res) => {
           notes: row[10]?.toString() || '',
           template: ['classic', 'modern'].includes(row[11]) ? row[11] : 'classic',
           status: ['Pending', 'Paid', 'Overdue'].includes(row[12]) ? row[12] : 'Pending',
-          color: (row[13] && row[13].trim() !== "") ? row[13] : '#166534',
-          send_status: row[14]?.toString() || 'no', // Ensure string type
-          date_sent: row[15]?.toString() || '', // Ensure string type
-          reminders_sent: parseInt(row[16]?.toString() || '0'), // Ensure integer type
-          email_opened: row[17]?.toString() || 'no', // Added email_opened
-          email_opened_at: row[18]?.toString() || '', // Added email_opened_at
-          email_opened_count: parseInt(row[19]?.toString() || '0') // Added email_opened_count
+          color: (row[13] && row[13].trim() !== "") ? row[13] : '#166534' // Add color field
         };
       } catch (error) {
         console.error(`Error processing row ${index + 1}:`, error);
@@ -2462,11 +2453,11 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
       'Customer Email', 'Customer Address', 'Items', 'Amount',
       'Tax', 'Discount', 'Notes', 'Template', 'Status', 'Color',
       'send_status', 'date_sent', 'reminders_sent',
-      'email_opened', 'email_opened_at', 'email_opened_count' // Added new headers
+      'email_opened', 'email_opened_at', 'email_opened_count'
     ];
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: 'SheetBills Invoices!A1:T1', // Updated range to T1
+      range: 'SheetBills Invoices!A1:T1',
       valueInputOption: 'RAW',
       requestBody: { values: [invoiceHeaders] }
     });
@@ -2504,17 +2495,17 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
           // Format invoice sheet headers
           {
             repeatCell: {
-              range: {
-                sheetId: invoiceSheetId,
-                startRowIndex: 0,
+              range: { 
+                sheetId: invoiceSheetId, 
+                startRowIndex: 0, 
                 endRowIndex: 1,
                 startColumnIndex: 0,
-                endColumnIndex: invoiceHeaders.length // Uses updated length
+                endColumnIndex: invoiceHeaders.length
               },
               cell: {
                 userEnteredFormat: {
                   backgroundColor: { red: 0.2, green: 0.2, blue: 0.2 },
-                  textFormat: {
+                  textFormat: { 
                     bold: true,
                     foregroundColor: { red: 1, green: 1, blue: 1 }
                   },
@@ -2528,9 +2519,9 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
           // Format business details sheet headers
           {
             repeatCell: {
-              range: {
-                sheetId: businessSheetId,
-                startRowIndex: 0,
+              range: { 
+                sheetId: businessSheetId, 
+                startRowIndex: 0, 
                 endRowIndex: 1,
                 startColumnIndex: 0,
                 endColumnIndex: 3
@@ -2538,7 +2529,7 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
               cell: {
                 userEnteredFormat: {
                   backgroundColor: { red: 0.2, green: 0.2, blue: 0.2 },
-                  textFormat: {
+                  textFormat: { 
                     bold: true,
                     foregroundColor: { red: 1, green: 1, blue: 1 }
                   },
@@ -2556,7 +2547,7 @@ async function createUnifiedBusinessSheet(accessToken, businessData) {
                 sheetId: invoiceSheetId,
                 dimension: 'COLUMNS',
                 startIndex: 0,
-                endIndex: invoiceHeaders.length // Uses updated length
+                endIndex: invoiceHeaders.length
               },
               properties: {
                 pixelSize: 150
@@ -3561,7 +3552,7 @@ app.post('/api/send-invoice-email', async (req, res) => {
     // Fetch invoice data
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A2:T`, // Corrected range to A2:T
+      range: `${sheetName}!A2:Q`,
     });
 
     const rows = response.data.values || [];
@@ -3623,15 +3614,15 @@ app.post('/api/send-invoice-email', async (req, res) => {
     // Prepare webhook payload with keys matching template variables
     const webhookPayload = {
       invoiceNumber: invoiceId,
-      amount: (parseFloat(row[7] || '0') || 0).toFixed(2), // Ensure amount is always a valid number
-      dueDate: row[2] || '', // Provide empty string if dueDate is undefined
+      amount: (parseFloat(row[7]) || 0).toFixed(2),
+      dueDate: row[2],
       customerEmail: to, // Use 'to' from request body
       message: row[10] || `Dear ${row[3] || "Customer"},
 
 Thank you for doing business with us. Feel free to contact us if you have any questions.`,
-      companyName: businessData.companyName || '', // Ensure empty string if undefined
-      businessEmail: businessData.email || '',     // Ensure empty string if undefined
-      logo: businessData.logo || '',             // Ensure empty string if undefined
+      companyName: businessData.companyName,
+      businessEmail: businessData.email,
+      logo: businessData.logo,
       shareableLink: shareUrl,
       from: from, // Use 'from' from request body
       subject: subject // Use 'subject' from request body

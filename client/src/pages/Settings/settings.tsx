@@ -657,9 +657,12 @@ export default function SettingsPage() {
           </div>
           {/* Lynk */}
           <div className="flex flex-col items-center bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-            <img src="https://logo.clearbit.com/lynk.co" alt="Lynk Logo" className="h-10 mb-3" />
+            {/* <img src="https://logo.clearbit.com/lynk.co" alt="Lynk Logo" className="h-10 mb-3" /> */}
+            <div className="h-10 mb-3 flex items-center justify-center w-full">
+              <span className="text-gray-400 text-sm font-semibold">Coming Soon</span>
+            </div>
             <div className="font-semibold text-lg mb-2">Lynk</div>
-            <Button variant="outline" className="w-full" disabled>Connect</Button>
+            {/* <Button variant="outline" className="w-full" disabled>Connect</Button> */}
           </div>
           {/* PayPal */}
           <div className="flex flex-col items-center bg-white border border-gray-200 rounded-lg p-6 shadow-sm">

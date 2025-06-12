@@ -222,207 +222,189 @@ async function ensureInvoiceSheetHeaders(sheets, spreadsheetId, sheetName) {
     'email_opened_count'
   ];
   try {
-    const headerResp = await sheets.spreadsheets.values.get({
+    // Always update the header row to ensure correctness
+    await sheets.spreadsheets.values.update({
       spreadsheetId,
       range: `${sheetName}!A1:T1`,
+      valueInputOption: 'RAW',
+      resource: { values: [correctHeaders] },
     });
-    const currentHeaders = headerResp.data.values ? headerResp.data.values[0] : [];
-    // If headers are missing or don't match, update them
-    let needsUpdate = false;
-    if (currentHeaders.length !== correctHeaders.length) {
-      needsUpdate = true;
-    } else {
-      for (let i = 0; i < correctHeaders.length; i++) {
-        if (currentHeaders[i] !== correctHeaders[i]) {
-          needsUpdate = true;
-          break;
-        }
-      }
-    }
-    if (needsUpdate) {
-      await sheets.spreadsheets.values.update({
-        spreadsheetId,
-        range: `${sheetName}!A1:T1`,
-        valueInputOption: 'RAW',
-        resource: { values: [correctHeaders] },
-      });
 
-      // Apply formatting and data validation
-      await sheets.spreadsheets.batchUpdate({
-        spreadsheetId,
-        requestBody: {
-          requests: [
-            // Format headers
-            {
-              repeatCell: {
-                range: {
-                  sheetId: 0,
-                  startRowIndex: 0,
-                  endRowIndex: 1,
-                  startColumnIndex: 0,
-                  endColumnIndex: correctHeaders.length
-                },
-                cell: {
-                  userEnteredFormat: {
-                    backgroundColor: { red: 0.2, green: 0.2, blue: 0.2 },
-                    textFormat: { 
-                      bold: true,
-                      foregroundColor: { red: 1, green: 1, blue: 1 }
-                    },
-                    horizontalAlignment: 'CENTER',
-                    verticalAlignment: 'MIDDLE'
+    // Apply formatting and data validation
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: {
+        requests: [
+          // Format headers
+          {
+            repeatCell: {
+              range: {
+                sheetId: 0,
+                startRowIndex: 0,
+                endRowIndex: 1,
+                startColumnIndex: 0,
+                endColumnIndex: correctHeaders.length
+              },
+              cell: {
+                userEnteredFormat: {
+                  backgroundColor: { red: 0.2, green: 0.2, blue: 0.2 },
+                  textFormat: { 
+                    bold: true,
+                    foregroundColor: { red: 1, green: 1, blue: 1 }
+                  },
+                  horizontalAlignment: 'CENTER',
+                  verticalAlignment: 'MIDDLE'
+                }
+              },
+              fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)'
+            }
+          },
+          // Set column widths
+          {
+            updateDimensionProperties: {
+              range: {
+                sheetId: 0,
+                dimension: 'COLUMNS',
+                startIndex: 0,
+                endIndex: correctHeaders.length
+              },
+              properties: {
+                pixelSize: 150
+              },
+              fields: 'pixelSize'
+            }
+          },
+          // Format date columns
+          {
+            repeatCell: {
+              range: {
+                sheetId: 0,
+                startRowIndex: 1,
+                startColumnIndex: 1,
+                endColumnIndex: 3
+              },
+              cell: {
+                userEnteredFormat: {
+                  numberFormat: {
+                    type: 'DATE',
+                    pattern: 'yyyy-mm-dd'
                   }
-                },
-                fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)'
-              }
-            },
-            // Set column widths
-            {
-              updateDimensionProperties: {
-                range: {
-                  sheetId: 0,
-                  dimension: 'COLUMNS',
-                  startIndex: 0,
-                  endIndex: correctHeaders.length
-                },
-                properties: {
-                  pixelSize: 150
-                },
-                fields: 'pixelSize'
-              }
-            },
-            // Format date columns
-            {
-              repeatCell: {
-                range: {
-                  sheetId: 0,
-                  startRowIndex: 1,
-                  startColumnIndex: 1,
-                  endColumnIndex: 3
-                },
-                cell: {
-                  userEnteredFormat: {
-                    numberFormat: {
-                      type: 'DATE',
-                      pattern: 'yyyy-mm-dd'
-                    }
+                }
+              },
+              fields: 'userEnteredFormat.numberFormat'
+            }
+          },
+          // Format amount column
+          {
+            repeatCell: {
+              range: {
+                sheetId: 0,
+                startRowIndex: 1,
+                startColumnIndex: 7,
+                endColumnIndex: 8
+              },
+              cell: {
+                userEnteredFormat: {
+                  numberFormat: {
+                    type: 'CURRENCY',
+                    pattern: '"$"#,##0.00'
                   }
+                }
+              },
+              fields: 'userEnteredFormat.numberFormat'
+            }
+          },
+          // Add data validation for status
+          {
+            setDataValidation: {
+              range: {
+                sheetId: 0,
+                startRowIndex: 1,
+                startColumnIndex: 12,
+                endColumnIndex: 13
+              },
+              rule: {
+                condition: {
+                  type: 'ONE_OF_LIST',
+                  values: [
+                    { userEnteredValue: 'Pending' },
+                    { userEnteredValue: 'Paid' },
+                    { userEnteredValue: 'Overdue' }
+                  ]
                 },
-                fields: 'userEnteredFormat.numberFormat'
+                showCustomUi: true
               }
-            },
-            // Format amount column
-            {
-              repeatCell: {
-                range: {
-                  sheetId: 0,
-                  startRowIndex: 1,
-                  startColumnIndex: 7,
-                  endColumnIndex: 8
-                },
-                cell: {
-                  userEnteredFormat: {
-                    numberFormat: {
-                      type: 'CURRENCY',
-                      pattern: '"$"#,##0.00'
-                    }
-                  }
-                },
-                fields: 'userEnteredFormat.numberFormat'
-              }
-            },
-            // Add data validation for status
-            {
-              setDataValidation: {
-                range: {
+            }
+          },
+          // Add conditional formatting for status
+          {
+            addConditionalFormatRule: {
+              rule: {
+                ranges: [{
                   sheetId: 0,
                   startRowIndex: 1,
                   startColumnIndex: 12,
                   endColumnIndex: 13
-                },
-                rule: {
+                }],
+                booleanRule: {
                   condition: {
-                    type: 'ONE_OF_LIST',
-                    values: [
-                      { userEnteredValue: 'Pending' },
-                      { userEnteredValue: 'Paid' },
-                      { userEnteredValue: 'Overdue' }
-                    ]
+                    type: 'TEXT_EQ',
+                    values: [{ userEnteredValue: 'Paid' }]
                   },
-                  showCustomUi: true
-                }
-              }
-            },
-            // Add conditional formatting for status
-            {
-              addConditionalFormatRule: {
-                rule: {
-                  ranges: [{
-                    sheetId: 0,
-                    startRowIndex: 1,
-                    startColumnIndex: 12,
-                    endColumnIndex: 13
-                  }],
-                  booleanRule: {
-                    condition: {
-                      type: 'TEXT_EQ',
-                      values: [{ userEnteredValue: 'Paid' }]
-                    },
-                    format: {
-                      backgroundColor: { red: 0.7, green: 0.9, blue: 0.7 }
-                    }
-                  }
-                }
-              }
-            },
-            {
-              addConditionalFormatRule: {
-                rule: {
-                  ranges: [{
-                    sheetId: 0,
-                    startRowIndex: 1,
-                    startColumnIndex: 12,
-                    endColumnIndex: 13
-                  }],
-                  booleanRule: {
-                    condition: {
-                      type: 'TEXT_EQ',
-                      values: [{ userEnteredValue: 'Overdue' }]
-                    },
-                    format: {
-                      backgroundColor: { red: 0.9, green: 0.7, blue: 0.7 }
-                    }
-                  }
-                }
-              }
-            },
-            // Add conditional formatting for amounts
-            {
-              addConditionalFormatRule: {
-                rule: {
-                  ranges: [{
-                    sheetId: 0,
-                    startRowIndex: 1,
-                    startColumnIndex: 7,
-                    endColumnIndex: 8
-                  }],
-                  gradientRule: {
-                    minpoint: {
-                      color: { red: 0.7, green: 0.9, blue: 0.7 },
-                      type: 'MIN'
-                    },
-                    maxpoint: {
-                      color: { red: 0.9, green: 0.7, blue: 0.7 },
-                      type: 'MAX'
-                    }
+                  format: {
+                    backgroundColor: { red: 0.7, green: 0.9, blue: 0.7 }
                   }
                 }
               }
             }
-          ]
-        }
-      });
-    }
+          },
+          {
+            addConditionalFormatRule: {
+              rule: {
+                ranges: [{
+                  sheetId: 0,
+                  startRowIndex: 1,
+                  startColumnIndex: 12,
+                  endColumnIndex: 13
+                }],
+                booleanRule: {
+                  condition: {
+                    type: 'TEXT_EQ',
+                    values: [{ userEnteredValue: 'Overdue' }]
+                  },
+                  format: {
+                    backgroundColor: { red: 0.9, green: 0.7, blue: 0.7 }
+                  }
+                }
+              }
+            }
+          },
+          // Add conditional formatting for amounts
+          {
+            addConditionalFormatRule: {
+              rule: {
+                ranges: [{
+                  sheetId: 0,
+                  startRowIndex: 1,
+                  startColumnIndex: 7,
+                  endColumnIndex: 8
+                }],
+                gradientRule: {
+                  minpoint: {
+                    color: { red: 0.7, green: 0.9, blue: 0.7 },
+                    type: 'MIN'
+                  },
+                  maxpoint: {
+                    color: { red: 0.9, green: 0.7, blue: 0.7 },
+                    type: 'MAX'
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    });
   } catch (err) {
     // If header row doesn't exist, just set it
     await sheets.spreadsheets.values.update({
@@ -3618,8 +3600,7 @@ app.post('/api/send-invoice-email', async (req, res) => {
       dueDate: row[2],
       customerEmail: to, // Use 'to' from request body
       message: row[10] || `Dear ${row[3] || "Customer"},
-
-Thank you for doing business with us. Feel free to contact us if you have any questions.`,
+      Thank you for doing business with us. Feel free to contact us if you have any questions.`,
       companyName: businessData.companyName,
       businessEmail: businessData.email,
       logo: businessData.logo,

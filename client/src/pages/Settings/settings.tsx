@@ -643,34 +643,12 @@ export default function SettingsPage() {
       {/* Payment Integrations Section */}
       <div className="mb-12 pl-8 pr-8">
         <h2 className="text-2xl font-onest font-medium text-gray-900 mb-1 flex items-center gap-2">
-          Payment Integrations
+          Payment Integrations (Coming Soon)
         </h2>
         <p className="text-sm font-onest font-normal text-gray-400 mb-6">
-          Connect your preferred payment providers to accept payments on your invoices.
+          You will be able to connect your preferred payment providers to accept payments on your invoices.
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {/* Stripe */}
-          <div className="flex flex-col items-center bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-            <img src="https://logo.clearbit.com/stripe.com" alt="Stripe Logo" className="h-10 mb-3" />
-            <div className="font-semibold text-lg mb-2">Stripe</div>
-            <Button variant="outline" className="w-full" disabled>Connect</Button>
-          </div>
-          {/* Lynk */}
-          <div className="flex flex-col items-center bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-            {/* <img src="https://logo.clearbit.com/lynk.co" alt="Lynk Logo" className="h-10 mb-3" /> */}
-            <div className="h-10 mb-3 flex items-center justify-center w-full">
-              <span className="text-gray-400 text-sm font-semibold">Coming Soon</span>
-            </div>
-            <div className="font-semibold text-lg mb-2">Lynk</div>
-            {/* <Button variant="outline" className="w-full" disabled>Connect</Button> */}
-          </div>
-          {/* PayPal */}
-          <div className="flex flex-col items-center bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-            <img src="https://logo.clearbit.com/paypal.com" alt="PayPal Logo" className="h-10 mb-3" />
-            <div className="font-semibold text-lg mb-2">PayPal</div>
-            <Button variant="outline" className="w-full" disabled>Connect</Button>
-          </div>
-        </div>
+       
       </div>
 
       {/* Terms & Privacy Policy Section */}

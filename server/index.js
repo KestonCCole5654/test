@@ -3618,62 +3618,75 @@ Thank you for doing business with us. Feel free to contact us if you have any qu
       subject: subject
     };
 
-    // Send webhook to Make
-    if (!MAKE_WEBHOOK_URL) {
-      throw new Error('Make webhook URL not configured');
-    }
+    let makeWebhookSuccess = false;
+    let makeWebhookError = null;
 
-    const webhookResponse = await axios.post(MAKE_WEBHOOK_URL, webhookPayload);
-
-    if (webhookResponse.status === 200) {
-      // Send email using Resend
-      const { data, error } = await resend.emails.send({
-        from: from,
-        to: to,
-        subject: subject,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            ${businessData.logo ? `<img src="${businessData.logo}" alt="${businessData.companyName}" style="max-height: 60px; margin-bottom: 20px;">` : ''}
-            <h1 style="color: #166534; margin-bottom: 20px;">${businessData.companyName}</h1>
-            <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-              <p style="margin: 0; color: #6b7280; font-size: 14px;">INVOICE # ${invoiceId}</p>
-              <h2 style="margin: 10px 0; color: #1f2937; font-size: 24px;">$${(parseFloat(row[7]) || 0).toFixed(2)}</h2>
-              <a href="${shareUrl}" style="display: inline-block; background-color: #1f2937; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin: 10px 0;">View/Print Invoice</a>
-              <p style="margin: 10px 0; color: #6b7280; font-size: 14px;">DUE ${row[2]}</p>
-            </div>
-            <div style="white-space: pre-line; margin-bottom: 20px;">${webhookPayload.message}</div>
-            <div style="text-align: center; color: #9ca3af; font-size: 14px; margin-top: 40px;">
-              Powered by <span style="font-weight: bold; color: #166534;">SheetBills</span> @sheetbills.com
-            </div>
-          </div>
-        `,
-      });
-
-      if (error) {
-        console.error('Resend API error:', error);
-        throw new Error('Failed to send email');
+    // Try to send webhook to Make
+    if (MAKE_WEBHOOK_URL) {
+      try {
+        const webhookResponse = await axios.post(MAKE_WEBHOOK_URL, webhookPayload);
+        makeWebhookSuccess = webhookResponse.status === 200;
+      } catch (error) {
+        console.error('Make webhook error:', error);
+        makeWebhookError = error.message;
       }
-
-      // Update invoice status in Google Sheet
-      const rowIndex = rows.findIndex(r => r[0] === invoiceId) + 2; // +2 because we start from A2 and need 1-based index
-      await sheets.spreadsheets.values.update({
-        spreadsheetId,
-        range: `${sheetName}!O${rowIndex}:P${rowIndex}`,
-        valueInputOption: 'USER_ENTERED',
-        requestBody: {
-          values: [['yes', new Date().toISOString().split('T')[0]]]
-        }
-      });
-
-      res.json({ success: true, message: 'Invoice email sent successfully' });
     } else {
-      throw new Error('Failed to send webhook to Make');
+      console.warn('Make webhook URL not configured');
     }
+
+    // Send email using Resend
+    const { data: resendData, error: resendError } = await resend.emails.send({
+      from: from,
+      to: to,
+      subject: subject,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          ${businessData.logo ? `<img src="${businessData.logo}" alt="${businessData.companyName}" style="max-height: 60px; margin-bottom: 20px;">` : ''}
+          <h1 style="color: #166534; margin-bottom: 20px;">${businessData.companyName}</h1>
+          <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <p style="margin: 0; color: #6b7280; font-size: 14px;">INVOICE # ${invoiceId}</p>
+            <h2 style="margin: 10px 0; color: #1f2937; font-size: 24px;">$${(parseFloat(row[7]) || 0).toFixed(2)}</h2>
+            <a href="${shareUrl}" style="display: inline-block; background-color: #1f2937; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin: 10px 0;">View/Print Invoice</a>
+            <p style="margin: 10px 0; color: #6b7280; font-size: 14px;">DUE ${row[2]}</p>
+          </div>
+          <div style="white-space: pre-line; margin-bottom: 20px;">${webhookPayload.message}</div>
+          <div style="text-align: center; color: #9ca3af; font-size: 14px; margin-top: 40px;">
+            Powered by <span style="font-weight: bold; color: #166534;">SheetBills</span> @sheetbills.com
+          </div>
+        </div>
+      `,
+    });
+
+    if (resendError) {
+      console.error('Resend API error:', resendError);
+      throw new Error(`Failed to send email: ${resendError.message}`);
+    }
+
+    // Update invoice status in Google Sheet
+    const rowIndex = rows.findIndex(r => r[0] === invoiceId) + 2; // +2 because we start from A2 and need 1-based index
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: `${sheetName}!O${rowIndex}:P${rowIndex}`,
+      valueInputOption: 'USER_ENTERED',
+      requestBody: {
+        values: [['yes', new Date().toISOString().split('T')[0]]]
+      }
+    });
+
+    // Return success response with webhook status
+    res.json({ 
+      success: true, 
+      message: 'Invoice email sent successfully',
+      makeWebhookStatus: makeWebhookSuccess ? 'success' : 'failed',
+      makeWebhookError: makeWebhookError
+    });
+
   } catch (error) {
     console.error('Error sending invoice email:', error);
     res.status(500).json({
       error: 'Failed to send invoice email',
-      details: error.message
+      details: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 });

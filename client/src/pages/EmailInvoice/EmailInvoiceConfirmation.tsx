@@ -100,8 +100,7 @@ export default function EmailInvoiceConfirmation() {
                 />
               )}
               <div className="text-xs text-gray-500 mb-2 border-b border-gray-200 pb-2">
-                From: {from}
-                <br />
+               
                 To: {invoice.customer?.email}
                 <br />
                 <span className="block mt-1">Subject: {subject}</span>

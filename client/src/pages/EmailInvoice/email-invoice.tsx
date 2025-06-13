@@ -232,12 +232,28 @@ export default function EmailInvoice() {
         }
       );
       if (response.data.success) {
-        toast({
-          title: "Success",
-          description: "Invoice email has been sent successfully.",
-        });
+        // Check if there were any issues with the Make webhook
+        if (response.data.makeWebhookStatus === 'failed') {
+          toast({
+            title: "Warning",
+            description: `Email sent successfully, but there was an issue with the webhook: ${response.data.makeWebhookError}`,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Success",
+            description: "Invoice email has been sent successfully.",
+          });
+        }
         setIsSendingEmail(false);
-        navigate('/email-invoice/confirmation', { state: { invoice, shareableLink: generatedLink } });
+        navigate('/email-invoice/confirmation', { 
+          state: { 
+            invoice, 
+            shareableLink: generatedLink,
+            from: emailData.from,
+            subject: emailData.subject
+          } 
+        });
       } else {
         throw new Error(response.data.error || "Failed to send invoice email");
       }
@@ -272,17 +288,6 @@ export default function EmailInvoice() {
             You can send this invoice to your customer via WhatsApp, email, or SMS. 
           </p>
           <div className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="from">From</Label>
-              <Input
-                id="from"
-                value={emailData.from}
-                onChange={(e) =>
-                  setEmailData({ ...emailData, from: e.target.value })
-                }
-                placeholder="your@email.com"
-              />
-            </div>
             <div className="grid gap-2">
               <Label htmlFor="to">To</Label>
               <Input
@@ -363,8 +368,7 @@ export default function EmailInvoice() {
             />
           )}
           <div className="text-xs text-gray-500 mb-2 border-b border-gray-200 pb-2">
-            From: {emailData.from}
-            <br />
+            {/* From: {emailData.from} <br /> */}
             To: {emailData.to}
           </div>
           {/* Logo and Company Name */}

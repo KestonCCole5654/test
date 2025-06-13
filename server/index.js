@@ -13,6 +13,7 @@ dotenv.config(); // Load environment variables
 const app = express(); // Create Express app
 const drive = google.drive('v3'); // Google Drive API
 
+// Initialize Resend
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Add this with other environment variables
@@ -3497,10 +3498,10 @@ app.delete('/api/customers/bulk-delete', async (req, res) => {
 // Add this new endpoint
 app.post('/api/send-invoice-email', async (req, res) => {
   try {
-    const { invoiceId, sheetUrl, from, to, subject } = req.body; // Added from, to, subject
+    const { invoiceId, sheetUrl, from, to, subject } = req.body;
 
     // Validate input
-    if (!invoiceId || !sheetUrl || !from || !to || !subject) { // Updated validation
+    if (!invoiceId || !sheetUrl || !from || !to || !subject) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
@@ -3605,7 +3606,7 @@ app.post('/api/send-invoice-email', async (req, res) => {
       invoiceNumber: invoiceId,
       amount: (parseFloat(row[7]) || 0).toFixed(2),
       dueDate: row[2],
-      customerEmail: to, // Use 'to' from request body
+      customerEmail: to,
       message: row[10] || `Dear ${row[3] || "Customer"},
 
 Thank you for doing business with us. Feel free to contact us if you have any questions.`,
@@ -3613,8 +3614,8 @@ Thank you for doing business with us. Feel free to contact us if you have any qu
       businessEmail: businessData.email,
       logo: businessData.logo,
       shareableLink: shareUrl,
-      from: from, // Use 'from' from request body
-      subject: subject // Use 'subject' from request body
+      from: from,
+      subject: subject
     };
 
     // Send webhook to Make
@@ -3625,6 +3626,34 @@ Thank you for doing business with us. Feel free to contact us if you have any qu
     const webhookResponse = await axios.post(MAKE_WEBHOOK_URL, webhookPayload);
 
     if (webhookResponse.status === 200) {
+      // Send email using Resend
+      const { data, error } = await resend.emails.send({
+        from: from,
+        to: to,
+        subject: subject,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            ${businessData.logo ? `<img src="${businessData.logo}" alt="${businessData.companyName}" style="max-height: 60px; margin-bottom: 20px;">` : ''}
+            <h1 style="color: #166534; margin-bottom: 20px;">${businessData.companyName}</h1>
+            <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+              <p style="margin: 0; color: #6b7280; font-size: 14px;">INVOICE # ${invoiceId}</p>
+              <h2 style="margin: 10px 0; color: #1f2937; font-size: 24px;">$${(parseFloat(row[7]) || 0).toFixed(2)}</h2>
+              <a href="${shareUrl}" style="display: inline-block; background-color: #1f2937; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin: 10px 0;">View/Print Invoice</a>
+              <p style="margin: 10px 0; color: #6b7280; font-size: 14px;">DUE ${row[2]}</p>
+            </div>
+            <div style="white-space: pre-line; margin-bottom: 20px;">${webhookPayload.message}</div>
+            <div style="text-align: center; color: #9ca3af; font-size: 14px; margin-top: 40px;">
+              Powered by <span style="font-weight: bold; color: #166534;">SheetBills</span> @sheetbills.com
+            </div>
+          </div>
+        `,
+      });
+
+      if (error) {
+        console.error('Resend API error:', error);
+        throw new Error('Failed to send email');
+      }
+
       // Update invoice status in Google Sheet
       const rowIndex = rows.findIndex(r => r[0] === invoiceId) + 2; // +2 because we start from A2 and need 1-based index
       await sheets.spreadsheets.values.update({

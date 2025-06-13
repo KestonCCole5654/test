@@ -3607,15 +3607,13 @@ app.post('/api/send-invoice-email', async (req, res) => {
       amount: (parseFloat(row[7]) || 0).toFixed(2),
       dueDate: row[2],
       customerEmail: to,
-      message: row[10] || `Dear ${row[3] || "Customer"},
-
-Thank you for doing business with us. Feel free to contact us if you have any questions.`,
+      message: row[10] || `Dear ${row[3] || "Customer"},\n\nThank you for doing business with us. Feel free to contact us if you have any questions.`,
       companyName: businessData.companyName,
       businessEmail: businessData.email,
       logo: businessData.logo,
       shareableLink: shareUrl,
-      from: from,
       subject: subject
+      // from: from, // REMOVED from webhook payload
     };
 
     let makeWebhookSuccess = false;

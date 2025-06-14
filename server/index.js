@@ -3498,10 +3498,10 @@ app.delete('/api/customers/bulk-delete', async (req, res) => {
 // Add this new endpoint
 app.post('/api/send-invoice-email', async (req, res) => {
   try {
-    const { invoiceId, sheetUrl, from, to, subject } = req.body;
+    const { invoiceId, sheetUrl, to, subject } = req.body;
 
     // Validate input
-    if (!invoiceId || !sheetUrl || !from || !to || !subject) {
+    if (!invoiceId || !sheetUrl || !to || !subject) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
@@ -3634,7 +3634,6 @@ app.post('/api/send-invoice-email', async (req, res) => {
 
     // Send email using Resend
     const { data: resendData, error: resendError } = await resend.emails.send({
-      from: from,
       to: to,
       subject: subject,
       html: `

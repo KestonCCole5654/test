@@ -19,7 +19,6 @@ import { LoadingSpinner } from "../../components/ui/loadingSpinner";
 
 interface EmailData {
   to: string;
-  from: string;
   subject: string;
   message: string;
 }
@@ -220,7 +219,6 @@ export default function EmailInvoice() {
         {
           invoiceId: invoiceId || invoice?.invoiceNumber,
           sheetUrl,
-          from: emailData.from,
           to: emailData.to,
           subject: emailData.subject
         },

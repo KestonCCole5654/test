@@ -91,21 +91,10 @@ export default function EmailInvoice() {
   }, [supabase, toast]);
 
   // Always call hooks first!
-  const [emailData, setEmailData] = useState<EmailData>(() => {
-    const businessEmail = invoice?.businessEmail || "";
-    const companyName = invoice?.companyName || "";
-    const customerEmail = invoice?.customer?.email || "";
-    const customerName = invoice?.customer?.name || "";
-    const amount = invoice?.amount || 0;
-    const dueDate = invoice?.dueDate || "";
-    const invoiceDate = invoice?.date || "";
-    const invoiceNumber = invoiceId || invoice?.invoiceNumber || "";
-    return {
-      to: customerEmail,
-      from: businessEmail,
-      subject: `${companyName} INVOICE #: ${invoiceNumber}`,
-      message: `Dear ${customerName},\n\nThank you for doing business with us. Feel free to contact us if you have any questions.`,
-    };
+  const [emailData, setEmailData] = useState<EmailData>({
+    to: '',
+    subject: '',
+    message: ''
   });
 
   // Keep subject in sync with business name and invoice number

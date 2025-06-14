@@ -8,6 +8,7 @@ import cors from 'cors'; // Cross-Origin Resource Sharing middleware
 import { google } from 'googleapis'; // Google APIs client
 import { createClient } from '@supabase/supabase-js'; // Supabase client
 import { Resend } from 'resend';
+import crypto from 'crypto';
 
 dotenv.config(); // Load environment variables
 const app = express(); // Create Express app
@@ -3551,19 +3552,6 @@ app.post('/api/send-invoice-email', async (req, res) => {
       return res.status(404).json({ error: 'Invoice not found' });
     }
 
-    // Generate shareable link
-    const expiresAt = Date.now() + 1000 * 60 * 60 * 24; // 24 hours from now
-    const shareToken = Buffer.from(`${invoiceId}:${expiresAt}`).toString('base64');
-    const shareUrl = `https://sheetbills-client.vercel.app/invoice/shared/${shareToken}?sheetUrl=${encodeURIComponent(sheetUrl)}`;
-
-    // Parse items, tax, discount
-    let items = [];
-    let tax = { type: 'percentage', value: 0 };
-    let discount = { type: 'percentage', value: 0 };
-    try { items = JSON.parse(row[6] || '[]'); } catch {}
-    try { tax = JSON.parse(row[8] || '{"type":"percentage","value":0}'); } catch {}
-    try { discount = JSON.parse(row[9] || '{"type":"percentage","value":0}'); } catch {}
-
     // Get business details
     const businessResponse = await sheets.spreadsheets.values.get({
       spreadsheetId,
@@ -3601,6 +3589,30 @@ app.post('/api/send-invoice-email', async (req, res) => {
       }
     });
 
+    // Generate shareable link
+    const expiresAt = Date.now() + 1000 * 60 * 60 * 24;
+    const shareToken = crypto.createHash('sha256')
+      .update(`${invoiceId}-${expiresAt}`)
+      .digest('hex');
+
+    // Store the token in the database
+    const { error: dbError } = await supabase
+      .from('shared_invoices')
+      .insert([
+        {
+          invoice_id: invoiceId,
+          token: shareToken,
+          expires_at: new Date(expiresAt).toISOString()
+        }
+      ]);
+
+    if (dbError) {
+      console.error('Error storing share token:', dbError);
+      return res.status(500).json({ error: 'Failed to create shareable link' });
+    }
+
+    const shareUrl = `${process.env.CLIENT_URL}/invoice/${invoiceId}/${shareToken}`;
+
     // Prepare webhook payload with keys matching template variables
     const webhookPayload = {
       invoiceNumber: invoiceId,
@@ -3613,55 +3625,20 @@ app.post('/api/send-invoice-email', async (req, res) => {
       logo: businessData.logo,
       shareableLink: shareUrl,
       subject: subject
-      // from: from, // REMOVED from webhook payload
     };
 
-    let makeWebhookSuccess = false;
-    let makeWebhookError = null;
-
-    // Try to send webhook to Make
-    if (MAKE_WEBHOOK_URL) {
-      try {
-        const webhookResponse = await axios.post(MAKE_WEBHOOK_URL, webhookPayload);
-        makeWebhookSuccess = webhookResponse.status === 200;
-      } catch (error) {
-        console.error('Make webhook error:', error);
-        makeWebhookError = error.message;
-      }
-    } else {
-      console.warn('Make webhook URL not configured');
+    // Send webhook to Make
+    if (!MAKE_WEBHOOK_URL) {
+      throw new Error('Make webhook URL not configured');
     }
 
-    // Send email using Resend
-    const { data: resendData, error: resendError } = await resend.emails.send({
-      from: 'noreply@sheetbills.com', // Default from address
-      to: to,
-      subject: subject,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          ${businessData.logo ? `<img src="${businessData.logo}" alt="${businessData.companyName}" style="max-height: 60px; margin-bottom: 20px;">` : ''}
-          <h1 style="color: #166534; margin-bottom: 20px;">${businessData.companyName}</h1>
-          <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-            <p style="margin: 0; color: #6b7280; font-size: 14px;">INVOICE # ${invoiceId}</p>
-            <h2 style="margin: 10px 0; color: #1f2937; font-size: 24px;">$${(parseFloat(row[7]) || 0).toFixed(2)}</h2>
-            <a href="${shareUrl}" style="display: inline-block; background-color: #1f2937; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin: 10px 0;">View/Print Invoice</a>
-            <p style="margin: 10px 0; color: #6b7280; font-size: 14px;">DUE ${row[2]}</p>
-          </div>
-          <div style="white-space: pre-line; margin-bottom: 20px;">${webhookPayload.message}</div>
-          <div style="text-align: center; color: #9ca3af; font-size: 14px; margin-top: 40px;">
-            Powered by <span style="font-weight: bold; color: #166534;">SheetBills</span> @sheetbills.com
-          </div>
-        </div>
-      `,
-    });
-
-    if (resendError) {
-      console.error('Resend API error:', resendError);
-      throw new Error(`Failed to send email: ${resendError.message}`);
+    const webhookResponse = await axios.post(MAKE_WEBHOOK_URL, webhookPayload);
+    if (webhookResponse.status !== 200) {
+      throw new Error('Failed to send webhook to Make');
     }
 
     // Update invoice status in Google Sheet
-    const rowIndex = rows.findIndex(r => r[0] === invoiceId) + 2; // +2 because we start from A2 and need 1-based index
+    const rowIndex = rows.findIndex(r => r[0] === invoiceId) + 2;
     await sheets.spreadsheets.values.update({
       spreadsheetId,
       range: `${sheetName}!O${rowIndex}:P${rowIndex}`,
@@ -3671,12 +3648,10 @@ app.post('/api/send-invoice-email', async (req, res) => {
       }
     });
 
-    // Return success response with webhook status
+    // Return success response
     res.json({ 
       success: true, 
-      message: 'Invoice email sent successfully',
-      makeWebhookStatus: makeWebhookSuccess ? 'success' : 'failed',
-      makeWebhookError: makeWebhookError
+      message: 'Invoice email sent successfully'
     });
 
   } catch (error) {

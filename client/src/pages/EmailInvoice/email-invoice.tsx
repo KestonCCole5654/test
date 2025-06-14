@@ -90,13 +90,6 @@ export default function EmailInvoice() {
     fetchBusinessDetails();
   }, [supabase, toast]);
 
-  // Auto-fill emailData.from when businessData.email is loaded and not empty
-  useEffect(() => {
-    if (businessData.email && businessData.email !== emailData.from) {
-      setEmailData((prev) => ({ ...prev, from: businessData.email }));
-    }
-  }, [businessData.email]);
-
   // Always call hooks first!
   const [emailData, setEmailData] = useState<EmailData>(() => {
     const businessEmail = invoice?.businessEmail || "";
@@ -248,7 +241,6 @@ export default function EmailInvoice() {
           state: { 
             invoice, 
             shareableLink: generatedLink,
-            from: emailData.from,
             subject: emailData.subject
           } 
         });

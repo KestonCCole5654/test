@@ -3595,22 +3595,6 @@ app.post('/api/send-invoice-email', async (req, res) => {
       .update(`${invoiceId}-${expiresAt}`)
       .digest('hex');
 
-    // Store the token in the database
-    const { error: dbError } = await supabase
-      .from('shared_invoices')
-      .insert([
-        {
-          invoice_id: invoiceId,
-          token: shareToken,
-          expires_at: new Date(expiresAt).toISOString()
-        }
-      ]);
-
-    if (dbError) {
-      console.error('Error storing share token:', dbError);
-      return res.status(500).json({ error: 'Failed to create shareable link' });
-    }
-
     const shareUrl = `${process.env.CLIENT_URL}/invoice/${invoiceId}/${shareToken}`;
 
     // Prepare webhook payload with keys matching template variables

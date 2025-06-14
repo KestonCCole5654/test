@@ -934,7 +934,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto font-onest mt-4 bg-gray-50/50">
+    <div className="w-full max-w-7xl md:p-0 px-4 py-4  md:px-0 md:py-0 mx-auto font-onest mt-4 bg-gray-50/50">
       {/* Breadcrumb Navigation */}
       <div className="mt-4 mb-6">
         <Breadcrumb>
@@ -996,7 +996,7 @@ export default function Dashboard() {
 
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
-        <div className="flex bg-gray-100 border border-gray-200">
+        <div className="flex md:bg-gray-100 bg-white border border-gray-200">
           {[
             { label: "All", value: "all" },
             { label: "Pending", value: "pending" },

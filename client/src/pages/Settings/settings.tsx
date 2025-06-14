@@ -358,7 +358,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="w-full font-onest max-w-7xl mx-auto mt-4 px-4">
+    <div className="w-full font-onest max-w-7xl mx-auto md:mt-4 md:px-4  px-2  ">
       {/* Breadcrumb Navigation and Page Title */}
       <div className="mb-8">
         <Breadcrumb>

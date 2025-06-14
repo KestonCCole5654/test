@@ -280,7 +280,7 @@ Thank you for doing business with us. Feel free to contact us if you have any qu
      
 
       {/* Left: Email Form */}
-      <div className="flex-1 flex items-center justify-center min-w-0 py-8">
+      <div className="flex-1 flex items-center justify-center min-w-0 md:py-8 md:px-0 py-8 px-4">
         <div className="w-full max-w-md">
           <h1 className="text-3xl font-bold text-left mb-1">Send Invoice</h1>
           <p className="text-sm text-gray-500 font-normal text-left mb-6">
@@ -352,7 +352,7 @@ Thank you for doing business with us. Feel free to contact us if you have any qu
       </div>
 
       {/* Right: Invoice Preview */}
-      <div className="flex-1 min-w-0 pt-10">
+      <div className="flex-1 min-w-0 pt-10 md:py-8 md:px-0 py-8 px-4">
         <div
           className="bg-transparent w-full mx-auto overflow-y-auto"
           style={{ maxHeight: "calc(100vh - 48px)" }}

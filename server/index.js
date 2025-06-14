@@ -2032,7 +2032,7 @@ app.post("/api/contact", async (req, res) => {
     // Send email using Resend
     try {
       const { data, error } = await resend.emails.send({
-        from: 'onboarding@resend.dev',
+        from: 'noreply@sheetbills.com', // Default from address
         to: email,
         subject: `[SheetBills Support] ${subject}`,
         html: `
@@ -3634,6 +3634,7 @@ app.post('/api/send-invoice-email', async (req, res) => {
 
     // Send email using Resend
     const { data: resendData, error: resendError } = await resend.emails.send({
+      from: 'noreply@sheetbills.com', // Default from address
       to: to,
       subject: subject,
       html: `

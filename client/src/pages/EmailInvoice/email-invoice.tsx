@@ -90,22 +90,42 @@ export default function EmailInvoice() {
     fetchBusinessDetails();
   }, [supabase, toast]);
 
+  // Auto-fill emailData.from when businessData.email is loaded and not empty
+  useEffect(() => {
+    if (businessData.email) {
+      // Any other business email related logic can go here
+    }
+  }, [businessData.email]);
+
   // Always call hooks first!
-  const [emailData, setEmailData] = useState<EmailData>({
-    to: '',
-    subject: '',
-    message: ''
+  const [emailData, setEmailData] = useState<EmailData>(() => {
+    const customerEmail = invoice?.customer?.email || "";
+    const customerName = invoice?.customer?.name || "";
+    const companyName = invoice?.companyName || businessData.companyName || ""; // Use businessData.companyName as fallback
+    const invoiceNumber = invoiceId || invoice?.invoiceNumber || "";
+    return {
+      to: customerEmail,
+      subject: `${companyName} Invoice #: ${invoiceNumber}`,
+      message: `Dear ${customerName},
+
+Thank you for doing business with us. Feel free to contact us if you have any questions.`,
+    };
   });
 
-  // Keep subject in sync with business name and invoice number
+  // Keep message in sync with customer name, and subject with business name and invoice number
   useEffect(() => {
     const companyName = invoice?.companyName || businessData.companyName || "";
     const invoiceNumber = invoiceId || invoice?.invoiceNumber || "";
-    const newSubject = `${companyName} Invoice #: ${invoiceNumber}`;
-    if (emailData.subject !== newSubject) {
-      setEmailData((prev) => ({ ...prev, subject: newSubject }));
-    }
-  }, [businessData.companyName, invoiceId, invoice?.invoiceNumber]);
+    const customerName = invoice?.customer?.name || "";
+
+    setEmailData((prev) => ({
+      ...prev,
+      subject: `${companyName} Invoice #: ${invoiceNumber}`,
+      message: `Dear ${customerName},
+
+Thank you for doing business with us. Feel free to contact us if you have any questions.`,
+    }));
+  }, [businessData.companyName, invoiceId, invoice?.invoiceNumber, invoice?.customer?.name]);
 
   if (!invoice) {
     return (

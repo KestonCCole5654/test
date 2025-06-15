@@ -92,7 +92,7 @@ const HeroSection = () => {
                   clip-rule="evenodd"
                 ></path>
               </svg>
-              Ditch formulas & templates
+              Seamless Google Sheets Integration
             </li>
             <li className="flex  items-center justify-center lg:justify-start gap-2">
               <svg
@@ -107,7 +107,7 @@ const HeroSection = () => {
                   clip-rule="evenodd"
                 ></path>
               </svg>
-              Centralized invoice management
+              Automated Invoice Generation
             </li>
             <li className="flex items-center justify-center lg:justify-start gap-2">
               <svg
@@ -122,7 +122,7 @@ const HeroSection = () => {
                   clip-rule="evenodd"
                 ></path>
               </svg>
-              Smart syncing with Google Drive
+              Easy Customer & Business Details Management
             </li>
           
           </ul>

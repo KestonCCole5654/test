@@ -34,29 +34,34 @@ const FeatureCard = ({ icon, title, description, delay = 0 }: FeatureCardProps) 
 const FeatureSection = () => {
   const featureCards = [
     {
+      icon: <FileTextIcon className="w-6 h-6" />,
+      title: "Effortless Invoice Creation",
+      description: "Generate professional invoices quickly with intuitive forms, no manual formatting required.",
+    },
+    {
       icon: <CircleDollarSign className="w-6 h-6" />,
-      title: "Fast Approvals",
-      description: "Get approved in as little as 24 hours—because we know time is valuable.",
+      title: "Automated Calculations",
+      description: "Automatically calculate totals, taxes, and discounts as you add items, ensuring accuracy.",
     },
     {
       icon: <Target className="w-6 h-6" />,
-      title: "Competitive Rates",
-      description: "Affordable interest rates designed to fit your budget and save you more.",
+      title: "Centralized Customer Management",
+      description: "Keep all your customer details organized and easily accessible for quick invoicing.",
     },
     {
-      icon: <FileCheck className="w-6 h-6" />,
-      title: "Transparent Terms",
-      description: "No hidden fees, no surprises. Understand your loan terms from the start.",
+      icon: <ZapIcon className="w-6 h-6" />,
+      title: "Instant Shareable Links",
+      description: "Create secure, public links for your invoices that clients can view and print instantly.",
     },
     {
-      icon: <GitFork className="w-6 h-6" />,
-      title: "Flexible Loan Options",
-      description: "Choose from personalized plans tailored to your needs, whether it's for personal, business, or home improvement.",
+      icon: <RefreshCwIcon className="w-6 h-6" />,
+      title: "Seamless Google Sheets Sync",
+      description: "All your invoice data is automatically synced to your Google Sheet in real-time.",
     },
     {
       icon: <Headphones className="w-6 h-6" />,
-      title: "24/7 Support",
-      description: "Our dedicated team is here to guide you at every step, anytime you need us.",
+      title: "Customizable Invoice Design",
+      description: "Personalize your invoices with your business logo and brand colors to match your identity.",
     },
   ];
 
@@ -78,7 +83,7 @@ const FeatureSection = () => {
             viewport={{ once: true }}
             className="text-3xl md:text-4xl font-normal mb-6 text-gray-900 leading-tight"
           >
-            Loans Made Simple, Fast, and Transparent.
+            Streamline Your Invoicing with SheetBills.
           </motion.h2>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -87,7 +92,7 @@ const FeatureSection = () => {
             transition={{ delay: 0.1 }}
             className="text-gray-600 font-sans text-lg max-w-2xl mx-auto"
           >
-            Empowering you to achieve your goals with flexible, reliable, and stress-free financing solutions.
+            Simplify your billing process, automate calculations, and manage client records all in one place, powered by Google Sheets.
           </motion.p>
         </div>
 

@@ -2,17 +2,17 @@ import React, { useState } from 'react';
 
 const steps = [
   {
-    title: '1. Connect your Google Account',
-    description: 'Securely link your Google Sheets to SheetBills. No coding required.',
+    title: '1. Connect Your Google Account',
+    description: 'Securely link SheetBills to your Google account. This grants access to Google Sheets and Drive files that SheetBills creates and manages, without any coding required from your side.',
     isOpen: true,
   },
   {
-    title: '2. Setup Business Details',
-    description: 'Enter your business name, address, and other details.',
+    title: '2. Set Up Your Business Details',
+    description: 'Easily enter your company name, business email, address, and phone number. This information is stored directly in your Google Sheet and automatically populates your invoices.',
   },
   {
-    title: '3. Customers generate invoices',
-    description: 'Enter your customer details and generate invoices.',
+    title: '3. Create & Manage Invoices',
+    description: 'Start generating professional invoices by entering customer details and itemizing your services. All data is automatically saved and organized in your connected Google Sheet.',
   },
 ];
 
@@ -25,7 +25,7 @@ const HowItWorksSection = () => {
           Get Started in Just 3 Simple Steps
         </h2>
         <p className="text-center text-[#2F303C] font-sans font-medium text-lg mb-12">SheetBills is designed to be simple and easy to use. Just follow these steps to get started.</p>
-        <div className="grid md:grid-cols-2  gap-12">
+        <div className="grid md:grid-cols-1 gap-12 max-w-2xl mx-auto">
           <div className="space-y-6">
             {steps.map((step, index) => (
               <details
@@ -49,6 +49,7 @@ const HowItWorksSection = () => {
               </details>
             ))}
           </div>
+          {/*
           <div className="hidden md:block">
             <img
               src="/placeholder-image.jpg"
@@ -56,6 +57,7 @@ const HowItWorksSection = () => {
               className="rounded-lg shadow-lg"
             />
           </div>
+          */}
         </div>
       </div>
     </section>

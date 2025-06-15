@@ -9,20 +9,20 @@ const PricingSection = () => {
     <section className="bg-gray-50 py-16 md:py-24 px-4" id="pricing">
       <div className="max-w-7xl mx-auto text-center">
         <h2 className="text-3xl text-[#2F303C] md:text-4xl font-normal mb-6">
-          Get Your SheetBills Free Plan
+          Start Streamlining Your Invoicing with SheetBills Free Plan
         </h2>
         <p className="text-[#2F303C] font-sans font-medium text-lg mb-12">
-          All the essentials for $0.00 — forever.
+          All the essential tools for professional invoicing, absolutely free.
           <span className="text-green-800 block mt-2">
-            Paid plans with advanced features are coming soon!
+            Paid plans with advanced features like advanced reporting and automation are coming soon!
           </span>
         </p>
         <div className="max-w-md mx-auto relative bg-white rounded-2xl border-2 border-green-800 p-6 md:p-8">
-          <div className="absolute font-sans font-medium text-lg -top-4 left-1/2 transform -translate-x-1/2 bg-green-800 text-white px-4 py-1 rounded-md ">
-            All Features Included
+          <div className="absolute font-sans font-medium text-lg -top-[14px] left-1/2 transform -translate-x-1/2 bg-green-800 text-white px-4 py-1 rounded-md z-20">
+            Core Features Included
           </div>
           <div className="mt-4 mb-8">
-            <div className="flex items-baseline justify-center">
+            <div className="flex items-baseline mt-4 justify-center">
               <span className="text-4xl md:text-5xl font-normal">$0.00</span>
               <span className="text-[#2F303C] ml-2">USD</span>
             </div>
@@ -30,7 +30,7 @@ const PricingSection = () => {
           <ul className="space-y-4 mb-8 text-left">
             <li className="flex items-center">
               <CheckIcon className="w-5 h-5 text-green-800 mr-2" />
-              <span className="font-sans font-medium text-lg">Unlimited invoices</span>
+              <span className="font-sans font-medium text-lg">Unlimited invoice creation & management</span>
             </li>
             <li className="flex items-center">
               <CheckIcon className="w-5 h-5 text-green-800 mr-2" />
@@ -38,12 +38,16 @@ const PricingSection = () => {
                 <span className="bg-green-100 font-sans font-medium text-lg  text-green-800 px-2 py-0.5 rounded mr-1">
                   Unlimited
                 </span>
-                Invoice Link Generation
+                Public Invoice Link Generation & Sharing
               </span>
             </li>
             <li className="flex items-center">
               <CheckIcon className="w-5 h-5 text-green-800 mr-2" />
-              <span className="font-sans font-medium text-lg"> Automatic formatting — no templates or formulas</span>
+              <span className="font-sans font-medium text-lg">Automated formatting, calculations, and Google Sheets sync</span>
+            </li>
+            <li className="flex items-center">
+              <CheckIcon className="w-5 h-5 text-green-800 mr-2" />
+              <span className="font-sans font-medium text-lg">Centralized customer and business details management</span>
             </li>
           </ul>
           <Button

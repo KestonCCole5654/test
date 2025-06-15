@@ -996,7 +996,7 @@ export default function Dashboard() {
 
       {/* Filter Tabs, Search, and Create Invoice Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-6">
-        <div className="flex md:bg-gray-100 bg-white border border-gray-200">
+        <div className="flex md:bg-gray-100 bg-white md:border md:border-gray-200  border-none">
           {[
             { label: "All", value: "all" },
             { label: "Pending", value: "pending" },

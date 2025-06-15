@@ -3595,7 +3595,7 @@ app.post('/api/send-invoice-email', async (req, res) => {
       .update(`${invoiceId}-${expiresAt}`)
       .digest('hex');
 
-    const shareUrl = `${process.env.CLIENT_URL}/invoice/${invoiceId}/${shareToken}`;
+    const shareUrl = `https://sheetbills-client.vercel.app/invoice/${invoiceId}/${shareToken}`;
 
     // Prepare webhook payload with keys matching template variables
     const webhookPayload = {

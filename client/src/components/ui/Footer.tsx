@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
@@ -11,9 +12,9 @@ export default function Footer() {
       </div>
       <div className="text-gray-400 font-onest text-sm mb-2">© {new Date().getFullYear()} SheetBills. All rights reserved.</div>
       <div className="flex items-center font-onest gap-3 text-gray-400 text-sm">
-        <a href="/privacy" className="hover:text-green-800 font-onest transition-colors">Privacy Policy</a>
+        <Link to="/privacy-policy" className="hover:text-green-800 font-onest transition-colors">Privacy Policy</Link>
         <span className="mx-1">|</span>
-        <a href="/terms" className="hover:text-green-800 font-onest transition-colors">Terms of Service</a>
+        <Link to="/terms-of-service" className="hover:text-green-800 font-onest transition-colors">Terms of Service</Link>
       </div>
     </footer>
   );

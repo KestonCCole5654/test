@@ -24,13 +24,13 @@ import AuthCallback from './pages/auth-callback'
 import PublicInvoice from "./pages/PublicInvoice/PublicInvoice";
 import PrintInvoice from './pages/PrintInvoice/print-invoice';
 import EmailInvoice from './pages/EmailInvoice/email-invoice';
-import LegalPage from './pages/Legal/legal';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 import LandingPage from './pages/Landing/page';
 import AccountStatus from './pages/AccountStatus/AccountStatus';
 import ReportsPage from "./pages/Reports/reports"
 import EmailInvoiceConfirmation from "./pages/EmailInvoice/EmailInvoiceConfirmation";
-
-
+import Footer from './components/Footer';
 
 function App() {
   const [user, setUser] = useState<any>(null);
@@ -195,61 +195,65 @@ function App() {
   return (
     <SessionContextProvider supabaseClient={supabase}>
     <HelmetProvider>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/auth-callback" element={<AuthCallback />} />
-        <Route path="/legal" element={<LegalPage />} />
-        <Route path="/account-status" element={<AccountStatus />} />
-    
-        {/* Onboarding Route */}
-        <Route
-          path="/Onboarding"
-          element={
-                <AuthenticatedRoute isLoading={loading}>
-              <OnboardingPage />
-            </AuthenticatedRoute>
-          }
-        />
+      <div className="flex flex-col min-h-screen">
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/auth-callback" element={<AuthCallback />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/account-status" element={<AccountStatus />} />
+      
+          {/* Onboarding Route */}
+          <Route
+            path="/Onboarding"
+            element={
+                  <AuthenticatedRoute isLoading={loading}>
+                <OnboardingPage />
+              </AuthenticatedRoute>
+            }
+          />
 
-        {/* Protected Routes */}
-        <Route
-          element={
-                <AuthenticatedRoute isLoading={loading}>
-              <SidebarLayout />
-            </AuthenticatedRoute>
-          }
-        >
-          <Route path="/invoices" element={<Dashboard />} />
-          <Route path="/create-invoice" element={<InvoiceForm />} />
-          <Route path="/email-invoice/:invoiceId" element={<EmailInvoice />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-            <Route path="/reports" element={<ReportsPage />} />
-        </Route>
+          {/* Protected Routes */}
+          <Route
+            element={
+                  <AuthenticatedRoute isLoading={loading}>
+                <SidebarLayout />
+              </AuthenticatedRoute>
+            }
+          >
+            <Route path="/invoices" element={<Dashboard />} />
+            <Route path="/create-invoice" element={<InvoiceForm />} />
+            <Route path="/email-invoice/:invoiceId" element={<EmailInvoice />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+              <Route path="/reports" element={<ReportsPage />} />
+          </Route>
 
-        {/* Public Invoice Route - must be after catch-all to take precedence */}
-        <Route path="/invoice/shared/:token" element={<PublicInvoice />} />
+          {/* Public Invoice Route - must be after catch-all to take precedence */}
+          <Route path="/invoice/shared/:token" element={<PublicInvoice />} />
 
-        {/* Add print-invoice route OUTSIDE the SidebarLayout group */}
-        <Route
-          path="/print-invoice/:invoiceId"
-          element={
-                <AuthenticatedRoute isLoading={loading}>
-              <PrintInvoice />
-            </AuthenticatedRoute>
-          }
-        />
+          {/* Add print-invoice route OUTSIDE the SidebarLayout group */}
+          <Route
+            path="/print-invoice/:invoiceId"
+            element={
+                  <AuthenticatedRoute isLoading={loading}>
+                <PrintInvoice />
+              </AuthenticatedRoute>
+            }
+          />
 
-        {/* Email Invoice Confirmation Route */}
-        <Route path="/email-invoice/confirmation" element={<EmailInvoiceConfirmation />} />
+          {/* Email Invoice Confirmation Route */}
+          <Route path="/email-invoice/confirmation" element={<EmailInvoiceConfirmation />} />
 
-        {/* Catch all route - redirect to landing page for unauthenticated users */}
-        <Route path="*" element={
-          <Navigate to={user ? "/invoices" : "/"} />
-        } />
-      </Routes>
+          {/* Catch all route - redirect to landing page for unauthenticated users */}
+          <Route path="*" element={
+            <Navigate to={user ? "/invoices" : "/"} />
+          } />
+        </Routes>
+        <Footer />
+      </div>
     </HelmetProvider>
     </SessionContextProvider>
   );

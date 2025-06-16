@@ -8,8 +8,6 @@ import HeroSection from '../../components/HeroSection';
 import HowItWorksSection from '../../components/HowItWorksSection';
 import PricingSection from '../../components/PricingSection';
 import FAQSection from '../../components/FAQSection';
-import FooterSection from '../../components/FooterSection';
-
 // Feature card data
 const featureCards = [
   {
@@ -61,7 +59,7 @@ const LandingPage = () => {
         <PricingSection />
         <FAQSection />
       </main>
-      <FooterSection />
+  
     </div>
   );
 };
